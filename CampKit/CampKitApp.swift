@@ -10,9 +10,10 @@ import SwiftData
 
 @main
 struct CampKitApp: App {
+    
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
-            Item.self,
+            Item.self, PackingList.self, Category.self
         ])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 
@@ -25,7 +26,10 @@ struct CampKitApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            HomeListView()
+                .onAppear {
+                    preloadPackingListData(context: sharedModelContainer.mainContext)
+                }
         }
         .modelContainer(sharedModelContainer)
     }
