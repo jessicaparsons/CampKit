@@ -10,11 +10,7 @@ import SwiftData
 
 struct HomeListView: View {
     @Environment(\.modelContext) private var modelContext
-//    @Query private var packingLists: [PackingList] // Fetch all UserList objects
-    
-    let packingLists: [PackingList] = [
-            PackingList(title: "Sequoia")
-        ]
+    @Query private var packingLists: [PackingList] // Fetch all PackingList objects
     
     let hapticFeedback = UINotificationFeedbackGenerator()
     

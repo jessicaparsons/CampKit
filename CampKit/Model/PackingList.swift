@@ -16,7 +16,7 @@ class PackingList {
     @Relationship(deleteRule: .cascade) var categories: [Category]
 
     init(title: String, photo: Data? = nil, dateCreated: Date = Date()) {
-        self.title = "Your Packing List"
+        self.title = title
         self.photo = photo
         self.dateCreated = dateCreated
         self.categories = []

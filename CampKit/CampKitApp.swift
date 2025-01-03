@@ -28,7 +28,9 @@ struct CampKitApp: App {
         WindowGroup {
             HomeListView()
                 .onAppear {
-                    preloadPackingListData(context: sharedModelContainer.mainContext)
+                    DispatchQueue.main.async {
+                        preloadPackingListData(context: sharedModelContainer.mainContext)
+                    }
                 }
         }
         .modelContainer(sharedModelContainer)

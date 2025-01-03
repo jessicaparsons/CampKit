@@ -41,47 +41,7 @@ struct ListView: View {
                     
                     List {
                         ForEach(packingList.categories) { category in
-                            Section(header: Text(category.name).font(.headline)) {
-                                
-                                //Iterate through items in the category
-                                ForEach(category.items) { item in
-                                    HStack {
-                                        Button(action: {
-                                            // Toggle completion state
-                                            if let index = category.items.firstIndex(where: { $0.id == item.id }) {
-                                                category.items[index].isPacked.toggle()
-                                                hapticFeedback.notificationOccurred(.success)
-                                            }
-                                        }) {
-                                            Image(systemName: item.isPacked ? "checkmark.circle.fill" : "circle")
-                                                .foregroundColor(item.isPacked ? .green : .gray)
-                                                .font(.system(size: 20))
-                                        }
-                                        .buttonStyle(BorderlessButtonStyle()) // Prevent button from triggering NavigationLink
-                                        
-                                        Text(item.title)
-                                            .foregroundColor(textColor(for: item))
-                                            .strikethrough(item.isPacked)
-                                            .italic(item.isPacked)
-                                    }//:HSTACK
-                                }//:FOREACH
-                                .onDelete { indexSet in
-                                    deleteItems(in: category, at: indexSet)
-                                }
-                                
-                                // Add new item to the category
-                                HStack {
-                                    Image(systemName: "plus.circle")
-                                        .foregroundColor(.gray)
-                                        .font(.title2)
-                                    TextField("Add new item", text: $item)
-                                        .textFieldStyle(.plain)
-                                        .onSubmit {
-                                            addItem(to: category)
-                                        }
-                                }//:HSTACK
-                                
-                            } //:SECTION
+                            CategorySectionView(category: category)
                             
                         }//:FOREACH
                     }//:LIST
@@ -90,16 +50,16 @@ struct ListView: View {
                                 ContentUnavailableView("Empty List", systemImage: "plus.circle", description: Text("Add some items to your list"))
                             }
                         }
-                        .toolbar {
-                            ToolbarItem(placement: .secondaryAction) {
-                                EditButton()
-                            }
-                            ToolbarItem {
-                                Button(action: addItem) {
-                                    Label("Add Item", systemImage: "plus")
-                                }
-                            }
-                        }
+//                        .toolbar {
+//                            ToolbarItem(placement: .secondaryAction) {
+//                                EditButton()
+//                            }
+//                            ToolbarItem {
+//                                Button(action: addItem) {
+//                                    Label("Add Item", systemImage: "plus")
+//                                }
+//                            }
+//                        }
                 } //:VSTACK
                 .background(Color(red: 0.949, green: 0.949, blue: 0.967))
             }//:VSTACK
