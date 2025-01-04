@@ -1,0 +1,23 @@
+{
+  "images" : [
+    {
+      "filename" : "Fingerprint of the Land - Olive - © Autumn Musick 2021.jpg",
+      "idiom" : "universal",
+      "scale" : "1x"
+    },
+    {
+      "filename" : "Fingerprint of the Land - Olive - © Autumn Musick 2022.jpg",
+      "idiom" : "universal",
+      "scale" : "2x"
+    },
+    {
+      "filename" : "Fingerprint of the Land - Olive - © Autumn Musick 2023.jpg",
+      "idiom" : "universal",
+      "scale" : "3x"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

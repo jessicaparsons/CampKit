@@ -25,7 +25,7 @@ struct EditableItemView: View {
             }) {
                 Image(systemName: item.isPacked ? "checkmark.circle.fill" : "circle")
                     .foregroundColor(item.isPacked ? .green : .gray)
-                    .font(.system(size: 20))
+                    .font(.system(size: 22))
             }
             .buttonStyle(BorderlessButtonStyle()) // Prevent button from triggering NavigationLink
             

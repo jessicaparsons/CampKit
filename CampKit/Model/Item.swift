@@ -9,7 +9,8 @@ import Foundation
 import SwiftData
 
 @Model
-class Item {
+class Item: Identifiable {
+    var id: UUID = UUID()
     var title: String
     var isPacked: Bool
     var category: Category? // Backlink to the parent category

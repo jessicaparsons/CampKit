@@ -9,12 +9,11 @@ import SwiftUI
 
 
 struct ListDetailView: View {
-    
+    @Environment(\.modelContext) private var modelContext
     @Bindable var packingList: PackingList // Binding to the SwiftData model
     @State private var isEditingTitle: Bool = false
     
     //placeholders
-    @State private var bannerImage: Image? = Image("placeholder-banner")
     @State private var location: String = "Yosemite National Park"
     @State private var weather: String = "H:75°F Low:60°F"
     
@@ -50,17 +49,13 @@ struct ListDetailView: View {
                 .sheet(isPresented: $isEditingTitle) {
                     EditTitleView(packingList: packingList)
                 }
-                
             }//:HSTACK
-            HStack {
                 Text(location)
                     .fontWeight(.bold)
                 HStack {
-                    Spacer()
-                    Text("sym")
+                    Image(systemName: "cloud")
                     Text(weather)
                 }//:HSTACK
-            }//:HSTACK
             
         }//:VSTACK
         .padding()

@@ -35,7 +35,7 @@ struct HomeListView: View {
                     Spacer()
                 }//:VSTACK
             }//:ZSTACK
-            .frame(width: .infinity, height: 80)
+            .frame(height: 80)
             
             
             List {
@@ -48,9 +48,10 @@ struct HomeListView: View {
                             if let photoData = packingList.photo, let image = UIImage(data: photoData) {
                                 Image(uiImage: image)
                                     .resizable()
-                                    .scaledToFit()
+                                    .scaledToFill()
                                     .frame(width: 50, height: 50)
                                     .cornerRadius(8)
+                                    .padding(.trailing, 8)
                             }
                             
                             VStack(alignment: .leading) {

@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftData
+import UIKit
 
 func preloadPackingListData(context: ModelContext) {
     
@@ -21,11 +22,15 @@ func preloadPackingListData(context: ModelContext) {
         print("Data already exists. Skipping preload.")
         return
     }
+    
+    // Load the placeholder image as Data
+    let placeholderImage = UIImage(named: "SequoiaPlaceholder")
+    let placeholderImageData = placeholderImage?.jpegData(compressionQuality: 0.8)
 
     // Create a sample PackingList
     let sampleList = PackingList(
         title: "Sample Camping Trip",
-        photo: nil, // Add sample photo data if needed
+        photo: placeholderImageData,
         dateCreated: Date()
     )
     print("Created PackingList: \(sampleList.title)")
@@ -47,6 +52,8 @@ func preloadPackingListData(context: ModelContext) {
         "Hike": ["Backpack", "Chargers", "Drugs", "Camera", "Trail snacks"]
     ]
     print("Created Items: \([items])")
+    
+    
     
     // Populate categories and their items
     for category in categories {

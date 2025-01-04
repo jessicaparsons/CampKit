@@ -13,7 +13,6 @@ struct CategorySectionView: View {
     @Bindable var category: Category
     @State private var item: String = ""
     
-    
     @State private var isExpanded: Bool = true
     
     let hapticFeedback = UINotificationFeedbackGenerator()
@@ -35,7 +34,7 @@ struct CategorySectionView: View {
             HStack {
                 Image(systemName: "plus.circle")
                     .foregroundColor(.gray)
-                    .font(.title2)
+                    .font(.title3)
                 TextField("Add new item", text: $item)
                     .textFieldStyle(.plain)
                     .onSubmit {
@@ -53,6 +52,7 @@ struct CategorySectionView: View {
         .animation(.easeInOut, value: isExpanded)
         
     }//:BODY
+
     
     private func addItem(to category: Category) {
         if !item.isEmpty {

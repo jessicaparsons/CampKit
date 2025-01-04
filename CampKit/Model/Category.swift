@@ -9,7 +9,8 @@ import Foundation
 import SwiftData
 
 @Model
-class Category {
+class Category: Identifiable {
+    var id: UUID = UUID() // Unique identifier
     var name: String
     @Relationship(deleteRule: .cascade) var items: [Item] // Relationship with items
     var packingList: PackingList? // Backlink to the parent PackingList
