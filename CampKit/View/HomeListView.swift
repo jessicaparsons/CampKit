@@ -22,6 +22,22 @@ struct HomeListView: View {
     
     var body: some View {
         NavigationStack {
+            ZStack {
+                LinearGradient(colors: [.customGold, .customSage, .customSky, .customLilac], startPoint: .bottomLeading, endPoint: .topTrailing)
+                    .ignoresSafeArea()
+                VStack {
+                    Spacer()
+                    Spacer()
+                    Text("Howdy, Camper!")
+                        .font(.title)
+                        .fontWeight(.light)
+                        .padding(.bottom)
+                    Spacer()
+                }//:VSTACK
+            }//:ZSTACK
+            .frame(width: .infinity, height: 80)
+            
+            
             List {
                 ForEach(packingLists) { packingList in
                     NavigationLink {
@@ -48,7 +64,30 @@ struct HomeListView: View {
                     }
                 } //:FOR EACH
                 .onDelete(perform: deleteItems)
+                
+                Section {
+                    Button {
+                        addNewList()
+                    } label: {
+                        HStack {
+                            Image(systemName: "plus")
+                            Text("Add New List")
+                                .padding(5)
+                        }
+                    }
+                    .buttonStyle(BigButton())
+                }//:SECTION
+                .listRowBackground(Color.customTan)
+                .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
+                
             }//:LIST
+            .scrollContentBackground(.hidden)
+            .background(Color.customTan)
+            .offset(y: -10)
+            .ignoresSafeArea()
+            
+            
+            
             
         }//:NAVIGATION STACK
         .navigationTitle("My Lists")
@@ -85,20 +124,22 @@ struct HomeListView: View {
         }
     }
     
+    
 }//:STRUCT
 
 
 
 #Preview("Sample Data") {
     
-    HomeListView()
+    let container = try! ModelContainer(for: PackingList.self, Category.self, Item.self, configurations: ModelConfiguration(isStoredInMemoryOnly: true))
+
+    // Populate the container with sample data
+    preloadPackingListData(context: container.mainContext)
     
-//    let container = try! ModelContainer(for: [PackingList.self, Category.self, Item.self], configurations: ModelConfiguration(isStoredInMemoryOnly: true))
-//    let sampleList = PackingList(title: "Sequoia")
-//        container.mainContext.insert(sampleList)
-//    
-//    return HomeListView()
-//        .modelContainer(container)
+    let samplePackingList = try! container.mainContext.fetch(FetchDescriptor<PackingList>()).first!
+    
+    return HomeListView()
+        .modelContainer(container)
 }
 
 #Preview("Empty List") {

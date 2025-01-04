@@ -6,13 +6,37 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct EditableItemView: View {
+    
+    @Environment(\.modelContext) private var modelContext
+    @Bindable var item: Item
+    
+    private func textColor(for item: Item) -> Color {
+        item.isPacked ? Color.accentColor : Color.primary
+    }
+    
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        HStack {
+            Button(action: {
+                // Toggle completion state
+                item.isPacked.toggle()
+            }) {
+                Image(systemName: item.isPacked ? "checkmark.circle.fill" : "circle")
+                    .foregroundColor(item.isPacked ? .green : .gray)
+                    .font(.system(size: 20))
+            }
+            .buttonStyle(BorderlessButtonStyle()) // Prevent button from triggering NavigationLink
+            
+            TextField("Item Name", text: $item.title)
+                .foregroundColor(textColor(for: item))
+                .strikethrough(item.isPacked)
+                .italic(item.isPacked)
+        }//:HSTACK
     }
 }
 
 #Preview {
-    EditableItemView()
+    EditableItemView(item: Item(title: "Tent"))
 }

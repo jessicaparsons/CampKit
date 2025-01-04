@@ -32,12 +32,12 @@ struct ListView: View {
                         .scaledToFill()
                         .frame(height: 100)
                 }
-                //:DETAIL CARD
+                
+            //:DETAIL CARD
                 VStack {
                     ListDetailView(packingList: packingList)
                         .offset(y: -20)
-                    
-                    //:LISTS
+            //:LISTS
                     
                     List {
                         ForEach(packingList.categories) { category in
@@ -45,21 +45,13 @@ struct ListView: View {
                             
                         }//:FOREACH
                     }//:LIST
-                        .overlay {
-                            if packingList.categories.isEmpty {
-                                ContentUnavailableView("Empty List", systemImage: "plus.circle", description: Text("Add some items to your list"))
-                            }
+                    .scrollContentBackground(.hidden)
+                    .background(Color("ColorTan"))
+                    .overlay {
+                        if packingList.categories.isEmpty {
+                            ContentUnavailableView("Empty List", systemImage: "plus.circle", description: Text("Add some items to your list"))
                         }
-//                        .toolbar {
-//                            ToolbarItem(placement: .secondaryAction) {
-//                                EditButton()
-//                            }
-//                            ToolbarItem {
-//                                Button(action: addItem) {
-//                                    Label("Add Item", systemImage: "plus")
-//                                }
-//                            }
-//                        }
+                    }
                 } //:VSTACK
                 .background(Color(red: 0.949, green: 0.949, blue: 0.967))
             }//:VSTACK
@@ -88,25 +80,25 @@ struct ListView: View {
     }
 }
 
+
+#Preview("Sample Data") {
+    
+    // Create an in-memory ModelContainer
+    let container = try! ModelContainer(
+        for: PackingList.self, Category.self, Item.self,
+        configurations: ModelConfiguration(isStoredInMemoryOnly: true)
+    )
+    
+    // Populate the container with sample data
+    preloadPackingListData(context: container.mainContext)
+    
+    let samplePackingList = try! container.mainContext.fetch(FetchDescriptor<PackingList>()).first!
+    
+    // Return the view with the mock ModelContainer
+    return ListView(packingList: samplePackingList)
+        .modelContainer(container)
+}
+
 #Preview("Basic Preview") {
     ListView(packingList: PackingList(title: "Sample List"))
 }
-
-//#Preview("Sample Data") {
-//    
-//    let sampleList = PackingList(title: "Sample List")
-//    sampleList.categories.append(Category(name: "Category 1"))
-//    
-//    let container = try! ModelContainer(for: PackingList.self, Category.self, Item.self, configurations: ModelConfiguration(isStoredInMemoryOnly: true))
-//        container.mainContext.insert(sampleList)
-//        
-//    ListView(packingList: sampleList)
-//            .modelContainer(container)
-//}
-
-//#Preview("Empty List") {
-//    let container = try! ModelContainer(for: PackingList.self, Category.self, Item.self, configurations: ModelConfiguration(isStoredInMemoryOnly: true))
-//        
-//        ListView(packingList: PackingList(title: "Empty List"))
-//            .modelContainer(container)
-//}

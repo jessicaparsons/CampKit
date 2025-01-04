@@ -10,9 +10,10 @@ import SwiftData
 
 func preloadPackingListData(context: ModelContext) {
     
+    // Add debug statement to confirm function execution
+    print("populateSampleData called")
     let fetchDescriptor = FetchDescriptor<PackingList>()
     let existingPackingLists = try? context.fetch(fetchDescriptor)
-    
     print("Fetched Packing Lists Before Insert: \(existingPackingLists ?? [])")
     
     // Check if there are already packing lists to avoid duplication
@@ -27,6 +28,7 @@ func preloadPackingListData(context: ModelContext) {
         photo: nil, // Add sample photo data if needed
         dateCreated: Date()
     )
+    print("Created PackingList: \(sampleList.title)")
     
     let categories = [
         Category(name: "Bed"),
@@ -35,6 +37,7 @@ func preloadPackingListData(context: ModelContext) {
         Category(name: "Lounge"),
         Category(name: "Hike")
     ]
+    print("Created Categories: \([categories])")
     
     let items = [
         "Bed": ["Pillows", "Sleeping bag", "Sleeping pad"],
@@ -43,6 +46,7 @@ func preloadPackingListData(context: ModelContext) {
         "Lounge": ["Chair", "Electronics", "Shade pop up", "Books", "Cards/games", "Instruments"],
         "Hike": ["Backpack", "Chargers", "Drugs", "Camera", "Trail snacks"]
     ]
+    print("Created Items: \([items])")
     
     // Populate categories and their items
     for category in categories {
@@ -59,14 +63,14 @@ func preloadPackingListData(context: ModelContext) {
 
     
     
-    // Debug inserted data
-    print("Inserted PackingList: \(sampleList.title)")
-    print("Categories in '\(sampleList.title)':")
-    for category in sampleList.categories {
-        print("  - \(category.name)")
-        for item in category.items {
-            print("    - \(item.title), Packed: \(item.isPacked)")
-        }
-    }
+//    // Debug inserted data
+//    print("Inserted PackingList: \(sampleList.title)")
+//    print("Categories in '\(sampleList.title)':")
+//    for category in sampleList.categories {
+//        print("  - \(category.name)")
+//        for item in category.items {
+//            print("    - \(item.title), Packed: \(item.isPacked)")
+//        }
+//    }
 
 }

@@ -6,3 +6,16 @@
 //
 
 import Foundation
+import SwiftUI
+
+
+extension Color {
+    static let customGold = Color("ColorGold")
+    static let customLilac = Color("ColorLilac")
+    static let customNeon = Color("ColorNeon")
+    static let customSage = Color("ColorSage")
+    static let customSky = Color("ColorSky")
+    static let customSteel = Color("ColorSteel")
+    static let customTan = Color("ColorTan")
+
+}
