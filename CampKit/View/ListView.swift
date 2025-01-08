@@ -18,7 +18,7 @@ struct ListView: View {
     @State private var item: String = ""
     @State private var showPhotoPicker = false
     @State private var isCollapsed = false
-    @State private var isReordering = false
+    @State private var isRearranging = false
     
     @State private var draggedCategory: Category?
     
@@ -91,7 +91,7 @@ struct ListView: View {
                                         RoundedRectangle(cornerRadius: 10)
                                             .fill(Color.white) // Background color
                                             .shadow(color: .gray.opacity(0.2), radius: 4, x: 0, y: 2)
-                                        CategorySectionView(category: category)
+                                        CategorySectionView(category: category, deleteCategory: deleteCategory)
                                     }
                                 }//:ZSTACK
                                 .onDrag {
@@ -107,9 +107,6 @@ struct ListView: View {
                                     )
                                 )
                             }//:FOREACH
-                            .onDelete { indexSet in
-                                deleteCategories(at: indexSet)
-                            }
                             
                         }//:ELSE
                         
@@ -134,9 +131,11 @@ struct ListView: View {
                 Menu {
                     // Rearrange option
                     Button(action: {
-                        toggleRearrangeMode()
+                        withAnimation {
+                            isRearranging.toggle()
+                        }
                     }) {
-                        Label(isReordering ? "Done Rearranging" : "Rearrange", systemImage: "arrow.up.arrow.down")
+                        Label(isRearranging ? "Done" : "Rearrange", systemImage: "arrow.up.arrow.down")
                     }
                     
                     // Collapse All option
@@ -145,6 +144,7 @@ struct ListView: View {
                     }) {
                         Label("Collapse All", systemImage: "arrowtriangle.up")
                     }
+                    
                 } label: {
                     Label("Options", systemImage: "ellipsis.circle")
                 }
@@ -154,14 +154,21 @@ struct ListView: View {
         
     }//:BODY
     
-    private func deleteCategories(at offsets: IndexSet) {
-        for index in offsets {
-            modelContext.delete(packingList.categories[index])
-        }
-        do {
-            try modelContext.save()
-        } catch {
-            print("Failed to save after delete: \(error.localizedDescription)")
+    private func deleteCategory(_ category: Category) {
+        withAnimation {
+            // Remove the category from the packing list
+            packingList.categories.removeAll { $0.id == category.id }
+            
+            // Delete the category from SwiftData
+            modelContext.delete(category)
+            
+            // Save changes
+            do {
+                try modelContext.save()
+                print("Category \(category.name) deleted successfully.")
+            } catch {
+                print("Failed to delete category: \(error.localizedDescription)")
+            }
         }
     }
     
@@ -177,10 +184,10 @@ struct ListView: View {
     
     private func toggleRearrangeMode() {
         withAnimation {
-            isReordering.toggle()
-            editMode?.wrappedValue = isReordering ? .active : .inactive
+            isRearranging.toggle()
+            editMode?.wrappedValue = isRearranging ? .active : .inactive
         }
-        print(isReordering ? "Rearranging mode enabled." : "Rearranging mode disabled.")
+        print(isRearranging ? "Rearranging mode enabled." : "Rearranging mode disabled.")
     }
     
     private func collapseAllCategories() {
@@ -195,14 +202,6 @@ struct ListView: View {
                 category.items.append(newItem) // Add item to category
                 modelContext.insert(newItem)   // Insert into SwiftData
                 item = ""
-            }
-        }
-    }
-    
-    private func deleteItems(in category: Category, at offsets: IndexSet) {
-        withAnimation {
-            for index in offsets {
-                modelContext.delete(category.items[index])
             }
         }
     }

@@ -74,6 +74,7 @@ struct ListDetailView: View {
     func deleteList() {
         print("Deleting the list!")
     }
+    
 }
 
 struct EditTitleView: View {

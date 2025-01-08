@@ -45,11 +45,11 @@ func preloadPackingListData(context: ModelContext) {
     print("Created Categories: \([categories])")
     
     let items = [
-        "Bed": ["Pillows", "Sleeping bag", "Sleeping pad"],
-        "Clothes": ["Jackets", "Hats", "Shoes", "Toiletries", "Supplements"],
-        "Food": ["Propane", "Stove", "Cooler", "Ice", "Dry bag", "Water", "Water bottles"],
-        "Lounge": ["Chair", "Electronics", "Shade pop up", "Books", "Cards/games", "Instruments"],
-        "Hike": ["Backpack", "Chargers", "Drugs", "Camera", "Trail snacks"]
+        "Bed 0": ["Pillows", "Sleeping bag", "Sleeping pad"],
+        "Clothes 1": ["Jackets", "Hats", "Shoes", "Toiletries", "Supplements"],
+        "Food 2": ["Propane", "Stove", "Cooler", "Ice", "Dry bag", "Water", "Water bottles"],
+        "Lounge 3": ["Chair", "Electronics", "Shade pop up", "Books", "Cards/games", "Instruments"],
+        "Hike 4": ["Backpack", "Chargers", "Drugs", "Camera", "Trail snacks"]
     ]
     print("Created Items: \([items])")
     

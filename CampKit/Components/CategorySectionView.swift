@@ -14,6 +14,9 @@ struct CategorySectionView: View {
     @State private var item: String = ""
     
     @State private var isExpanded: Bool = false
+    @State private var isEditing: Bool = false
+    
+    let deleteCategory: (Category) -> Void
     
     let hapticFeedback = UINotificationFeedbackGenerator()
     
@@ -23,14 +26,9 @@ struct CategorySectionView: View {
             //Iterate through items in the category
             ForEach(category.items) { item in
                 
-                EditableItemView(item: item) { itemToDelete in
-                    deleteItem(itemToDelete)
-                }
+                EditableItemView(item: item)
                 
             }//:FOREACH
-            .onDelete { indexSet in
-                deleteItems(in: category, at: indexSet)
-            }
             
             // Add new item to the category
             HStack {
@@ -42,39 +40,58 @@ struct CategorySectionView: View {
                     .onSubmit {
                         addItem(to: category)
                     }
-                    
+                
             }//:HSTACK
             .padding(.top, 10)
             
-            
-            
         } label: {
-            
+            // Editable text field for category name
+            if isEditing {
                 TextField("Category Name", text: $category.name)
-                    .textFieldStyle(.plain)
+                    .textFieldStyle(.roundedBorder)
                     .font(.headline)
                     .multilineTextAlignment(.leading)
-                    
-    
-            
+                    .onSubmit {
+                        isEditing = false // Disable editing after submit
+                        saveChanges()
+                    }
+                Spacer()
+                Button {
+                    isEditing = false // Disable editing after submit
+                    saveChanges()
+                } label: {
+                    Text("Done")
+                }
+            } else {
+                HStack {
+                    Text(category.name)
+                        .font(.headline)
+                        .multilineTextAlignment(.leading)
+                    Spacer()
+                    Menu {
+                        Button {
+                            isEditing = true // Enable editing
+                        } label: {
+                            Label("Edit Name", systemImage: "pencil")
+                        }
+                        Button(role: .destructive) {
+                            deleteCategory(category)
+                        } label: {
+                            Label("Delete", systemImage: "trash")
+                        }
+                    } label: {
+                        Label("Edit", systemImage: "ellipsis")
+                    } //:MENU
+                    .labelStyle(.iconOnly)
+                }
+            }
         } //:DISCLOSURE GROUP
         .animation(.easeInOut, value: isExpanded)
         .padding()
+        .disclosureGroupStyle(LeftDisclosureStyle())
         
-
     }//:BODY
     
-    
-    
-    // Handles deleting a single item
-        private func deleteItem(_ item: Item) {
-            withAnimation {
-                category.items.removeAll { $0.id == item.id } // Remove from the category array
-                modelContext.delete(item)                   // Delete from SwiftData
-                saveChanges()
-            }
-        }
-
     
     private func addItem(to category: Category) {
         if !item.isEmpty {
@@ -85,29 +102,55 @@ struct CategorySectionView: View {
         }
     }
     
-    private func deleteItems(in category: Category, at offsets: IndexSet) {
-        for index in offsets {
-            modelContext.delete(category.items[index])
+    private func saveChanges() {
+        do {
+            try modelContext.save()
+            print("Changes saved successfully.")
+        } catch {
+            print("Failed to save changes: \(error.localizedDescription)")
         }
     }
-    
-    private func saveChanges() {
-            do {
-                try modelContext.save()
-                print("Changes saved successfully.")
-            } catch {
-                print("Failed to save changes: \(error.localizedDescription)")
-            }
-        }
 }
 
 
+//MARK: - DISCLOSURE GROUP STYLE
 
+struct LeftDisclosureStyle: DisclosureGroupStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        VStack {
+            Button {
+                withAnimation {
+                    configuration.isExpanded.toggle()
+                }
+            } label: {
+                HStack(alignment: .firstTextBaseline) {
+                    Image(systemName: configuration.isExpanded ? "chevron.down" : "chevron.right")
+                        .foregroundColor(.accentColor)
+                        .font(.caption.lowercaseSmallCaps())
+                        .animation(nil, value: configuration.isExpanded)
+                    configuration.label
+                    Spacer()
+                    
 
+                }
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            if configuration.isExpanded {
+                configuration.content
+            }
+        }
+    }
+}
 
-//#Preview {
-//    ZStack {
-//        Color(.colorTan)
-//        CategorySectionView(category: Category(name: "Sleeping", position: 0))
-//    }
-//}
+#Preview {
+    ZStack {
+        Color(.colorTan)
+        CategorySectionView(
+            category: Category(name: "Sleeping", position: 0),
+            deleteCategory: { category in
+                print("Mock delete category: \(category.name)")
+            }
+        )
+    }
+}

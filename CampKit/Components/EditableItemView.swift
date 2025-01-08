@@ -12,10 +12,8 @@ struct EditableItemView: View {
     
     @Environment(\.modelContext) private var modelContext
     @Bindable var item: Item
-    let onDelete: (Item) -> Void
     
     @State private var offset: CGFloat = 0
-    @State private var isSwiping = false
     
     private func textColor(for item: Item) -> Color {
         item.isPacked ? Color.accentColor : Color.primary
@@ -23,19 +21,6 @@ struct EditableItemView: View {
     
     var body: some View {
         ZStack {
-            // Background for delete action
-            HStack {
-                Spacer()
-                Image(systemName: "trash")
-                    .foregroundColor(.white)
-                    .font(.footnote)
-                    .padding(.horizontal)
-                    .padding(.vertical, 10)
-                    .background(Color.red)
-            }
-            .opacity(isSwiping ? 1 : 0) // Only show during swipe
-            
-            // Foreground content
             HStack {
                 Button(action: {
                     // Toggle completion state
@@ -53,27 +38,6 @@ struct EditableItemView: View {
                     .italic(item.isPacked)
             }
             .offset(x: offset)
-            .gesture(
-                DragGesture()
-                    .onChanged { gesture in
-                        if isSwiping || gesture.translation.width < 0 {
-                            isSwiping = true
-                            offset = min(gesture.translation.width, 0) // Limit to left swipe
-                        }
-                    }
-                    .onEnded { _ in
-                        if offset < -100 { // Threshold for delete
-                            withAnimation {
-                                onDelete(item)
-                            }
-                        } else {
-                            withAnimation {
-                                offset = 0
-                                isSwiping = false
-                            }
-                        }
-                    }
-            )
             .padding(.vertical, 5)
         }
     }
@@ -92,11 +56,10 @@ struct EditableItemView: View {
     container.mainContext.insert(sampleItem) // Insert it into the context
     
     // Return the view
-    return ZStack {
+   return ZStack {
         Color(.colorTan)
-        EditableItemView(item: sampleItem) { deletedItem in
-            print("Deleted item: \(deletedItem.title)")
+        EditableItemView(item: sampleItem)
         }
         .modelContainer(container)
     }
-}
+
