@@ -11,12 +11,15 @@ import SwiftData
 @Model
 class Category: Identifiable {
     var id: UUID = UUID() // Unique identifier
-    var name: String
+    @Attribute var name: String
     @Relationship(deleteRule: .cascade) var items: [Item] // Relationship with items
     var packingList: PackingList? // Backlink to the parent PackingList
+    @Attribute var position: Int
 
-    init(name: String) {
+    init(name: String, position: Int) {
         self.name = name
         self.items = []
+        self.position = position
     }
+    
 }

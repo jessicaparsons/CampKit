@@ -11,7 +11,7 @@ import SwiftData
 struct ListView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.editMode) private var editMode
-    @Bindable var packingList: PackingList // Property to accept a PackingList instance
+    @Bindable var packingList: PackingList
     
     let hapticFeedback = UINotificationFeedbackGenerator()
     
@@ -20,97 +20,115 @@ struct ListView: View {
     @State private var isCollapsed = false
     @State private var isReordering = false
     
+    @State private var draggedCategory: Category?
+    
+    
     private func textColor(for item: Item) -> Color {
         item.isPacked ? Color.accentColor : Color.primary
     }
     
     var body: some View {
         NavigationStack {
-            Section {
-                // Banner Image Section
+            
+            ScrollView(showsIndicators: true) {
                 ZStack {
-                    if let photoData = packingList.photo, let bannerImage = UIImage(data: photoData) {
-                        Image(uiImage: bannerImage)
-                            .resizable()
-                            .scaledToFill()
-                            .frame(height: 50, alignment: .center)
-                            .ignoresSafeArea()
-                            .overlay(
-                                Image(systemName: "camera")
-                                    .font(.title3)
-                                    .foregroundColor(.white)
-                            )
-                            .background(Color.red)
-                    } else {
-                        Image("TopographyDesign")
-                            .resizable()
-                            .scaledToFill()
-                            .frame(height: 100, alignment: .center)
-                            .ignoresSafeArea()
-                            .overlay(
-                                Image(systemName: "camera")
-                                    .font(.title3)
-                                    .foregroundColor(.white)
-                            )
-                    }
+                    // Banner Image Section
+                    ZStack {
+                        if let photoData = packingList.photo, let bannerImage = UIImage(data: photoData) {
+                            Image(uiImage: bannerImage)
+                                .resizable()
+                                .scaledToFill()
+                                .frame(height: 100, alignment: .bottom)
+                                .ignoresSafeArea()
+                                .overlay(
+                                    Image(systemName: "camera")
+                                        .font(.title3)
+                                        .foregroundColor(.white)
+                                )
+                                .background(Color.red)
+                        } else {
+                            Image("TopographyDesign")
+                                .resizable()
+                                .scaledToFill()
+                                .frame(height: 100, alignment: .center)
+                                .ignoresSafeArea()
+                                .overlay(
+                                    Image(systemName: "camera")
+                                        .font(.title3)
+                                        .foregroundColor(.white)
+                                )
+                        }
                         
+                    }//:ZSTACK
+                    .onTapGesture {
+                        showPhotoPicker.toggle()
+                    }
+                    
                 }//:ZSTACK
-                .onTapGesture {
-                    showPhotoPicker.toggle()
+                
+                
+                // Details Card
+                ZStack {
+                    ListDetailView(packingList: packingList)
+                        .offset(y: -20)
                 }
-                
-            }//:SECTION
-            
-            
-            // Details Card
-            Section {
-                ListDetailView(packingList: packingList)
-                .offset(y: -20)
-            }
-            .background(Color.colorTan)
-            
-            //Lists Display
-         
-            Section {
-                // Horizontal Chip Buttons (Separate Component)
-//                ChipButtonList(
-//                    isCollapsed: $isCollapsed,
-//                    isReordering: $isReordering
-//                )
-//                .background(Color.colorTan)
-                
-                List {
-                
-                    ForEach(packingList.categories) { category in
-                            
-                            CategorySectionView(category: category)
-                        
-                    }//:FOREACH
-                    .onMove { from, to in
-                        packingList.categories.move(fromOffsets: from, toOffset: to)
-                        do {
-                                try modelContext.save()
-                                print("Reordering saved successfully.")
-                            } catch {
-                                print("Failed to save reordering: \(error.localizedDescription)")
-                            }
-                    }
-                }//:LIST
-                .environment(\.editMode, editMode)
                 .background(Color.colorTan)
-                .scrollContentBackground(.hidden)
-                .overlay {
-                    if packingList.categories.isEmpty {
-                        ContentUnavailableView("Empty List", systemImage: "plus.circle", description: Text("Add some items to your list"))
-                    }
+                
+                //Lists Display
+                ZStack {
+                    LazyVStack {
+                        if packingList.categories.isEmpty {
+                            ContentUnavailableView(
+                                "No Lists Available",
+                                systemImage: "plus.circle",
+                                description: Text("Add a new list to get started")
+                            )
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        } else {
+                            ForEach(packingList.categories.sorted(by: { $0.position < $1.position }), id: \.id) { category in
+                                ZStack {
+                                    ZStack {
+                                        RoundedRectangle(cornerRadius: 10)
+                                            .fill(Color.white) // Background color
+                                            .shadow(color: .gray.opacity(0.2), radius: 4, x: 0, y: 2)
+                                        CategorySectionView(category: category)
+                                    }
+                                }//:ZSTACK
+                                .onDrag {
+                                    self.draggedCategory = category
+                                    return NSItemProvider(object: "\(category.id)" as NSString)
+                                }
+                                .onDrop(
+                                    of: [.text],
+                                    delegate: CategoryDropDelegate(
+                                        currentCategory: category,
+                                        categories: $packingList.categories,
+                                        draggedCategory: $draggedCategory
+                                    )
+                                )
+                            }//:FOREACH
+                            .onDelete { indexSet in
+                                deleteCategories(at: indexSet)
+                            }
+                            
+                        }//:ELSE
+                        
+                    }//:LAZY VSTACK
+                    .environment(\.editMode, editMode)
+                    .padding()
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
-            } //:SECTION
-            .offset(y: -10)
-            .ignoresSafeArea()
+                .background(Color.colorTan)
+                .offset(y: -20)
+                
+                
+            }//:SCROLL VIEW
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(Color.colorTan)
             
         }//:NAVIGATION STACK
         .tint(.accentColor)
+        
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Menu {
@@ -120,7 +138,7 @@ struct ListView: View {
                     }) {
                         Label(isReordering ? "Done Rearranging" : "Rearrange", systemImage: "arrow.up.arrow.down")
                     }
-
+                    
                     // Collapse All option
                     Button(action: {
                         collapseAllCategories()
@@ -135,8 +153,28 @@ struct ListView: View {
         .tint(.white)
         
     }//:BODY
-
-
+    
+    private func deleteCategories(at offsets: IndexSet) {
+        for index in offsets {
+            modelContext.delete(packingList.categories[index])
+        }
+        do {
+            try modelContext.save()
+        } catch {
+            print("Failed to save after delete: \(error.localizedDescription)")
+        }
+    }
+    
+    private func moveCategories(from source: IndexSet, to destination: Int) {
+        packingList.categories.move(fromOffsets: source, toOffset: destination)
+        do {
+            try modelContext.save()
+            print("Reordering saved.")
+        } catch {
+            print("Failed to save reordering: \(error.localizedDescription)")
+        }
+    }
+    
     private func toggleRearrangeMode() {
         withAnimation {
             isReordering.toggle()
@@ -144,7 +182,7 @@ struct ListView: View {
         }
         print(isReordering ? "Rearranging mode enabled." : "Rearranging mode disabled.")
     }
-
+    
     private func collapseAllCategories() {
         // Logic to collapse all categories
         print("All categories collapsed.")
@@ -168,6 +206,52 @@ struct ListView: View {
             }
         }
     }
+    
+}
+
+//MARK: - DRAG AND DROP METHODS
+
+struct CategoryDropDelegate: DropDelegate {
+    let currentCategory: Category
+    @Binding var categories: [Category]
+    @Binding var draggedCategory: Category?
+    
+    func dropUpdated(info: DropInfo) -> DropProposal? {
+        return DropProposal(operation: .move)
+    }
+    
+    func performDrop(info: DropInfo) -> Bool {
+        draggedCategory = nil
+        return true
+    }
+    
+    func dropEntered(info: DropInfo) {
+        guard let draggedCategory,
+              let fromIndex = categories.firstIndex(of: draggedCategory),
+              let toIndex = categories.firstIndex(of: currentCategory),
+              fromIndex != toIndex else { return }
+        
+        withAnimation {
+            // Reorder categories in the array
+            categories.move(fromOffsets: IndexSet(integer: fromIndex), toOffset: toIndex)
+            
+            // Update the positions after the move
+            updateCategoryPositions()
+        }
+    }
+    
+    func validateDrop(info: DropInfo) -> Bool {
+        return true
+    }
+    
+    private func updateCategoryPositions() {
+        for (index, category) in categories.enumerated() {
+            category.position = index
+        }
+        print("Updated positions: \(categories.map { "\($0.name): \($0.position)" })")
+    }
+    
+    
 }
 
 

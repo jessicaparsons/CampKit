@@ -13,11 +13,13 @@ class Item: Identifiable {
     var id: UUID = UUID()
     var title: String
     var isPacked: Bool
+    var position: Int // Custom order property
     var category: Category? // Backlink to the parent category
     
     init(title: String, isPacked: Bool = false) {
         self.title = title
         self.isPacked = isPacked
+        self.position = 0
     }
 }
 

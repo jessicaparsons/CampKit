@@ -36,11 +36,11 @@ func preloadPackingListData(context: ModelContext) {
     print("Created PackingList: \(sampleList.title)")
     
     let categories = [
-        Category(name: "Bed"),
-        Category(name: "Clothes"),
-        Category(name: "Food"),
-        Category(name: "Lounge"),
-        Category(name: "Hike")
+        Category(name: "Bed 0", position: 0),
+        Category(name: "Clothes 1", position: 1),
+        Category(name: "Food 2", position: 2),
+        Category(name: "Lounge 3", position: 3),
+        Category(name: "Hike 4", position: 4)
     ]
     print("Created Categories: \([categories])")
     
@@ -61,7 +61,12 @@ func preloadPackingListData(context: ModelContext) {
             let categoryItems = itemNames.map { Item(title: $0) }
             category.items.append(contentsOf: categoryItems)
         }
+        print("Assigning \(category.name) position: \(category.position)")
         sampleList.categories.append(category)
+        
+        for category in sampleList.categories {
+            print("Category '\(category.name)' has position \(category.position)")
+        }
     }
     
     // Insert the sample list into the context
