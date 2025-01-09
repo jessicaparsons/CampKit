@@ -13,7 +13,7 @@ struct CategorySectionView: View {
     @Bindable var category: Category
     @State private var item: String = ""
     
-    @State private var isExpanded: Bool = false
+    @State private var isExpanded: Bool = true
     @State private var isEditing: Bool = false
     
     let deleteCategory: (Category) -> Void
@@ -89,6 +89,7 @@ struct CategorySectionView: View {
         .animation(.easeInOut, value: isExpanded)
         .padding()
         .disclosureGroupStyle(LeftDisclosureStyle())
+        
         
     }//:BODY
     

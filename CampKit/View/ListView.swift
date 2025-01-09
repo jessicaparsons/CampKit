@@ -17,9 +17,8 @@ struct ListView: View {
     
     @State private var item: String = ""
     @State private var showPhotoPicker = false
-    @State private var isCollapsed = false
     @State private var isRearranging = false
-    
+    @State private var isExpanded: Bool = false
     @State private var draggedCategory: Category?
     
     
@@ -91,7 +90,9 @@ struct ListView: View {
                                         RoundedRectangle(cornerRadius: 10)
                                             .fill(Color.white) // Background color
                                             .shadow(color: .gray.opacity(0.2), radius: 4, x: 0, y: 2)
-                                        CategorySectionView(category: category, deleteCategory: deleteCategory)
+                                        CategorySectionView(
+                                            category: category,
+                                            deleteCategory: deleteCategory)
                                     }
                                 }//:ZSTACK
                                 .onDrag {
@@ -140,9 +141,11 @@ struct ListView: View {
                     
                     // Collapse All option
                     Button(action: {
-                        collapseAllCategories()
+                        withAnimation {
+                            isExpanded.toggle()
+                        }
                     }) {
-                        Label("Collapse All", systemImage: "arrowtriangle.up")
+                        Label(isExpanded ? "Expand All" : "Collapse All", systemImage: isExpanded ? "arrowtriangle.down" : "arrowtriangle.up")
                     }
                     
                 } label: {
@@ -188,11 +191,6 @@ struct ListView: View {
             editMode?.wrappedValue = isRearranging ? .active : .inactive
         }
         print(isRearranging ? "Rearranging mode enabled." : "Rearranging mode disabled.")
-    }
-    
-    private func collapseAllCategories() {
-        // Logic to collapse all categories
-        print("All categories collapsed.")
     }
     
     private func addItem(to category: Category) {
