@@ -14,7 +14,6 @@ struct ListDetailView: View {
     @Binding var isEditingTitle: Bool
     
     //placeholders
-    @State private var location: String = "Yosemite National Park"
     @State private var weather: String = "H:75°F Low:60°F"
     
     var body: some View {
@@ -32,7 +31,7 @@ struct ListDetailView: View {
                     EditListScreen(packingList: packingList)
                 }
             }//:HSTACK
-            Text(location)
+            Text(packingList.locationName ?? "No Location Set")
                 .fontWeight(.bold)
             HStack {
                 Image(systemName: "cloud")
@@ -50,38 +49,13 @@ struct ListDetailView: View {
     }
 }
 
-struct EditListScreen: View {
-    @Bindable var packingList: PackingList
-    @Environment(\.dismiss) var dismiss
-    
-    var body: some View {
-        NavigationStack {
-            VStack {
-                TextField("Enter new title", text: $packingList.title)
-                    .textFieldStyle(.roundedBorder)
-                    .padding()
-                
-                Spacer()
-            }
-            .navigationTitle("Edit List Details")
-            .toolbar {
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Done") {
-                        dismiss()
-                        packingList.title = packingList.title.trimmingCharacters(in: .whitespacesAndNewlines)
-                        
-                    }
-                }
-            }
-        }
-    }
-}
+
 
 #Preview {
     
     @Previewable @State var isEditingTitle: Bool = false
     
-    let sampleUserList = PackingList(title: "Summer List")
+    let sampleUserList = PackingList(title: "Summer List", locationName: "Joshua Tree")
     ZStack {
         Color(.gray)
         ListDetailView(packingList: sampleUserList, isEditingTitle: $isEditingTitle)

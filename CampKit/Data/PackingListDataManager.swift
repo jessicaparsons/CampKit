@@ -31,7 +31,8 @@ func preloadPackingListData(context: ModelContext) {
     let sampleList = PackingList(
         title: "Sample Camping Trip",
         photo: placeholderImageData,
-        dateCreated: Date()
+        dateCreated: Date(),
+        locationName: "Joshua Tree National Park"
     )
     print("Created PackingList: \(sampleList.title)")
     
@@ -52,6 +53,8 @@ func preloadPackingListData(context: ModelContext) {
         "Hike 4": ["Backpack", "Chargers", "Drugs", "Camera", "Trail snacks"]
     ]
     print("Created Items: \([items])")
+    
+    
     
     
     
