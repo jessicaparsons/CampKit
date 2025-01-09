@@ -12,7 +12,8 @@ struct ListView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.editMode) private var editMode
     @Bindable var packingList: PackingList
-    @State private var isExpanded = true
+    @State private var globalIsExpanded: Bool = false
+    @State private var globalExpandCollapseAction = UUID() // Unique trigger for .onChange in CategorySectionView
     
     let hapticFeedback = UINotificationFeedbackGenerator()
     
@@ -92,7 +93,8 @@ struct ListView: View {
                                             .shadow(color: .gray.opacity(0.2), radius: 4, x: 0, y: 2)
                                         CategorySectionView(
                                             category: category,
-                                            globalIsExpanded: isExpanded,
+                                            globalIsExpanded: globalIsExpanded,
+                                            globalExpandCollapseAction: globalExpandCollapseAction,
                                             deleteCategory: deleteCategory)
                                     }
                                 }//:ZSTACK
@@ -150,13 +152,10 @@ struct ListView: View {
                 Menu {
                     
                     // Edit Title
-                    Button("Edit Title") {
+                    Button(action: {
                         isEditingTitle.toggle()
-                    }
-                    
-                    // Edit Locatoin
-                    Button("Edit Location") {
-                        shareList()
+                    }) {
+                        Label("Edit List Details", systemImage: "pencil")
                     }
                     
                     // Rearrange option
@@ -168,13 +167,24 @@ struct ListView: View {
                         Label(isRearranging ? "Done" : "Rearrange", systemImage: "arrow.up.arrow.down")
                     }
                     
-                    // Collapse All option
+                    // Expand All
                     Button(action: {
                         withAnimation {
-                            isExpanded.toggle()
+                            globalIsExpanded = true
+                            globalExpandCollapseAction = UUID()
                         }
                     }) {
-                        Label("Expand/Collapse All", systemImage: "arrowtriangle.up")
+                        Label("Expand All", systemImage: "rectangle.expand.vertical")
+                    }
+                    
+                    // Collapse All
+                    Button(action: {
+                        withAnimation {
+                            globalIsExpanded = false
+                            globalExpandCollapseAction = UUID()
+                        }
+                    }) {
+                        Label("Collapse All", systemImage: "rectangle.compress.vertical")
                     }
                     
                     // Delete List

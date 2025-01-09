@@ -29,7 +29,7 @@ struct ListDetailView: View {
                     Spacer()
                 }//:HSTACK
                 .sheet(isPresented: $isEditingTitle) {
-                    EditTitleView(packingList: packingList)
+                    EditListScreen(packingList: packingList)
                 }
             }//:HSTACK
             Text(location)
@@ -50,7 +50,7 @@ struct ListDetailView: View {
     }
 }
 
-struct EditTitleView: View {
+struct EditListScreen: View {
     @Bindable var packingList: PackingList
     @Environment(\.dismiss) var dismiss
     
@@ -63,7 +63,7 @@ struct EditTitleView: View {
                 
                 Spacer()
             }
-            .navigationTitle("Edit Title")
+            .navigationTitle("Edit List Details")
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Done") {

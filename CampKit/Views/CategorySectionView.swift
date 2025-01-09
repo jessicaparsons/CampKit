@@ -13,10 +13,11 @@ struct CategorySectionView: View {
     @Bindable var category: Category
     @State private var item: String = ""
     
-    @State private var isExpanded: Bool = true
+    @State private var isExpanded: Bool = false
     @State private var isEditing: Bool = false
     
-    let globalIsExpanded: Bool
+    let globalIsExpanded: Bool // Desired global state
+    let globalExpandCollapseAction: UUID // Unique trigger
     let deleteCategory: (Category) -> Void
     
     let hapticFeedback = UINotificationFeedbackGenerator()
@@ -94,8 +95,8 @@ struct CategorySectionView: View {
                 .padding(.trailing, 10)
             }
         } //:DISCLOSURE GROUP
-        .onChange(of: globalIsExpanded) {
-            isExpanded = !globalIsExpanded
+        .onChange(of: globalExpandCollapseAction) {
+            isExpanded = globalIsExpanded
         }
         .animation(.easeInOut, value: isExpanded)
         .disclosureGroupStyle(LeftDisclosureStyle())
@@ -160,7 +161,8 @@ struct LeftDisclosureStyle: DisclosureGroupStyle {
     ZStack {
         Color(.colorTan)
         CategorySectionView(
-            category: Category(name: "Sleeping", position: 0), globalIsExpanded: isExpanded,
+            category: Category(name: "Sleeping", position: 0), globalIsExpanded: false,
+            globalExpandCollapseAction: UUID(),
             deleteCategory: { category in
                 print("Mock delete category: \(category.name)")
             }
