@@ -12,13 +12,13 @@ struct ListView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.editMode) private var editMode
     @Bindable var packingList: PackingList
+    @State private var isExpanded: Bool = true
     
     let hapticFeedback = UINotificationFeedbackGenerator()
     
     @State private var item: String = ""
     @State private var showPhotoPicker = false
     @State private var isRearranging = false
-    @State private var isExpanded: Bool = false
     @State private var draggedCategory: Category?
     
     
@@ -92,6 +92,7 @@ struct ListView: View {
                                             .shadow(color: .gray.opacity(0.2), radius: 4, x: 0, y: 2)
                                         CategorySectionView(
                                             category: category,
+                                            isExpanded: $isExpanded,
                                             deleteCategory: deleteCategory)
                                     }
                                 }//:ZSTACK
@@ -115,10 +116,27 @@ struct ListView: View {
                     .environment(\.editMode, editMode)
                     .padding()
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
-                }
+                
+                    
+                }//:ZSTACK
                 .background(Color.colorTan)
                 .offset(y: -20)
                 
+                HStack {
+                    Button {
+                        addNewCategory()
+                    } label: {
+                        HStack {
+                            Image(systemName: "plus")
+                            Text("Add New Category")
+                                .padding(5)
+                        }
+                    }
+                    .buttonStyle(BigButton())
+                    Spacer()
+                }//:HSTACK
+                .padding(.horizontal)
+                .offset(y: -20)
                 
             }//:SCROLL VIEW
             .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -145,7 +163,7 @@ struct ListView: View {
                             isExpanded.toggle()
                         }
                     }) {
-                        Label(isExpanded ? "Expand All" : "Collapse All", systemImage: isExpanded ? "arrowtriangle.down" : "arrowtriangle.up")
+                        Label(isExpanded ? "Collapse All" : "Expand All", systemImage: isExpanded ? "arrowtriangle.down" : "arrowtriangle.up")
                     }
                     
                 } label: {
@@ -156,6 +174,20 @@ struct ListView: View {
         .tint(.white)
         
     }//:BODY
+    
+    
+    //MARK: - Edit List
+    
+    private func addNewCategory() {
+        withAnimation {
+            let newPosition = packingList.categories.count
+            let newCategory = Category(name: "New Category", position: newPosition)
+            packingList.categories.append(newCategory)
+            modelContext.insert(newCategory)
+            print("All categories: \(packingList.categories)")
+        }
+    }
+    
     
     private func deleteCategory(_ category: Category) {
         withAnimation {

@@ -13,7 +13,7 @@ struct CategorySectionView: View {
     @Bindable var category: Category
     @State private var item: String = ""
     
-    @State private var isExpanded: Bool = true
+    @Binding var isExpanded: Bool
     @State private var isEditing: Bool = false
     
     let deleteCategory: (Category) -> Void
@@ -145,10 +145,13 @@ struct LeftDisclosureStyle: DisclosureGroupStyle {
 }
 
 #Preview {
+    
+    @Previewable @State var isExpanded: Bool = true
+    
     ZStack {
         Color(.colorTan)
         CategorySectionView(
-            category: Category(name: "Sleeping", position: 0),
+            category: Category(name: "Sleeping", position: 0), isExpanded: $isExpanded,
             deleteCategory: { category in
                 print("Mock delete category: \(category.name)")
             }

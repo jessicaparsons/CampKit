@@ -52,6 +52,13 @@ struct HomeListView: View {
                                     .frame(width: 50, height: 50)
                                     .cornerRadius(8)
                                     .padding(.trailing, 8)
+                            } else {
+                                Image("TopographyDesign")
+                                        .resizable()
+                                        .scaledToFill()
+                                        .frame(width: 50, height: 50)
+                                        .cornerRadius(8)
+                                        .padding(.trailing, 8)
                             }
                             
                             VStack(alignment: .leading) {
