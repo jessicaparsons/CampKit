@@ -20,7 +20,7 @@ struct ListView: View {
     @State private var showPhotoPicker = false
     @State private var isRearranging = false
     @State private var draggedCategory: Category?
-    
+    @State private var isEditingTitle: Bool = false
     
     private func textColor(for item: Item) -> Color {
         item.isPacked ? Color.accentColor : Color.primary
@@ -68,7 +68,7 @@ struct ListView: View {
                 
                 // Details Card
                 ZStack {
-                    ListDetailView(packingList: packingList)
+                    ListDetailView(packingList: packingList, isEditingTitle: $isEditingTitle)
                         .offset(y: -20)
                 }
                 .background(Color.colorTan)
@@ -148,6 +148,17 @@ struct ListView: View {
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Menu {
+                    
+                    // Edit Title
+                    Button("Edit Title") {
+                        isEditingTitle.toggle()
+                    }
+                    
+                    // Edit Locatoin
+                    Button("Edit Location") {
+                        shareList()
+                    }
+                    
                     // Rearrange option
                     Button(action: {
                         withAnimation {
@@ -166,6 +177,13 @@ struct ListView: View {
                         Label("Expand/Collapse All", systemImage: "arrowtriangle.up")
                     }
                     
+                    // Delete List
+                    Button(role: .destructive) {
+                        deleteList()
+                    } label: {
+                        Label("Delete List", systemImage: "trash")
+                    }
+                    
                 } label: {
                     Label("Options", systemImage: "ellipsis.circle")
                 }
@@ -177,6 +195,14 @@ struct ListView: View {
     
     
     //MARK: - Edit List
+    
+    func shareList() {
+        print("Sharing the list!")
+    }
+    
+    func deleteList() {
+        print("Deleting the list!")
+    }
     
     private func addNewCategory() {
         withAnimation {

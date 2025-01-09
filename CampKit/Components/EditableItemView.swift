@@ -17,6 +17,8 @@ struct EditableItemView: View {
     @State private var willDelete = false
     private let deletionThreshold: CGFloat = 100
     
+    let hapticFeedback = UINotificationFeedbackGenerator()
+    
     private func textColor(for item: Item) -> Color {
         item.isPacked ? Color.accentColor : Color.primary
     }
@@ -72,6 +74,7 @@ struct EditableItemView: View {
                     .onEnded { _ in
                         if willDelete {
                             deleteItem()
+                            hapticFeedback.notificationOccurred(.success)
                         } else {
                             withAnimation {
                                 offset = 0 // Reset position if not deleted

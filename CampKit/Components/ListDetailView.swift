@@ -11,7 +11,7 @@ import SwiftUI
 struct ListDetailView: View {
     @Environment(\.modelContext) private var modelContext
     @Bindable var packingList: PackingList // Binding to the SwiftData model
-    @State private var isEditingTitle: Bool = false
+    @Binding var isEditingTitle: Bool
     
     //placeholders
     @State private var location: String = "Yosemite National Park"
@@ -23,39 +23,21 @@ struct ListDetailView: View {
             HStack {
                 HStack {
                     Spacer()
-                    TextField("New Packing List", text: $packingList.title)
-                        .textFieldStyle(.plain)
+                    Text(packingList.title)
                         .multilineTextAlignment(.center)
                         .font(.title2.weight(.bold))
-                        .offset(x: 5)
-                    Menu {
-                        Button("Edit Title") {
-                            isEditingTitle.toggle()
-                        }
-                        Button("Edit Location") {
-                            shareList()
-                        }
-                        Button(role: .destructive) {
-                            deleteList()
-                        } label: {
-                            Label("Delete List", systemImage: "trash")
-                        }
-                    } label: {
-                        Image(systemName: "pencil")
-                            .font(.title3)
-                    }
                     Spacer()
                 }//:HSTACK
                 .sheet(isPresented: $isEditingTitle) {
                     EditTitleView(packingList: packingList)
                 }
             }//:HSTACK
-                Text(location)
-                    .fontWeight(.bold)
-                HStack {
-                    Image(systemName: "cloud")
-                    Text(weather)
-                }//:HSTACK
+            Text(location)
+                .fontWeight(.bold)
+            HStack {
+                Image(systemName: "cloud")
+                Text(weather)
+            }//:HSTACK
             
         }//:VSTACK
         .padding()
@@ -66,21 +48,12 @@ struct ListDetailView: View {
         )
         .padding(.horizontal, 20)
     }
-    
-    func shareList() {
-        print("Sharing the list!")
-    }
-    
-    func deleteList() {
-        print("Deleting the list!")
-    }
-    
 }
 
 struct EditTitleView: View {
     @Bindable var packingList: PackingList
     @Environment(\.dismiss) var dismiss
-
+    
     var body: some View {
         NavigationStack {
             VStack {
@@ -96,7 +69,7 @@ struct EditTitleView: View {
                     Button("Done") {
                         dismiss()
                         packingList.title = packingList.title.trimmingCharacters(in: .whitespacesAndNewlines)
-
+                        
                     }
                 }
             }
@@ -106,9 +79,11 @@ struct EditTitleView: View {
 
 #Preview {
     
+    @Previewable @State var isEditingTitle: Bool = false
+    
     let sampleUserList = PackingList(title: "Summer List")
     ZStack {
         Color(.gray)
-        ListDetailView(packingList: sampleUserList)
+        ListDetailView(packingList: sampleUserList, isEditingTitle: $isEditingTitle)
     }
 }
