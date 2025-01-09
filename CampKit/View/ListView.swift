@@ -12,7 +12,7 @@ struct ListView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.editMode) private var editMode
     @Bindable var packingList: PackingList
-    @State private var isExpanded: Bool = true
+    @State private var isExpanded = true
     
     let hapticFeedback = UINotificationFeedbackGenerator()
     
@@ -92,7 +92,7 @@ struct ListView: View {
                                             .shadow(color: .gray.opacity(0.2), radius: 4, x: 0, y: 2)
                                         CategorySectionView(
                                             category: category,
-                                            isExpanded: $isExpanded,
+                                            globalIsExpanded: isExpanded,
                                             deleteCategory: deleteCategory)
                                     }
                                 }//:ZSTACK
@@ -128,7 +128,7 @@ struct ListView: View {
                     } label: {
                         HStack {
                             Image(systemName: "plus")
-                            Text("Add New Category")
+                            Text("New Category")
                                 .padding(5)
                         }
                     }
@@ -163,7 +163,7 @@ struct ListView: View {
                             isExpanded.toggle()
                         }
                     }) {
-                        Label(isExpanded ? "Collapse All" : "Expand All", systemImage: isExpanded ? "arrowtriangle.down" : "arrowtriangle.up")
+                        Label(isExpanded ? "Expand All" : "Collapse All", systemImage: isExpanded ? "arrowtriangle.down" : "arrowtriangle.up")
                     }
                     
                 } label: {
