@@ -14,6 +14,8 @@ struct EditableItemView: View {
     @Bindable var item: Item
     
     @State private var offset: CGFloat = 0
+    @State private var willDelete = false
+    private let deletionThreshold: CGFloat = 100
     
     private func textColor(for item: Item) -> Color {
         item.isPacked ? Color.accentColor : Color.primary
@@ -21,9 +23,25 @@ struct EditableItemView: View {
     
     var body: some View {
         ZStack {
+            
+            // Background for delete action
+            HStack {
+                Spacer()
+                Rectangle()
+                    .fill(Color.red)
+                    .frame(width: abs(offset)) // Show background width based on drag distance
+                    .overlay(
+                        Image(systemName: "trash")
+                            .foregroundColor(.white)
+                            .font(.system(size: 24))
+                            .padding(.trailing, 16),
+                        alignment: .trailing
+                    )
+            }
+            
+            // Foreground for list item
             HStack {
                 Button(action: {
-                    // Toggle completion state
                     item.isPacked.toggle()
                 }) {
                     Image(systemName: item.isPacked ? "checkmark.circle.fill" : "circle")
@@ -39,9 +57,46 @@ struct EditableItemView: View {
             }
             .offset(x: offset)
             .padding(.vertical, 5)
+            .padding(.horizontal)
+            .background(Color.white) // Prevent bleed-through from red background
+            .cornerRadius(5)
+            .offset(x: offset)
+            .gesture(
+                DragGesture()
+                    .onChanged { gesture in
+                        if gesture.translation.width < 0 { // Dragging to the left
+                            offset = gesture.translation.width
+                            willDelete = abs(offset) > deletionThreshold
+                        }
+                    }
+                    .onEnded { _ in
+                        if willDelete {
+                            deleteItem()
+                        } else {
+                            withAnimation {
+                                offset = 0 // Reset position if not deleted
+                            }
+                        }
+                    }
+            )
+            .animation(.spring(), value: offset)
+        }//:ZSTACK
+        
+    }//:BODY
+    
+    private func deleteItem() {
+        withAnimation {
+            modelContext.delete(item)
+            do {
+                try modelContext.save()
+                print("Item deleted successfully.")
+            } catch {
+                print("Failed to delete item: \(error.localizedDescription)")
+            }
         }
     }
 }
+
 
 
 #Preview {

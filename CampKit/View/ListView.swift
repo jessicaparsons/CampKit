@@ -75,7 +75,7 @@ struct ListView: View {
                 
                 //Lists Display
                 ZStack {
-                    LazyVStack {
+                    LazyVStack(spacing: 10) {
                         if packingList.categories.isEmpty {
                             ContentUnavailableView(
                                 "No Lists Available",
@@ -163,7 +163,7 @@ struct ListView: View {
                             isExpanded.toggle()
                         }
                     }) {
-                        Label(isExpanded ? "Expand All" : "Collapse All", systemImage: isExpanded ? "arrowtriangle.down" : "arrowtriangle.up")
+                        Label("Expand/Collapse All", systemImage: "arrowtriangle.up")
                     }
                     
                 } label: {

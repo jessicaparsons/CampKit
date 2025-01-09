@@ -43,7 +43,8 @@ struct CategorySectionView: View {
                     }
                 
             }//:HSTACK
-            .padding(.top, 10)
+            .padding(.vertical, 10)
+            .padding(.horizontal)
             
         } label: {
             // Editable text field for category name
@@ -63,6 +64,9 @@ struct CategorySectionView: View {
                 } label: {
                     Text("Done")
                 }
+                .padding(.vertical)
+                .padding(.leading, 30)
+                .padding(.trailing, 10)
             } else {
                 HStack {
                     Text(category.name)
@@ -85,13 +89,15 @@ struct CategorySectionView: View {
                     } //:MENU
                     .labelStyle(.iconOnly)
                 }
+                .padding(.vertical)
+                .padding(.leading, 30)
+                .padding(.trailing, 10)
             }
         } //:DISCLOSURE GROUP
         .onChange(of: globalIsExpanded) {
             isExpanded = !globalIsExpanded
         }
         .animation(.easeInOut, value: isExpanded)
-        .padding()
         .disclosureGroupStyle(LeftDisclosureStyle())
         
         
@@ -132,11 +138,10 @@ struct LeftDisclosureStyle: DisclosureGroupStyle {
                     Image(systemName: configuration.isExpanded ? "chevron.down" : "chevron.right")
                         .foregroundColor(.accentColor)
                         .font(.caption.lowercaseSmallCaps())
-                        .animation(nil, value: configuration.isExpanded)
+                        .offset(x: 20)
+                        .animation(.default, value: configuration.isExpanded)
                     configuration.label
                     Spacer()
-                    
-
                 }
                 .contentShape(Rectangle())
             }
