@@ -25,25 +25,6 @@ struct EditableItemView: View {
     
     var body: some View {
         ZStack {
-            
-            // Background for delete action
-            HStack {
-                Spacer()
-                if offset != 0 {
-                    Rectangle()
-                        .fill(Color.red)
-                        .frame(width: abs(offset)) // Show background width based on drag distance
-                        .overlay(
-                            Image(systemName: "trash")
-                                .foregroundColor(.white)
-                                .font(.system(size: trashIconSize()))
-                                .padding(.trailing, 16),
-                            alignment: .trailing
-                        )
-                }
-            }
-            
-            // Foreground for list item
             HStack {
                 Button(action: {
                     item.isPacked.toggle()
@@ -62,51 +43,11 @@ struct EditableItemView: View {
             .offset(x: offset)
             .padding(.vertical, 5)
             .padding(.horizontal)
-            .background(Color.colorWhite) // Prevent bleed-through from red background
+            .background(Color.colorWhite)
             .offset(x: offset)
-            .gesture(
-                DragGesture()
-                    .onChanged { gesture in
-                        if gesture.translation.width < 0 { // Dragging to the left
-                            offset = gesture.translation.width
-                            let newWillDelete = abs(offset) > deletionThreshold
-                            if newWillDelete != willDelete { // Only trigger feedback on state change
-                                willDelete = newWillDelete
-                                if willDelete {
-                                    hapticFeedback.notificationOccurred(.warning)
-                                }
-                            }
-                        }
-                    }
-                    .onEnded { _ in
-                        if willDelete {
-                            if abs(offset) > deletionThreshold {
-                                withAnimation {
-                                    offset = -UIScreen.main.bounds.width
-                                }
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                                    deleteItem()
-                                    hapticFeedback.notificationOccurred(.success)
-                                }
-                            }
-                        } else {
-                            withAnimation(.spring) {
-                                offset = 0 // Reset position if not deleted
-                            }
-                        }
-                    }
-            )
-           .animation(.spring(), value: offset)
         }//:ZSTACK
         
     }//:BODY
-    
-    private func trashIconSize() -> CGFloat {
-        let baseSize: CGFloat = 14
-        let maxSize: CGFloat = 20
-        let scaleFactor = min(abs(offset) / deletionThreshold, 1.0) // Max scale is 1.0
-        return baseSize + (maxSize - baseSize) * scaleFactor
-    }
     
     private func deleteItem() {
         withAnimation {

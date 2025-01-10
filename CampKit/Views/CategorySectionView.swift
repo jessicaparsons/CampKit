@@ -7,29 +7,67 @@
 
 import SwiftUI
 import SwiftData
+import SwipeCell
 
 struct CategorySectionView: View {
     @Environment(\.modelContext) private var modelContext
     @Bindable var category: Category
     @State private var item: String = ""
     
-    @State private var isExpanded: Bool = false
+    @State private var isExpanded: Bool = true
     @State private var isEditing: Bool = false
     
     let globalIsExpanded: Bool // Desired global state
     let globalExpandCollapseAction: UUID // Unique trigger
     let deleteCategory: (Category) -> Void
     
+    
     let hapticFeedback = UINotificationFeedbackGenerator()
     
     var body: some View {
+        
         DisclosureGroup(isExpanded: $isExpanded) {
             
             //Iterate through items in the category
             ForEach(category.items) { item in
                 
                 EditableItemView(item: item)
-                
+                    .swipeCell(
+                        cellPosition: .both,
+                        leftSlot: nil,
+                        rightSlot:
+                            SwipeCellSlot(
+                                slots: [
+                                    SwipeCellButton(buttonStyle: .view,
+                                        title: "",
+                                        systemImage: "",
+                                        view: {
+                                            AnyView(
+                                                Image(systemName: "trash")
+                                                    .resizable()
+                                                    .aspectRatio(contentMode: .fit)
+                                                    .frame(width: 20, height: 20)
+                                                    .foregroundColor(.white)
+                                            )},
+                                        backgroundColor: .red,
+                                            action: {
+                                                deleteItem(item)
+                                            },
+                                        feedback:true
+                                                   ),
+                                    
+                                ],
+                                slotStyle: .destructiveDelay),
+                        swipeCellStyle: SwipeCellStyle(
+                            alignment: .leading,
+                            dismissWidth: 20,
+                            appearWidth: 20,
+                            destructiveWidth: 240,
+                            vibrationForButton: .error,
+                            vibrationForDestructive: .heavy,
+                            autoResetTime: 3)
+                            )
+                    .dismissSwipeCellForScrollViewForLazyVStack()
             }//:FOREACH
             // Add new item to the category
             HStack {
@@ -102,6 +140,18 @@ struct CategorySectionView: View {
         
     }//:BODY
     
+    private func deleteItem(_ item: Item) {
+        withAnimation {
+            modelContext.delete(item)
+            do {
+                try modelContext.save()
+                print("Item deleted successfully.")
+            } catch {
+                print("Failed to delete item: \(error.localizedDescription)")
+            }
+        }
+    }
+    
     
     private func addItem(to category: Category) {
         if !item.isEmpty {
@@ -165,5 +215,6 @@ struct LeftDisclosureStyle: DisclosureGroupStyle {
                 print("Mock delete category: \(category.name)")
             }
         )
+        .frame(height:50)
     }
 }

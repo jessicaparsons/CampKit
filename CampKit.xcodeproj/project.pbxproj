@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		C82EBE932D3116E2000B39DF /* SwipeCell in Frameworks */ = {isa = PBXBuildFile; productRef = C82EBE922D3116E2000B39DF /* SwipeCell */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		C8B614F22D27078500E1DB8D /* CampKit.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CampKit.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -36,6 +40,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C82EBE932D3116E2000B39DF /* SwipeCell in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -78,6 +83,7 @@
 			);
 			name = CampKit;
 			packageProductDependencies = (
+				C82EBE922D3116E2000B39DF /* SwipeCell */,
 			);
 			productName = CampKit;
 			productReference = C8B614F22D27078500E1DB8D /* CampKit.app */;
@@ -107,6 +113,9 @@
 			);
 			mainGroup = C8B614E92D27078500E1DB8D;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				C82EBE912D3116E2000B39DF /* XCRemoteSwiftPackageReference "SwipeCell" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = C8B614F32D27078500E1DB8D /* Products */;
 			projectDirPath = "";
@@ -339,6 +348,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		C82EBE912D3116E2000B39DF /* XCRemoteSwiftPackageReference "SwipeCell" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/fatbobman/SwipeCell";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.9.8;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		C82EBE922D3116E2000B39DF /* SwipeCell */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C82EBE912D3116E2000B39DF /* XCRemoteSwiftPackageReference "SwipeCell" */;
+			productName = SwipeCell;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = C8B614EA2D27078500E1DB8D /* Project object */;
 }
