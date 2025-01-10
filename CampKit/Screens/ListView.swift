@@ -91,7 +91,7 @@ struct ListView: View {
                                 ZStack {
                                     ZStack {
                                         RoundedRectangle(cornerRadius: 10)
-                                            .fill(Color.white) // Background color
+                                            .fill(Color.customWhite) // Background color
                                             .shadow(color: .gray.opacity(0.2), radius: 4, x: 0, y: 2)
                                         CategorySectionView(
                                             category: category,
@@ -99,19 +99,7 @@ struct ListView: View {
                                             globalExpandCollapseAction: globalExpandCollapseAction,
                                             deleteCategory: deleteCategory)
                                     }
-                                }//:ZSTACK
-//                                .onDrag {
-//                                    self.draggedCategory = category
-//                                    return NSItemProvider(object: "\(category.id)" as NSString)
-//                                }
-//                                .onDrop(
-//                                    of: [.text],
-//                                    delegate: CategoryDropDelegate(
-//                                        currentCategory: category,
-//                                        categories: $packingList.categories,
-//                                        draggedCategory: $draggedCategory
-//                                    )
-//                                )
+                                }
                             }//:FOREACH
                             
                         }//:ELSE

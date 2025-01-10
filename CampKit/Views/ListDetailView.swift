@@ -27,9 +27,7 @@ struct ListDetailView: View {
                         .font(.title2.weight(.bold))
                     Spacer()
                 }//:HSTACK
-                .sheet(isPresented: $isEditingTitle) {
-                    EditListScreen(packingList: packingList)
-                }
+                
             }//:HSTACK
             Text(packingList.locationName ?? "No Location Set")
                 .fontWeight(.bold)
@@ -42,10 +40,16 @@ struct ListDetailView: View {
         .padding()
         .background(
             RoundedRectangle(cornerRadius: 15)
-                .fill(Color.white)
-                .shadow(color: .gray, radius: 3, x: 0, y: 3)
+                .fill(Color.colorWhite)
+                .shadow(color: Color(hue: 1.0, saturation: 1.0, brightness: 0.079, opacity: 0.3), radius: 3, x: 0, y: 3)
         )
-        .padding(.horizontal, 20)
+        .padding(.horizontal, 15)
+        .sheet(isPresented: $isEditingTitle) {
+            EditListScreen(packingList: packingList)
+        }
+        .onTapGesture {
+            isEditingTitle = true
+        }
     }
 }
 

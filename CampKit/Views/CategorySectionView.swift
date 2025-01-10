@@ -31,7 +31,6 @@ struct CategorySectionView: View {
                 EditableItemView(item: item)
                 
             }//:FOREACH
-            
             // Add new item to the category
             HStack {
                 Image(systemName: "plus.circle")
@@ -98,7 +97,6 @@ struct CategorySectionView: View {
         .onChange(of: globalExpandCollapseAction) {
             isExpanded = globalIsExpanded
         }
-        //.animation(.easeInOut, value: isExpanded)
         .disclosureGroupStyle(LeftDisclosureStyle())
         
         
