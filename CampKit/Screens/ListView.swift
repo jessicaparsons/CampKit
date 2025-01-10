@@ -100,18 +100,18 @@ struct ListView: View {
                                             deleteCategory: deleteCategory)
                                     }
                                 }//:ZSTACK
-                                .onDrag {
-                                    self.draggedCategory = category
-                                    return NSItemProvider(object: "\(category.id)" as NSString)
-                                }
-                                .onDrop(
-                                    of: [.text],
-                                    delegate: CategoryDropDelegate(
-                                        currentCategory: category,
-                                        categories: $packingList.categories,
-                                        draggedCategory: $draggedCategory
-                                    )
-                                )
+//                                .onDrag {
+//                                    self.draggedCategory = category
+//                                    return NSItemProvider(object: "\(category.id)" as NSString)
+//                                }
+//                                .onDrop(
+//                                    of: [.text],
+//                                    delegate: CategoryDropDelegate(
+//                                        currentCategory: category,
+//                                        categories: $packingList.categories,
+//                                        draggedCategory: $draggedCategory
+//                                    )
+//                                )
                             }//:FOREACH
                             
                         }//:ELSE
@@ -161,11 +161,9 @@ struct ListView: View {
                     
                     // Rearrange option
                     Button(action: {
-                        withAnimation {
-                            isRearranging.toggle()
-                        }
+                        isRearranging = true
                     }) {
-                        Label(isRearranging ? "Done" : "Rearrange", systemImage: "arrow.up.arrow.down")
+                        Label("Rearrange", systemImage: "arrow.up.arrow.down")
                     }
                     
                     // Expand All
@@ -201,6 +199,9 @@ struct ListView: View {
             }
         }//:TOOLBAR
         .tint(.white)
+        .sheet(isPresented: $isRearranging) {
+            RearrangeCategoriesView(categories: $packingList.categories)
+        }
         .confirmationDialog(
             "Are you sure you want to delete this list?",
                 isPresented: $showDeleteConfirmation,
@@ -276,14 +277,6 @@ struct ListView: View {
         }
     }
     
-    private func toggleRearrangeMode() {
-        withAnimation {
-            isRearranging.toggle()
-            editMode?.wrappedValue = isRearranging ? .active : .inactive
-        }
-        print(isRearranging ? "Rearranging mode enabled." : "Rearranging mode disabled.")
-    }
-    
     private func addItem(to category: Category) {
         withAnimation {
             if !item.isEmpty {
@@ -297,48 +290,48 @@ struct ListView: View {
     
 }
 
-//MARK: - DRAG AND DROP METHODS
-
-struct CategoryDropDelegate: DropDelegate {
-    let currentCategory: Category
-    @Binding var categories: [Category]
-    @Binding var draggedCategory: Category?
-    
-    func dropUpdated(info: DropInfo) -> DropProposal? {
-        return DropProposal(operation: .move)
-    }
-    
-    func performDrop(info: DropInfo) -> Bool {
-        draggedCategory = nil
-        return true
-    }
-    
-    func dropEntered(info: DropInfo) {
-        guard let draggedCategory,
-              let fromIndex = categories.firstIndex(of: draggedCategory),
-              let toIndex = categories.firstIndex(of: currentCategory),
-              fromIndex != toIndex else { return }
-        
-        withAnimation {
-            // Reorder categories in the array
-            categories.move(fromOffsets: IndexSet(integer: fromIndex), toOffset: toIndex)
-            
-            // Update the positions after the move
-            updateCategoryPositions()
-        }
-    }
-    
-    func validateDrop(info: DropInfo) -> Bool {
-        return true
-    }
-    
-    private func updateCategoryPositions() {
-        for (index, category) in categories.enumerated() {
-            category.position = index
-        }
-        print("Updated positions: \(categories.map { "\($0.name): \($0.position)" })")
-    }
-}
+////MARK: - DRAG AND DROP METHODS
+//
+//struct CategoryDropDelegate: DropDelegate {
+//    let currentCategory: Category
+//    @Binding var categories: [Category]
+//    @Binding var draggedCategory: Category?
+//    
+//    func dropUpdated(info: DropInfo) -> DropProposal? {
+//        return DropProposal(operation: .move)
+//    }
+//    
+//    func performDrop(info: DropInfo) -> Bool {
+//        draggedCategory = nil
+//        return true
+//    }
+//    
+//    func dropEntered(info: DropInfo) {
+//        guard let draggedCategory,
+//              let fromIndex = categories.firstIndex(of: draggedCategory),
+//              let toIndex = categories.firstIndex(of: currentCategory),
+//              fromIndex != toIndex else { return }
+//        
+//        withAnimation {
+//            // Reorder categories in the array
+//            categories.move(fromOffsets: IndexSet(integer: fromIndex), toOffset: toIndex)
+//            
+//            // Update the positions after the move
+//            updateCategoryPositions()
+//        }
+//    }
+//    
+//    func validateDrop(info: DropInfo) -> Bool {
+//        return true
+//    }
+//    
+//    private func updateCategoryPositions() {
+//        for (index, category) in categories.enumerated() {
+//            category.position = index
+//        }
+//        print("Updated positions: \(categories.map { "\($0.name): \($0.position)" })")
+//    }
+//}
 
 
 #Preview("Sample Data") {
