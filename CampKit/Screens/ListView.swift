@@ -11,6 +11,7 @@ import SwiftData
 struct ListView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.editMode) private var editMode
+    @Environment(\.dismiss) private var dismiss
     @Bindable var packingList: PackingList
     @State private var globalIsExpanded: Bool = false
     @State private var globalExpandCollapseAction = UUID() // Unique trigger for .onChange in CategorySectionView
@@ -22,6 +23,7 @@ struct ListView: View {
     @State private var isRearranging = false
     @State private var draggedCategory: Category?
     @State private var isEditingTitle: Bool = false
+    @State private var showDeleteConfirmation = false
     
     private func textColor(for item: Item) -> Color {
         item.isPacked ? Color.accentColor : Color.primary
@@ -146,7 +148,6 @@ struct ListView: View {
             
         }//:NAVIGATION STACK
         .tint(.accentColor)
-        
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Menu {
@@ -189,7 +190,7 @@ struct ListView: View {
                     
                     // Delete List
                     Button(role: .destructive) {
-                        deleteList()
+                        showDeleteConfirmation = true
                     } label: {
                         Label("Delete List", systemImage: "trash")
                     }
@@ -200,6 +201,16 @@ struct ListView: View {
             }
         }//:TOOLBAR
         .tint(.white)
+        .confirmationDialog(
+            "Are you sure you want to delete this list?",
+                isPresented: $showDeleteConfirmation,
+                titleVisibility: .visible
+        ) {
+            Button("Delete", role: .destructive) {
+                deleteList() // Perform delete
+            }
+            Button("Cancel", role: .cancel) { }
+            }
         
     }//:BODY
     
@@ -211,7 +222,19 @@ struct ListView: View {
     }
     
     func deleteList() {
-        print("Deleting the list!")
+        withAnimation {
+            // Delete the category from SwiftData
+            modelContext.delete(packingList)
+            
+            // Save changes
+            do {
+                try modelContext.save()
+                print("Category \(packingList) deleted successfully.")
+                dismiss()
+            } catch {
+                print("Failed to delete list: \(error.localizedDescription)")
+            }
+        }
     }
     
     private func addNewCategory() {
@@ -315,8 +338,6 @@ struct CategoryDropDelegate: DropDelegate {
         }
         print("Updated positions: \(categories.map { "\($0.name): \($0.position)" })")
     }
-    
-    
 }
 
 

@@ -98,7 +98,7 @@ struct CategorySectionView: View {
         .onChange(of: globalExpandCollapseAction) {
             isExpanded = globalIsExpanded
         }
-        .animation(.easeInOut, value: isExpanded)
+        //.animation(.easeInOut, value: isExpanded)
         .disclosureGroupStyle(LeftDisclosureStyle())
         
         

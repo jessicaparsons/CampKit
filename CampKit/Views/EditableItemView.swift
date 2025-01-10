@@ -15,7 +15,7 @@ struct EditableItemView: View {
     
     @State private var offset: CGFloat = 0
     @State private var willDelete = false
-    private let deletionThreshold: CGFloat = 100
+    private let deletionThreshold: CGFloat = 120
     
     let hapticFeedback = UINotificationFeedbackGenerator()
     
@@ -35,7 +35,7 @@ struct EditableItemView: View {
                     .overlay(
                         Image(systemName: "trash")
                             .foregroundColor(.white)
-                            .font(.system(size: 24))
+                            .font(.system(size: trashIconSize()))
                             .padding(.trailing, 16),
                         alignment: .trailing
                     )
@@ -68,7 +68,13 @@ struct EditableItemView: View {
                     .onChanged { gesture in
                         if gesture.translation.width < 0 { // Dragging to the left
                             offset = gesture.translation.width
-                            willDelete = abs(offset) > deletionThreshold
+                            let newWillDelete = abs(offset) > deletionThreshold
+                            if newWillDelete != willDelete { // Only trigger feedback on state change
+                                willDelete = newWillDelete
+                                if willDelete {
+                                    hapticFeedback.notificationOccurred(.warning)
+                                }
+                            }
                         }
                     }
                     .onEnded { _ in
@@ -86,6 +92,13 @@ struct EditableItemView: View {
         }//:ZSTACK
         
     }//:BODY
+    
+    private func trashIconSize() -> CGFloat {
+        let baseSize: CGFloat = 18
+        let maxSize: CGFloat = 24
+        let scaleFactor = min(abs(offset) / deletionThreshold, 1.0) // Max scale is 1.0
+        return baseSize + (maxSize - baseSize) * scaleFactor
+    }
     
     private func deleteItem() {
         withAnimation {
