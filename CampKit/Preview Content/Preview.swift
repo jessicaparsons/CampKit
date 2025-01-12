@@ -7,24 +7,28 @@
 
 import Foundation
 import SwiftData
+import SwiftUI
 
-struct Preview {
+struct Preview: PreviewModifier {
     
-let modelContainer: ModelContainer
-    init() {
+    static func makeSharedContext() async throws -> Context {
         let config = ModelConfiguration(isStoredInMemoryOnly: true)
-        do {
-            modelContainer = try ModelContainer(for: PackingList.self, configurations: config)
-        } catch {
-            fatalError("Could not initialize ModelContainer")
+        let container = try ModelContainer(for: PackingList.self, Category.self, configurations: config)
+        
+        
+        for category in Category.sampleCategories {
+            container.mainContext.insert(category)
+            
         }
+        
+        return container
     }
     
-    func addExamples(_ examples: PackingList) {
-        Task {
-            @MainActor in
-                modelContainer.mainContext.insert(examples)
-            }
+    func body(content: Content, context: ModelContainer) -> some View {
+        content.modelContainer(context)
     }
-    
 }
+
+//extension PreviewTrait where T == Preview.ViewTraits {
+//    @MainActor static var sampleData: Self = .modifier(SampleDataReminders())
+//}

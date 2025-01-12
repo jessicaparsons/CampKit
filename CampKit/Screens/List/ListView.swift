@@ -43,6 +43,7 @@ struct ListView: View {
                 }//:VSTACK
             }//:SCROLL VIEW
             .background(Color.colorTan)
+            .environmentObject(viewModel)
             
         }//:NAVIGATION STACK
         .toolbar {
@@ -162,11 +163,11 @@ struct ListView: View {
        
         HStack {
             Button(action: {
-                viewModel.checkAll.toggle
+                viewModel.toggleAllItems(using: modelContext)
             }) {
                 Label(
-                    checkAll ? "Check All" : "Uncheck All",
-                    systemImage: checkAll ? "checkmark.circle" : "checkmark.circle.fill")
+                    viewModel.areAllItemsChecked ? "Check All" : "Uncheck All",
+                    systemImage: viewModel.areAllItemsChecked ? "checkmark.circle.fill" : "checkmark.circle")
             }
             Menu {
                 // Edit Title

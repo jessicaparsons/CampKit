@@ -10,7 +10,8 @@ import SwiftData
 import SwipeCell
 
 struct CategorySectionView: View {
-    @Environment(\.modelContext) private var modelContext
+    @Environment(\.modelContext) private var modelContext: ModelContext
+    @EnvironmentObject var viewModel: ListViewModel
     @Bindable var category: Category
     @Binding var isRearranging: Bool
     
@@ -34,7 +35,11 @@ struct CategorySectionView: View {
             //Iterate through items in the category
             ForEach(category.items) { item in
                 
-                EditableItemView(item: item)
+                EditableItemView(
+                    item: item,
+                    togglePacked: {
+                    viewModel.togglePacked(for: item, using: modelContext)
+                    })
                     .swipeCell(
                         cellPosition: .both,
                         leftSlot: nil,
@@ -106,12 +111,12 @@ struct CategorySectionView: View {
                     .multilineTextAlignment(.leading)
                     .onSubmit {
                         isEditing = false // Disable editing after submit
-                        saveContext()
+                        viewModel.saveContext(using: modelContext)
                     }
                 Spacer()
                 Button {
                     isEditing = false // Disable editing after submit
-                    saveContext()
+                    viewModel.saveContext(using: modelContext)
                 } label: {
                     Text("Done")
                 }
@@ -161,16 +166,6 @@ struct CategorySectionView: View {
         
     }//:BODY
     
-    
-    
-    private func saveContext() {
-        do {
-            try modelContext.save()
-            print("Changes saved successfully.")
-        } catch {
-            print("Failed to save changes: \(error.localizedDescription)")
-        }
-    }
 }
 
 

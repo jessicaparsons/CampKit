@@ -94,19 +94,63 @@ class ListViewModel: ObservableObject {
         }
     }
     
-    func checkAll() {
-        
+    var areAllItemsChecked: Bool {
+        packingList.categories.allSatisfy { category in
+            category.items.allSatisfy { $0.isPacked }
+        }
     }
+
+    func toggleAllItems(using context: ModelContext) {
+        if areAllItemsChecked {
+            uncheckAllItems(using: context)
+        } else {
+            checkAllItems(using: context)
+        }
+    }
+    
+    
+    func checkAllItems(using context: ModelContext) {
+        for category in packingList.categories {
+            for item in category.items {
+                item.isPacked = true
+            }
+        }
+        saveContext(using: context)
+    }
+
+    func uncheckAllItems(using context: ModelContext) {
+        for category in packingList.categories {
+            for item in category.items {
+                item.isPacked = false
+            }
+        }
+        saveContext(using: context)
+    }
+    
+    func togglePacked(for item: Item, using context: ModelContext) {
+            withAnimation {
+                item.isPacked.toggle()
+                saveContext(using: context)
+            }
+        }
     
     func shareList() {
         print("Sharing the list!")
     }
     
-    func textColor(for item: Item) -> Color {
+    func packedTextColor(for item: Item) -> Color {
         item.isPacked ? .accentColor : .primary
     }
+    
+    func packedCircleColor(for item: Item) -> (systemName: String, color: Color) {
+            if item.isPacked {
+                return ("checkmark.circle.fill", .green)
+            } else {
+                return ("circle", .gray)
+            }
+    }
 
-    private func saveContext(using context: ModelContext) {
+    func saveContext(using context: ModelContext) {
         do {
             try context.save()
             print("Packing list and categories deleted successfully.")

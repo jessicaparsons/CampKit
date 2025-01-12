@@ -8,10 +8,43 @@
 import Foundation
 import UIKit
 
+extension Category {
+    
+    static var sampleCategories: [Category] {
+        [
+            Category(name: "Bed 0", position: 0, items: [
+                Item(title: "Pillows", isPacked: false),
+                Item(title: "Sleeping bag", isPacked: false),
+                Item(title: "Sleeping pad", isPacked: false),
+            ]),
+            Category(name: "Clothes 1", position: 1, items: [
+                Item(title: "Jackets", isPacked: false),
+                Item(title: "Shoes", isPacked: false),
+                Item(title: "Toiletries", isPacked: false),
+            ]),
+            Category(name: "Food 2", position: 2, items: [
+                Item(title: "Propane", isPacked: false),
+                Item(title: "Stove", isPacked: false),
+                Item(title: "Cooler", isPacked: false),
+            ]),
+            Category(name: "Lounge 3", position: 3, items: [
+                Item(title: "Chair", isPacked: false),
+                Item(title: "Books", isPacked: false),
+                Item(title: "Cards/Games", isPacked: false),
+            ]),
+            Category(name: "Hike 4", position: 4, items: [
+                Item(title: "Backpack", isPacked: false),
+                Item(title: "Camera", isPacked: false),
+                Item(title: "Trail snacks", isPacked: false),
+            ]),
+        ]
+    }
+}
+
+
 extension PackingList {
     
-    
-    static var sample: PackingList {
+    static var samplePackingList: PackingList {
         let photo = UIImage(named: "placeholder")?.pngData()
         let packingList = PackingList(
             title: "Sample Camping Trip",
@@ -19,49 +52,8 @@ extension PackingList {
             dateCreated: Date(),
             locationName: "Joshua Tree National Park"
         )
-        
-        packingList.categories = Category.sample
+        packingList.categories = Category.sampleCategories
         return packingList
-    }
-}
-
-
-extension Category {
-    
-    static var sample: [Category] {
-        let categories =
-        
-        [
-            Category(name: "Bed 0", position: 0),
-            Category(name: "Clothes 1", position: 1),
-            Category(name: "Food 2", position: 2),
-            Category(name: "Lounge 3", position: 3),
-            Category(name: "Hike 4", position: 4)
-        ]
-        
-        // Map items to categories
-        let itemsByCategory = Item.sample
-        for category in categories {
-            if let items = itemsByCategory[category.name] {
-                category.items = items
-                items.forEach { $0.category = category }
-            }
-        }
-
-        return categories
-        
-    }
-}
-
-extension Item {
-    static var sample: [String: [Item]] {
-        [
-            "Bed 0": ["Pillows", "Sleeping bag", "Sleeping pad"].map { Item(title: $0) },
-            "Clothes 1": ["Jackets", "Hats", "Shoes", "Toiletries", "Supplements"].map { Item(title: $0) },
-            "Food 2": ["Propane", "Stove", "Cooler", "Ice", "Dry bag", "Water", "Water bottles"].map { Item(title: $0) },
-            "Lounge 3": ["Chair", "Electronics", "Shade pop up", "Books", "Cards/games", "Instruments"].map { Item(title: $0) },
-            "Hike 4": ["Backpack", "Chargers", "Drugs", "Camera", "Trail snacks"].map { Item(title: $0) }
-        ]
     }
 }
 
