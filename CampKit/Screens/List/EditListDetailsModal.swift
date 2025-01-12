@@ -7,7 +7,7 @@
 import SwiftUI
 import SwiftData
 
-struct EditListScreen: View {
+struct EditListDetailsModal: View {
     @Bindable var packingList: PackingList
     @Environment(\.dismiss) var dismiss
     
@@ -58,7 +58,7 @@ struct EditListScreen: View {
 #Preview {
     let sampleUserList = PackingList(title: "Summer List")
     NavigationStack {
-        EditListScreen(
+        EditListDetailsModal(
             packingList: sampleUserList
         )
     }

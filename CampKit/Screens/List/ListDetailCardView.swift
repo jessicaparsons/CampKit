@@ -8,7 +8,7 @@
 import SwiftUI
 
 
-struct ListDetailView: View {
+struct ListDetailCardView: View {
     @Environment(\.modelContext) private var modelContext
     @Bindable var packingList: PackingList // Binding to the SwiftData model
     @Binding var isEditingTitle: Bool
@@ -43,9 +43,8 @@ struct ListDetailView: View {
                 .fill(Color.colorWhite)
                 .shadow(color: Color(hue: 1.0, saturation: 1.0, brightness: 0.079, opacity: 0.3), radius: 3, x: 0, y: 3)
         )
-        .padding(.horizontal, 15)
         .sheet(isPresented: $isEditingTitle) {
-            EditListScreen(packingList: packingList)
+            EditListDetailsModal(packingList: packingList)
         }
         .onTapGesture {
             isEditingTitle = true
@@ -62,6 +61,6 @@ struct ListDetailView: View {
     let sampleUserList = PackingList(title: "Summer List", locationName: "Joshua Tree")
     ZStack {
         Color(.gray)
-        ListDetailView(packingList: sampleUserList, isEditingTitle: $isEditingTitle)
+        ListDetailCardView(packingList: sampleUserList, isEditingTitle: $isEditingTitle)
     }
 }

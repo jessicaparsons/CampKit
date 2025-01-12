@@ -12,6 +12,7 @@ struct EditableItemView: View {
     
     @Environment(\.modelContext) private var modelContext
     @Bindable var item: Item
+    @FocusState private var isFocused: Bool
     
     @State private var offset: CGFloat = 0
     @State private var willDelete = false
@@ -39,6 +40,18 @@ struct EditableItemView: View {
                     .foregroundColor(textColor(for: item))
                     .strikethrough(item.isPacked)
                     .italic(item.isPacked)
+                    .focused($isFocused)
+                    .onSubmit {
+                        isFocused = false
+                    }
+                if isFocused {
+                    Button {
+                        isFocused = false
+                    } label: {
+                        Text("Done")
+                    }
+
+                }
             }
             .offset(x: offset)
             .padding(.vertical, 5)

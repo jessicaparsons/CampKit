@@ -10,7 +10,7 @@ import SwiftData
 
 @Model
 class Item: Identifiable {
-    var id: UUID = UUID()
+    var myID: UUID = UUID()
     var title: String
     var isPacked: Bool
     var position: Int // Custom order property

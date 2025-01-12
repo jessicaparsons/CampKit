@@ -12,15 +12,18 @@ import SwipeCell
 struct CategorySectionView: View {
     @Environment(\.modelContext) private var modelContext
     @Bindable var category: Category
-    @State private var item: String = ""
+    @Binding var isRearranging: Bool
     
+    let addItem: (String) -> Void
+    let deleteItem: (Item) -> Void
+    let deleteCategory: () -> Void
+    
+    @State private var newItemText: String = ""
     @State private var isExpanded: Bool = true
     @State private var isEditing: Bool = false
     
     let globalIsExpanded: Bool // Desired global state
     let globalExpandCollapseAction: UUID // Unique trigger
-    let deleteCategory: (Category) -> Void
-    
     
     let hapticFeedback = UINotificationFeedbackGenerator()
     
@@ -74,11 +77,21 @@ struct CategorySectionView: View {
                 Image(systemName: "plus.circle")
                     .foregroundColor(.gray)
                     .font(.title3)
-                TextField("Add new item", text: $item)
+                TextField("Add new item", text: $newItemText)
                     .textFieldStyle(.plain)
                     .onSubmit {
-                        addItem(to: category)
+                        addItem(newItemText)
+                        newItemText = ""
+                        
                     }
+                if !newItemText.isEmpty {
+                    Button {
+                        addItem(newItemText)
+                        newItemText = ""
+                    } label: {
+                        Text("Done")
+                    }
+                }
                 
             }//:HSTACK
             .padding(.vertical, 10)
@@ -93,12 +106,12 @@ struct CategorySectionView: View {
                     .multilineTextAlignment(.leading)
                     .onSubmit {
                         isEditing = false // Disable editing after submit
-                        saveChanges()
+                        saveContext()
                     }
                 Spacer()
                 Button {
                     isEditing = false // Disable editing after submit
-                    saveChanges()
+                    saveContext()
                 } label: {
                     Text("Done")
                 }
@@ -117,13 +130,21 @@ struct CategorySectionView: View {
                         } label: {
                             Label("Edit Name", systemImage: "pencil")
                         }
+                        Button(action: {
+                            isRearranging = true
+                        }) {
+                            Label("Rearrange", systemImage: "arrow.up.arrow.down")
+                        }
                         Button(role: .destructive) {
-                            deleteCategory(category)
+                            deleteCategory()
                         } label: {
                             Label("Delete", systemImage: "trash")
                         }
                     } label: {
                         Label("Edit", systemImage: "ellipsis")
+                            .padding(10)
+                            .background(Color.gray.opacity(0.1))
+                            .cornerRadius(8)
                     } //:MENU
                     .labelStyle(.iconOnly)
                 }
@@ -140,29 +161,9 @@ struct CategorySectionView: View {
         
     }//:BODY
     
-    private func deleteItem(_ item: Item) {
-        withAnimation {
-            modelContext.delete(item)
-            do {
-                try modelContext.save()
-                print("Item deleted successfully.")
-            } catch {
-                print("Failed to delete item: \(error.localizedDescription)")
-            }
-        }
-    }
     
     
-    private func addItem(to category: Category) {
-        if !item.isEmpty {
-            let newItem = Item(title: item, isPacked: false)
-            category.items.append(newItem)
-            modelContext.insert(newItem)
-            item = ""
-        }
-    }
-    
-    private func saveChanges() {
+    private func saveContext() {
         do {
             try modelContext.save()
             print("Changes saved successfully.")
@@ -185,7 +186,7 @@ struct LeftDisclosureStyle: DisclosureGroupStyle {
             } label: {
                 HStack(alignment: .firstTextBaseline) {
                     Image(systemName: configuration.isExpanded ? "chevron.down" : "chevron.right")
-                        .foregroundColor(.accentColor)
+                        .foregroundColor(.customNeonLight)
                         .font(.caption.lowercaseSmallCaps())
                         .offset(x: 20)
                         .animation(.default, value: configuration.isExpanded)
@@ -205,15 +206,25 @@ struct LeftDisclosureStyle: DisclosureGroupStyle {
 #Preview {
     
     @Previewable @State var isExpanded: Bool = true
+    @Previewable @State var isRearranging: Bool = false
+    
+    let mockCategory = Category(name: "Sleeping", position: 0, items: [
+            Item(title: "Sleeping Bag", isPacked: false),
+            Item(title: "Tent", isPacked: true)
+        ])
+
     
     ZStack {
         Color(.colorTan)
         CategorySectionView(
-            category: Category(name: "Sleeping", position: 0), globalIsExpanded: false,
-            globalExpandCollapseAction: UUID(),
-            deleteCategory: { category in
-                print("Mock delete category: \(category.name)")
-            }
+            category: mockCategory,
+            isRearranging: $isRearranging,
+            addItem: { newItem in print("Mock add new item")},
+            deleteItem: { item in print("Delete mock item")} ,
+            deleteCategory: { print("Delete mock category")},
+            globalIsExpanded: true,
+            globalExpandCollapseAction: UUID()
+            
         )
         .frame(height:50)
     }
