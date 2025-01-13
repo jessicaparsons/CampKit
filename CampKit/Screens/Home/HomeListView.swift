@@ -10,14 +10,14 @@ import SwiftData
 
 struct HomeListView: View {
     @Environment(\.modelContext) private var modelContext
-    @Query private var packingLists: [PackingList] // Fetch all PackingList objects
+    @StateObject private var viewModel: HomeListViewModel
+    
     
     let hapticFeedback = UINotificationFeedbackGenerator()
     
-    @State private var item: String = ""
     
-    private func textColor(for item: Item) -> Color {
-        item.isPacked ? Color.accentColor : Color.primary
+    init(modelContext: ModelContext) {
+        _viewModel = StateObject(wrappedValue: HomeListViewModel(modelContext: modelContext))
     }
     
     var body: some View {
@@ -39,7 +39,7 @@ struct HomeListView: View {
             
             
             List {
-                ForEach(packingLists) { packingList in
+                ForEach(viewModel.packingLists) { packingList in
                     NavigationLink {
                         let listViewModel = ListViewModel(packingList: packingList, modelContext: modelContext)
                         ListView(viewModel: listViewModel)
@@ -72,11 +72,11 @@ struct HomeListView: View {
                         }
                     }
                 } //:FOR EACH
-                .onDelete(perform: deleteItems)
+                .onDelete(perform: viewModel.deleteLists)
                 
                 Section {
                     Button {
-                        addNewList()
+                        viewModel.addNewList()
                     } label: {
                         HStack {
                             Image(systemName: "plus")
@@ -95,63 +95,49 @@ struct HomeListView: View {
             .offset(y: -10)
             .ignoresSafeArea()
             
-            
-            
-            
+
         }//:NAVIGATION STACK
         .navigationTitle("My Lists")
         .overlay {
-            if packingLists.isEmpty {
+            if viewModel.packingLists.isEmpty {
                 ContentUnavailableView("Empty List", systemImage: "plus.circle", description: Text("You haven't created any lists yet. Get started!"))
             }
         }
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button {
-                    addNewList()
+                    viewModel.addNewList()
                 } label: {
                     Label("Add List", systemImage: "plus")
                 }
             }
         }
     }//:BODY
-    
-    
-    private func addNewList() {
-        withAnimation {
-            let newPackingList = PackingList(title: "New List")
-            // Save to SwiftData
-            modelContext.insert(newPackingList)
-        }
-    }
-    
-    private func deleteItems(offsets: IndexSet) {
-        withAnimation {
-            for index in offsets {
-                modelContext.delete(packingLists[index])
-            }
-        }
-    }
-    
-    
+
 }//:STRUCT
 
 
-
 #Preview("Sample Data") {
-    
-    let container = try! ModelContainer(for: PackingList.self, Category.self, Item.self, configurations: ModelConfiguration(isStoredInMemoryOnly: true))
+    let container = try! ModelContainer(
+        for: PackingList.self, Category.self, Item.self,
+        configurations: ModelConfiguration(isStoredInMemoryOnly: true)
+    )
 
-    // Populate the container with sample data
     preloadPackingListData(context: container.mainContext)
-    
-    let samplePackingList = try! container.mainContext.fetch(FetchDescriptor<PackingList>()).first!
-    
-    return HomeListView()
+
+    return HomeListView(modelContext: container.mainContext)
         .modelContainer(container)
 }
 
+
 #Preview("Empty List") {
-    HomeListView()
-        .modelContainer(for: [PackingList.self, Category.self, Item.self], inMemory: true)
+    // Create an in-memory ModelContainer
+    let container = try! ModelContainer(
+        for: PackingList.self, Category.self, Item.self,
+        configurations: ModelConfiguration(isStoredInMemoryOnly: true)
+    )
+
+    // Return the HomeListView and pass the `modelContext`
+    return HomeListView(modelContext: container.mainContext)
+        .modelContainer(container) // Attach the mock container for previews
 }

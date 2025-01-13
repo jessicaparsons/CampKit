@@ -23,16 +23,32 @@ struct CampKitApp: App {
             fatalError("Could not create ModelContainer: \(error)")
         }
     }()
+    
+    init() {
+            preloadDataIfNeeded()
+        }
 
     var body: some Scene {
         WindowGroup {
-            HomeListView()
-                .onAppear {
-                    DispatchQueue.main.async {
-                        preloadPackingListData(context: sharedModelContainer.mainContext)
-                    }
-                }
+            HomeListView(modelContext: sharedModelContainer.mainContext)
         }
         .modelContainer(sharedModelContainer)
+    }
+    
+    private func preloadDataIfNeeded() {
+        let context = sharedModelContainer.mainContext
+        let fetchDescriptor = FetchDescriptor<PackingList>()
+        
+        do {
+            let existingLists = try context.fetch(fetchDescriptor)
+            if existingLists.isEmpty {
+                print("Preloading data...")
+                preloadPackingListData(context: context)
+            } else {
+                print("Data already exists. Skipping preload.")
+            }
+        } catch {
+            print("Error checking existing data: \(error)")
+        }
     }
 }
