@@ -41,7 +41,8 @@ struct HomeListView: View {
             List {
                 ForEach(packingLists) { packingList in
                     NavigationLink {
-                        ListView(packingList: packingList)
+                        let listViewModel = ListViewModel(packingList: packingList, modelContext: modelContext)
+                        ListView(viewModel: listViewModel)
                     } label: {
                         HStack {
                             // Optional photo thumbnail

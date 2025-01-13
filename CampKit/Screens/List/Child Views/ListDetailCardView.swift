@@ -9,7 +9,6 @@ import SwiftUI
 
 
 struct ListDetailCardView: View {
-    @Environment(\.modelContext) private var modelContext
     @Bindable var packingList: PackingList // Binding to the SwiftData model
     @Binding var isEditingTitle: Bool
     

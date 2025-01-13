@@ -66,12 +66,21 @@ struct EditableItemView: View {
 
 #Preview {
     let container = try! ModelContainer(
-        for: Item.self,
-        configurations: ModelConfiguration(isStoredInMemoryOnly: true)
+        for: PackingList.self, Category.self, Item.self,
+        configurations: ModelConfiguration(isStoredInMemoryOnly: true) // In-memory for preview
     )
     
-    let sampleItem = Item(title: "Tent", isPacked: false, position: 0, category: Category(name: "Sleep", position: 0))
-    container.mainContext.insert(sampleItem)
+    // Sample data
+    let sampleCategory = Category(name: "Sleep", position: 0)
+    let sampleItem = Item(title: "Tent", isPacked: false, position: 0, category: sampleCategory)
+    sampleCategory.items.append(sampleItem)
+    
+    let samplePackingList = PackingList(title: "Sample Trip")
+    samplePackingList.categories.append(sampleCategory)
+    container.mainContext.insert(samplePackingList)
+
+    // Create a mock ListViewModel
+    let viewModel = ListViewModel(packingList: samplePackingList, modelContext: container.mainContext)
 
     return ZStack {
         Color(.colorTan)
@@ -82,5 +91,6 @@ struct EditableItemView: View {
             }
         )
     }
-    .modelContainer(container)
+    .modelContainer(container) // Provide the SwiftData container
+    .environmentObject(viewModel) // Inject the mock ListViewModel
 }

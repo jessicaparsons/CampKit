@@ -9,6 +9,7 @@ import SwiftUI
 import SwiftData
 
 class ListViewModel: ObservableObject {
+    private let modelContext: ModelContext
     @Published var packingList: PackingList
     @Published var item: String = ""
     @Published var globalIsExpanded: Bool = false
@@ -21,11 +22,12 @@ class ListViewModel: ObservableObject {
 
     let hapticFeedback = UINotificationFeedbackGenerator()
     
-    init(packingList: PackingList) {
+    init(packingList: PackingList, modelContext: ModelContext) {
         self.packingList = packingList
+        self.modelContext = modelContext
     }
     
-    func addItem(to category: Category, itemTitle: String, using context: ModelContext) {
+    func addItem(to category: Category, itemTitle: String) {
         guard !itemTitle.isEmpty else { return }
             let newItem = Item(
                 title: itemTitle,
@@ -33,39 +35,70 @@ class ListViewModel: ObservableObject {
                 position: category.items.count,
                 category: category)
             category.items.append(newItem)
-            context.insert(newItem)
-            saveContext(using: context)
+            modelContext.insert(newItem)
+            reassignItemPositions(for: category)
     }
     
-    func deleteItem(using context: ModelContext, _ item: Item) {
+    func reassignItemPositions(for category: Category) {
+        for (index, item) in category.items.sorted(by: { $0.position < $1.position }).enumerated() {
+            item.position = index
+        }
+        saveContext()
+    }
+    
+    func deleteItem(_ item: Item) {
+        guard let safeItem = item.category else {
+            print("Error: Item does not belong to a category.")
+            return
+        }
+        
         withAnimation {
-            context.delete(item)
-            saveContext(using: context)
+            modelContext.delete(item)
+            reassignItemPositions(for: safeItem)
         }
     }
     
-    func addNewCategory(using context: ModelContext) {
+    func addNewCategory() {
         withAnimation {
             let newPosition = packingList.categories.count
             let newCategory = Category(name: "New Category", position: newPosition)
             packingList.categories.append(newCategory)
-            context.insert(newCategory)
-            saveContext(using: context)
+            modelContext.insert(newCategory)
+            reassignCategoryPositions(for: packingList)
         }
     }
     
-    func deleteCategory(using context: ModelContext, _ category: Category) {
+    func reassignCategoryPositions(for packingList: PackingList) {
+        let sortedCategories = packingList.categories.sorted(by: { $0.position < $1.position })
+        for (index, category) in sortedCategories.enumerated() {
+            category.position = index // Assign new sequential position
+        }
+        saveContext()
+    }
+    
+    func deleteCategory(_ category: Category) {
         withAnimation {
             // Remove the category from the packing list
             packingList.categories.removeAll { $0.id == category.id }
-            context.delete(category)
-            saveContext(using: context)
+            modelContext.delete(category)
+            reassignCategoryPositions(for: packingList)
         }
     }
     
-    func moveCategories(from source: IndexSet, to destination: Int, using context: ModelContext) {
-        packingList.categories.move(fromOffsets: source, toOffset: destination)
-        saveContext(using: context)
+    func moveCategory(from source: IndexSet, to destination: Int) {
+            // Sort categories by position before reordering
+        var sortedCategories = packingList.categories.sorted(by: { $0.position < $1.position })
+            
+            // Perform the move operation
+            sortedCategories.move(fromOffsets: source, toOffset: destination)
+            
+            // Update the original categories array to reflect the new order
+            for (index, category) in sortedCategories.enumerated() {
+                category.position = index
+            }
+            packingList.categories = sortedCategories // Update the binding
+            
+            saveContext()
     }
     
     func expandAll() {
@@ -82,18 +115,18 @@ class ListViewModel: ObservableObject {
         }
     }
     
-    func deleteList(using context: ModelContext, dismiss: DismissAction) {
+    func deleteList(dismiss: DismissAction) {
         withAnimation {
             
             // Log categories before deletion
             print("Categories before deletion: \(packingList.categories.map { $0.name })")
             
             for category in packingList.categories {
-                context.delete(category)
+                modelContext.delete(category)
             }
             
-            context.delete(packingList)
-            saveContext(using: context)
+            modelContext.delete(packingList)
+            saveContext()
             dismiss()
         }
     }
@@ -104,37 +137,37 @@ class ListViewModel: ObservableObject {
         }
     }
 
-    func toggleAllItems(using context: ModelContext) {
+    func toggleAllItems() {
         if areAllItemsChecked {
-            uncheckAllItems(using: context)
+            uncheckAllItems()
         } else {
-            checkAllItems(using: context)
+            checkAllItems()
         }
     }
     
     
-    func checkAllItems(using context: ModelContext) {
+    func checkAllItems() {
         for category in packingList.categories {
             for item in category.items {
                 item.isPacked = true
             }
         }
-        saveContext(using: context)
+        saveContext()
     }
 
-    func uncheckAllItems(using context: ModelContext) {
+    func uncheckAllItems() {
         for category in packingList.categories {
             for item in category.items {
                 item.isPacked = false
             }
         }
-        saveContext(using: context)
+        saveContext()
     }
     
-    func togglePacked(for item: Item, using context: ModelContext) {
+    func togglePacked(for item: Item) {
             withAnimation {
                 item.isPacked.toggle()
-                saveContext(using: context)
+                saveContext()
             }
         }
     
@@ -154,9 +187,9 @@ class ListViewModel: ObservableObject {
             }
     }
 
-    func saveContext(using context: ModelContext) {
+    func saveContext() {
         do {
-            try context.save()
+            try modelContext.save()
             print("Packing list and categories deleted successfully.")
         } catch {
             print("Failed to save context: \(error.localizedDescription)")

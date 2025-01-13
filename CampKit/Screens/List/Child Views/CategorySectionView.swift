@@ -10,7 +10,6 @@ import SwiftData
 import SwipeCell
 
 struct CategorySectionView: View {
-    @Environment(\.modelContext) private var modelContext: ModelContext
     @EnvironmentObject var viewModel: ListViewModel
     @Bindable var category: Category
     @Binding var isRearranging: Bool
@@ -38,7 +37,7 @@ struct CategorySectionView: View {
                 EditableItemView(
                     item: item,
                     togglePacked: {
-                    viewModel.togglePacked(for: item, using: modelContext)
+                    viewModel.togglePacked(for: item)
                     })
                     .swipeCell(
                         cellPosition: .both,
@@ -111,12 +110,12 @@ struct CategorySectionView: View {
                     .multilineTextAlignment(.leading)
                     .onSubmit {
                         isEditing = false // Disable editing after submit
-                        viewModel.saveContext(using: modelContext)
+                        viewModel.saveContext()
                     }
                 Spacer()
                 Button {
                     isEditing = false // Disable editing after submit
-                    viewModel.saveContext(using: modelContext)
+                    viewModel.saveContext()
                 } label: {
                     Text("Done")
                 }
@@ -199,29 +198,36 @@ struct LeftDisclosureStyle: DisclosureGroupStyle {
 }
 
 #Preview {
-    @Previewable @State var isExpanded: Bool = true
     @Previewable @State var isRearranging: Bool = false
     
     // Create an in-memory ModelContainer
     let container = try! ModelContainer(
         for: PackingList.self, Category.self, Item.self,
-        configurations: ModelConfiguration(isStoredInMemoryOnly: true)
+        configurations: ModelConfiguration(isStoredInMemoryOnly: true) // In-memory for preview
     )
     
-    // Populate the container with sample data
+    // Populate the container with mock data
     preloadPackingListData(context: container.mainContext)
+
+    // Fetch a sample category
+    let samplePackingList = try! container.mainContext.fetch(FetchDescriptor<PackingList>()).first!
+    let sampleCategory = samplePackingList.categories.first!
     
-    let mockCategory = try! container.mainContext.fetch(FetchDescriptor<Category>()).first!
-    
-    return CategorySectionView(
-            category: mockCategory,
+    // Create a mock ListViewModel
+    let viewModel = ListViewModel(packingList: samplePackingList, modelContext: container.mainContext)
+
+    // Return the preview
+    return NavigationStack {
+        CategorySectionView(
+            category: sampleCategory,
             isRearranging: $isRearranging,
-            addItem: { newItem in print("Mock add new item")},
-            deleteItem: { item in print("Delete mock item")} ,
-            deleteCategory: { print("Delete mock category")},
+            addItem: { newItem in print("Mock add new item: \(newItem)") },
+            deleteItem: { item in print("Mock delete item: \(item.title)") },
+            deleteCategory: { print("Mock delete category: \(sampleCategory.name)") },
             globalIsExpanded: true,
             globalExpandCollapseAction: UUID()
-            
         )
-        .modelContainer(container)
+        .modelContainer(container) // Provide the ModelContainer
+        .environmentObject(viewModel) // Inject the mock ListViewModel
+    }
 }

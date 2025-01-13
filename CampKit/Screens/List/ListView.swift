@@ -9,14 +9,12 @@ import SwiftUI
 import SwiftData
 
 struct ListView: View {
-    @Environment(\.modelContext) private var modelContext: ModelContext
     @Environment(\.dismiss) private var dismiss
     @StateObject private var viewModel: ListViewModel
     
-    init(packingList: PackingList) {
-        _viewModel = StateObject(wrappedValue: ListViewModel(packingList: packingList))
+    init(viewModel: ListViewModel) {
+        _viewModel = StateObject(wrappedValue: viewModel)
     }
-    
    
     
     var body: some View {
@@ -52,7 +50,8 @@ struct ListView: View {
             }
         }
         .sheet(isPresented: $viewModel.isRearranging) {
-            RearrangeCategoriesView(categories: $viewModel.packingList.categories)
+            RearrangeCategoriesView()
+                .environmentObject(viewModel)
         }
         .confirmationDialog(
             "Are you sure you want to delete this list?",
@@ -60,7 +59,7 @@ struct ListView: View {
             titleVisibility: .visible
         ) {
             Button("Delete", role: .destructive) {
-                viewModel.deleteList(using: modelContext, dismiss: dismiss) // Perform delete
+                viewModel.deleteList(dismiss: dismiss) // Perform delete
             }
             Button("Cancel", role: .cancel) { }
         }
@@ -127,9 +126,9 @@ struct ListView: View {
                         CategorySectionView(
                             category: category,
                             isRearranging: $viewModel.isRearranging,
-                            addItem: { itemTitle in viewModel.addItem(to: category, itemTitle: itemTitle, using: modelContext) }, // Pass the title and category
-                            deleteItem: { item in viewModel.deleteItem(using: modelContext, item) }, // Pass the item to delete
-                            deleteCategory: { viewModel.deleteCategory(using: modelContext, category) }, // Delete the category
+                            addItem: { itemTitle in viewModel.addItem(to: category, itemTitle: itemTitle) }, // Pass the title and category
+                            deleteItem: { item in viewModel.deleteItem(item) }, // Pass the item to delete
+                            deleteCategory: { viewModel.deleteCategory(category) }, // Delete the category
                             globalIsExpanded: viewModel.globalIsExpanded,
                             globalExpandCollapseAction: viewModel.globalExpandCollapseAction
                         )
@@ -144,7 +143,7 @@ struct ListView: View {
     
     private var addCategoryButton: some View {
         HStack {
-            Button { viewModel.addNewCategory(using: modelContext)
+            Button { viewModel.addNewCategory()
             } label: {
                 HStack {
                     Image(systemName: "plus")
@@ -163,7 +162,7 @@ struct ListView: View {
        
         HStack {
             Button(action: {
-                viewModel.toggleAllItems(using: modelContext)
+                viewModel.toggleAllItems()
             }) {
                 Label(
                     viewModel.areAllItemsChecked ? "Check All" : "Uncheck All",
@@ -219,25 +218,36 @@ struct ListView: View {
 
 #Preview("Sample Data") {
     NavigationStack {
-        // Create an in-memory ModelContainer
         let container = try! ModelContainer(
             for: PackingList.self, Category.self, Item.self,
-            configurations: ModelConfiguration(isStoredInMemoryOnly: true)
+            configurations: ModelConfiguration(isStoredInMemoryOnly: true) // In-memory container
         )
-        
+
         // Populate the container with sample data
         preloadPackingListData(context: container.mainContext)
-        
+
+        // Fetch a sample packing list from the container
         let samplePackingList = try! container.mainContext.fetch(FetchDescriptor<PackingList>()).first!
-        
-        // Return the view with the mock ModelContainer
-        return ListView(packingList: samplePackingList)
-            .modelContainer(container)
+
+        // Create the ListViewModel
+        let viewModel = ListViewModel(packingList: samplePackingList, modelContext: container.mainContext)
+
+        // Return the ListView with the in-memory container
+        return ListView(viewModel: viewModel)
+            .modelContainer(container) // Attach the model container for SwiftData
     }
 }
 
 #Preview("Basic Preview") {
     NavigationStack {
-        ListView(packingList: PackingList(title: "Sample List"))
+        let placeholderPackingList = PackingList(title: "Sample Packing List")
+        let container = try! ModelContainer(
+            for: PackingList.self, Category.self, Item.self,
+            configurations: ModelConfiguration(isStoredInMemoryOnly: true)
+        )
+        let viewModel = ListViewModel(packingList: placeholderPackingList, modelContext: container.mainContext)
+
+        ListView(viewModel: viewModel)
+            .modelContainer(container)
     }
 }

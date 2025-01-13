@@ -6,16 +6,17 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct RearrangeCategoriesView: View {
-    @Environment(\.modelContext) private var modelContext
-    @Binding var categories: [Category]
+    @EnvironmentObject var viewModel: ListViewModel // Use ListViewModel
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
         NavigationStack {
             List {
-                ForEach(categories.sorted(by: { $0.position < $1.position }), id: \.id) { category in
+                // Access categories from the ViewModel
+                ForEach(viewModel.packingList.categories.sorted(by: { $0.position < $1.position }), id: \.id) { category in
                     Text(category.name)
                         .font(.headline)
                 }
@@ -34,38 +35,37 @@ struct RearrangeCategoriesView: View {
     }
     
     private func moveCategory(from source: IndexSet, to destination: Int) {
-            // Sort categories by position before reordering
-            var sortedCategories = categories.sorted(by: { $0.position < $1.position })
-            
-            // Perform the move operation
-            sortedCategories.move(fromOffsets: source, toOffset: destination)
-            
-            // Update the original categories array to reflect the new order
-            for (index, category) in sortedCategories.enumerated() {
-                category.position = index
-            }
-            categories = sortedCategories // Update the binding
-            
-            // Save the changes to SwiftData
-            do {
-                try modelContext.save()
-                print("Categories reordered successfully.")
-            } catch {
-                print("Failed to save reordered categories: \(error.localizedDescription)")
-            }
+        withAnimation {
+            viewModel.moveCategory(from: source, to: destination) // Use ViewModel's method
         }
+    }
 }
 
 #Preview {
-    // Sample categories for the preview
-    @Previewable @State var sampleCategories: [Category] = [
+    // Create an in-memory ModelContainer
+    let container = try! ModelContainer(
+        for: PackingList.self, Category.self, Item.self,
+        configurations: ModelConfiguration(isStoredInMemoryOnly: true) // In-memory for preview
+    )
+    
+    // Create a mock PackingList and populate it with sample categories
+    let samplePackingList = PackingList(title: "Sample Trip")
+    let sampleCategories = [
         Category(name: "Clothes", position: 0),
         Category(name: "Food", position: 1),
         Category(name: "Camping Gear", position: 2),
         Category(name: "Electronics", position: 3)
     ]
-    
+    samplePackingList.categories.append(contentsOf: sampleCategories)
+    container.mainContext.insert(samplePackingList)
+
+    // Create a mock ListViewModel with the PackingList
+    let viewModel = ListViewModel(packingList: samplePackingList, modelContext: container.mainContext)
+
+    // Return the view with the mock ModelContainer and ViewModel
     return NavigationStack {
-        RearrangeCategoriesView(categories: $sampleCategories)
+        RearrangeCategoriesView() // No need to pass categories; ViewModel handles it
+            .environmentObject(viewModel) // Inject the mock ViewModel
     }
+    .modelContainer(container) // Attach the mock ModelContainer for SwiftData support
 }
