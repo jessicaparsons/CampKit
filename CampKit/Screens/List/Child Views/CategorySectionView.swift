@@ -33,7 +33,7 @@ struct CategorySectionView: View {
         DisclosureGroup(isExpanded: $isExpanded) {
             
             //Iterate through items in the category
-            ForEach(category.items) { item in
+            ForEach(category.items.sorted(by: { $0.position < $1.position })) { item in
                 
                 EditableItemView(
                     item: item,
@@ -199,19 +199,21 @@ struct LeftDisclosureStyle: DisclosureGroupStyle {
 }
 
 #Preview {
-    
     @Previewable @State var isExpanded: Bool = true
     @Previewable @State var isRearranging: Bool = false
     
-    let mockCategory = Category(name: "Sleeping", position: 0, items: [
-            Item(title: "Sleeping Bag", isPacked: false),
-            Item(title: "Tent", isPacked: true)
-        ])
-
+    // Create an in-memory ModelContainer
+    let container = try! ModelContainer(
+        for: PackingList.self, Category.self, Item.self,
+        configurations: ModelConfiguration(isStoredInMemoryOnly: true)
+    )
     
-    ZStack {
-        Color(.colorTan)
-        CategorySectionView(
+    // Populate the container with sample data
+    preloadPackingListData(context: container.mainContext)
+    
+    let mockCategory = try! container.mainContext.fetch(FetchDescriptor<Category>()).first!
+    
+    return CategorySectionView(
             category: mockCategory,
             isRearranging: $isRearranging,
             addItem: { newItem in print("Mock add new item")},
@@ -221,6 +223,5 @@ struct LeftDisclosureStyle: DisclosureGroupStyle {
             globalExpandCollapseAction: UUID()
             
         )
-        .frame(height:50)
-    }
+        .modelContainer(container)
 }

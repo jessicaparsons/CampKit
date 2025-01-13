@@ -36,14 +36,11 @@ func preloadPackingListData(context: ModelContext) {
     )
     print("Created PackingList: \(sampleList.title)")
     
-    let categories = [
-        Category(name: "Bed 0", position: 0),
-        Category(name: "Clothes 1", position: 1),
-        Category(name: "Food 2", position: 2),
-        Category(name: "Lounge 3", position: 3),
-        Category(name: "Hike 4", position: 4)
-    ]
-    print("Created Categories: \([categories])")
+    let categoryNames = [
+            "Bed 0", "Clothes 1", "Food 2", "Lounge 3", "Hike 4"
+        ]
+    
+    print("Created Categories: \([categoryNames])")
     
     let items = [
         "Bed 0": ["Pillows", "Sleeping bag", "Sleeping pad"],
@@ -55,22 +52,22 @@ func preloadPackingListData(context: ModelContext) {
     print("Created Items: \([items])")
     
     
-    
-    
-    
-    // Populate categories and their items
-    for category in categories {
-        if let itemNames = items[category.name] {
-            let categoryItems = itemNames.map { Item(title: $0) }
-            category.items.append(contentsOf: categoryItems)
+    // Create and populate categories with items
+    for (index, categoryName) in categoryNames.enumerated() {
+        let category = Category(name: categoryName, position: index)
+
+        // Add items to category
+        if let itemNames = items[categoryName] {
+            for (itemIndex, itemName) in itemNames.enumerated() {
+                let item = Item(title: itemName, isPacked: false, position: itemIndex, category: category)
+                category.items.append(item)
+            }
         }
+
         print("Assigning \(category.name) position: \(category.position)")
         sampleList.categories.append(category)
-        
-        for category in sampleList.categories {
-            print("Category '\(category.name)' has position \(category.position)")
-        }
     }
+
     
     // Insert the sample list into the context
     context.insert(sampleList)

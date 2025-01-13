@@ -70,7 +70,7 @@ struct EditableItemView: View {
         configurations: ModelConfiguration(isStoredInMemoryOnly: true)
     )
     
-    let sampleItem = Item(title: "Tent")
+    let sampleItem = Item(title: "Tent", isPacked: false, position: 0, category: Category(name: "Sleep", position: 0))
     container.mainContext.insert(sampleItem)
 
     return ZStack {

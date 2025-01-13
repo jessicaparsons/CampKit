@@ -27,7 +27,11 @@ class ListViewModel: ObservableObject {
     
     func addItem(to category: Category, itemTitle: String, using context: ModelContext) {
         guard !itemTitle.isEmpty else { return }
-            let newItem = Item(title: itemTitle, isPacked: false)
+            let newItem = Item(
+                title: itemTitle,
+                isPacked: false,
+                position: category.items.count,
+                category: category)
             category.items.append(newItem)
             context.insert(newItem)
             saveContext(using: context)

@@ -9,35 +9,24 @@ import Foundation
 import UIKit
 
 extension Category {
-    
     static var sampleCategories: [Category] {
-        [
-            Category(name: "Bed 0", position: 0, items: [
-                Item(title: "Pillows", isPacked: false),
-                Item(title: "Sleeping bag", isPacked: false),
-                Item(title: "Sleeping pad", isPacked: false),
-            ]),
-            Category(name: "Clothes 1", position: 1, items: [
-                Item(title: "Jackets", isPacked: false),
-                Item(title: "Shoes", isPacked: false),
-                Item(title: "Toiletries", isPacked: false),
-            ]),
-            Category(name: "Food 2", position: 2, items: [
-                Item(title: "Propane", isPacked: false),
-                Item(title: "Stove", isPacked: false),
-                Item(title: "Cooler", isPacked: false),
-            ]),
-            Category(name: "Lounge 3", position: 3, items: [
-                Item(title: "Chair", isPacked: false),
-                Item(title: "Books", isPacked: false),
-                Item(title: "Cards/Games", isPacked: false),
-            ]),
-            Category(name: "Hike 4", position: 4, items: [
-                Item(title: "Backpack", isPacked: false),
-                Item(title: "Camera", isPacked: false),
-                Item(title: "Trail snacks", isPacked: false),
-            ]),
+        // Define category names and associated items
+        let categoriesWithItems: [(name: String, position: Int, items: [String])] = [
+            ("Bed 0", 0, ["Pillows", "Sleeping bag", "Sleeping pad"]),
+            ("Clothes 1", 1, ["Jackets", "Shoes", "Toiletries"]),
+            ("Food 2", 2, ["Propane", "Stove", "Cooler"]),
+            ("Lounge 3", 3, ["Chair", "Books", "Cards/Games"]),
+            ("Hike 4", 4, ["Backpack", "Camera", "Trail snacks"])
         ]
+
+        // Create categories with items
+        return categoriesWithItems.map { categoryData in
+            let category = Category(name: categoryData.name, position: categoryData.position)
+            category.items = categoryData.items.enumerated().map { index, itemTitle in
+                Item(title: itemTitle, isPacked: false, position: index, category: category)
+            }
+            return category
+        }
     }
 }
 
