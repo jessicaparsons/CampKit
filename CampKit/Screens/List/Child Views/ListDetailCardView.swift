@@ -6,10 +6,10 @@
 //
 
 import SwiftUI
-
+import SwiftData
 
 struct ListDetailCardView: View {
-    @Bindable var packingList: PackingList // Binding to the SwiftData model
+    @EnvironmentObject var viewModel: ListViewModel
     @Binding var isEditingTitle: Bool
     
     //placeholders
@@ -21,14 +21,14 @@ struct ListDetailCardView: View {
             HStack {
                 HStack {
                     Spacer()
-                    Text(packingList.title)
+                    Text(viewModel.packingList.title)
                         .multilineTextAlignment(.center)
                         .font(.title2.weight(.bold))
                     Spacer()
                 }//:HSTACK
                 
             }//:HSTACK
-            Text(packingList.locationName ?? "No Location Set")
+            Text(viewModel.packingList.locationName ?? "No Location Set")
                 .fontWeight(.bold)
             HStack {
                 Image(systemName: "cloud")
@@ -43,7 +43,7 @@ struct ListDetailCardView: View {
                 .shadow(color: Color(hue: 1.0, saturation: 1.0, brightness: 0.079, opacity: 0.3), radius: 3, x: 0, y: 3)
         )
         .sheet(isPresented: $isEditingTitle) {
-            EditListDetailsModal(packingList: packingList)
+            EditListDetailsModal(packingList: viewModel.packingList)
         }
         .onTapGesture {
             isEditingTitle = true
@@ -54,12 +54,27 @@ struct ListDetailCardView: View {
 
 
 #Preview {
+        // Define a mock `isEditingTitle` state
+        @Previewable @State var isEditingTitle: Bool = false
+        
+        // Create an in-memory ModelContainer
+        let container = try! ModelContainer(
+            for: PackingList.self, Category.self, Item.self,
+            configurations: ModelConfiguration(isStoredInMemoryOnly: true) // In-memory for preview
+        )
+        
+        // Populate the container with mock data
+        preloadPackingListData(context: container.mainContext)
+        
+        // Fetch a sample PackingList
+        let samplePackingList = try! container.mainContext.fetch(FetchDescriptor<PackingList>()).first!
+        
+        // Create a mock ListViewModel
+        let viewModel = ListViewModel(packingList: samplePackingList, modelContext: container.mainContext)
+        
+        // Return the preview
+        return ListDetailCardView(isEditingTitle: $isEditingTitle)
+            .modelContainer(container) // Provide the ModelContainer
+            .environmentObject(viewModel) // Inject the mock ListViewModel
     
-    @Previewable @State var isEditingTitle: Bool = false
-    
-    let sampleUserList = PackingList(title: "Summer List", locationName: "Joshua Tree")
-    ZStack {
-        Color(.gray)
-        ListDetailCardView(packingList: sampleUserList, isEditingTitle: $isEditingTitle)
-    }
 }
