@@ -27,18 +27,20 @@ struct CategorySectionView: View {
     
     let hapticFeedback = UINotificationFeedbackGenerator()
     
+//MARK: - CATEGORY BODY
     var body: some View {
-        
-        DisclosureGroup(isExpanded: $isExpanded) {
-            
-            //Iterate through items in the category
-            ForEach(category.items.sorted(by: { $0.position < $1.position })) { item in
+            DisclosureGroup(isExpanded: $isExpanded) {
                 
-                EditableItemView(
-                    item: item,
-                    togglePacked: {
-                    viewModel.togglePacked(for: item)
-                    })
+                //Iterate through items in the category
+                ForEach(category.items.sorted(by: { $0.position < $1.position })) { item in
+                    
+                    EditableItemView(
+                        item: item,
+                        togglePacked: {
+                            viewModel.togglePacked(for: item)
+                        })
+                    
+                    //MARK: - SWIPE TO DELETE
                     .swipeCell(
                         cellPosition: .both,
                         leftSlot: nil,
@@ -46,21 +48,21 @@ struct CategorySectionView: View {
                             SwipeCellSlot(
                                 slots: [
                                     SwipeCellButton(buttonStyle: .view,
-                                        title: "",
-                                        systemImage: "",
-                                        view: {
-                                            AnyView(
-                                                Image(systemName: "trash")
-                                                    .resizable()
-                                                    .aspectRatio(contentMode: .fit)
-                                                    .frame(width: 20, height: 20)
-                                                    .foregroundColor(.white)
-                                            )},
-                                        backgroundColor: .red,
-                                            action: {
-                                                deleteItem(item)
-                                            },
-                                        feedback:true
+                                                    title: "",
+                                                    systemImage: "",
+                                                    view: {
+                                                        AnyView(
+                                                            Image(systemName: "trash")
+                                                                .resizable()
+                                                                .aspectRatio(contentMode: .fit)
+                                                                .frame(width: 20, height: 20)
+                                                                .foregroundColor(.white)
+                                                        )},
+                                                    backgroundColor: .red,
+                                                    action: {
+                                                        deleteItem(item)
+                                                    },
+                                                    feedback:true
                                                    ),
                                     
                                 ],
@@ -73,96 +75,98 @@ struct CategorySectionView: View {
                             vibrationForButton: .error,
                             vibrationForDestructive: .heavy,
                             autoResetTime: 3)
-                            )
+                    )
                     .dismissSwipeCellForScrollViewForLazyVStack()
-            }//:FOREACH
-            // Add new item to the category
-            HStack {
-                Image(systemName: "plus.circle")
-                    .foregroundColor(.gray)
-                    .font(.title3)
-                TextField("Add new item", text: $newItemText)
-                    .textFieldStyle(.plain)
-                    .onSubmit {
-                        addItem(newItemText)
-                        newItemText = ""
-                        
+                }//:FOREACH
+                
+                
+//MARK: - ADD NEW ITEM
+                
+                HStack {
+                    Image(systemName: "plus.circle")
+                        .foregroundColor(.gray)
+                        .font(.title3)
+                    TextField("Add new item", text: $newItemText)
+                        .textFieldStyle(.plain)
+                        .onSubmit {
+                            addItem(newItemText)
+                            newItemText = ""
+                            
+                        }
+                    if !newItemText.isEmpty {
+                        Button {
+                            addItem(newItemText)
+                            newItemText = ""
+                        } label: {
+                            Text("Done")
+                        }
                     }
-                if !newItemText.isEmpty {
+                    
+                }//:HSTACK
+                .padding(.vertical, 10)
+                .padding(.horizontal)
+             
+//MARK: - MENU
+            } label: {
+                // Editable text field for category name
+                if isEditing {
+                    TextField("Category Name", text: $category.name)
+                        .textFieldStyle(.roundedBorder)
+                        .font(.headline)
+                        .multilineTextAlignment(.leading)
+                        .onSubmit {
+                            isEditing = false // Disable editing after submit
+                            viewModel.saveContext()
+                        }
+                    Spacer()
                     Button {
-                        addItem(newItemText)
-                        newItemText = ""
+                        isEditing = false // Disable editing after submit
+                        viewModel.saveContext()
                     } label: {
                         Text("Done")
                     }
-                }
-                
-            }//:HSTACK
-            .padding(.vertical, 10)
-            .padding(.horizontal)
-            
-        } label: {
-            // Editable text field for category name
-            if isEditing {
-                TextField("Category Name", text: $category.name)
-                    .textFieldStyle(.roundedBorder)
-                    .font(.headline)
-                    .multilineTextAlignment(.leading)
-                    .onSubmit {
-                        isEditing = false // Disable editing after submit
-                        viewModel.saveContext()
+                    .padding(.vertical)
+                    .padding(.leading, 30)
+                    .padding(.trailing, 10)
+                } else {
+                    HStack {
+                        Text(category.name)
+                            .font(.headline)
+                            .multilineTextAlignment(.leading)
+                        Spacer()
+                        Menu {
+                            Button {
+                                isEditing = true // Enable editing
+                            } label: {
+                                Label("Edit Name", systemImage: "pencil")
+                            }
+                            Button(action: {
+                                isRearranging = true
+                            }) {
+                                Label("Rearrange", systemImage: "arrow.up.arrow.down")
+                            }
+                            Button(role: .destructive) {
+                                deleteCategory()
+                            } label: {
+                                Label("Delete", systemImage: "trash")
+                            }
+                        } label: {
+                            Label("Edit", systemImage: "ellipsis")
+                                .padding(10)
+                                .background(Color.gray.opacity(0.1))
+                                .cornerRadius(8)
+                        } //:MENU
+                        .labelStyle(.iconOnly)
                     }
-                Spacer()
-                Button {
-                    isEditing = false // Disable editing after submit
-                    viewModel.saveContext()
-                } label: {
-                    Text("Done")
+                    .padding(.vertical)
+                    .padding(.leading, 30)
+                    .padding(.trailing, 10)
                 }
-                .padding(.vertical)
-                .padding(.leading, 30)
-                .padding(.trailing, 10)
-            } else {
-                HStack {
-                    Text(category.name)
-                        .font(.headline)
-                        .multilineTextAlignment(.leading)
-                    Spacer()
-                    Menu {
-                        Button {
-                            isEditing = true // Enable editing
-                        } label: {
-                            Label("Edit Name", systemImage: "pencil")
-                        }
-                        Button(action: {
-                            isRearranging = true
-                        }) {
-                            Label("Rearrange", systemImage: "arrow.up.arrow.down")
-                        }
-                        Button(role: .destructive) {
-                            deleteCategory()
-                        } label: {
-                            Label("Delete", systemImage: "trash")
-                        }
-                    } label: {
-                        Label("Edit", systemImage: "ellipsis")
-                            .padding(10)
-                            .background(Color.gray.opacity(0.1))
-                            .cornerRadius(8)
-                    } //:MENU
-                    .labelStyle(.iconOnly)
-                }
-                .padding(.vertical)
-                .padding(.leading, 30)
-                .padding(.trailing, 10)
-            }
-        } //:DISCLOSURE GROUP
-        .onChange(of: globalExpandCollapseAction) {
+            }//:DISCLOSURE GROUP
+            .onChange(of: globalExpandCollapseAction) {
             isExpanded = globalIsExpanded
-        }
-        .disclosureGroupStyle(LeftDisclosureStyle())
-        
-        
+            }
+            .disclosureGroupStyle(LeftDisclosureStyle())
     }//:BODY
     
 }
@@ -197,6 +201,8 @@ struct LeftDisclosureStyle: DisclosureGroupStyle {
     }
 }
 
+//MARK: - PREVIEW
+
 #Preview {
     @Previewable @State var isRearranging: Bool = false
     
@@ -208,14 +214,14 @@ struct LeftDisclosureStyle: DisclosureGroupStyle {
     
     // Populate the container with mock data
     preloadPackingListData(context: container.mainContext)
-
+    
     // Fetch a sample category
     let samplePackingList = try! container.mainContext.fetch(FetchDescriptor<PackingList>()).first!
     let sampleCategory = samplePackingList.categories.first!
     
     // Create a mock ListViewModel
     let viewModel = ListViewModel(packingList: samplePackingList, modelContext: container.mainContext)
-
+    
     // Return the preview
     return NavigationStack {
         CategorySectionView(

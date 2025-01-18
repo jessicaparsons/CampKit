@@ -30,7 +30,7 @@ struct CampKitApp: App {
 
     var body: some Scene {
         WindowGroup {
-            HomeListView(modelContext: sharedModelContainer.mainContext)
+            MainView(modelContext: sharedModelContainer.mainContext)
         }
         .modelContainer(sharedModelContainer)
     }

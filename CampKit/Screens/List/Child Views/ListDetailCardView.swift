@@ -38,7 +38,7 @@ struct ListDetailCardView: View {
         }//:VSTACK
         .padding()
         .background(
-            RoundedRectangle(cornerRadius: 15)
+            RoundedRectangle(cornerRadius: 10)
                 .fill(Color.colorWhite)
                 .shadow(color: Color(hue: 1.0, saturation: 1.0, brightness: 0.079, opacity: 0.3), radius: 3, x: 0, y: 3)
         )

@@ -12,11 +12,11 @@ struct ListView: View {
     @Environment(\.dismiss) private var dismiss
     @StateObject private var viewModel: ListViewModel
     
+    //Initialize ListView with its corresponding ViewModel
     init(viewModel: ListViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
     }
    
-    
     var body: some View {
         NavigationStack {
             ScrollView(showsIndicators: true) {
@@ -36,39 +36,39 @@ struct ListView: View {
                     }
                     .padding()
                     .background(Color.colorTan)
-                    
-                    
+
                 }//:VSTACK
             }//:SCROLL VIEW
             .background(Color.colorTan)
             .environmentObject(viewModel)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    optionsMenu
+                }
+            }
+            .sheet(isPresented: $viewModel.isRearranging) {
+                RearrangeCategoriesView()
+                    .environmentObject(viewModel)
+            }
+            .confirmationDialog(
+                "Are you sure you want to delete this list?",
+                isPresented: $viewModel.showDeleteConfirmation,
+                titleVisibility: .visible
+            ) {
+                Button("Delete", role: .destructive) {
+                    viewModel.deleteList(dismiss: dismiss) // Perform delete
+                }
+                Button("Cancel", role: .cancel) { }
+            }
             
         }//:NAVIGATION STACK
-        .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                optionsMenu
-            }
-        }
-        .sheet(isPresented: $viewModel.isRearranging) {
-            RearrangeCategoriesView()
-                .environmentObject(viewModel)
-        }
-        .confirmationDialog(
-            "Are you sure you want to delete this list?",
-            isPresented: $viewModel.showDeleteConfirmation,
-            titleVisibility: .visible
-        ) {
-            Button("Delete", role: .destructive) {
-                viewModel.deleteList(dismiss: dismiss) // Perform delete
-            }
-            Button("Cancel", role: .cancel) { }
-        }
+        
         
         
     }//:BODY
     
     
-    //MARK: - Edit List
+    //MARK: - BANNER IMAGE
     
     
     private var bannerImage: some View {
@@ -101,7 +101,7 @@ struct ListView: View {
         
     }
     
-    
+    //MARK: - CATEGORIES LIST
     
     private var categoriesList: some View {
         LazyVStack(spacing: 10) {
@@ -141,6 +141,8 @@ struct ListView: View {
         .offset(y: -30)
     }
     
+    //MARK: - ADD CATEGORY BUTTON
+    
     private var addCategoryButton: some View {
         HStack {
             Button { viewModel.addNewCategory()
@@ -157,6 +159,8 @@ struct ListView: View {
         .padding(.horizontal)//mine
         .offset(y: -20)//mine
     }
+    
+    //MARK: - OPTIONS MENU
     
     private var optionsMenu: some View {
        

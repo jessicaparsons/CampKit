@@ -14,9 +14,8 @@ struct EditableItemView: View {
     @Bindable var item: Item
     @FocusState private var isFocused: Bool
     
-    @State private var offset: CGFloat = 0
+
     @State private var willDelete = false
-    private let deletionThreshold: CGFloat = 120
     let togglePacked: () -> Void
     
     let hapticFeedback = UINotificationFeedbackGenerator()
@@ -51,11 +50,11 @@ struct EditableItemView: View {
 
                 }
             }
-            .offset(x: offset)
+            
             .padding(.vertical, 5)
             .padding(.horizontal)
             .background(Color.colorWhite)
-            .offset(x: offset)
+            
         }//:ZSTACK
         
     }//:BODY
@@ -64,7 +63,7 @@ struct EditableItemView: View {
 
 
 
-#Preview {
+#Preview(traits: .sizeThatFitsLayout) {
     let container = try! ModelContainer(
         for: PackingList.self, Category.self, Item.self,
         configurations: ModelConfiguration(isStoredInMemoryOnly: true) // In-memory for preview
@@ -82,15 +81,14 @@ struct EditableItemView: View {
     // Create a mock ListViewModel
     let viewModel = ListViewModel(packingList: samplePackingList, modelContext: container.mainContext)
 
-    return ZStack {
-        Color(.colorTan)
+    return
         EditableItemView(
             item: sampleItem,
             togglePacked: {
                 print("Toggle packed for \(sampleItem.title)")
             }
         )
-    }
+    
     .modelContainer(container) // Provide the SwiftData container
     .environmentObject(viewModel) // Inject the mock ListViewModel
 }

@@ -16,7 +16,6 @@ final class HomeListViewModel: ObservableObject {
             print("Packing lists updated: \(packingLists.map { $0.title })")
         }
     }
-    @State private var item: String = ""
     
     init(modelContext: ModelContext) {
         self.modelContext = modelContext

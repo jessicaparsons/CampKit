@@ -7,53 +7,30 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		C82EBE4F2D2F3769000B39DF /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C82EBE4A2D2F3769000B39DF /* Assets.xcassets */; };
-		C82EBE602D2F3769000B39DF /* CampKitApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C82EBE4C2D2F3769000B39DF /* CampKitApp.swift */; };
 		C82EBE932D3116E2000B39DF /* SwipeCell in Frameworks */ = {isa = PBXBuildFile; productRef = C82EBE922D3116E2000B39DF /* SwipeCell */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		C82EBE4A2D2F3769000B39DF /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		C82EBE4B2D2F3769000B39DF /* CampKit.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = CampKit.entitlements; sourceTree = "<group>"; };
-		C82EBE4C2D2F3769000B39DF /* CampKitApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CampKitApp.swift; sourceTree = "<group>"; };
-		C82EBE4D2D2F3769000B39DF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		C8B614F22D27078500E1DB8D /* CampKit.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CampKit.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		C85DEC462D39E6070023A1BD /* Exceptions for "CampKit" folder in "CampKit" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = C8B614F12D27078500E1DB8D /* CampKit */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		C82EBEC92D3357A5000B39DF /* Screens */ = {
+		C85DEC2B2D39E6070023A1BD /* CampKit */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = Screens;
-			sourceTree = "<group>";
-		};
-		C82EBED22D3357AC000B39DF /* Views */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = Views;
-			sourceTree = "<group>";
-		};
-		C82EBED52D3357B7000B39DF /* Components */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = Components;
-			sourceTree = "<group>";
-		};
-		C82EBED92D3357BE000B39DF /* Data */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = Data;
-			sourceTree = "<group>";
-		};
-		C82EBEDF2D3357C0000B39DF /* Model */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = Model;
-			sourceTree = "<group>";
-		};
-		C82EBEE42D3357C2000B39DF /* Utility */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = Utility;
-			sourceTree = "<group>";
-		};
-		C82EBEE72D3357C8000B39DF /* Preview Content */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = "Preview Content";
+			exceptions = (
+				C85DEC462D39E6070023A1BD /* Exceptions for "CampKit" folder in "CampKit" target */,
+			);
+			path = CampKit;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -70,28 +47,10 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		C82EBEBF2D335789000B39DF /* CampKit */ = {
-			isa = PBXGroup;
-			children = (
-				C82EBEC92D3357A5000B39DF /* Screens */,
-				C82EBED22D3357AC000B39DF /* Views */,
-				C82EBED92D3357BE000B39DF /* Data */,
-				C82EBEDF2D3357C0000B39DF /* Model */,
-				C82EBED52D3357B7000B39DF /* Components */,
-				C82EBE4B2D2F3769000B39DF /* CampKit.entitlements */,
-				C82EBE4C2D2F3769000B39DF /* CampKitApp.swift */,
-				C82EBE4A2D2F3769000B39DF /* Assets.xcassets */,
-				C82EBE4D2D2F3769000B39DF /* Info.plist */,
-				C82EBEE42D3357C2000B39DF /* Utility */,
-				C82EBEE72D3357C8000B39DF /* Preview Content */,
-			);
-			path = CampKit;
-			sourceTree = "<group>";
-		};
 		C8B614E92D27078500E1DB8D = {
 			isa = PBXGroup;
 			children = (
-				C82EBEBF2D335789000B39DF /* CampKit */,
+				C85DEC2B2D39E6070023A1BD /* CampKit */,
 				C8B614F32D27078500E1DB8D /* Products */,
 			);
 			sourceTree = "<group>";
@@ -120,13 +79,7 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				C82EBEC92D3357A5000B39DF /* Screens */,
-				C82EBED22D3357AC000B39DF /* Views */,
-				C82EBED52D3357B7000B39DF /* Components */,
-				C82EBED92D3357BE000B39DF /* Data */,
-				C82EBEDF2D3357C0000B39DF /* Model */,
-				C82EBEE42D3357C2000B39DF /* Utility */,
-				C82EBEE72D3357C8000B39DF /* Preview Content */,
+				C85DEC2B2D39E6070023A1BD /* CampKit */,
 			);
 			name = CampKit;
 			packageProductDependencies = (
@@ -178,7 +131,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C82EBE4F2D2F3769000B39DF /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -189,7 +141,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C82EBE602D2F3769000B39DF /* CampKitApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -220,6 +171,9 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = co.junipercreative.CampKit;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -250,6 +204,9 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = co.junipercreative.CampKit;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
