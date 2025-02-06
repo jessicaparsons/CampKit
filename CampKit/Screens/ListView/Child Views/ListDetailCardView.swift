@@ -9,7 +9,7 @@ import SwiftUI
 import SwiftData
 
 struct ListDetailCardView: View {
-    @EnvironmentObject var viewModel: ListViewModel
+    @ObservedObject var viewModel: ListViewModel
     @Binding var isEditingTitle: Bool
     
     //placeholders
@@ -70,11 +70,10 @@ struct ListDetailCardView: View {
         let samplePackingList = try! container.mainContext.fetch(FetchDescriptor<PackingList>()).first!
         
         // Create a mock ListViewModel
-        let viewModel = ListViewModel(packingList: samplePackingList, modelContext: container.mainContext)
+        let viewModel = ListViewModel(modelContext: container.mainContext, packingList: samplePackingList)
         
         // Return the preview
-        return ListDetailCardView(isEditingTitle: $isEditingTitle)
+        return ListDetailCardView(viewModel: viewModel, isEditingTitle: $isEditingTitle)
             .modelContainer(container) // Provide the ModelContainer
-            .environmentObject(viewModel) // Inject the mock ListViewModel
     
 }

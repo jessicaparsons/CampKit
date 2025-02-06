@@ -11,6 +11,7 @@ import SwiftData
 final class HomeListViewModel: ObservableObject {
     
     private let modelContext: ModelContext
+    
     @Published var packingLists: [PackingList] = [] {
         didSet {
             print("Packing lists updated: \(packingLists.map { $0.title })")
@@ -19,7 +20,6 @@ final class HomeListViewModel: ObservableObject {
     
     init(modelContext: ModelContext) {
         self.modelContext = modelContext
-        print("HomeListViewModel initialized and called fetchPackingLists")
         fetchPackingLists()
     }
     

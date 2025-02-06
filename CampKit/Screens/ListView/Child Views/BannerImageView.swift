@@ -10,7 +10,7 @@ import SwiftData
 
 struct BannerImageView: View {
     
-    @EnvironmentObject var viewModel: ListViewModel
+    @ObservedObject var viewModel: ListViewModel
     private let placeholderImage: String = "TopographyDesign"
     
     var body: some View {
@@ -57,11 +57,10 @@ struct BannerImageView: View {
     let samplePackingList = try! container.mainContext.fetch(FetchDescriptor<PackingList>()).first!
 
     // Create the ListViewModel
-    let viewModel = ListViewModel(packingList: samplePackingList, modelContext: container.mainContext)
+    let viewModel = ListViewModel(modelContext: container.mainContext, packingList: samplePackingList)
 
     // Return the ListView with the in-memory container
-    return BannerImageView()
+    return BannerImageView(viewModel: viewModel)
         .modelContainer(container)
-        .environmentObject(viewModel)
     
 }

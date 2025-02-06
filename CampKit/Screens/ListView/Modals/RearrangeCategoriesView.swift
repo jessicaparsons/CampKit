@@ -9,7 +9,7 @@ import SwiftUI
 import SwiftData
 
 struct RearrangeCategoriesView: View {
-    @EnvironmentObject var viewModel: ListViewModel // Use ListViewModel
+    @ObservedObject var viewModel: ListViewModel
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
@@ -60,12 +60,11 @@ struct RearrangeCategoriesView: View {
     container.mainContext.insert(samplePackingList)
 
     // Create a mock ListViewModel with the PackingList
-    let viewModel = ListViewModel(packingList: samplePackingList, modelContext: container.mainContext)
+    let viewModel = ListViewModel(modelContext: container.mainContext, packingList: samplePackingList)
 
     // Return the view with the mock ModelContainer and ViewModel
     return NavigationStack {
-        RearrangeCategoriesView() // No need to pass categories; ViewModel handles it
-            .environmentObject(viewModel) // Inject the mock ViewModel
+        RearrangeCategoriesView(viewModel: viewModel)
     }
     .modelContainer(container) // Attach the mock ModelContainer for SwiftData support
 }

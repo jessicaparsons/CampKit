@@ -7,19 +7,18 @@
 
 import SwiftUI
 import SwiftData
+import SwipeCell
 
 struct EditableItemView: View {
     
-    @EnvironmentObject var viewModel: ListViewModel
+    @ObservedObject var viewModel: ListViewModel
     @Bindable var item: Item
     @FocusState private var isFocused: Bool
     
 
     @State private var willDelete = false
     let togglePacked: () -> Void
-    
-    let hapticFeedback = UINotificationFeedbackGenerator()
-    
+        
     var body: some View {
         ZStack {
             HStack {
@@ -47,16 +46,48 @@ struct EditableItemView: View {
                     } label: {
                         Text("Done")
                     }
-
                 }
             }
-            
-            .padding(.vertical, 5)
-            .padding(.horizontal)
-            .background(Color.colorWhite)
-            
         }//:ZSTACK
-        
+        .padding(.horizontal)
+        .padding(.vertical, 8)
+        //MARK: - SWIPE TO DELETE
+        .swipeCell(
+            cellPosition: .both,
+            leftSlot: nil,
+            rightSlot:
+                SwipeCellSlot(
+                    slots: [
+                        SwipeCellButton(buttonStyle: .view,
+                                        title: "",
+                                        systemImage: "",
+                                        view: {
+                                            AnyView(
+                                                Image(systemName: "trash")
+                                                    .resizable()
+                                                    .aspectRatio(contentMode: .fit)
+                                                    .frame(width: 20, height: 20)
+                                                    .foregroundColor(.white)
+                                            )},
+                                        backgroundColor: .red,
+                                        action: {
+                                            viewModel.deleteItem(item)
+                                        },
+                                        feedback:true
+                                       ),
+                        
+                    ],
+                    slotStyle: .destructiveDelay),
+            swipeCellStyle: SwipeCellStyle(
+                alignment: .leading,
+                dismissWidth: 20,
+                appearWidth: 20,
+                destructiveWidth: 240,
+                vibrationForButton: .error,
+                vibrationForDestructive: .heavy,
+                autoResetTime: 3)
+        )
+        .dismissSwipeCellForScrollViewForLazyVStack()
     }//:BODY
     
 }
@@ -79,10 +110,11 @@ struct EditableItemView: View {
     container.mainContext.insert(samplePackingList)
 
     // Create a mock ListViewModel
-    let viewModel = ListViewModel(packingList: samplePackingList, modelContext: container.mainContext)
+    let viewModel = ListViewModel(modelContext: container.mainContext, packingList: samplePackingList)
 
     return
         EditableItemView(
+            viewModel: viewModel,
             item: sampleItem,
             togglePacked: {
                 print("Toggle packed for \(sampleItem.title)")
@@ -90,5 +122,4 @@ struct EditableItemView: View {
         )
     
     .modelContainer(container) // Provide the SwiftData container
-    .environmentObject(viewModel) // Inject the mock ListViewModel
 }

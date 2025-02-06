@@ -16,11 +16,13 @@ class Category: Identifiable {
     @Relationship(deleteRule: .cascade) var items: [Item] = []
     var packingList: PackingList?
     
+    var isExpanded: Bool
 
-    init(name: String, position: Int, items: [Item] = []) {
+    init(name: String, position: Int, items: [Item] = [], isExpanded: Bool = true) {
         self.name = name
         self.position = position
         self.items = []
+        self.isExpanded = isExpanded
     }
     
 }

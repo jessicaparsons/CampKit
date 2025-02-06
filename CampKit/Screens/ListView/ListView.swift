@@ -9,6 +9,7 @@ import SwiftUI
 import SwiftData
 
 struct ListView: View {
+
     @Environment(\.dismiss) private var dismiss
     @StateObject private var viewModel: ListViewModel
     
@@ -21,32 +22,37 @@ struct ListView: View {
         NavigationStack {
             ScrollView {
                 VStack {
-                    BannerImageView()
+                    
+                    //MARK: - BANNER IMAGE
+                    BannerImageView(viewModel: viewModel)
                         .frame(maxWidth: .infinity) // Ensure full width
                         .listRowInsets(EdgeInsets()) // Remove extra padding
                         .background(Color.blue)
                         .onTapGesture { viewModel.showPhotoPicker.toggle() }
+                    
+                    //MARK: - LIST DETAILS HEADER
                     VStack {
                         ListDetailCardView(
-                            isEditingTitle: $viewModel.isEditingTitle
+                            viewModel: viewModel, isEditingTitle: $viewModel.isEditingTitle
                         )
                         .offset(y: -40)
                         
-                        CategoriesListView()
+                    //MARK: - LIST CATEGORIES
+                        
+                        CategoriesListView(viewModel: viewModel)
                         addCategoryButton
                         
                     }//:VSTACK
                     .padding(.horizontal)
                 }//:VSTACK
                 .background(Color.colorTan)
-                .environmentObject(viewModel)
                 .toolbar {
                     ToolbarItem(placement: .navigationBarTrailing) {
                         optionsMenu
                     }
                 }
                 .sheet(isPresented: $viewModel.isRearranging) {
-                    RearrangeCategoriesView()
+                    RearrangeCategoriesView(viewModel: viewModel)
                         .environmentObject(viewModel)
                 }
                 .confirmationDialog(
@@ -159,12 +165,12 @@ struct ListView: View {
         // Fetch a sample packing list from the container
         let samplePackingList = try! container.mainContext.fetch(FetchDescriptor<PackingList>()).first!
 
-        // Create the ListViewModel
-        let viewModel = ListViewModel(packingList: samplePackingList, modelContext: container.mainContext)
-
+        let viewModel = ListViewModel(modelContext: container.mainContext, packingList: samplePackingList)
+        
         // Return the ListView with the in-memory container
         return ListView(viewModel: viewModel)
-            .modelContainer(container) // Attach the model container for SwiftData
+            .modelContainer(container)
+            .environment(\.modelContext, container.mainContext)
     }
 }
 
@@ -175,9 +181,11 @@ struct ListView: View {
             for: PackingList.self, Category.self, Item.self,
             configurations: ModelConfiguration(isStoredInMemoryOnly: true)
         )
-        let viewModel = ListViewModel(packingList: placeholderPackingList, modelContext: container.mainContext)
+        
+        let viewModel = ListViewModel(modelContext: container.mainContext, packingList: placeholderPackingList)
 
         ListView(viewModel: viewModel)
             .modelContainer(container)
+            .environment(\.modelContext, container.mainContext)
     }
 }

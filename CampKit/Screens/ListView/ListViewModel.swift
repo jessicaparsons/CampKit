@@ -9,8 +9,11 @@ import SwiftUI
 import SwiftData
 
 class ListViewModel: ObservableObject {
+    
     private let modelContext: ModelContext
+    
     @Published var packingList: PackingList
+    
     @Published var item: String = ""
     @Published var globalIsExpanded: Bool = false
     @Published var globalExpandCollapseAction = UUID() // Trigger for animation
@@ -19,12 +22,10 @@ class ListViewModel: ObservableObject {
     @Published var showDeleteConfirmation: Bool = false
     @Published var showPhotoPicker: Bool = false
     @Published var draggedCategory: Category?
-
-    let hapticFeedback = UINotificationFeedbackGenerator()
     
-    init(packingList: PackingList, modelContext: ModelContext) {
-        self.packingList = packingList
+    init(modelContext: ModelContext, packingList: PackingList) {
         self.modelContext = modelContext
+        self.packingList = packingList
     }
     
     func addItem(to category: Category, itemTitle: String) {

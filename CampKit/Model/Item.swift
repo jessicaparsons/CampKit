@@ -24,15 +24,3 @@ class Item: Identifiable {
     }
 }
 
-//@Model
-//final class Item {
-//    var title: String
-//    var isComplete: Bool
-//    var timestamp: Date
-//    
-//    init(title: String, isComplete: Bool, timestamp: Date) {
-//        self.title = title
-//        self.isComplete = isComplete
-//        self.timestamp = timestamp
-//    }
-//}

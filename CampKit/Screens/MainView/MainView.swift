@@ -9,22 +9,17 @@ import SwiftUI
 import SwiftData
 
 struct MainView: View {
-    @Environment(\.modelContext) private var modelContext
+    @Environment(\.modelContext) var modelContext
     
     @State private var selection = 0
     @State private var isShowingSettings: Bool = false
     @State private var isShowingQuiz: Bool = false
     
-    init(modelContext: ModelContext) {
-        
-    }
-    
     var body: some View {
         ZStack(alignment: .bottom) {
             TabView(selection: $selection) {
                 Group {
-                    let homeListViewModel = HomeListViewModel(modelContext: modelContext)
-                    HomeListView(modelContext: modelContext, viewModel: homeListViewModel)
+                    HomeListView(modelContext: modelContext)
                         .tabItem {
                             Image(systemName: "list.bullet")
                         }
@@ -88,7 +83,7 @@ struct MainView: View {
     
     preloadPackingListData(context: container.mainContext)
     
-    return MainView(modelContext: container.mainContext)
+    return MainView()
         .modelContainer(container)
 }
 

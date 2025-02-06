@@ -9,19 +9,22 @@ import SwiftUI
 import SwiftData
 
 struct HomeListView: View {
-    private let modelContext: ModelContext
+    
+    @Environment(\.modelContext) var modelContext
     @StateObject private var viewModel: HomeListViewModel
     @State private var isNewListQuizShowing: Bool = false
-    
-    let hapticFeedback = UINotificationFeedbackGenerator()
-    
-    init(modelContext: ModelContext, viewModel: HomeListViewModel) {
+
+    init(modelContext: ModelContext) {
+        let viewModel = HomeListViewModel(modelContext: modelContext)
         _viewModel = StateObject(wrappedValue: viewModel)
-        self.modelContext = modelContext
+        
     }
     
     var body: some View {
         NavigationStack {
+            
+            //MARK: - HEADER
+            
             ZStack {
                 LinearGradient(colors: [.customGold, .customSage, .customSky, .customLilac], startPoint: .bottomLeading, endPoint: .topTrailing)
                     .ignoresSafeArea()
@@ -32,19 +35,21 @@ struct HomeListView: View {
                         .font(.title)
                         .fontWeight(.light)
                         .foregroundColor(.black)
-                        .shadow(color: Color(red: 0, green: 0, blue: 0, opacity: 0.15), radius: 2, x: 1, y: 1)
                         .padding(.bottom)
                     Spacer()
                 }//:VSTACK
             }//:ZSTACK
             .frame(height: 80)
             
+            //MARK: - PACKING LISTS
             
             List {
                 ForEach(viewModel.packingLists) { packingList in
+                    let listViewModel = ListViewModel(modelContext: modelContext, packingList: packingList)
+                    
                     NavigationLink(destination: {
-                        let listViewModel = ListViewModel(packingList: packingList, modelContext: modelContext)
                         ListView(viewModel: listViewModel)
+                        
                     }, label: {
                         HStack {
                             // Optional photo thumbnail
@@ -53,14 +58,14 @@ struct HomeListView: View {
                                     .resizable()
                                     .scaledToFill()
                                     .frame(width: 50, height: 50)
-                                    .cornerRadius(8)
+                                    .cornerRadius(Constants.cornerRadius)
                                     .padding(.trailing, 8)
                             } else {
                                 Image("TopographyDesign")
                                         .resizable()
                                         .scaledToFill()
                                         .frame(width: 50, height: 50)
-                                        .cornerRadius(8)
+                                        .cornerRadius(Constants.cornerRadius)
                                         .padding(.trailing, 8)
                             }
                             
@@ -76,6 +81,7 @@ struct HomeListView: View {
                 } //:FOR EACH
                 .onDelete(perform: viewModel.deleteLists)
                 
+                //MARK: - ADD NEW LIST BUTTON
                 Section {
                     Button {
                         viewModel.addNewList()
@@ -118,26 +124,23 @@ struct HomeListView: View {
         for: PackingList.self, Category.self, Item.self,
         configurations: ModelConfiguration(isStoredInMemoryOnly: true)
     )
-
+        
     preloadPackingListData(context: container.mainContext)
-    
-    let viewModel = HomeListViewModel(modelContext: container.mainContext)
 
-    return HomeListView(modelContext: container.mainContext, viewModel: viewModel)
+    return HomeListView(modelContext: container.mainContext)
         .modelContainer(container)
+        .environment(\.modelContext, container.mainContext)
 }
 
 
 #Preview("Empty List") {
-    // Create an in-memory ModelContainer
+
     let container = try! ModelContainer(
         for: PackingList.self, Category.self, Item.self,
         configurations: ModelConfiguration(isStoredInMemoryOnly: true)
     )
-
-    let viewModel = HomeListViewModel(modelContext: container.mainContext)
     
-    // Return the HomeListView and pass the `modelContext`
-    return HomeListView(modelContext: container.mainContext, viewModel: viewModel)
-        .modelContainer(container) // Attach the mock container for previews
+    return HomeListView(modelContext: container.mainContext)
+        .modelContainer(container)
+        .environment(\.modelContext, container.mainContext)
 }

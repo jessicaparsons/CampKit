@@ -19,6 +19,7 @@ struct CampKitApp: App {
 
         do {
             return try ModelContainer(for: schema, configurations: [modelConfiguration])
+            
         } catch {
             fatalError("Could not create ModelContainer: \(error)")
         }
@@ -30,7 +31,7 @@ struct CampKitApp: App {
 
     var body: some Scene {
         WindowGroup {
-            MainView(modelContext: sharedModelContainer.mainContext)
+            MainView()
         }
         .modelContainer(sharedModelContainer)
     }

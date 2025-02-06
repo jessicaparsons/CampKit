@@ -9,7 +9,7 @@ import SwiftUI
 import SwiftData
 
 struct CategoriesListView: View {
-    @EnvironmentObject var viewModel: ListViewModel
+    @ObservedObject var viewModel: ListViewModel
     @Environment(\.dismiss) private var dismiss
     
     var body: some View {
@@ -33,10 +33,9 @@ struct CategoriesListView: View {
                                 .fill(Color.customWhite)
                                 .shadow(color: .gray.opacity(0.2), radius: 4, x: 0, y: 2)
                             CategorySectionView(
+                                viewModel: viewModel,
                                 category: category,
                                 isRearranging: $viewModel.isRearranging,
-                                addItem: { itemTitle in viewModel.addItem(to: category, itemTitle: itemTitle) }, // Pass the title and category
-                                deleteItem: { item in viewModel.deleteItem(item) }, // Pass the item to delete
                                 deleteCategory: { viewModel.deleteCategory(category) }, // Delete the category
                                 globalIsExpanded: viewModel.globalIsExpanded,
                                 globalExpandCollapseAction: viewModel.globalExpandCollapseAction
@@ -64,11 +63,13 @@ struct CategoriesListView: View {
     let samplePackingList = try! container.mainContext.fetch(FetchDescriptor<PackingList>()).first!
     
     // Create a mock ListViewModel
-    let viewModel = ListViewModel(packingList: samplePackingList, modelContext: container.mainContext)
+    let viewModel = ListViewModel(modelContext: container.mainContext, packingList: samplePackingList)
     
     // Return the preview
-    return CategoriesListView()
-        .modelContainer(container) // Provide the ModelContainer
-        .environmentObject(viewModel) // Inject the mock ListViewModel
-    
+    return ScrollView {
+        LazyVStack {
+            CategoriesListView(viewModel: viewModel)
+                .modelContainer(container)
+        }
+    }
 }
