@@ -11,12 +11,12 @@ import UIKit
 extension Category {
     static var sampleCategories: [Category] {
         // Define category names and associated items
-        let categoriesWithItems: [(name: String, position: Int, items: [String])] = [
-            ("Bed 0", 0, ["Pillows", "Sleeping bag", "Sleeping pad"]),
-            ("Clothes 1", 1, ["Jackets", "Shoes", "Toiletries"]),
-            ("Food 2", 2, ["Propane", "Stove", "Cooler"]),
-            ("Lounge 3", 3, ["Chair", "Books", "Cards/Games"]),
-            ("Hike 4", 4, ["Backpack", "Camera", "Trail snacks"])
+        let categoriesWithItems: [(name: String, position: Int, items: [String], isExpanded: Bool)] = [
+            ("Bed 0", 0, ["Pillows", "Sleeping bag", "Sleeping pad"], true),
+            ("Clothes 1", 1, ["Jackets", "Shoes", "Toiletries"], true),
+            ("Food 2", 2, ["Propane", "Stove", "Cooler"], true),
+            ("Lounge 3", 3, ["Chair", "Books", "Cards/Games"], true),
+            ("Hike 4", 4, ["Backpack", "Camera", "Trail snacks"], true)
         ]
 
         // Create categories with items

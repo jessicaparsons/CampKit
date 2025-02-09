@@ -69,9 +69,9 @@ struct MainView: View {
                 selection = oldValue // Revert to the previous tab
             }
         }
-        .sheet(isPresented: $isShowingQuiz) {
-            QuizView()
-        }
+//        .sheet(isPresented: $isShowingQuiz) {
+//            QuizView(viewModel: QuizViewModel(modelContext: modelContext))
+//        }
     }
 }
 

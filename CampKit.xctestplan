@@ -1,0 +1,29 @@
+{
+  "configurations" : [
+    {
+      "id" : "063CA7BC-4F49-4CA5-92DC-DBCACE166DD5",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:CampKit.xcodeproj",
+      "identifier" : "C8B614F12D27078500E1DB8D",
+      "name" : "CampKit"
+    }
+  },
+  "testTargets" : [
+    {
+      "parallelizable" : true,
+      "target" : {
+        "containerPath" : "container:CampKit.xcodeproj",
+        "identifier" : "C8C0F23A2D56B13200D3499A",
+        "name" : "CampKitTests"
+      }
+    }
+  ],
+  "version" : 1
+}

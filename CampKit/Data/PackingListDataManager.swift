@@ -74,15 +74,4 @@ func preloadPackingListData(context: ModelContext) {
     print("Inserted PackingList: \(sampleList)")
 
     
-    
-//    // Debug inserted data
-//    print("Inserted PackingList: \(sampleList.title)")
-//    print("Categories in '\(sampleList.title)':")
-//    for category in sampleList.categories {
-//        print("  - \(category.name)")
-//        for item in category.items {
-//            print("    - \(item.title), Packed: \(item.isPacked)")
-//        }
-//    }
-
 }

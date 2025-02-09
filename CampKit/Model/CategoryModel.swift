@@ -15,7 +15,6 @@ class Category: Identifiable {
     @Attribute var position: Int
     @Relationship(deleteRule: .cascade) var items: [Item] = []
     var packingList: PackingList?
-    
     var isExpanded: Bool
 
     init(name: String, position: Int, items: [Item] = [], isExpanded: Bool = true) {

@@ -11,7 +11,7 @@ struct BigButton: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .padding(.vertical, 13)
-            .padding(.horizontal, 20)
+            .padding(.horizontal, Constants.horizontalPadding)
             .background(
                 RoundedRectangle(cornerRadius: 50)
                     .fill(.colorNeon)
@@ -22,6 +22,23 @@ struct BigButton: ButtonStyle {
 
     }
 }
+
+struct BigButtonWide: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .padding(.vertical, 15)
+            .padding(.horizontal, Constants.horizontalPadding)
+            .background(
+                RoundedRectangle(cornerRadius: 10)
+                    .fill(.colorNeon)
+            )
+            .foregroundColor(.black)
+            .opacity(configuration.isPressed ? 0.5 : 1)
+            .animation(.easeInOut(duration: 0.2), value: configuration.isPressed)
+
+    }
+}
+
 
 #Preview {
     //CustomButton()

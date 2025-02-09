@@ -10,8 +10,20 @@
 		C82EBE932D3116E2000B39DF /* SwipeCell in Frameworks */ = {isa = PBXBuildFile; productRef = C82EBE922D3116E2000B39DF /* SwipeCell */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		C8C0F23F2D56B13300D3499A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C8B614EA2D27078500E1DB8D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C8B614F12D27078500E1DB8D;
+			remoteInfo = CampKit;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
 		C8B614F22D27078500E1DB8D /* CampKit.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CampKit.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		C8C0F23B2D56B13200D3499A /* CampKitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CampKitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		C8C0F2482D5702FC00D3499A /* CampKit.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = CampKit.xctestplan; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -33,6 +45,11 @@
 			path = CampKit;
 			sourceTree = "<group>";
 		};
+		C8C0F23C2D56B13200D3499A /* CampKitTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = CampKitTests;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -44,13 +61,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		C8C0F2382D56B13200D3499A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		C8B614E92D27078500E1DB8D = {
 			isa = PBXGroup;
 			children = (
+				C8C0F2482D5702FC00D3499A /* CampKit.xctestplan */,
 				C85DEC2B2D39E6070023A1BD /* CampKit */,
+				C8C0F23C2D56B13200D3499A /* CampKitTests */,
 				C8B614F32D27078500E1DB8D /* Products */,
 			);
 			sourceTree = "<group>";
@@ -59,6 +85,7 @@
 			isa = PBXGroup;
 			children = (
 				C8B614F22D27078500E1DB8D /* CampKit.app */,
+				C8C0F23B2D56B13200D3499A /* CampKitTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -89,6 +116,29 @@
 			productReference = C8B614F22D27078500E1DB8D /* CampKit.app */;
 			productType = "com.apple.product-type.application";
 		};
+		C8C0F23A2D56B13200D3499A /* CampKitTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C8C0F2412D56B13300D3499A /* Build configuration list for PBXNativeTarget "CampKitTests" */;
+			buildPhases = (
+				C8C0F2372D56B13200D3499A /* Sources */,
+				C8C0F2382D56B13200D3499A /* Frameworks */,
+				C8C0F2392D56B13200D3499A /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				C8C0F2402D56B13300D3499A /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				C8C0F23C2D56B13200D3499A /* CampKitTests */,
+			);
+			name = CampKitTests;
+			packageProductDependencies = (
+			);
+			productName = CampKitTests;
+			productReference = C8C0F23B2D56B13200D3499A /* CampKitTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -101,6 +151,10 @@
 				TargetAttributes = {
 					C8B614F12D27078500E1DB8D = {
 						CreatedOnToolsVersion = 16.2;
+					};
+					C8C0F23A2D56B13200D3499A = {
+						CreatedOnToolsVersion = 16.2;
+						TestTargetID = C8B614F12D27078500E1DB8D;
 					};
 				};
 			};
@@ -122,12 +176,20 @@
 			projectRoot = "";
 			targets = (
 				C8B614F12D27078500E1DB8D /* CampKit */,
+				C8C0F23A2D56B13200D3499A /* CampKitTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		C8B614F02D27078500E1DB8D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C8C0F2392D56B13200D3499A /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -144,7 +206,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		C8C0F2372D56B13200D3499A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		C8C0F2402D56B13300D3499A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = C8B614F12D27078500E1DB8D /* CampKit */;
+			targetProxy = C8C0F23F2D56B13300D3499A /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		C8B615042D27078700E1DB8D /* Debug */ = {
@@ -332,6 +409,42 @@
 			};
 			name = Release;
 		};
+		C8C0F2422D56B13300D3499A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 4Q55A6KPP6;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = co.junipercreative.CampKitTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CampKit.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/CampKit";
+			};
+			name = Debug;
+		};
+		C8C0F2432D56B13300D3499A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 4Q55A6KPP6;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = co.junipercreative.CampKitTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CampKit.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/CampKit";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -349,6 +462,15 @@
 			buildConfigurations = (
 				C8B615042D27078700E1DB8D /* Debug */,
 				C8B615052D27078700E1DB8D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C8C0F2412D56B13300D3499A /* Build configuration list for PBXNativeTarget "CampKitTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C8C0F2422D56B13300D3499A /* Debug */,
+				C8C0F2432D56B13300D3499A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
