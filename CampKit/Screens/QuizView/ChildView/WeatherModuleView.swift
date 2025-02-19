@@ -14,50 +14,52 @@ struct WeatherModuleView: View {
     
     var body: some View {
         GroupBox {
-            VStack {
-                if let weather = weatherViewModel.weather {
-                    HStack {
-                        Text(weather.cityName)
-                            .font(.body)
-                        Spacer()
+            ZStack {
+                VStack {
+                    if let weather = weatherViewModel.weather {
+                        HStack {
+                            Text(weather.first?.cityName ?? "Unknown")
+                                .font(.body)
+                            Spacer()
+                        }
+                        Divider().padding(.vertical, 4)
+                       
+                        ForEach(weather.prefix(upTo: 5), id: \.id) { day in
+                                WeatherRowView(
+                                    symbol: day.conditionName,
+                                    day: day.date,
+                                    highTemp: day.highTemp,
+                                    lowTemp: day.lowTemp
+                                )
+                                .frame(height: 25)
+                            }
+          
+               
+                    }//:CONDITION
+                    else {
+                        VStack(spacing: Constants.verticalSpacing) {
+                            Text("Weather Forecast")
+                                .font(.headline)
+                                .fontWeight(.bold)
+                            Text("Choose a location on the previous screen to see weather forecast")
+                                .multilineTextAlignment(.center)
+                            Image(systemName: "cloud.sun")
+                        }
+                        .padding()
                     }
-                    Divider().padding(.vertical, 4)
-                    List {
-                        WeatherRowView(
-                            symbol: weather.conditionName,
-                            day: weather.cityName,
-                            highTemp: weather.highTemp,
-                            lowTemp: weather.lowTemp
-                        )
-                        .listRowBackground(Color.clear)
-                        .listRowSeparator(.hidden)
-                    }//:LIST
-                    .listStyle(PlainListStyle())
-                    .frame(maxHeight: 120)
-                }//:CONDITION
-                else {
-                    VStack(spacing: Constants.verticalSpacing) {
-                        Text("Weather Forecast")
-                            .font(.headline)
-                            .fontWeight(.bold)
-                        Text("Choose a location on the previous screen to see weather forecast")
-                            .multilineTextAlignment(.center)
-                        Image(systemName: "cloud.sun")
-                    }
-                    .padding()
-                }
-            }//:VSTACK
+                }//:VSTACK
+            }//:ZSTACK
         }//:GROUPBOX
         .backgroundStyle(Color.colorTan)
         .task {
-            await weatherViewModel.fetchLocation(cityName: location)
+            await weatherViewModel.fetchLocation(for: location)
         }
     }
 }
 
 #Preview {
     
-    @Previewable @State var location: String = "Paris"
+    @Previewable @State var location: String = "Los Angeles"
     WeatherModuleView(location: $location)
         .environment(WeatherViewModel(weatherFetcher: GetWeather()))
 }

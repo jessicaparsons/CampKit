@@ -7,28 +7,35 @@
 
 import SwiftUI
 import SwiftData
+import CoreLocation
 
 @Observable
 class QuizViewModel {
     
     private let modelContext: ModelContext
     
-    var whoArray: [Choice] = []
-    var activityArray: [Choice] = []
+    var whoArray: [Choice] = [
+        Choice(name: "Adults", isSelected: false),
+        Choice(name: "Kids", isSelected: false),
+        Choice(name: "Dogs", isSelected: false)
+    ]
+    
+    var activityArray: [Choice] = [
+        Choice(name: "Hiking", isSelected: false),
+        Choice(name: "Fishing", isSelected: false),
+        Choice(name: "Bouldering", isSelected: false),
+        Choice(name: "Water Sports", isSelected: false)
+    ]
+    
+    var weatherArray: [Choice] = [
+        Choice(name: "Warm", isSelected: false),
+        Choice(name: "Cold", isSelected: false),
+        Choice(name: "Snow", isSelected: false),
+        Choice(name: "Rainy", isSelected: false)
+    ]
     
     init(modelContext: ModelContext) {
         self.modelContext = modelContext
-        self.whoArray = [
-            Choice(name: "Adults", isSelected: false),
-            Choice(name: "Kids", isSelected: false),
-            Choice(name: "Dogs", isSelected: false)
-        ]
-        self.activityArray = [
-            Choice(name: "Hiking", isSelected: false),
-            Choice(name: "Fishing", isSelected: false),
-            Choice(name: "Bouldering", isSelected: false),
-            Choice(name: "Water Sports", isSelected: false)
-        ]
     }
     
     
@@ -46,8 +53,11 @@ class QuizViewModel {
         
         let whoChoices = whoArray.filter { $0.isSelected }.map { $0.name }
         let activityChoices = activityArray.filter { $0.isSelected }.map { $0.name }
+        let weatherChoices = weatherArray.filter {
+            $0.isSelected }.map { $0.name }
         
-        return whoChoices + activityChoices
+        return whoChoices + activityChoices + weatherChoices
     }
+    
     
 }

@@ -7,18 +7,20 @@
 
 import Foundation
 
-struct WeatherModel {
+struct WeatherModel: Identifiable {
+    let id = UUID()
+    let date: String
     let conditionID: Int
     let cityName: String
-    let temperatureMax: Double
-    let temperatureMin: Double
+    let high: Double
+    let low: Double
     
     var highTemp: String {
-        return String(format: "%.1f", temperatureMax)
+        return String(format: "%.1f", high)
     }
     
     var lowTemp: String {
-        return String(format: "%.1f", temperatureMin)
+        return String(format: "%.1f", low)
     }
     
     var conditionName: String {

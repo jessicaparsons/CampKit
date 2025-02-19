@@ -36,10 +36,7 @@ extension PackingList {
     static var samplePackingList: PackingList {
         let photo = UIImage(named: "placeholder")?.pngData()
         let packingList = PackingList(
-            title: "Sample Camping Trip",
-            photo: photo,
-            dateCreated: Date(),
-            locationName: "Joshua Tree National Park"
+            title: "Sample Camping Trip"
         )
         packingList.categories = Category.sampleCategories
         return packingList
