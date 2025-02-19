@@ -18,8 +18,9 @@ struct WeatherRowView: View {
             Image(systemName: symbol)
             Text(day)
             Spacer()
-            Text("\(highTemp) / \(lowTemp) °F")
+            Text("\(lowTemp) / \(highTemp) °F")
         }//:HStack
+        .padding(0)
     }
 }
 

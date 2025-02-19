@@ -14,6 +14,7 @@ struct QuizPageTwoView: View {
     @State var viewModel: QuizViewModel
     @Binding var isStepOne: Bool
     @Binding var location: String
+    @State private var weatherChoice: [String] = ["warm"]
     
     var body: some View {
         VStack(alignment: .center, spacing: Constants.cardSpacing) {
@@ -30,7 +31,10 @@ struct QuizPageTwoView: View {
             WeatherModuleView(location: $location)
             
             //MARK: - WEATHER SUGGESTION
+            Group {
+                Text("Based on the forecast, we sugget packing for \(weatherChoice.joined(separator: ",")) weather")
             
+            }//:GROUP
             
             //MARK: - WEATHER SELECTION
             
@@ -42,7 +46,7 @@ struct QuizPageTwoView: View {
                     Spacer()
                 }
                 
-                ChipSectionView(choices: $viewModel.activityArray)
+                ChipSectionView(choices: $viewModel.weatherArray)
                 
             }//:VSTACK
             

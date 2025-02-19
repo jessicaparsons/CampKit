@@ -35,8 +35,9 @@ struct CampKitApp: App {
         WindowGroup {
             MainView()
                 .environment(weatherViewModel)
+                .modelContainer(sharedModelContainer)
         }
-        .modelContainer(sharedModelContainer)
+        
     }
     
     private func preloadDataIfNeeded() {
