@@ -11,7 +11,7 @@ import SwiftData
 @main
 struct CampKitApp: App {
     
-    @StateObject private var weatherViewModel = WeatherViewModel(weatherFetcher: GetWeather())
+    var weatherViewModel = WeatherViewModel(weatherFetcher: GetWeather())
     
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
@@ -34,7 +34,7 @@ struct CampKitApp: App {
     var body: some Scene {
         WindowGroup {
             MainView()
-                .environmentObject(weatherViewModel)
+                .environment(weatherViewModel)
         }
         .modelContainer(sharedModelContainer)
     }

@@ -10,8 +10,8 @@ import SwiftData
 
 struct QuizPageTwoView: View {
     
-    @EnvironmentObject var weatherViewModel: WeatherViewModel
-    @ObservedObject var viewModel: QuizViewModel
+    @Environment(WeatherViewModel.self) private var weatherViewModel
+    @State var viewModel: QuizViewModel
     @Binding var isStepOne: Bool
     @Binding var location: String
     
@@ -61,5 +61,5 @@ struct QuizPageTwoView: View {
         configurations: ModelConfiguration(isStoredInMemoryOnly: true)
     )
     QuizPageTwoView(viewModel: QuizViewModel(modelContext: container.mainContext), isStepOne: $isStepOne, location: $location)
-        .environmentObject(WeatherViewModel(weatherFetcher: GetWeather()))
+        .environment(WeatherViewModel(weatherFetcher: GetWeather()))
 }

@@ -10,7 +10,7 @@ import SwiftData
 
 struct QuizView: View {
 
-    @StateObject var viewModel: QuizViewModel
+    @State var viewModel: QuizViewModel
     @Binding var isNewListQuizShowing: Bool
     @Binding var isStepOne: Bool
     @Binding var location: String
@@ -98,4 +98,5 @@ struct QuizView: View {
         configurations: ModelConfiguration(isStoredInMemoryOnly: true)
     )
     QuizView(viewModel: QuizViewModel(modelContext: container.mainContext), isNewListQuizShowing: $isNewListQuizShowing, isStepOne: $isStepOne, location: $location)
+        .environment(WeatherViewModel(weatherFetcher: GetWeather()))
 }

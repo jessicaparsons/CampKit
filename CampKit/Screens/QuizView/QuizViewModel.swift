@@ -8,12 +8,13 @@
 import SwiftUI
 import SwiftData
 
-class QuizViewModel: ObservableObject {
+@Observable
+class QuizViewModel {
     
     private let modelContext: ModelContext
     
-    @Published var whoArray: [Choice] = []
-    @Published var activityArray: [Choice] = []
+    var whoArray: [Choice] = []
+    var activityArray: [Choice] = []
     
     init(modelContext: ModelContext) {
         self.modelContext = modelContext

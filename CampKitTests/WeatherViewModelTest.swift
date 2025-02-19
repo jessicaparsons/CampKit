@@ -6,7 +6,6 @@
 //
 
 import XCTest
-import Combine
 @testable import CampKit
 
 final class WeatherViewModelTest: XCTestCase {
@@ -14,12 +13,14 @@ final class WeatherViewModelTest: XCTestCase {
     var viewModel: WeatherViewModel!
 
     override func setUpWithError() throws {
+        super.setUp()
         let mockFetcher = MockWeatherFetcher()
         viewModel = WeatherViewModel(weatherFetcher: mockFetcher)
     }
 
     override func tearDownWithError() throws {
         viewModel = nil
+        super.tearDown()
     }
 
     //basic structure is: set up your variables, do something, then assert what the results should be.

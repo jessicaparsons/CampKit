@@ -28,7 +28,7 @@ struct WeatherRowView: View {
     @Previewable @State  var location: String = "Paris"
     
     WeatherModuleView(location: $location)
-        .environmentObject(WeatherViewModel(weatherFetcher: GetWeather()))
+        .environment(WeatherViewModel(weatherFetcher: GetWeather()))
 }
 
 

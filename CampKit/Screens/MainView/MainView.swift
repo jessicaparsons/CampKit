@@ -73,6 +73,7 @@ struct MainView: View {
 //            QuizView(viewModel: QuizViewModel(modelContext: modelContext))
 //        }
     }
+    
 }
 
 #Preview {

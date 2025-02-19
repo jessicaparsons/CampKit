@@ -10,7 +10,7 @@ import SwiftData
 
 struct QuizPageOneView: View {
     
-    @ObservedObject var viewModel: QuizViewModel
+    @State var viewModel: QuizViewModel
     @Binding var location: String
     @State private var elevation: Double = 0
     @Binding var isStepOne: Bool

@@ -5,11 +5,11 @@
 //  Created by Jessica Parsons on 2/6/25.
 //
 
-import Foundation
 import SwiftUI
 import CoreLocation
+import Observation
 
-// Protocl created so we have a dependency injection for testing
+// Protocol created so we have a dependency injection for testing
 protocol WeatherFetcher {
     func fetchWeather(with urlString: String) async throws -> WeatherModel?
 }
@@ -20,27 +20,46 @@ enum NetworkError: Error {
     case decodingFailed
 }
 
-class WeatherViewModel: ObservableObject {
+@Observable
+class WeatherViewModel {
     
-    @Published var weather: WeatherModel?
+    var weather: WeatherModel?
     
     private let weatherFetcher: WeatherFetcher
     
     let apiKey = "461015f75676862154eee3154367a074"
-    let weatherURL = "https://api.openweathermap.org/data/2.5/weather"
+    let weatherURL = "https://api.openweathermap.org/data/2.5/forecast"
     
     init(weatherFetcher: WeatherFetcher) {
         self.weatherFetcher = weatherFetcher
     }
     
+    //Get coordinates from city name
+    func getCoordinatesFrom(cityName: String) async throws -> CLLocationCoordinate2D? {
+        let coordinates = try await CLGeocoder().geocodeAddressString(cityName)
+        return coordinates.first?.location?.coordinate
+    }
+    
+    
     //Fetch by city name
+    @MainActor
     func fetchLocation(cityName: String) async {
-        let urlString = "\(weatherURL)?appid=\(apiKey)&q=\(cityName)&units=imperial"
-        
-        print("fetchLocation called with URL: \(urlString)")
         
         do {
+            guard let coordinates = try await getCoordinatesFrom(cityName: cityName) else {
+                print("Could not get coordinates from city name")
+                return
+            }
+        
+            let lat = coordinates.latitude
+            let lon = coordinates.longitude
+            
+            let urlString = "\(weatherURL)?lat=\(lat)&lon=\(lon)&appid=\(apiKey)"
+        
+            print("fetchLocation called with URL: \(urlString)")
+        
             self.weather = try await weatherFetcher.fetchWeather(with: urlString)
+            
         } catch let error as NetworkError {
             print("Could not fetch location: \(error)")
         } catch {

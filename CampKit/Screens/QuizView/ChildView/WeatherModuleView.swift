@@ -9,7 +9,7 @@ import SwiftUI
 
 struct WeatherModuleView: View {
     
-    @EnvironmentObject var weatherViewModel: WeatherViewModel
+    @Environment(WeatherViewModel.self) private var weatherViewModel
     @Binding var location: String
     
     var body: some View {
@@ -59,5 +59,5 @@ struct WeatherModuleView: View {
     
     @Previewable @State var location: String = "Paris"
     WeatherModuleView(location: $location)
-        .environmentObject(WeatherViewModel(weatherFetcher: GetWeather()))
+        .environment(WeatherViewModel(weatherFetcher: GetWeather()))
 }
