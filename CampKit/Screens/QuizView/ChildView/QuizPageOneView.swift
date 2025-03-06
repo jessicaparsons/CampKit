@@ -77,7 +77,7 @@ struct QuizPageOneView: View {
                 
                 VStack {
                     HStack {
-                        Text("Add elevation (optional)")
+                        Text("Add Elevation Compensation (optional)")
                             .font(.footnote)
                             .fontWeight(.bold)
                         Spacer()
@@ -89,13 +89,13 @@ struct QuizPageOneView: View {
                         // Bars grow along this axis
                         HStack(alignment: .bottom, spacing: 2) {
                             ForEach(0..<barCount, id: \.self) { index in
-                                BarView(height: Double(index + 1) * 2) // Height increases with index
+                                ElevationBarView(height: Double(index + 1) * 2) // Height increases with index
                             }
                         }
                         .frame(height: 50, alignment: .bottom)
                         .offset(x: 15, y: -18)
                         
-                        Slider(value: $elevation, in: 0...14000, step: 100)
+                        Slider(value: $elevation, in: 0...10000, step: 100)
                             .tint(Color.colorNeon)
                             .onChange(of: elevation) {
                                 HapticsManager.shared.triggerLightImpact()
@@ -103,7 +103,7 @@ struct QuizPageOneView: View {
 
                     }
 
-                    Text("\(Int(elevation)) ft")
+                    Text("+ \(Int(elevation)) ft")
                     
                 }//:VSTACK
                 

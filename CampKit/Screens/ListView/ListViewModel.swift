@@ -116,6 +116,7 @@ class ListViewModel: ObservableObject {
         }
     }
     
+    @MainActor
     func deleteList(dismiss: DismissAction) {
         withAnimation {
             

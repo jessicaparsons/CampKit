@@ -68,6 +68,9 @@
             ReferencedContainer = "container:CampKit.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
+      <StoreKitConfigurationFileReference
+         identifier = "../../CampKit/StoreKit/Configuration.storekit/Configuration.storekit">
+      </StoreKitConfigurationFileReference>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"

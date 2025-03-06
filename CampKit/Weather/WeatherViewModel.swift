@@ -10,7 +10,7 @@ import CoreLocation
 import Observation
 
 // Protocol created so we have a dependency injection for testing
-protocol WeatherFetcher {
+protocol WeatherFetching {
     func fetchWeather(with urlString: String) async throws -> [WeatherModel]?
     
     func getDailyWeather(from forecastList: [WeatherEntry]) async -> [DailyWeather]
@@ -28,42 +28,123 @@ class WeatherViewModel {
     var weather: [WeatherModel]? // 5 day forecast
     var coordinates: CLLocationCoordinate2D? // user's location input
     
-    private let weatherFetcher: WeatherFetcher
+    private let weatherFetcher: WeatherFetching
     
-    init(weatherFetcher: WeatherFetcher) {
+    init(weatherFetcher: WeatherFetching) {
         self.weatherFetcher = weatherFetcher
     }
     
     //Get coordinates from city name
     func getCoordinatesFrom(cityName: String) async throws -> CLLocationCoordinate2D? {
         let coordinates = try await CLGeocoder().geocodeAddressString(cityName)
-            return coordinates.first?.location?.coordinate
+        return coordinates.first?.location?.coordinate
     }
     
     //Fetch weather by city and coordinates that are stored in the Packing List
+    
     @MainActor
     func fetchLocation(for cityName: String) async {
         
         do {
-            guard let location = try await getCoordinatesFrom(cityName: cityName) else {
-                print("Couldn't get coordinates for \(cityName)")
-                return
-            }
-        
-            self.coordinates = location
-        
-            let urlString = "\(Constants.weatherURL)?lat=\(location.latitude)&lon=\(location.longitude)&units=imperial&appid=\(Constants.apiKey)"
-        
-            print("fetchLocation called with URL: \(urlString)")
-        
-        
-            let fiveDayForecast = try await weatherFetcher.fetchWeather(with: urlString)
-            self.weather = fiveDayForecast
+            try await Task {
+                guard let location = try await getCoordinatesFrom(cityName: cityName) else {
+                    throw NetworkError.requestFailed
+                }
+                
+                self.coordinates = location
+                
+                
+                let urlString = "\(Constants.weatherURL)?lat=\(location.latitude)&lon=\(location.longitude)&units=imperial&appid=\(Constants.apiKey)"
+                
+                print("fetchLocation called with URL: \(urlString)")
+                
+                
+                let fiveDayForecast = try await weatherFetcher.fetchWeather(with: urlString)
+                
+                await MainActor.run {
+                    self.weather = fiveDayForecast
+                }
+            }.value
+            
             
         } catch let error as NetworkError {
             print("Could not fetch location: \(error)")
         } catch {
             print("Could not fetch location: \(error.localizedDescription)")
+        }
+    }
+    
+    // Creates the user's weather choices for page 2 of the Packing List Quiz
+    // If the high temp is at or above 80, mark it as "hot" mild hot cold snow rainy
+    // If the temp is lower than 50, mark it as cold
+    // If the conditionName == "cloud.bolt.rain", "cloud.drizzle", "cloud.heavyrain", mark it as rain
+    // If the conditionName == "cloud.snow", mark it as snow
+    
+    func categorizeWeather(for forecast: [WeatherModel]) -> Set<String> {
+        
+        var weatherCategories: Set<String> = ["mild"]
+        
+        for day in forecast {
+            let high = day.high
+            let low = day.low
+            let conditionName = day.conditionName
+            
+            if high >= 80 {
+                weatherCategories.insert("hot")
+                
+                if low > 70 {
+                    weatherCategories.remove("mild")
+                }
+            }
+            
+            if low <= 45 {
+                weatherCategories.remove("mild")
+                
+                if high < 50 {
+                    weatherCategories.insert("cold")
+                }
+            }
+            
+            if conditionName == "cloud.bolt.rain" ||
+                conditionName == "cloud.drizzle" ||
+                conditionName == "cloud.heavyrain" {
+                weatherCategories.insert("rainy")
+            }
+            
+            if conditionName == "cloud.snow" {
+                weatherCategories.insert("snowy")
+                weatherCategories.remove("mild")
+            }
+        }
+        
+        return weatherCategories
+    }
+    
+    //Formats the weather categories for display in the UI
+    
+    func formatWeatherCategories(_ categories: Set<String>) -> Text {
+        let sortedCategories = categories.sorted()  // Sorting for consistent order
+        
+        switch sortedCategories.count {
+        case 0:
+            return Text("mild").bold() // Default message if empty
+        case 1:
+            return Text(sortedCategories[0]).bold()
+        case 2:
+            return Text(sortedCategories[0]).bold() + Text(" and ") + Text(sortedCategories[1]).bold()
+        default:
+            var text = Text("")
+            for (index, category) in sortedCategories.enumerated() {
+                if index > 0 {
+                    if index == sortedCategories.count - 1 {
+                        text = text + Text(", and ")
+                    } else {
+                        text = text + Text(", ")
+                    }
+                }
+                text = text + Text(category).bold()
+            }
+            return text
         }
     }
     
@@ -96,7 +177,7 @@ class WeatherViewModel {
     }
 }
 
-class GetWeather: WeatherFetcher {
+class WeatherAPIClient: WeatherFetching {
     
     func fetchWeather(with urlString: String) async throws -> [WeatherModel]? {
         
@@ -155,7 +236,7 @@ class GetWeather: WeatherFetcher {
             //Store all temperatures
             dailyTemps[date]?.append(threeHours.main.temp_max)
             dailyTemps[date]?.append(threeHours.main.temp_min)
-                        
+            
             if dailyWeatherIDs[date] == nil {
                 dailyWeatherIDs[date] = []
             }
@@ -181,6 +262,9 @@ class GetWeather: WeatherFetcher {
         return dailyWeather.sorted { $0.date < $1.date }
     }
     
+    //Finds the most common weather ID by identifying the mode.
+    //This is to display the most accurate weather icon next to each day
+    
     private func findMode(_ numbers: [Int]) -> Int {
         let frequency = numbers.reduce(into: [:]) { counts, number in
             counts[number, default: 0] += 1
@@ -188,3 +272,4 @@ class GetWeather: WeatherFetcher {
         return frequency.max { $0.value < $1.value }?.key ?? numbers.first ?? 0
     }
 }
+

@@ -8,7 +8,7 @@
 import SwiftUI
 import SwiftData
 
-struct BarView: View {
+struct ElevationBarView: View {
     
     var height: Double
     @State private var isAnimating: Bool = false
@@ -18,7 +18,7 @@ struct BarView: View {
         ZStack {
             Rectangle()
                 .fill(LinearGradient(gradient: Gradient(colors: [Color.colorTan, Color.colorLilac]), startPoint: .top, endPoint: .bottom))
-                .frame(width: 10, height: CGFloat(height)) // Dynamic height
+                .frame(width: 15, height: CGFloat(height)) // Dynamic height
                 .scaleEffect(y: isAnimating ? 1 : 0, anchor: .bottom)
         }
         .onAppear {
@@ -45,5 +45,5 @@ struct BarView: View {
 
 
 #Preview {
-    BarView(height: 30)
+    ElevationBarView(height: 30)
 }

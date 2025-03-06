@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+@MainActor
 final class HapticsManager {
     static let shared = HapticsManager()
 

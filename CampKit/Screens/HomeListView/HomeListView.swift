@@ -12,9 +12,11 @@ struct HomeListView: View {
     
     @Environment(\.modelContext) var modelContext
     @StateObject private var viewModel: HomeListViewModel
+    @StateObject private var storeKitManager = StoreKitManager()
     @State private var isNewListQuizShowing: Bool = false
     @State private var isStepOne: Bool = true
     @State private var location: String = ""
+    @State private var isUpgradeToProShowing: Bool = false
     
     init(modelContext: ModelContext) {
         let viewModel = HomeListViewModel(modelContext: modelContext)
@@ -87,7 +89,11 @@ struct HomeListView: View {
                     //MARK: - ADD NEW LIST BUTTON
                     Section {
                         Button {
-                            isNewListQuizShowing = true
+                            if storeKitManager.isUnlimitedListsUnlocked || viewModel.packingLists.count < 3 {
+                                isNewListQuizShowing = true
+                            } else {
+                                isUpgradeToProShowing = true
+                            }
                         } label: {
                             HStack {
                                 Image(systemName: "plus")
@@ -96,20 +102,23 @@ struct HomeListView: View {
                             }
                         }
                         .buttonStyle(BigButton())
-                        .sheet(isPresented: $isNewListQuizShowing) {
-                            NavigationStack {
-                                QuizView(
-                                    viewModel: QuizViewModel(modelContext: modelContext),
-                                    isNewListQuizShowing: $isNewListQuizShowing,
-                                    isStepOne: $isStepOne, location: $location
-                                )
-                            }
-                        }
                     }//:SECTION
                     .listRowBackground(Color.customTan)
                     .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
                     
                 }//:LIST
+                .sheet(isPresented: $isNewListQuizShowing) {
+                    NavigationStack {
+                        QuizView(
+                            viewModel: QuizViewModel(modelContext: modelContext),
+                            isNewListQuizShowing: $isNewListQuizShowing,
+                            isStepOne: $isStepOne, location: $location
+                        )
+                    }
+                }
+                .sheet(isPresented: $isUpgradeToProShowing) {
+                    UpgradeToProView(isUpgradeToProShowing: $isUpgradeToProShowing, storeKitManager: storeKitManager)
+                }
             }//:ZSTACK
             .navigationTitle("Packing Lists")
             .navigationBarHidden(true)

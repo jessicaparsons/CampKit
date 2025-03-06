@@ -51,9 +51,6 @@ struct WeatherModuleView: View {
             }//:ZSTACK
         }//:GROUPBOX
         .backgroundStyle(Color.colorTan)
-        .task {
-            await weatherViewModel.fetchLocation(for: location)
-        }
     }
 }
 
@@ -61,5 +58,5 @@ struct WeatherModuleView: View {
     
     @Previewable @State var location: String = "Los Angeles"
     WeatherModuleView(location: $location)
-        .environment(WeatherViewModel(weatherFetcher: GetWeather()))
+        .environment(WeatherViewModel(weatherFetcher: WeatherAPIClient()))
 }
