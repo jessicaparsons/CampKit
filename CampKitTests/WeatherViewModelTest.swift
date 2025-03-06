@@ -57,7 +57,7 @@ final class WeatherViewModelTest: XCTestCase {
 }
 
 // Mock verson of WeatherFetcher
-class MockWeatherFetcher: WeatherFetcher {
+class MockWeatherFetcher: WeatherFetching {
     
     func fetchWeather(with urlString: String) async throws -> WeatherModel? {
         

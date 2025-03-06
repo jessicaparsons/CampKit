@@ -11,13 +11,13 @@ import SwiftData
 @main
 struct CampKitApp: App {
     
-    var weatherViewModel = WeatherViewModel(weatherFetcher: GetWeather())
+    var weatherViewModel = WeatherViewModel(weatherFetcher: WeatherAPIClient())
     
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
             Item.self, PackingList.self, Category.self
         ])
-        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)//change to false in production
+        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)//change to false in production
 
         do {
             return try ModelContainer(for: schema, configurations: [modelConfiguration])

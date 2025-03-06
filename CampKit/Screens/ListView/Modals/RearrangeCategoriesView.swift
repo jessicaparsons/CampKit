@@ -14,14 +14,14 @@ struct RearrangeCategoriesView: View {
 
     var body: some View {
         NavigationStack {
-           // List {
+           List {
                 // Access categories from the ViewModel
                 ForEach(viewModel.packingList.categories.sorted(by: { $0.position < $1.position }), id: \.id) { category in
                     Text(category.name)
                         .font(.headline)
                 }
                 .onMove(perform: moveCategory)
-          //  }
+            }
             .navigationTitle("Rearrange Categories")
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {

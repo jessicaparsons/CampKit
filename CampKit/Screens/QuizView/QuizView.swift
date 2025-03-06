@@ -98,5 +98,5 @@ struct QuizView: View {
         configurations: ModelConfiguration(isStoredInMemoryOnly: true)
     )
     QuizView(viewModel: QuizViewModel(modelContext: container.mainContext), isNewListQuizShowing: $isNewListQuizShowing, isStepOne: $isStepOne, location: $location)
-        .environment(WeatherViewModel(weatherFetcher: GetWeather()))
+        .environment(WeatherViewModel(weatherFetcher: WeatherAPIClient()))
 }
