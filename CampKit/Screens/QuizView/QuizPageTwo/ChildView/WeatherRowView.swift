@@ -14,19 +14,24 @@ struct WeatherRowView: View {
     let lowTemp: String
     
     var body: some View {
-        HStack {
+        LazyVGrid(columns: [
+            GridItem(.fixed(30), alignment: .leading),  // Icon
+            GridItem(.flexible(), alignment: .leading), // Day
+            GridItem(.fixed(80), alignment: .leading), // High Temp
+            GridItem(.fixed(80), alignment: .leading)  // Low Temp
+        ]) {
             Image(systemName: symbol)
             Text(day)
-            Spacer()
-            Text("\(lowTemp) / \(highTemp) °F")
-        }//:HStack
+            Text("H: \(highTemp)°")
+            Text("L: \(lowTemp)°F")
+        }
         .padding(0)
     }
 }
 
 #Preview("WeatherView") {
     
-    @Previewable @State  var location: String = "Paris"
+    @Previewable @State var location: String = "Paris"
     
     WeatherModuleView(location: $location)
         .environment(WeatherViewModel(weatherFetcher: WeatherAPIClient()))

@@ -11,11 +11,12 @@ import SwiftData
 struct QuizPageOneView: View {
     
     @State var viewModel: QuizViewModel
-    @Binding var location: String
+    @State private var location: String = ""
     @State private var elevation: Double = 0
+    @State private var isLocationSearchOpen: Bool = false
     @Binding var isStepOne: Bool
     let columns: [GridItem] = Array(repeating: .init(.flexible(), spacing: 10), count: 3)
-
+    
     var barCount: Int {
         Int(elevation / 500)
     } // Number of bars (each 550ft adds 1 bar)
@@ -24,6 +25,7 @@ struct QuizPageOneView: View {
     
     var body: some View {
         
+        ZStack {
             VStack(alignment: .center, spacing: Constants.cardSpacing) {
                 
                 //MARK: - TITLE
@@ -45,11 +47,11 @@ struct QuizPageOneView: View {
                     }
                     
                     LazyVGrid(columns: columns, alignment: .center) {
-                        CardButtonView(emoji: "👨‍🦰", title: "Adults")
-                        CardButtonView(emoji: "🧸", title: "Kids")
-                        CardButtonView(emoji: "🐶", title: "Dogs")
+                        CardButtonView(viewModel: viewModel, emoji: "👨‍🦰", title: ChoiceOptions.adults)
+                        CardButtonView(viewModel: viewModel, emoji: "🧸", title: ChoiceOptions.kids)
+                        CardButtonView(viewModel: viewModel, emoji: "🐶", title: ChoiceOptions.dogs)
                     }
-                                            
+                    
                 }
                 
                 
@@ -61,17 +63,31 @@ struct QuizPageOneView: View {
                             .fontWeight(.bold)
                         Spacer()
                     }
-                    HStack {
-                        TextField("Search...", text: $location)
-                        Image(systemName: "magnifyingglass")
+                    ZStack {
+                        HStack {
+                            if location == "" {
+                                Text("Search...")
+                                    .foregroundStyle(.secondary)
+                            } else {
+                                Text(location)
+                            }
+                            Spacer()
+                            Image(systemName: "magnifyingglass")
+                        }
+                        .padding(.vertical, 10)
+                        .padding(.horizontal, 15)
+                        .overlay {
+                            RoundedRectangle(cornerRadius: Constants.cornerRadius)
+                                .stroke(Color.colorSteel, lineWidth: 1)
+                        }
+                    }//:ZSTACK
+                    .onTapGesture {
+                        withAnimation {
+                            isLocationSearchOpen.toggle()
+                        }
                     }
-                    .padding(.vertical, 10)
-                    .padding(.horizontal, 15)
-                    .overlay {
-                        RoundedRectangle(cornerRadius: Constants.cornerRadius)
-                            .stroke(Color.colorSteel, lineWidth: 1)
-                    }
-                }
+                }//:GROUP
+                
                 
                 //MARK: - ADD ELEVATION
                 
@@ -100,9 +116,9 @@ struct QuizPageOneView: View {
                             .onChange(of: elevation) {
                                 HapticsManager.shared.triggerLightImpact()
                             }
-
+                        
                     }
-
+                    
                     Text("+ \(Int(elevation)) ft")
                     
                 }//:VSTACK
@@ -118,14 +134,27 @@ struct QuizPageOneView: View {
                         Spacer()
                     }
                     
-                    ChipSectionView(choices: $viewModel.activityArray)
+                    ChipSectionView(choices: $viewModel.activityChoices)
                     
                 }//:VSTACK
                 
             }//:VSTACK
             .padding(.horizontal, Constants.horizontalPadding)
             
-
+            //MARK: - LOCATION SEARCH
+            
+            VStack(alignment: .leading, spacing: Constants.cardSpacing) {
+                LocationSearchView(location: $location, isLocationSearchOpen: $isLocationSearchOpen)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(Color.white)
+                    .offset(x: isLocationSearchOpen ? 0 : UIScreen.main.bounds.width) // Slide in from right
+                    .transition(.move(edge: .trailing))
+                    .animation(.easeInOut(duration: 0.3), value: isLocationSearchOpen)
+            }
+            
+            
+        }//:ZSTACK
+        
     }//:BODY
     
 }
@@ -133,11 +162,12 @@ struct QuizPageOneView: View {
 #Preview {
     @Previewable @State var isStepOne: Bool = true
     @Previewable @State var location: String = "Paris"
-
+    
     let container = try! ModelContainer(
         for: PackingList.self, Category.self, Item.self,
         configurations: ModelConfiguration(isStoredInMemoryOnly: true)
     )
-    
-    QuizPageOneView(viewModel: QuizViewModel(modelContext: container.mainContext), location: $location, isStepOne: $isStepOne)
+    NavigationView {
+        QuizPageOneView(viewModel: QuizViewModel(modelContext: container.mainContext), isStepOne: $isStepOne)
+    }
 }

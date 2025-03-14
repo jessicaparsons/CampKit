@@ -10,7 +10,7 @@ import SwiftData
 
 struct CardButtonView: View {
     
-    
+    @Bindable var viewModel: QuizViewModel
     let emoji: String
     let title: String
     @State var isSelected: Bool = false
@@ -33,6 +33,7 @@ struct CardButtonView: View {
             )
             .onTapGesture {
                 isSelected.toggle()
+                viewModel.toggleParticipant(title)
                 HapticsManager.shared.triggerLightImpact()
             }
             
@@ -63,5 +64,10 @@ struct CardButtonView: View {
 
 
 #Preview {
-    CardButtonView(emoji: "🧍‍♂️", title: "Adults", isSelected: false)
+    
+    let container = try! ModelContainer(
+        for: PackingList.self, Category.self, Item.self,
+        configurations: ModelConfiguration(isStoredInMemoryOnly: true)
+    )
+    CardButtonView(viewModel: QuizViewModel(modelContext: container.mainContext), emoji: "🧍‍♂️", title: "Adults")
 }
