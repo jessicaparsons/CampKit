@@ -132,8 +132,10 @@ struct HomeListView: View {
                 }
             }
         }//:NAVIGATION STACK
+        .onAppear {
+            viewModel.fetchPackingLists()
+        }
     }//:BODY
-    
 }//:STRUCT
 
 

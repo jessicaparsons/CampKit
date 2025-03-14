@@ -50,7 +50,12 @@ struct WeatherModuleView: View {
                 }//:VSTACK
             }//:ZSTACK
         }//:GROUPBOX
-        .backgroundStyle(Color.colorTan)
+        .backgroundStyle(LinearGradient(gradient: Gradient(colors: [
+            Color.colorTan,
+            Color.colorSky
+        ]),
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing))
     }
 }
 

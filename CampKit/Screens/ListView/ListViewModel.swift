@@ -32,18 +32,25 @@ class ListViewModel: ObservableObject {
         guard !itemTitle.isEmpty else { return }
             let newItem = Item(
                 title: itemTitle,
-                isPacked: false,
-                position: category.items.count,
-                category: category)
+                isPacked: false)
+            newItem.position = category.items.count
+            newItem.category = category
             category.items.append(newItem)
             modelContext.insert(newItem)
             reassignItemPositions(for: category)
     }
     
+    //Keeps items arranged when a new item is added to a category
     func reassignItemPositions(for category: Category) {
-        for (index, item) in category.items.sorted(by: { $0.position < $1.position }).enumerated() {
+        
+        let sortedItems = category.items
+            .compactMap { $0.position != nil ? $0 : nil }
+            .sorted { ($0.position ?? 0) < ($1.position ?? 0) }
+        
+        for (index, item) in sortedItems.enumerated() {
             item.position = index
         }
+        
         saveContext()
     }
     

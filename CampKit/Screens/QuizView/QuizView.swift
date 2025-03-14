@@ -20,7 +20,7 @@ struct QuizView: View {
             ZStack {
                 ScrollView {
                     if isStepOne {
-                        QuizPageOneView(viewModel: viewModel, location: $location, isStepOne: $isStepOne)
+                        QuizPageOneView(viewModel: viewModel, isStepOne: $isStepOne)
                             .transition(.move(edge: .leading))
                     } else {
                         QuizPageTwoView(viewModel: viewModel, isStepOne: $isStepOne, location: $location)
@@ -51,7 +51,7 @@ struct QuizView: View {
                         if isStepOne {
                             isStepOne = false
                         } else {
-                            //createNewList()
+                            viewModel.createPackingList()
                             isNewListQuizShowing = false
                         }
                     }) {

@@ -48,7 +48,7 @@ struct QuizPageTwoView: View {
                     Spacer()
                 }
                 
-                ChipSectionView(choices: $viewModel.weatherArray)
+                ChipSectionView(choices: $viewModel.weatherChoices)
                 
             }//:VSTACK
             

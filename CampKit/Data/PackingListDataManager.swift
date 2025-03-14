@@ -59,7 +59,9 @@ func preloadPackingListData(context: ModelContext) {
         // Add items to category
         if let itemNames = items[categoryName] {
             for (itemIndex, itemName) in itemNames.enumerated() {
-                let item = Item(title: itemName, isPacked: false, position: itemIndex, category: category)
+                let item = Item(title: itemName, isPacked: false)
+                item.position = itemIndex
+                item.category = category
                 category.items.append(item)
             }
         }

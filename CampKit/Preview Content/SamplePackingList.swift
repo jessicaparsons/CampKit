@@ -23,7 +23,10 @@ extension Category {
         return categoriesWithItems.map { categoryData in
             let category = Category(name: categoryData.name, position: categoryData.position)
             category.items = categoryData.items.enumerated().map { index, itemTitle in
-                Item(title: itemTitle, isPacked: false, position: index, category: category)
+                let item = Item(title: itemTitle, isPacked: false)
+                item.position = index
+                item.category = category
+                return item
             }
             return category
         }

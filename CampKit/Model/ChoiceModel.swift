@@ -8,8 +8,9 @@
 import Foundation
 import SwiftUI
 
+
 struct Choice: Identifiable {
     let id = UUID()
     let name: String
-    @State var isSelected: Bool
+    var isSelected: Bool
 }

@@ -30,7 +30,7 @@ struct CategorySectionView: View {
             } else {
                 LazyVStack(spacing: 0) {
                     //Iterate through items in the category
-                    ForEach(category.items.sorted(by: { $0.position < $1.position })) { item in
+                    ForEach(category.sortedItems) { item in
                         
                         EditableItemView(
                             viewModel: viewModel,
