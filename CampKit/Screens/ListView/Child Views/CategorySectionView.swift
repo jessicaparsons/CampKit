@@ -97,8 +97,7 @@ struct CategorySectionView: View {
                     .labelStyle(.iconOnly)
                 }
                 .padding(.vertical)
-                .padding(.leading, 30)
-                .padding(.trailing, 10)
+                .padding(.leading, 10)
             }
             
         }//:DISCLOSURE GROUP
@@ -121,21 +120,23 @@ struct LeftDisclosureStyle: DisclosureGroupStyle {
                     configuration.isExpanded.toggle()
                 }
             } label: {
-                HStack(alignment: .firstTextBaseline) {
-                    Image(systemName: configuration.isExpanded ? "chevron.down" : "chevron.right")
+                HStack {
+                    Image(systemName: "chevron.forward")
                         .foregroundColor(.customNeonLight)
                         .font(.caption.lowercaseSmallCaps())
-                        .offset(x: 20)
+                        //.offset(x: 20)
+                        .rotationEffect(configuration.isExpanded ? .degrees(90.0) : .zero)
                         .animation(.default, value: configuration.isExpanded)
                     configuration.label
                     Spacer()
                 }
                 .contentShape(Rectangle())
             }
-            .buttonStyle(.plain)
-            if configuration.isExpanded {
-                configuration.content
-            }
+            .padding(.horizontal)
+            configuration
+                .content
+                .frame(height: configuration.isExpanded ? nil : .zero, alignment: .top)
+                .clipped()
         }
     }
 }

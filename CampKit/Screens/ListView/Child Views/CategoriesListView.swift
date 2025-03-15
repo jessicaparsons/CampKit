@@ -36,7 +36,7 @@ struct CategoriesListView: View {
                                 viewModel: viewModel,
                                 category: category,
                                 isRearranging: $viewModel.isRearranging,
-                                deleteCategory: { viewModel.deleteCategory(category) }, // Delete the category
+                                deleteCategory: { viewModel.deleteCategory(category) },
                                 globalIsExpanded: viewModel.globalIsExpanded,
                                 globalExpandCollapseAction: viewModel.globalExpandCollapseAction
                             )
