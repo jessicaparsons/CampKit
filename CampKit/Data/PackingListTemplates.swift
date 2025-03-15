@@ -10,6 +10,13 @@ import Foundation
 
 //Dictionary with all category templates
 
+let packingPreferenceCategories: [String: [String]] = [
+    ChoiceOptions.participants: [ChoiceOptions.adults, ChoiceOptions.kids, ChoiceOptions.dogs],
+    ChoiceOptions.activities: [ChoiceOptions.hiking, ChoiceOptions.fishing, ChoiceOptions.bouldering, ChoiceOptions.waterSports, ChoiceOptions.biking, ChoiceOptions.backpacking, ChoiceOptions.kayaking],
+    ChoiceOptions.weatherConditions: [ChoiceOptions.hot, ChoiceOptions.cold, ChoiceOptions.snowy, ChoiceOptions.rainy]
+    ]
+
+
 @MainActor
 let categoryTemplates: [String: [Item]] = [
     

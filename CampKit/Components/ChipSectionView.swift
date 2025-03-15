@@ -10,18 +10,30 @@ import SwiftData
 
 struct ChipSectionView: View {
     
-    @Binding var choices: [Choice]
-    
+    @Binding var selectedFilters: Set<String>
+    let preferenceCategory: String
     
     var body: some View {
         
         FlowLayout {
-            ForEach(choices) { choice in
-                ChipButtonsView(label: choice.name, isSelected: choice.isSelected)
+            if let category = packingPreferenceCategories[preferenceCategory] {
+                ForEach(category, id: \.self) { category in
+                    ChipButtonsView(label: category, isSelected: selectedFilters.contains(category)) {
+                        toggleSelection(category)
+                    }
                     .padding(.trailing, 8)
                     .padding(.bottom, 8)
+                }
             }
         }//:FLOWLAYOUT
+    }
+    
+    private func toggleSelection(_ filter: String) {
+        if selectedFilters.contains(filter) {
+            selectedFilters.remove(filter)
+        } else {
+            selectedFilters.insert(filter)
+        }
     }
 }
 
@@ -83,19 +95,19 @@ struct FlowLayout: Layout {
     }
 }
 
-#Preview {
-    
-    @Previewable @State var sampleChoices: [Choice] = [
-        Choice(name: "Adults", isSelected: false),
-        Choice(name: "Kids", isSelected: false),
-        Choice(name: "Dogs", isSelected: false)
-    ]
-    
-    let container = try! ModelContainer(
-        for: PackingList.self, Category.self, Item.self,
-        configurations: ModelConfiguration(isStoredInMemoryOnly: true)
-    )
-    //let viewModel = QuizViewModel(modelContext: container.mainContext)
-    
-    ChipSectionView(choices: $sampleChoices)
-}
+//#Preview {
+//    
+//    @Previewable @State var sampleChoices: [PackingPreference] = [
+//        PackingPreference(name: "Adults", type: .participant, isSelected: false),
+//        PackingPreference(name: "Kids", type: .participant, isSelected: false),
+//        PackingPreference(name: "Dogs", type: .participant, isSelected: false)
+//    ]
+//    
+//    let container = try! ModelContainer(
+//        for: PackingList.self, Category.self, Item.self,
+//        configurations: ModelConfiguration(isStoredInMemoryOnly: true)
+//    )
+//    //let viewModel = QuizViewModel(modelContext: container.mainContext)
+//    
+//    ChipSectionView(preferences: $sampleChoices)
+//}

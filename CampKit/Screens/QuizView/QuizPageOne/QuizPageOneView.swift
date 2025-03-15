@@ -47,9 +47,19 @@ struct QuizPageOneView: View {
                     }
                     
                     LazyVGrid(columns: columns, alignment: .center) {
-                        CardButtonView(viewModel: viewModel, emoji: "👨‍🦰", title: ChoiceOptions.adults)
-                        CardButtonView(viewModel: viewModel, emoji: "🧸", title: ChoiceOptions.kids)
-                        CardButtonView(viewModel: viewModel, emoji: "🐶", title: ChoiceOptions.dogs)
+                        CardButtonView(
+                            emoji: "👨‍🦰",
+                            title: ChoiceOptions.adults,
+                            isSelected: viewModel.selectedFilters.contains(ChoiceOptions.adults),
+                            onTap: { viewModel.toggleSelection(ChoiceOptions.adults) })
+                        CardButtonView(emoji: "🧸",
+                                       title: ChoiceOptions.kids,
+                                       isSelected: viewModel.selectedFilters.contains(ChoiceOptions.kids),
+                                       onTap: { viewModel.toggleSelection(ChoiceOptions.kids) })
+                        CardButtonView(emoji: "🐶",
+                                       title: ChoiceOptions.dogs,
+                                       isSelected: viewModel.selectedFilters.contains(ChoiceOptions.dogs),
+                                       onTap: { viewModel.toggleSelection(ChoiceOptions.dogs) })
                     }
                     
                 }
@@ -134,7 +144,7 @@ struct QuizPageOneView: View {
                         Spacer()
                     }
                     
-                    ChipSectionView(choices: $viewModel.activityChoices)
+                    ChipSectionView(selectedFilters: $viewModel.selectedFilters, preferenceCategory: ChoiceOptions.activities)
                     
                 }//:VSTACK
                 

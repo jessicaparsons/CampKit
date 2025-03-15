@@ -10,10 +10,10 @@ import SwiftData
 
 struct CardButtonView: View {
     
-    @Bindable var viewModel: QuizViewModel
     let emoji: String
     let title: String
-    @State var isSelected: Bool = false
+    var isSelected: Bool
+    let onTap: () -> Void
     
     var body: some View {
         VStack(alignment: .center) {
@@ -32,8 +32,7 @@ struct CardButtonView: View {
                 
             )
             .onTapGesture {
-                isSelected.toggle()
-                viewModel.toggleParticipant(title)
+                onTap()
                 HapticsManager.shared.triggerLightImpact()
             }
             
@@ -63,11 +62,11 @@ struct CardButtonView: View {
 }
 
 
-#Preview {
-    
-    let container = try! ModelContainer(
-        for: PackingList.self, Category.self, Item.self,
-        configurations: ModelConfiguration(isStoredInMemoryOnly: true)
-    )
-    CardButtonView(viewModel: QuizViewModel(modelContext: container.mainContext), emoji: "🧍‍♂️", title: "Adults")
-}
+//#Preview {
+//    
+//    let container = try! ModelContainer(
+//        for: PackingList.self, Category.self, Item.self,
+//        configurations: ModelConfiguration(isStoredInMemoryOnly: true)
+//    )
+//    CardButtonView(viewModel: QuizViewModel(modelContext: container.mainContext), emoji: "🧍‍♂️", title: "Adults")
+//}

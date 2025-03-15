@@ -16,29 +16,7 @@ class QuizViewModel {
     
     private let modelContext: ModelContext
     
-    var participantsChoices: [Choice] = [
-        Choice(name: ChoiceOptions.adults, isSelected: false), //always included
-        Choice(name: ChoiceOptions.kids, isSelected: false),
-        Choice(name: ChoiceOptions.dogs, isSelected: false)
-    ]
-    
-    var activityChoices: [Choice] = [
-        Choice(name: ChoiceOptions.hiking, isSelected: false),
-        Choice(name: ChoiceOptions.fishing, isSelected: false),
-        Choice(name: ChoiceOptions.bouldering, isSelected: false),
-        Choice(name: ChoiceOptions.waterSports, isSelected: false),
-        Choice(name: ChoiceOptions.biking, isSelected: false),
-        Choice(name: ChoiceOptions.backpacking, isSelected: false),
-        Choice(name: ChoiceOptions.kayaking, isSelected: false)
-    ]
-
-    var weatherChoices: [Choice] = [
-        Choice(name: ChoiceOptions.mild, isSelected: false), // Always included
-        Choice(name: ChoiceOptions.hot, isSelected: false),
-        Choice(name: ChoiceOptions.cold, isSelected: false),
-        Choice(name: ChoiceOptions.snowy, isSelected: false),
-        Choice(name: ChoiceOptions.rainy, isSelected: false)
-    ]
+    var selectedFilters: Set<String> = []
     
     var locationName: String = ""
     var latitude: Double?
@@ -65,43 +43,8 @@ class QuizViewModel {
                 longitude: longitude,
                 elevation: elevation)
             
-            let selectedParticipants = participantsChoices
-                .filter { $0.isSelected }
-                .map { choice in
-                    let participant = Participant(name: choice.name)
-                    modelContext.insert(participant)
-                    return participant
-                }
-            let selectedActivities = activityChoices
-                .filter { $0.isSelected }
-                .map { choice in
-                    let activity = Activity(name: choice.name)
-                    modelContext.insert(activity)
-                    return activity
-                }
-
-            let selectedWeather = weatherChoices
-                .filter { $0.isSelected }
-                .map { choice in
-                    let weatherCondition = WeatherCondition(name: choice.name)
-                    modelContext.insert(weatherCondition)
-                    return weatherCondition
-                }
-            
-            newPackingList.participants = selectedParticipants
-            print("Selected participants: \(selectedParticipants)")
-            
-            newPackingList.activities = selectedActivities
-            print("selected activities: \(selectedActivities)")
-            
-            newPackingList.weatherConditions = selectedWeather
-            print("selected weather: \(selectedWeather)")
-         
             //Generate recommended categories and items
-            let categories = generateCategories(for: selectedParticipants.map { $0.name },
-                                                activities: selectedActivities.map { $0.name },
-                                                weatherConditions: selectedWeather.map { $0.name}
-            )
+            let categories = generateCategories(from: newPackingList)
             newPackingList.categories.append(contentsOf: categories)
             
             //Save
@@ -109,7 +52,15 @@ class QuizViewModel {
             saveContext()
             
         }
-
+        
+    }
+    
+    func toggleSelection(_ filter: String) {
+        if selectedFilters.contains(filter) {
+            selectedFilters.remove(filter)
+        } else {
+            selectedFilters.insert(filter)
+        }
     }
     
     private func saveContext() {
@@ -124,11 +75,12 @@ class QuizViewModel {
     //Generate Packing Categories
     
     @MainActor
-    private func generateCategories(for participants: [String], activities: [String], weatherConditions: [String]) -> [Category] {
+    private func generateCategories(from packingList: PackingList) -> [Category] {
         
         var selectedCategories: [Category] = []
         
         let defaultCategories = ["Clothing", "Camping Gear", "First Aid"]
+        
         
         //Always include essential categories first
         
@@ -153,36 +105,21 @@ class QuizViewModel {
         
         //Add user selected categories
         
-        let userSelectedCategories = participants + activities + weatherConditions
-        print("userSelectedCategories: \(userSelectedCategories)")
-        
-        for selection in userSelectedCategories {
-            if let itemTemplates = categoryTemplates[selection] {
-                
-                let category = Category(name: selection, position: selectedCategories.count)
+        for filter in selectedFilters {
+            if let itemTemplates = categoryTemplates[filter] {
+                let category = Category(name: filter, position: selectedCategories.count)
                 
                 category.items = itemTemplates.enumerated().map { index, itemTemplate in
                     let newItem = Item(title: itemTemplate.title, isPacked: false)
                     newItem.position = index
                     newItem.category = category
-                    
                     return newItem
                 }
                 
                 selectedCategories.append(category)
             }
         }
-
+        
         return selectedCategories
-    }
-    
-    
-    //
-    func toggleParticipant(_ name: String) {
-        if let index = participantsChoices.firstIndex(where: { $0.name == name }) {
-            print("index = \(index)")
-            participantsChoices[index].isSelected.toggle()
-            print("Toggled \(name) : \(participantsChoices[index].isSelected)")
-        }
     }
 }

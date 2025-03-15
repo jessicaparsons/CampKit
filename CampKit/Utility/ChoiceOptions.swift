@@ -7,6 +7,11 @@
 
 struct ChoiceOptions {
     
+    //MARK: - Categories
+    static let activities = "Activities"
+    static let participants = "Participants"
+    static let weatherConditions = "Weather Conditions"
+    
     // MARK: - Participants
     static let adults = "Adults"
     static let kids = "Kids"
