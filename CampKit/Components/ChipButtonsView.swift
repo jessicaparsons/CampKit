@@ -10,7 +10,8 @@ import SwiftUI
 struct ChipButtonsView: View {
     
     let label: String
-    @State var isSelected: Bool
+    var isSelected: Bool
+    let onTap: () -> Void
     
     var body: some View {
     
@@ -26,15 +27,15 @@ struct ChipButtonsView: View {
                     .stroke(isSelected ? Color.clear : Color.colorSteel, lineWidth: 1)
             )
             .onTapGesture {
-                isSelected.toggle()
+                onTap()
                 HapticsManager.shared.triggerLightImpact()
             }
     }
 }
-
-#Preview {
-    
-    @Previewable @State var isSelected: Bool = true
-    
-    ChipButtonsView(label: "label", isSelected: isSelected)
-}
+//
+//#Preview {
+//    
+//    @Previewable @State var isSelected: Bool = true
+//    
+//    ChipButtonsView(label: "label", isSelected: isSelected, onTap: () -> Void)
+//}
