@@ -34,13 +34,12 @@ struct ElevationBarView: View {
     
     @Previewable @State var isNewListQuizShowing: Bool = true
     @Previewable @State var isStepOne: Bool = true
-    @Previewable @State var location: String = "Paris"
     
     let container = try! ModelContainer(
         for: PackingList.self, Category.self, Item.self,
         configurations: ModelConfiguration(isStoredInMemoryOnly: true)
     )
-    QuizView(viewModel: QuizViewModel(modelContext: container.mainContext), isNewListQuizShowing: $isNewListQuizShowing, isStepOne: $isStepOne, location: $location)
+    QuizView(viewModel: QuizViewModel(modelContext: container.mainContext), isNewListQuizShowing: $isNewListQuizShowing, isStepOne: $isStepOne)
 }
 
 

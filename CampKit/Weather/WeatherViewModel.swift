@@ -80,15 +80,24 @@ class WeatherViewModel {
     // If the conditionName == "cloud.bolt.rain", "cloud.drizzle", "cloud.heavyrain", mark it as rain
     // If the conditionName == "cloud.snow", mark it as snow
     
-    func categorizeWeather(for forecast: [WeatherModel]) -> Set<String> {
+    //add in elevation from page one.
+    
+    func categorizeWeather(for forecast: [WeatherModel], elevation: Double) -> Set<String> {
         
         var weatherCategories: Set<String> = ["mild"]
         
+        //The temperature decreases by approximately 0.33°F for every 100 feet of elevation gain.
+        let elevationCompensation = elevation / 100 * 0.33
+        
         for day in forecast {
-            let high = day.high
-            let low = day.low
+            let high = day.high - elevationCompensation
+            let low = day.low - elevationCompensation
             let conditionName = day.conditionName
             
+            print("elevation: \(elevation), high: \(day.high), low: \(day.low), elevationCompensation: \(elevationCompensation), condition: \(conditionName), high: \(high), low: \(low)")
+            
+            //if the high is higher than 80, it's hot and possibly mild.
+            //if the high is higher than 80 and the low is also higher than 70, it's just hot.
             if high >= 80 {
                 weatherCategories.insert("hot")
                 
@@ -97,11 +106,13 @@ class WeatherViewModel {
                 }
             }
             
+            //if the low is less than 45, it's cold, and possibly mild
+            //if the high is also less than 50, it's just cold
             if low <= 45 {
-                weatherCategories.remove("mild")
+                weatherCategories.insert("cold")
                 
                 if high < 50 {
-                    weatherCategories.insert("cold")
+                    weatherCategories.remove("mild")
                 }
             }
             

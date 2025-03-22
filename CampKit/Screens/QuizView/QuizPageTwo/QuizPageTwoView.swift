@@ -14,6 +14,7 @@ struct QuizPageTwoView: View {
     @State var viewModel: QuizViewModel
     @Binding var isStepOne: Bool
     @Binding var location: String
+    @Binding var elevation: Double
     @State private var weatherCategories: Set<String> = []
     
     var body: some View {
@@ -58,7 +59,7 @@ struct QuizPageTwoView: View {
             await weatherViewModel.fetchLocation(for: location)
 
             if let weather = weatherViewModel.weather {
-                weatherCategories = weatherViewModel.categorizeWeather(for: weather)
+                weatherCategories = weatherViewModel.categorizeWeather(for: weather, elevation: elevation)
             }
         }
         
@@ -68,11 +69,13 @@ struct QuizPageTwoView: View {
 #Preview {
     @Previewable @State var isStepOne: Bool = false
     @Previewable @State var location: String = "Tahoe"
+    @Previewable @State var elevation: Double = 0.0
+
     
     let container = try! ModelContainer(
         for: PackingList.self, Category.self, Item.self,
         configurations: ModelConfiguration(isStoredInMemoryOnly: true)
     )
-    QuizPageTwoView(viewModel: QuizViewModel(modelContext: container.mainContext), isStepOne: $isStepOne, location: $location)
+    QuizPageTwoView(viewModel: QuizViewModel(modelContext: container.mainContext), isStepOne: $isStepOne, location: $location, elevation: $elevation)
         .environment(WeatherViewModel(weatherFetcher: WeatherAPIClient()))
 }

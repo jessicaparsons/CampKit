@@ -11,19 +11,21 @@ import SwiftData
 struct QuizView: View {
 
     @State var viewModel: QuizViewModel
+    @State var weatherViewModel = WeatherViewModel(weatherFetcher: WeatherAPIClient())
     @Binding var isNewListQuizShowing: Bool
     @Binding var isStepOne: Bool
-    @Binding var location: String
+    @State private var location: String = ""
+    @State private var elevation: Double = 0.0
     
     var body: some View {
         VStack {
             ZStack {
                 ScrollView {
                     if isStepOne {
-                        QuizPageOneView(viewModel: viewModel, isStepOne: $isStepOne)
+                        QuizPageOneView(viewModel: viewModel, weatherViewModel: weatherViewModel, location: $location, elevation: $elevation, isStepOne: $isStepOne)
                             .transition(.move(edge: .leading))
                     } else {
-                        QuizPageTwoView(viewModel: viewModel, isStepOne: $isStepOne, location: $location)
+                        QuizPageTwoView(viewModel: viewModel, isStepOne: $isStepOne, location: $location, elevation: $elevation)
                             .transition(.move(edge: .trailing))
                     }
                 }
@@ -91,12 +93,11 @@ struct QuizView: View {
     
     @Previewable @State var isNewListQuizShowing: Bool = true
     @Previewable @State var isStepOne: Bool = true
-    @Previewable @State var location: String = "Paris"
     
     let container = try! ModelContainer(
         for: PackingList.self, Category.self, Item.self,
         configurations: ModelConfiguration(isStoredInMemoryOnly: true)
     )
-    QuizView(viewModel: QuizViewModel(modelContext: container.mainContext), isNewListQuizShowing: $isNewListQuizShowing, isStepOne: $isStepOne, location: $location)
+    QuizView(viewModel: QuizViewModel(modelContext: container.mainContext), isNewListQuizShowing: $isNewListQuizShowing, isStepOne: $isStepOne)
         .environment(WeatherViewModel(weatherFetcher: WeatherAPIClient()))
 }
