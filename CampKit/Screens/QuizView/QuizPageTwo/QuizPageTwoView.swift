@@ -28,20 +28,18 @@ struct QuizPageTwoView: View {
             }//:VSTACK
             
             //MARK: - WEATHER DISPLAY
-            
-            WeatherModuleView(location: $location)
-            
-            //MARK: - WEATHER SUGGESTION
-            Group {
+            VStack(alignment: .leading, spacing: Constants.cardSpacing) {
+                
+                WeatherModuleView(location: $location)
+                
+                //MARK: - WEATHER SUGGESTION
+                
                 Text("Based on the forecast, we sugget packing for ") +
                 weatherViewModel.formatWeatherCategories(weatherCategories) +
                 Text(" weather.")
-            
-            }//:GROUP
-            
-            //MARK: - WEATHER SELECTION
-            
-            VStack(alignment: .leading, spacing: Constants.cardSpacing) {
+                
+                //MARK: - WEATHER SELECTION
+                
                 HStack {
                     Text("Select the weather you'd like to pack for:")
                         .font(.footnote)
@@ -57,7 +55,7 @@ struct QuizPageTwoView: View {
         .padding(.horizontal, Constants.horizontalPadding)
         .task {
             await weatherViewModel.fetchLocation(for: location)
-
+            
             if let weather = weatherViewModel.weather {
                 weatherCategories = weatherViewModel.categorizeWeather(for: weather, elevation: elevation)
             }
@@ -68,9 +66,9 @@ struct QuizPageTwoView: View {
 
 #Preview {
     @Previewable @State var isStepOne: Bool = false
-    @Previewable @State var location: String = "Tahoe"
+    @Previewable @State var location: String = ""
     @Previewable @State var elevation: Double = 0.0
-
+    
     
     let container = try! ModelContainer(
         for: PackingList.self, Category.self, Item.self,

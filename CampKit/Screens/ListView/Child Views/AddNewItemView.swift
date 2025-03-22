@@ -19,7 +19,7 @@ struct AddNewItemView: View {
         HStack {
             Image(systemName: "plus.circle")
                 .foregroundColor(.gray)
-                .font(.title3)
+                .font(.title2)
             TextField("Add new item", text: $newItemText)
                 .focused($isFocused)
                 .textFieldStyle(.plain)
@@ -40,7 +40,7 @@ struct AddNewItemView: View {
             
         }//:HSTACK
         .padding(.horizontal)
-        .padding(.vertical, 8)
+        .padding(.vertical, 12)
     }
 }
 
@@ -61,8 +61,8 @@ struct AddNewItemView: View {
     
     let sampleViewModel = ListViewModel(modelContext: container.mainContext, packingList: samplePackingList)
     
-    // Return the preview
     return AddNewItemView(viewModel: sampleViewModel, category: sampleCategory)
         .modelContainer(container)
+        .background(Color.customTan)
     
 }
