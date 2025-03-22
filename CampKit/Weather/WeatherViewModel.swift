@@ -88,32 +88,26 @@ class WeatherViewModel {
         
         //The temperature decreases by approximately 0.33°F for every 100 feet of elevation gain.
         let elevationCompensation = elevation / 100 * 0.33
+        var avgHigh: Double = 0
+        var avgLow: Double = 0
+        
         
         for day in forecast {
             let high = day.high - elevationCompensation
             let low = day.low - elevationCompensation
             let conditionName = day.conditionName
             
+            avgHigh += high
+            avgLow += low
+            
             print("elevation: \(elevation), high: \(day.high), low: \(day.low), elevationCompensation: \(elevationCompensation), condition: \(conditionName), high: \(high), low: \(low)")
             
-            //if the high is higher than 80, it's hot and possibly mild.
-            //if the high is higher than 80 and the low is also higher than 70, it's just hot.
             if high >= 80 {
                 weatherCategories.insert("hot")
-                
-                if low > 70 {
-                    weatherCategories.remove("mild")
-                }
             }
             
-            //if the low is less than 45, it's cold, and possibly mild
-            //if the high is also less than 50, it's just cold
             if low <= 45 {
                 weatherCategories.insert("cold")
-                
-                if high < 50 {
-                    weatherCategories.remove("mild")
-                }
             }
             
             if conditionName == "cloud.bolt.rain" ||
@@ -126,6 +120,13 @@ class WeatherViewModel {
                 weatherCategories.insert("snowy")
                 weatherCategories.remove("mild")
             }
+        }
+        
+        print("avgHigh: \(avgHigh), avgLow: \(avgLow)")
+        
+        //If the average low is greater than 70, or if the average high is lower than 50, the user does not have to pack for Mild weather
+        if avgLow / Double(forecast.count) > 70 || avgHigh / Double(forecast.count) < 50 {
+            weatherCategories.remove("mild")
         }
         
         return weatherCategories

@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct WeatherModuleView: View {
     
@@ -15,16 +16,18 @@ struct WeatherModuleView: View {
     var body: some View {
         GroupBox {
             ZStack {
-                VStack {
-                    if let weather = weatherViewModel.weather {
-                        HStack {
-                            Text(weather.first?.cityName ?? "Unknown")
-                                .font(.body)
-                            Spacer()
-                        }
-                        Divider().padding(.vertical, 4)
-                       
-                        ForEach(weather.prefix(upTo: 5), id: \.id) { day in
+                HStack {
+                    Spacer()
+                    VStack {
+                        if let weather = weatherViewModel.weather {
+                            HStack {
+                                Text(weather.first?.cityName ?? "Unknown")
+                                    .font(.body)
+                                Spacer()
+                            }
+                            Divider().padding(.vertical, 4)
+                            
+                            ForEach(weather.prefix(upTo: 5), id: \.id) { day in
                                 WeatherRowView(
                                     symbol: day.conditionName,
                                     day: day.date,
@@ -33,21 +36,23 @@ struct WeatherModuleView: View {
                                 )
                                 .frame(height: 25)
                             }
-          
-               
-                    }//:CONDITION
-                    else {
-                        VStack(spacing: Constants.verticalSpacing) {
-                            Text("Weather Forecast")
-                                .font(.headline)
-                                .fontWeight(.bold)
-                            Text("Choose a location on the previous screen to see weather forecast")
-                                .multilineTextAlignment(.center)
-                            Image(systemName: "cloud.sun")
+                            
+                            
+                        }//:CONDITION
+                        else {
+                            VStack(spacing: Constants.verticalSpacing) {
+                                Text("Weather Forecast")
+                                    .font(.headline)
+                                    .fontWeight(.bold)
+                                Text("Choose a location on the previous screen to see weather forecast")
+                                    .multilineTextAlignment(.center)
+                                Image(systemName: "cloud.sun")
+                            }
+                            .padding()
                         }
-                        .padding()
-                    }
-                }//:VSTACK
+                    }//:VSTACK
+                    Spacer()
+                }//:HSTACK
             }//:ZSTACK
         }//:GROUPBOX
         .backgroundStyle(LinearGradient(gradient: Gradient(colors: [
@@ -58,6 +63,21 @@ struct WeatherModuleView: View {
             endPoint: .bottomTrailing))
     }
 }
+
+#Preview("Quiz Page Two") {
+    @Previewable @State var isStepOne: Bool = false
+    @Previewable @State var location: String = "Paris"
+    @Previewable @State var elevation: Double = 0.0
+    
+    
+    let container = try! ModelContainer(
+        for: PackingList.self, Category.self, Item.self,
+        configurations: ModelConfiguration(isStoredInMemoryOnly: true)
+    )
+    QuizPageTwoView(viewModel: QuizViewModel(modelContext: container.mainContext), isStepOne: $isStepOne, location: $location, elevation: $elevation)
+        .environment(WeatherViewModel(weatherFetcher: WeatherAPIClient()))
+}
+
 
 #Preview {
     

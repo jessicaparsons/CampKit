@@ -28,7 +28,7 @@ struct CardButtonView: View {
             .background(
                 RoundedRectangle(cornerRadius: Constants.cornerRadius)
                     .fill(isSelected ? Color.colorTan : Color.clear)
-                    .stroke(isSelected ? Color.clear : Color.colorSteel, lineWidth: 1)
+                    .stroke(isSelected ? Color.colorSage : Color.colorSteel, lineWidth: 1)
                 
             )
             .onTapGesture {
