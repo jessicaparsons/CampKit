@@ -95,19 +95,15 @@ struct FlowLayout: Layout {
     }
 }
 
-//#Preview {
-//    
-//    @Previewable @State var sampleChoices: [PackingPreference] = [
-//        PackingPreference(name: "Adults", type: .participant, isSelected: false),
-//        PackingPreference(name: "Kids", type: .participant, isSelected: false),
-//        PackingPreference(name: "Dogs", type: .participant, isSelected: false)
-//    ]
-//    
-//    let container = try! ModelContainer(
-//        for: PackingList.self, Category.self, Item.self,
-//        configurations: ModelConfiguration(isStoredInMemoryOnly: true)
-//    )
-//    //let viewModel = QuizViewModel(modelContext: container.mainContext)
-//    
-//    ChipSectionView(preferences: $sampleChoices)
-//}
+#Preview {
+    
+
+    
+    @Previewable @State var viewModel = QuizViewModel(modelContext: try! ModelContainer(
+        for: PackingList.self, Category.self, Item.self,
+        configurations: ModelConfiguration(isStoredInMemoryOnly: true)
+    ).mainContext)
+    
+    
+    ChipSectionView(selectedFilters: $viewModel.selectedFilters, preferenceCategory: ChoiceOptions.activities)
+}

@@ -112,7 +112,7 @@ struct HomeListView: View {
                         QuizView(
                             viewModel: QuizViewModel(modelContext: modelContext),
                             isNewListQuizShowing: $isNewListQuizShowing,
-                            isStepOne: $isStepOne, location: $location
+                            isStepOne: $isStepOne
                         )
                     }
                 }

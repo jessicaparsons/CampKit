@@ -11,8 +11,9 @@ import SwiftData
 struct QuizPageOneView: View {
     
     @State var viewModel: QuizViewModel
-    @State private var location: String = ""
-    @State private var elevation: Double = 0
+    @State var weatherViewModel: WeatherViewModel
+    @Binding var location: String
+    @Binding var elevation: Double
     @State private var isLocationSearchOpen: Bool = false
     @Binding var isStepOne: Bool
     let columns: [GridItem] = Array(repeating: .init(.flexible(), spacing: 10), count: 3)
@@ -144,7 +145,10 @@ struct QuizPageOneView: View {
                         Spacer()
                     }
                     
-                    ChipSectionView(selectedFilters: $viewModel.selectedFilters, preferenceCategory: ChoiceOptions.activities)
+                    ChipSectionView(
+                        selectedFilters: $viewModel.selectedFilters,
+                        preferenceCategory: ChoiceOptions.activities
+                    )
                     
                 }//:VSTACK
                 
@@ -172,12 +176,14 @@ struct QuizPageOneView: View {
 #Preview {
     @Previewable @State var isStepOne: Bool = true
     @Previewable @State var location: String = "Paris"
+    @Previewable @State var elevation: Double = 0.0
+
     
     let container = try! ModelContainer(
         for: PackingList.self, Category.self, Item.self,
         configurations: ModelConfiguration(isStoredInMemoryOnly: true)
     )
     NavigationView {
-        QuizPageOneView(viewModel: QuizViewModel(modelContext: container.mainContext), isStepOne: $isStepOne)
+        QuizPageOneView(viewModel: QuizViewModel(modelContext: container.mainContext), weatherViewModel: WeatherViewModel(weatherFetcher: WeatherAPIClient()), location: $location, elevation: $elevation, isStepOne: $isStepOne)
     }
 }
