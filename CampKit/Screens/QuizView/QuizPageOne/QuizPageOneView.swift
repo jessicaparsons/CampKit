@@ -14,7 +14,7 @@ struct QuizPageOneView: View {
     @State var weatherViewModel: WeatherViewModel
     @Binding var location: String
     @Binding var elevation: Double
-    @State private var isLocationSearchOpen: Bool = false
+    @Binding var isLocationSearchOpen: Bool
     @Binding var isStepOne: Bool
     let columns: [GridItem] = Array(repeating: .init(.flexible(), spacing: 10), count: 3)
     
@@ -154,19 +154,6 @@ struct QuizPageOneView: View {
                 
             }//:VSTACK
             .padding(.horizontal, Constants.horizontalPadding)
-            
-            //MARK: - LOCATION SEARCH
-            
-            VStack(alignment: .leading, spacing: Constants.cardSpacing) {
-                LocationSearchView(location: $location, isLocationSearchOpen: $isLocationSearchOpen)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .background(Color.white)
-                    .offset(x: isLocationSearchOpen ? 0 : UIScreen.main.bounds.width) // Slide in from right
-                    .transition(.move(edge: .trailing))
-                    .animation(.easeInOut(duration: 0.3), value: isLocationSearchOpen)
-            }
-            
-            
         }//:ZSTACK
         
     }//:BODY
@@ -177,13 +164,13 @@ struct QuizPageOneView: View {
     @Previewable @State var isStepOne: Bool = true
     @Previewable @State var location: String = "Paris"
     @Previewable @State var elevation: Double = 0.0
-
+    @Previewable @State var isLocationSearchOpen: Bool = false
     
     let container = try! ModelContainer(
         for: PackingList.self, Category.self, Item.self,
         configurations: ModelConfiguration(isStoredInMemoryOnly: true)
     )
     NavigationView {
-        QuizPageOneView(viewModel: QuizViewModel(modelContext: container.mainContext), weatherViewModel: WeatherViewModel(weatherFetcher: WeatherAPIClient()), location: $location, elevation: $elevation, isStepOne: $isStepOne)
+        QuizPageOneView(viewModel: QuizViewModel(modelContext: container.mainContext), weatherViewModel: WeatherViewModel(weatherFetcher: WeatherAPIClient()), location: $location, elevation: $elevation, isLocationSearchOpen: $isLocationSearchOpen, isStepOne: $isStepOne)
     }
 }
