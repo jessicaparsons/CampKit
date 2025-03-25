@@ -25,6 +25,9 @@ struct QuizPageTwoView: View {
                 Text("Let's get the weather")
                     .font(.title)
                     .fontWeight(.bold)
+//                Text("Powered by OpenWeatherAPI")
+//                    .foregroundColor(Color.gray)
+//                    .font(.caption)
             }//:VSTACK
             
             //MARK: - WEATHER DISPLAY

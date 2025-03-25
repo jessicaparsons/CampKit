@@ -21,10 +21,22 @@ struct WeatherModuleView: View {
                     VStack {
                         if let weather = weatherViewModel.weather {
                             HStack {
-                                Text(weather.first?.cityName ?? "Unknown")
-                                    .font(.body)
+                                VStack(alignment: .leading) {
+                                    Text("Nearest Location")
+                                        .font(.caption)
+                                    Text(weather.first?.cityName ?? "Unknown")
+                                        .font(.body)
+                                }//:VSTACK
                                 Spacer()
-                            }
+                                VStack(alignment: .trailing) {
+                                    Group {
+                                        Text("Powered by")
+                                        Text("OpenWeatherAPI")
+                                    }//:GROUP
+                                    .foregroundColor(Color.gray)
+                                    .font(.caption2)
+                                }//:VSTACK
+                            }//:HSTACK
                             Divider().padding(.vertical, 4)
                             
                             ForEach(weather.prefix(upTo: 5), id: \.id) { day in
