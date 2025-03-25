@@ -9,7 +9,7 @@ import SwiftUI
 import SwiftData
 
 struct ListDetailCardView: View {
-    @ObservedObject var viewModel: ListViewModel
+    @State var viewModel: ListViewModel
     @Binding var isEditingTitle: Bool
     
     //placeholders

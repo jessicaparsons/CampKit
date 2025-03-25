@@ -9,7 +9,7 @@ import SwiftUI
 import SwiftData
 
 struct AddNewItemView: View {
-    @ObservedObject var viewModel: ListViewModel
+    @State var viewModel: ListViewModel
     
     @FocusState var isFocused : Bool
     @State private var newItemText: String = ""

@@ -16,19 +16,21 @@ struct QuizView: View {
     @Binding var isStepOne: Bool
     @State private var location: String = ""
     @State private var elevation: Double = 0.0
+    @State private var isLocationSearchOpen: Bool = false
+
     
     var body: some View {
         VStack {
             ZStack {
                 ScrollView {
                     if isStepOne {
-                        QuizPageOneView(viewModel: viewModel, weatherViewModel: weatherViewModel, location: $location, elevation: $elevation, isStepOne: $isStepOne)
+                        QuizPageOneView(viewModel: viewModel, weatherViewModel: weatherViewModel, location: $location, elevation: $elevation, isLocationSearchOpen: $isLocationSearchOpen, isStepOne: $isStepOne)
                             .transition(.move(edge: .leading))
                     } else {
                         QuizPageTwoView(viewModel: viewModel, isStepOne: $isStepOne, location: $location, elevation: $elevation)
                             .transition(.move(edge: .trailing))
                     }
-                }
+                }//:SCROLLVIEW
             }//:ZSTACK
             
             Spacer()
@@ -66,6 +68,17 @@ struct QuizView: View {
             .padding()
             .padding(.bottom, 20)
         }//VSTACK
+        
+        //MARK: - LOCATION SEARCH
+        .fullScreenCover(isPresented: $isLocationSearchOpen, content: {
+            
+            LocationSearchView(location: $location, isLocationSearchOpen: $isLocationSearchOpen)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(Color.white)
+                .transition(.move(edge: .trailing))
+                .animation(.easeInOut(duration: 0.3), value: isLocationSearchOpen)
+            
+        })
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
                 Button {

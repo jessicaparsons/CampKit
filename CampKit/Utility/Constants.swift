@@ -12,7 +12,7 @@ struct Constants {
     
     static let apiKey = "REDACTED"
     static let weatherURL = "https://api.openweathermap.org/data/2.5/forecast"
-    
+    static let weatherLocationsURL = "https://api.openweathermap.org/geo/1.0/direct"
     
     static let cornerRadius: CGFloat = 8
     static let verticalSpacing: CGFloat = 10

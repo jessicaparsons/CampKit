@@ -7,60 +7,68 @@
 
 import SwiftUI
 import SwiftData
+import PhotosUI
 
 struct BannerImageView: View {
     
-    @ObservedObject var viewModel: ListViewModel
+    @State var viewModel: ListViewModel
+    @Binding var bannerImage: UIImage?
     private let placeholderImage: String = "TopographyDesign"
     
     var body: some View {
-        ZStack {
+        
+        ZStack(alignment: .bottomTrailing) {
+            
             bannerImageView
                 .resizable()
                 .scaledToFill()
-                .frame(height: 250, alignment: .center)
+                .frame(height: 200, alignment: .center)
                 .clipped()
-                .overlay(cameraOverlay)
         }
         .ignoresSafeArea(edges: .horizontal)
     }
     
-    // MARK: - SUBVIEWS
+    // MARK: - BANNER IMAGE
     private var bannerImageView: Image {
-        if let photoData = viewModel.packingList.photo,
-           let uiImage = UIImage(data: photoData) {
+        
+        // Load the most recent in-memory image first
+        if let bannerImage = bannerImage {
+            return Image(uiImage: bannerImage)
+            
+        // Check if there is a stored image in the PackingList Model
+        } else if let photoData = viewModel.packingList.photo,
+                  let uiImage = UIImage(data: photoData) {
             return Image(uiImage: uiImage)
+            
         } else {
             return Image(placeholderImage)
         }
     }
-    
-    private var cameraOverlay: some View {
-        Image(systemName: "camera")
-            .font(.title3)
-            .foregroundColor(.white)
-    }
+
 }
 
 
 #Preview {
     
+    @Previewable @State var bannerImage = UIImage(named: "TopographyDesign")
+    
     let container = try! ModelContainer(
         for: PackingList.self, Category.self, Item.self,
         configurations: ModelConfiguration(isStoredInMemoryOnly: true) // In-memory container
     )
-
+    
     // Populate the container with sample data
     preloadPackingListData(context: container.mainContext)
-
+    
     // Fetch a sample packing list from the container
     let samplePackingList = try! container.mainContext.fetch(FetchDescriptor<PackingList>()).first!
-
+    
     // Create the ListViewModel
     let viewModel = ListViewModel(modelContext: container.mainContext, packingList: samplePackingList)
-
+    
+    
     // Return the ListView with the in-memory container
-    return BannerImageView(viewModel: viewModel)
+    return BannerImageView(viewModel: viewModel, bannerImage: $bannerImage)
         .modelContainer(container)
     
 }

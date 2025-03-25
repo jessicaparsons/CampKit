@@ -10,7 +10,7 @@ import SwiftData
 
 
 struct CategorySectionView: View {
-    @ObservedObject var viewModel: ListViewModel
+    @State var viewModel: ListViewModel
     @Bindable var category: Category
     @Binding var isRearranging: Bool
     

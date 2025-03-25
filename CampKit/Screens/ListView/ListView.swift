@@ -7,15 +7,20 @@
 
 import SwiftUI
 import SwiftData
+import PhotosUI
 
 struct ListView: View {
 
     @Environment(\.dismiss) private var dismiss
-    @StateObject private var viewModel: ListViewModel
+    @State private var viewModel: ListViewModel
+    
+    @State private var isPhotoPickerPresented: Bool = false
+    @State private var bannerImageItem: PhotosPickerItem?
+    @State private var bannerImage: UIImage? // Saves to SwiftData
     
     //Initialize ListView with its corresponding ViewModel
     init(viewModel: ListViewModel) {
-        _viewModel = StateObject(wrappedValue: viewModel)
+        _viewModel = State(wrappedValue: viewModel)
     }
    
     var body: some View {
@@ -24,11 +29,9 @@ struct ListView: View {
                 VStack {
                     
                     //MARK: - BANNER IMAGE
-                    BannerImageView(viewModel: viewModel)
+                    BannerImageView(viewModel: viewModel, bannerImage: $bannerImage)
                         .frame(maxWidth: .infinity) // Ensure full width
                         .listRowInsets(EdgeInsets()) // Remove extra padding
-                        .background(Color.blue)
-                        .onTapGesture { viewModel.showPhotoPicker.toggle() }
                     
                     //MARK: - LIST DETAILS HEADER
                     VStack {
@@ -51,9 +54,23 @@ struct ListView: View {
                         optionsMenu
                     }
                 }
+                .photosPicker(isPresented: $isPhotoPickerPresented, selection: $bannerImageItem, matching: .images)
+                        .onChange(of: bannerImageItem) {
+                            Task {
+                                if let data = try? await bannerImageItem?.loadTransferable(type: Data.self),
+                                   let loadedImage = UIImage(data: data)
+                                {
+                                    bannerImage = loadedImage
+                                    viewModel.packingList.photo = data  // Save to SwiftData PackingList Model
+                                    viewModel.saveContext()
+                                    
+                                } else {
+                                    print("Failed to load image")
+                                }
+                            }
+                        }
                 .sheet(isPresented: $viewModel.isRearranging) {
                     RearrangeCategoriesView(viewModel: viewModel)
-                        .environmentObject(viewModel)
                 }
                 .confirmationDialog(
                     "Are you sure you want to delete this list?",
@@ -105,11 +122,16 @@ struct ListView: View {
                     systemImage: viewModel.areAllItemsChecked ? "checkmark.circle.fill" : "checkmark.circle")
             }
             Menu {
-                // Edit Title
+                // Edit List Details
                 Button(action: {
                     viewModel.isEditingTitle.toggle()
                 }) {
                     Label("Edit List Details", systemImage: "pencil")
+                }
+                
+                // Change banner image
+                Button(action: { isPhotoPickerPresented = true }) {
+                    Label("Edit Photo", systemImage: "camera")
                 }
                 
                 // Rearrange option

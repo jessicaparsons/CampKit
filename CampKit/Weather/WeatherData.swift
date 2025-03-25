@@ -47,7 +47,7 @@ struct DailyWeather {
         
         if let date = dateFormatter.date(from: date) {
             let outputFormatter = DateFormatter()
-            outputFormatter.dateFormat = "EEEE"
+            outputFormatter.dateFormat = "E"
             return outputFormatter.string(from: date)
         }
         

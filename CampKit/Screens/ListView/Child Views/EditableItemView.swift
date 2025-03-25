@@ -11,7 +11,7 @@ import SwipeCell
 
 struct EditableItemView: View {
     
-    @ObservedObject var viewModel: ListViewModel
+    @State var viewModel: ListViewModel
     @Bindable var item: Item
     @FocusState private var isFocused: Bool
     
@@ -94,34 +94,30 @@ struct EditableItemView: View {
 
 
 
-//#Preview(traits: .sizeThatFitsLayout) {
-//    let container = try! ModelContainer(
-//        for: PackingList.self, Category.self, Item.self,
-//        configurations: ModelConfiguration(isStoredInMemoryOnly: true) // In-memory for preview
-//    )
-//    
-//    // Sample data
-//    let sampleCategory = Category(name: "Sleep", position: 0)
-//    let sampleItem = Item(title: "Tent", isPacked: false)
-//    sampleItem.position = 0
-//    sampleItem.category = sampleCategory
-//    sampleCategory.items.append(sampleItem)
-//    
-//    let samplePackingList = PackingList(title: "Sample Trip")
-//    samplePackingList.categories.append(sampleCategory)
-//    container.mainContext.insert(samplePackingList)
-//
-//    // Create a mock ListViewModel
-//    let viewModel = ListViewModel(modelContext: container.mainContext, packingList: samplePackingList)
-//
-//    
-//        EditableItemView(
-//            viewModel: viewModel,
-//            item: sampleItem,
-//            togglePacked: {
-//                print("Toggle packed for \(sampleItem.title)")
-//            }
-//        )
-//    
-//    .modelContainer(container) // Provide the SwiftData container
-//}
+#Preview(traits: .sizeThatFitsLayout) {
+    let container = try! ModelContainer(
+        for: PackingList.self, Category.self, Item.self,
+        configurations: ModelConfiguration(isStoredInMemoryOnly: true) // In-memory for preview
+    )
+    
+    // Sample data
+    let sampleCategory = Category(name: "Sleep", position: 0)
+    let sampleItem = Item(title: "Tent", isPacked: false)
+    
+    let samplePackingList = PackingList(title: "Sample Trip")
+    samplePackingList.categories.append(sampleCategory)
+    container.mainContext.insert(samplePackingList)
+
+    // Create a mock ListViewModel
+    let viewModel = ListViewModel(modelContext: container.mainContext, packingList: samplePackingList)
+
+    return EditableItemView(
+            viewModel: viewModel,
+            item: sampleItem,
+            togglePacked: {
+                print("Toggle packed for \(sampleItem.title)")
+            }
+        )
+    
+    .modelContainer(container) // Provide the SwiftData container
+}
