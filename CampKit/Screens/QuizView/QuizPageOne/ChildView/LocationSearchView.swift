@@ -10,25 +10,30 @@ import SwiftUI
 struct LocationSearchView: View {
     
     @Environment(\.dismiss) private var dismiss
-    @State var locationSearchService = LocationSearchService()
+    @Environment(WeatherViewModel.self) private var weatherViewModel
     @Binding var location: String
     @Binding var isLocationSearchOpen: Bool
+    @State private var searchText = ""
     
     var body: some View {
         
         NavigationView {
             ZStack {
-                if locationSearchService.results.isEmpty {
+                if weatherViewModel.weatherLocationResults.isEmpty {
                     ContentUnavailableView("No results", systemImage: "mappin.slash", description: Text("Search for a location"))
                 } else {
-                    List(locationSearchService.results) { result in
+                    List(weatherViewModel.weatherLocationResults) { result in
                         Button {
-                            location = result.title
-                            isLocationSearchOpen = false
+                            Task {
+                                await weatherViewModel.fetchLocation(for: result)
+                                location = result.name
+                                isLocationSearchOpen = false
+                                hideKeyboard()
+                            }
                         } label: {
                             VStack(alignment: .leading) {
-                                Text(result.title)
-                                Text(result.subtitle)
+                                Text(result.name)
+                                Text("\(result.state ?? "N/A"), \(result.country)")
                                     .font(.caption)
                                     .foregroundStyle(.secondary)
                             }//:VSTACK
@@ -46,8 +51,19 @@ struct LocationSearchView: View {
                 }
             }
         }
-        .searchable(text: $locationSearchService.query, prompt: "Search for a location")
-        
+        .searchable(text: $searchText, prompt: "Search for a location")
+        .onChange(of: searchText) {
+            Task {
+                
+                try? await Task.sleep(nanoseconds: 700_000_000)
+                
+                do {
+                    try await weatherViewModel.getLocationsFrom(cityName: searchText)
+                } catch {
+                    print("Error fetching locations: \(error.localizedDescription)")
+                }
+            }
+        }
     }
 }
 
@@ -56,4 +72,5 @@ struct LocationSearchView: View {
     @Previewable @State var location: String = ""
     @Previewable @State var isLocationSearchOpen: Bool = true
     LocationSearchView(location: $location, isLocationSearchOpen: $isLocationSearchOpen)
+        .environment(WeatherViewModel(weatherFetcher: WeatherAPIClient()))
 }

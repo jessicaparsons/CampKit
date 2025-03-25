@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct WeatherModel: Identifiable {
+struct WeatherModel: Identifiable, Equatable {
     let id = UUID()
     let date: String
     let conditionID: Int

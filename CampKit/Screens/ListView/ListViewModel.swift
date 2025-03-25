@@ -7,26 +7,29 @@
 
 import SwiftUI
 import SwiftData
+import PhotosUI
 
-class ListViewModel: ObservableObject {
+@Observable
+class ListViewModel {
     
     private let modelContext: ModelContext
     
-    @Published var packingList: PackingList
+    var packingList: PackingList
     
-    @Published var item: String = ""
-    @Published var globalIsExpanded: Bool = false
-    @Published var globalExpandCollapseAction = UUID() // Trigger for animation
-    @Published var isRearranging: Bool = false
-    @Published var isEditingTitle: Bool = false
-    @Published var showDeleteConfirmation: Bool = false
-    @Published var showPhotoPicker: Bool = false
-    @Published var draggedCategory: Category?
+    var item: String = ""
+    var globalIsExpanded: Bool = false
+    var globalExpandCollapseAction = UUID() // Trigger for animation
+    var isRearranging: Bool = false
+    var isEditingTitle: Bool = false
+    var showDeleteConfirmation: Bool = false
+    var draggedCategory: Category?
     
     init(modelContext: ModelContext, packingList: PackingList) {
         self.modelContext = modelContext
         self.packingList = packingList
     }
+    
+    //MARK: - ADD AND REMOVE ITEMS
     
     func addItem(to category: Category, itemTitle: String) {
         guard !itemTitle.isEmpty else { return }
@@ -65,6 +68,8 @@ class ListViewModel: ObservableObject {
             reassignItemPositions(for: safeItem)
         }
     }
+    
+    //MARK: - ADD AND REMOVE CATEGORIES
     
     func addNewCategory() {
         withAnimation {
@@ -109,19 +114,7 @@ class ListViewModel: ObservableObject {
             saveContext()
     }
     
-    func expandAll() {
-        withAnimation {
-            globalIsExpanded = true
-            globalExpandCollapseAction = UUID()
-        }
-    }
-
-    func collapseAll() {
-        withAnimation {
-            globalIsExpanded = false
-            globalExpandCollapseAction = UUID()
-        }
-    }
+    //MARK: - DELETE LIST
     
     @MainActor
     func deleteList(dismiss: DismissAction) {
@@ -140,6 +133,23 @@ class ListViewModel: ObservableObject {
         }
     }
     
+    
+    //MARK: - CATEGORY CUSTOMIZATION
+    
+    func expandAll() {
+        withAnimation {
+            globalIsExpanded = true
+            globalExpandCollapseAction = UUID()
+        }
+    }
+
+    func collapseAll() {
+        withAnimation {
+            globalIsExpanded = false
+            globalExpandCollapseAction = UUID()
+        }
+    }
+    
     var areAllItemsChecked: Bool {
         packingList.categories.allSatisfy { category in
             category.items.allSatisfy { $0.isPacked }
@@ -153,7 +163,6 @@ class ListViewModel: ObservableObject {
             checkAllItems()
         }
     }
-    
     
     func checkAllItems() {
         for category in packingList.categories {
@@ -180,9 +189,14 @@ class ListViewModel: ObservableObject {
             }
         }
     
+    
+    //MARK: - SHARE LIST
+    
     func shareList() {
         print("Sharing the list!")
     }
+    
+    //MARK: - UI
     
     func packedTextColor(for item: Item) -> Color {
         item.isPacked ? .accentColor : .primary
@@ -196,6 +210,9 @@ class ListViewModel: ObservableObject {
             }
     }
 
+    
+    //MARK: - SAVE
+    
     func saveContext() {
         do {
             try modelContext.save()

@@ -27,6 +27,7 @@ class WeatherViewModel {
     
     var weather: [WeatherModel]? // 5 day forecast
     var coordinates: CLLocationCoordinate2D? // user's location input
+    var weatherLocationResults: [WeatherLocationResultsModel] = []
     
     private let weatherFetcher: WeatherFetching
     
@@ -35,35 +36,70 @@ class WeatherViewModel {
     }
     
     //Get coordinates from city name
-    func getCoordinatesFrom(cityName: String) async throws -> CLLocationCoordinate2D? {
-        let coordinates = try await CLGeocoder().geocodeAddressString(cityName)
-        return coordinates.first?.location?.coordinate
+    @MainActor
+    func getLocationsFrom(cityName: String) async throws {
+        
+        do  {
+            guard !cityName.isEmpty else { return }
+                
+            let encodedCity = cityName.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? cityName
+            
+            let urlString = "\(Constants.weatherLocationsURL)?q=\(encodedCity)&limit=10&appid=\(Constants.apiKey)"
+            
+            print("fetching from url: \(urlString)")
+            
+            guard let url = URL(string: urlString) else {
+                throw NetworkError.invalidURL
+            }
+            
+            let (data, response) = try await URLSession.shared.data(from: url)
+            
+            guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+                throw NetworkError.requestFailed
+            }
+            
+            let decoder = JSONDecoder()
+            decoder.keyDecodingStrategy = .convertFromSnakeCase
+            
+            do {
+                let weatherLocationsData = try decoder.decode([WeatherLocationResultsModel].self, from: data)
+
+                self.weatherLocationResults = weatherLocationsData  // Update the view model's results
+                
+            } catch let decodingError {
+                print("Decoding Error: \(decodingError)")
+                throw NetworkError.decodingFailed
+                        
+            }
+            
+        } catch {
+            throw NetworkError.decodingFailed
+        }
+        
+        //        let coordinates = try await CLGeocoder().geocodeAddressString(cityName)
+        //        return coordinates.first?.location?.coordinate
     }
     
     //Fetch weather by city and coordinates that are stored in the Packing List
     
     @MainActor
-    func fetchLocation(for cityName: String) async {
+    func fetchLocation(for location: WeatherLocationResultsModel) async {
         
         do {
             try await Task {
-                guard let location = try await getCoordinatesFrom(cityName: cityName) else {
-                    throw NetworkError.requestFailed
-                }
                 
-                self.coordinates = location
+                let urlString = "\(Constants.weatherURL)?lat=\(location.lat)&lon=\(location.lon)&units=imperial&appid=\(Constants.apiKey)"
                 
-                
-                let urlString = "\(Constants.weatherURL)?lat=\(location.latitude)&lon=\(location.longitude)&units=imperial&appid=\(Constants.apiKey)"
-                
-                print("fetchLocation called with URL: \(urlString)")
-                
-                
+                print("urlString from fetchLocation: \(urlString)")
+            
                 let fiveDayForecast = try await weatherFetcher.fetchWeather(with: urlString)
                 
                 await MainActor.run {
                     self.weather = fiveDayForecast
+                    
+                    print("weather: \(self.weather)")
                 }
+                
             }.value
             
             

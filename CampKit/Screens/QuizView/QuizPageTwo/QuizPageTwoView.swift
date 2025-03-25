@@ -34,7 +34,7 @@ struct QuizPageTwoView: View {
                 
                 //MARK: - WEATHER SUGGESTION
                 
-                Text("Based on the forecast, we sugget packing for ") +
+                Text("Based on the forecast and elevation, we sugget packing for ") +
                 weatherViewModel.formatWeatherCategories(weatherCategories) +
                 Text(" weather.")
                 
@@ -54,8 +54,6 @@ struct QuizPageTwoView: View {
         }//:VSTACK
         .padding(.horizontal, Constants.horizontalPadding)
         .task {
-            await weatherViewModel.fetchLocation(for: location)
-            
             if let weather = weatherViewModel.weather {
                 weatherCategories = weatherViewModel.categorizeWeather(for: weather, elevation: elevation)
             }
