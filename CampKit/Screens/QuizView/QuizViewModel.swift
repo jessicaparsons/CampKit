@@ -18,6 +18,7 @@ class QuizViewModel {
     
     var selectedFilters: Set<String> = []
     
+    var listTitle: String = "New Packing List"
     var locationName: String = ""
     var latitude: Double?
     var longitude: Double?
@@ -37,7 +38,7 @@ class QuizViewModel {
             // where 'isSelected' is true, then maps the filtered result to an array of their names
             // inserts the choices into the context
             let newPackingList = PackingList(
-                title: "New Camping Trip",
+                title: listTitle,
                 locationName: locationName,
                 latitude: latitude,
                 longitude: longitude,

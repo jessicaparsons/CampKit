@@ -8,11 +8,12 @@
 import SwiftUI
 import SwiftData
 
+@Observable
 final class HomeListViewModel: ObservableObject {
     
     private let modelContext: ModelContext
     
-    @Published var packingLists: [PackingList] = [] {
+    var packingLists: [PackingList] = [] {
         didSet {
             print("Packing lists updated: \(packingLists.map { $0.title })")
         }
