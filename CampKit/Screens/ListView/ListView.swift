@@ -18,6 +18,9 @@ struct ListView: View {
     @State private var bannerImageItem: PhotosPickerItem?
     @State private var bannerImage: UIImage? // Saves to SwiftData
     
+    @State private var scrollOffset: CGFloat = 0
+    private let scrollThreshold: CGFloat = 1
+    
     //Initialize ListView with its corresponding ViewModel
     init(viewModel: ListViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
@@ -49,9 +52,26 @@ struct ListView: View {
                     .padding(.horizontal)
                 }//:VSTACK
                 .background(Color.colorTan)
+                .navigationTitle(viewModel.packingList.title)
+                .navigationBarTitleDisplayMode(.inline)
+                .background(
+                    GeometryReader { geo in
+                        Color.clear
+                            .onChange(of: geo.frame(in: .global).minY) {
+                                scrollOffset = geo.frame(in: .global).minY
+                            }
+                    }
+                )
                 .toolbar {
                     ToolbarItem(placement: .navigationBarTrailing) {
                         optionsMenu
+                    }
+                    // This makes the title invisible until scrolled
+                    ToolbarItem(placement: .principal) {
+                        Text(viewModel.packingList.title)
+                            .opacity(scrollOffset < -scrollThreshold ? 1 : 0)
+                            .animation(scrollOffset < -scrollThreshold ? .default : .none, value: scrollOffset < -scrollThreshold)
+
                     }
                 }
                 .photosPicker(isPresented: $isPhotoPickerPresented, selection: $bannerImageItem, matching: .images)
@@ -120,7 +140,9 @@ struct ListView: View {
             }) {
                 Label(
                     viewModel.areAllItemsChecked ? "Check All" : "Uncheck All",
-                    systemImage: viewModel.areAllItemsChecked ? "checkmark.circle.fill" : "checkmark.circle")
+                    systemImage: viewModel.areAllItemsChecked ? "checkmark.circle.fill" : "checkmark.circle"
+                )
+                .foregroundStyle(scrollOffset < -scrollThreshold ? Color.primary : .white)
             }
             Menu {
                 // Edit Title
@@ -169,6 +191,7 @@ struct ListView: View {
                 
             } label: {
                 Label("Options", systemImage: "ellipsis.circle")
+                    .foregroundStyle(scrollOffset < -scrollThreshold ? Color.primary : .white)
             }
         }
         .tint(.white)
@@ -194,6 +217,7 @@ struct ListView: View {
         return ListView(viewModel: viewModel)
             .modelContainer(container)
             .environment(\.modelContext, container.mainContext)
+
     }
 }
 
@@ -210,5 +234,6 @@ struct ListView: View {
         ListView(viewModel: viewModel)
             .modelContainer(container)
             .environment(\.modelContext, container.mainContext)
+
     }
 }
