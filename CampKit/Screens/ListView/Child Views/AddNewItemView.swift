@@ -19,7 +19,7 @@ struct AddNewItemView: View {
         HStack {
             Image(systemName: "plus.circle")
                 .foregroundColor(.gray)
-                .font(.title2)
+                .font(.system(size: 22))
             TextField("Add new item", text: $newItemText)
                 .focused($isFocused)
                 .textFieldStyle(.plain)

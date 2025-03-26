@@ -51,7 +51,7 @@ struct CategorySectionView: View {
                     .textFieldStyle(.roundedBorder)
                     .font(.headline)
                     .multilineTextAlignment(.leading)
-                    .offset(x: 23)
+                    .offset(x: 3)
                     .onSubmit {
                         isEditing = false // Disable editing after submit
                         viewModel.saveContext()

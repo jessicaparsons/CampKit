@@ -11,13 +11,10 @@ import SwiftData
 struct ListDetailCardView: View {
     @ObservedObject var viewModel: ListViewModel
     @Binding var isEditingTitle: Bool
-    
-    //placeholders
-    @State private var weather: String = "H:75°F Low:60°F"
-    
+        
     var body: some View {
         // Section for Updating List Name
-        VStack {
+        VStack(spacing: 6) {
             HStack {
                 HStack {
                     Spacer()
@@ -29,18 +26,13 @@ struct ListDetailCardView: View {
                 
             }//:HSTACK
             Text(viewModel.packingList.locationName ?? "No Location Set")
-                .fontWeight(.bold)
-            HStack {
-                Image(systemName: "cloud")
-                Text(weather)
-            }//:HSTACK
             
         }//:VSTACK
-        .padding()
+        .padding(.vertical, Constants.cardSpacing)
         .background(
             RoundedRectangle(cornerRadius: 10)
                 .fill(Color.colorWhite)
-                .shadow(color: Color(hue: 1.0, saturation: 1.0, brightness: 0.079, opacity: 0.3), radius: 3, x: 0, y: 3)
+                .shadow(color: .gray.opacity(0.2), radius: 4, x: 0, y: 2)
         )
         .sheet(isPresented: $isEditingTitle) {
             EditListDetailsModal(packingList: viewModel.packingList)
@@ -56,7 +48,7 @@ struct ListDetailCardView: View {
 #Preview {
         // Define a mock `isEditingTitle` state
         @Previewable @State var isEditingTitle: Bool = false
-        
+
         // Create an in-memory ModelContainer
         let container = try! ModelContainer(
             for: PackingList.self, Category.self, Item.self,
@@ -74,6 +66,5 @@ struct ListDetailCardView: View {
         
         // Return the preview
         return ListDetailCardView(viewModel: viewModel, isEditingTitle: $isEditingTitle)
-            .modelContainer(container) // Provide the ModelContainer
-    
+                .modelContainer(container) // Provide the ModelContainer
 }
