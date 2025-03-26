@@ -17,13 +17,14 @@ struct QuizView: View {
     @State private var location: String = ""
     @State private var elevation: Double = 0.0
     @State private var isLocationSearchOpen: Bool = false
+    @State private var listName: String = ""
     
     var body: some View {
         VStack {
             ZStack {
                 ScrollView {
                     if isStepOne {
-                        QuizPageOneView(viewModel: viewModel, weatherViewModel: weatherViewModel, location: $location, elevation: $elevation, isLocationSearchOpen: $isLocationSearchOpen, isStepOne: $isStepOne)
+                        QuizPageOneView(viewModel: viewModel, weatherViewModel: weatherViewModel, location: $location, elevation: $elevation, isLocationSearchOpen: $isLocationSearchOpen, isStepOne: $isStepOne, listName: $listName)
                             .transition(.move(edge: .leading))
                     } else {
                         QuizPageTwoView(viewModel: viewModel, isStepOne: $isStepOne, location: $location, elevation: $elevation)
@@ -54,6 +55,8 @@ struct QuizView: View {
                         if isStepOne {
                             isStepOne = false
                         } else {
+                            viewModel.listTitle = listName
+                            viewModel.locationName = location
                             viewModel.createPackingList()
                             isNewListQuizShowing = false
                         }

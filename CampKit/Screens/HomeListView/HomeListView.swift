@@ -11,7 +11,8 @@ import SwiftData
 struct HomeListView: View {
     
     @Environment(\.modelContext) var modelContext
-    @StateObject private var viewModel: HomeListViewModel
+    @State private var viewModel: HomeListViewModel
+    @Query(sort: \PackingList.dateCreated, order: .forward) private var packingLists: [PackingList]
     @StateObject private var storeKitManager = StoreKitManager()
     @State private var isNewListQuizShowing: Bool = false
     @State private var isStepOne: Bool = true
@@ -20,7 +21,7 @@ struct HomeListView: View {
     
     init(modelContext: ModelContext) {
         let viewModel = HomeListViewModel(modelContext: modelContext)
-        _viewModel = StateObject(wrappedValue: viewModel)
+        _viewModel = State(wrappedValue: viewModel)
         
     }
     
@@ -50,7 +51,7 @@ struct HomeListView: View {
             ZStack {
                 
                 List {
-                    ForEach(viewModel.packingLists) { packingList in
+                    ForEach(packingLists) { packingList in
                         
                         NavigationLink(
                             destination: ListView(viewModel: ListViewModel(modelContext: modelContext, packingList: packingList)),
