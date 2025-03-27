@@ -12,12 +12,14 @@ struct HomeListView: View {
     
     @Environment(\.modelContext) var modelContext
     @State private var viewModel: HomeListViewModel
-    @Query(sort: \PackingList.dateCreated, order: .forward) private var packingLists: [PackingList]
+    @Query(sort: \PackingList.dateCreated, order: .reverse) private var packingLists: [PackingList]
     @StateObject private var storeKitManager = StoreKitManager()
     @State private var isNewListQuizShowing: Bool = false
     @State private var isStepOne: Bool = true
     @State private var location: String = ""
     @State private var isUpgradeToProShowing: Bool = false
+    @State private var navigateToListView = false
+    @State private var currentPackingList: PackingList?
     
     init(modelContext: ModelContext) {
         let viewModel = HomeListViewModel(modelContext: modelContext)
@@ -85,12 +87,24 @@ struct HomeListView: View {
                             }
                         )//:NAVIGATION LINK
                     } //:FOR EACH
-                    .onDelete(perform: viewModel.deleteLists)
+                    .onDelete { indexSet in
+                        for index in indexSet {
+                            let packingListToDelete = packingLists[index]
+                            modelContext.delete(packingListToDelete)
+                            
+                            do {
+                                try modelContext.save() // Save changes
+                                print("Packing list deleted successfully.")
+                            } catch {
+                                print("Failed to delete packing list: \(error)")
+                            }
+                        }
+                    }
                     
                     //MARK: - ADD NEW LIST BUTTON
                     Section {
                         Button {
-                            if storeKitManager.isUnlimitedListsUnlocked || viewModel.packingLists.count < 3 {
+                            if storeKitManager.isUnlimitedListsUnlocked || packingLists.count < 3 {
                                 isNewListQuizShowing = true
                             } else {
                                 isUpgradeToProShowing = true
@@ -113,8 +127,17 @@ struct HomeListView: View {
                         QuizView(
                             viewModel: QuizViewModel(modelContext: modelContext),
                             isNewListQuizShowing: $isNewListQuizShowing,
-                            isStepOne: $isStepOne
+                            isStepOne: $isStepOne,
+                            navigateToListView: $navigateToListView,
+                            currentPackingList: $currentPackingList
                         )
+                    }
+                }
+                .navigationDestination(isPresented: $navigateToListView) {
+                    if let packingList = currentPackingList {
+                        ListView(viewModel: ListViewModel(modelContext: modelContext, packingList: packingList))
+                    } else {
+                        Text("No packing list available.")
                     }
                 }
                 .sheet(isPresented: $isUpgradeToProShowing) {
@@ -128,14 +151,11 @@ struct HomeListView: View {
             .offset(y: -10)
             .ignoresSafeArea()
             .overlay {
-                if viewModel.packingLists.isEmpty {
+                if packingLists.isEmpty {
                     ContentUnavailableView("Empty List", systemImage: "plus.circle", description: Text("You haven't created any lists yet. Get started!"))
                 }
             }
         }//:NAVIGATION STACK
-        .onAppear {
-            viewModel.fetchPackingLists()
-        }
     }//:BODY
 }//:STRUCT
 

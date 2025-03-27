@@ -24,6 +24,9 @@ class QuizViewModel {
     var longitude: Double?
     var elevation: Double = 0
     
+    //Stores the packing list so the user gets sent to it after creation
+    var currentPackingList: PackingList?
+    
     init(modelContext: ModelContext) {
         self.modelContext = modelContext
     }
@@ -38,7 +41,7 @@ class QuizViewModel {
             // where 'isSelected' is true, then maps the filtered result to an array of their names
             // inserts the choices into the context
             let newPackingList = PackingList(
-                title: listTitle,
+                title: listTitle.isEmpty ? "My Packing List" : listTitle,
                 locationName: locationName,
                 latitude: latitude,
                 longitude: longitude,
@@ -52,6 +55,11 @@ class QuizViewModel {
             modelContext.insert(newPackingList)
             saveContext()
             
+            currentPackingList = newPackingList
+            print("✅ Packing List Created: \(newPackingList.title)")
+            print("✅ Location Name: \(newPackingList.locationName ?? "None")")
+            print("✅ Categories Count: \(newPackingList.categories.count)")
+            print("✅ Setting currentPackingList successful: \(currentPackingList != nil)")
         }
         
     }

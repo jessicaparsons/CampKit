@@ -27,13 +27,13 @@ struct EditableItemView: View {
                 }) {
                     let packedColor = viewModel.packedCircleColor(for: item)
                     Image(systemName: packedColor.systemName)
-                        .foregroundColor(packedColor.color)
+                        .foregroundStyle(packedColor.color)
                         .font(.system(size: 22))
                 }
                 .buttonStyle(BorderlessButtonStyle()) // Prevent button from triggering NavigationLink
                 
                 TextField("Item Name", text: $item.title)
-                    .foregroundColor(viewModel.packedTextColor(for: item))
+                    .foregroundStyle(viewModel.packedTextColor(for: item))
                     .strikethrough(item.isPacked)
                     .italic(item.isPacked)
                     .focused($isFocused)
