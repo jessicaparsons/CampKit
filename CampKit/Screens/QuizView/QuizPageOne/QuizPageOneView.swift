@@ -185,7 +185,7 @@ struct QuizPageOneView: View {
                         selectedFilters: $viewModel.selectedFilters,
                         preferenceCategory: ChoiceOptions.activities
                     )
-                    Spacer()
+                    .padding(.bottom, 150)
                     
                 }//:VSTACK
                 
