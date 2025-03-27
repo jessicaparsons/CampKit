@@ -79,6 +79,8 @@ struct HomeListView: View {
                                     VStack(alignment: .leading) {
                                         Text(packingList.title)
                                             .font(.headline)
+                                            .lineLimit(1)
+                                            .truncationMode(.tail)
                                         Text(packingList.dateCreated, style: .date)
                                             .font(.subheadline)
                                             .foregroundColor(.secondary)

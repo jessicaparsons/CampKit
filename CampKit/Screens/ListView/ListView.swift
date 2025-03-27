@@ -17,6 +17,7 @@ struct ListView: View {
     @State private var isPhotoPickerPresented: Bool = false
     @State private var bannerImageItem: PhotosPickerItem?
     @State private var bannerImage: UIImage? // Saves to SwiftData
+    @State private var isEditing: Bool = false
     
     @State private var scrollOffset: CGFloat = 0
     private let scrollThreshold: CGFloat = 1
@@ -102,6 +103,9 @@ struct ListView: View {
                         viewModel.deleteList(dismiss: dismiss) // Perform delete
                     }
                     Button("Cancel", role: .cancel) { }
+                }
+                .onTapGesture {
+                    hideKeyboard()
                 }
             }//:SCROLLVIEW
             .background(Color.colorTan)

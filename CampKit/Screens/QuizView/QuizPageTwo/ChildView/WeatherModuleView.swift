@@ -56,7 +56,7 @@ struct WeatherModuleView: View {
                                 Text("Weather Forecast")
                                     .font(.headline)
                                     .fontWeight(.bold)
-                                Text("Choose a location on the previous screen to see weather forecast")
+                                Text("Choose a location on the previous screen to see a 5 day weather forecast")
                                     .multilineTextAlignment(.center)
                                 Image(systemName: "cloud.sun")
                             }

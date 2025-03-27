@@ -13,7 +13,7 @@ class Category: Identifiable {
     var myID: UUID = UUID() // Unique identifier
     @Attribute var name: String
     @Attribute var position: Int
-    @Relationship(deleteRule: .cascade) var items: [Item] = []
+    @Relationship(deleteRule: .cascade) var items: [Item]
     var packingList: PackingList?
     var isExpanded: Bool
 

@@ -47,58 +47,66 @@ struct CategorySectionView: View {
         } label: {
             // Editable text field for category name
             if isEditing {
-                TextField("Category Name", text: $category.name)
-                    .textFieldStyle(.roundedBorder)
-                    .font(.headline)
-                    .multilineTextAlignment(.leading)
-                    .offset(x: 3)
-                    .onSubmit {
+                HStack {
+                    TextField("Category Name", text: $category.name)
+                        .textFieldStyle(.roundedBorder)
+                        .font(.headline)
+                        .offset(x: 10)
+                        .multilineTextAlignment(.leading)
+                        .onSubmit {
+                            isEditing = false // Disable editing after submit
+                            viewModel.saveContext()
+                        }
+                    Button {
                         isEditing = false // Disable editing after submit
                         viewModel.saveContext()
-                    }
-                Spacer()
-                Button {
-                    isEditing = false // Disable editing after submit
-                    viewModel.saveContext()
-                } label: {
-                    Text("Done")
-                }
-                .padding(.vertical)
-                .padding(.leading, 30)
-                .padding(.trailing, 10)
-            } else {
-                HStack {
-                    Text(category.name)
-                        .font(.headline)
-                        .multilineTextAlignment(.leading)
-                    Spacer()
-                    Menu {
-                        Button {
-                            isEditing = true // Enable editing
-                        } label: {
-                            Label("Edit Name", systemImage: "pencil")
-                        }
-                        Button(action: {
-                            isRearranging = true
-                        }) {
-                            Label("Rearrange", systemImage: "arrow.up.arrow.down")
-                        }
-                        Button(role: .destructive) {
-                            deleteCategory()
-                        } label: {
-                            Label("Delete", systemImage: "trash")
-                        }
                     } label: {
-                        Label("Edit", systemImage: "ellipsis")
-                            .padding(10)
-                            //.background(Color.gray.opacity(0.1))
-                            //.cornerRadius(Constants.cornerRadius)
-                    } //:MENU
-                    .labelStyle(.iconOnly)
-                }
+                        Text("Done")
+                    }
+                    .padding(.leading, 20)
+                }//:HSTACK
                 .padding(.vertical)
-                .padding(.leading, 10)
-            }
+            } else {
+                VStack {
+                    HStack {
+                        Text(category.name)
+                            .font(.headline)
+                            .multilineTextAlignment(.leading)
+                            .offset(x: 7)
+                        Spacer()
+                        Menu {
+                            Button {
+                                isEditing = true // Enable editing
+                            } label: {
+                                Label("Edit Name", systemImage: "pencil")
+                            }
+                            Button(action: {
+                                isRearranging = true
+                            }) {
+                                Label("Rearrange", systemImage: "arrow.up.arrow.down")
+                            }
+                            Button(role: .destructive) {
+                                deleteCategory()
+                            } label: {
+                                Label("Delete", systemImage: "trash")
+                            }
+                        } label: {
+                            Label("Edit", systemImage: "ellipsis")
+                                .padding(.leading, 10)
+                                .padding(.vertical, 10)
+                                .padding(.trailing, 0)
+                        } //:MENU
+                        .labelStyle(.iconOnly)
+                    }//:HSTACK
+                    .padding(.top)
+                    .padding(.leading, 10)
+                    
+                    if category.isExpanded {
+                        Divider()
+                    }
+                    
+                }//:VSTACK
+            }//:ELSE
             
         }//:DISCLOSURE GROUP
         .onChange(of: globalExpandCollapseAction) {
@@ -124,6 +132,8 @@ struct LeftDisclosureStyle: DisclosureGroupStyle {
                     Image(systemName: "chevron.forward")
                         .foregroundColor(.customNeonLight)
                         .font(.caption.lowercaseSmallCaps())
+                        .offset(y: configuration.isExpanded ? -7 : 7)
+                        .offset(x: configuration.isExpanded ? 0 : 7)
                         .rotationEffect(configuration.isExpanded ? .degrees(90.0) : .zero)
                     configuration.label
                     Spacer()
