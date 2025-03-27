@@ -91,8 +91,8 @@ struct CategorySectionView: View {
                     } label: {
                         Label("Edit", systemImage: "ellipsis")
                             .padding(10)
-                            .background(Color.gray.opacity(0.1))
-                            .cornerRadius(Constants.cornerRadius)
+                            //.background(Color.gray.opacity(0.1))
+                            //.cornerRadius(Constants.cornerRadius)
                     } //:MENU
                     .labelStyle(.iconOnly)
                 }
@@ -124,9 +124,7 @@ struct LeftDisclosureStyle: DisclosureGroupStyle {
                     Image(systemName: "chevron.forward")
                         .foregroundColor(.customNeonLight)
                         .font(.caption.lowercaseSmallCaps())
-                        //.offset(x: 20)
                         .rotationEffect(configuration.isExpanded ? .degrees(90.0) : .zero)
-                        .animation(.default, value: configuration.isExpanded)
                     configuration.label
                     Spacer()
                 }

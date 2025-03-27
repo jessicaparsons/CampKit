@@ -28,6 +28,8 @@ class ListViewModel: ObservableObject {
         self.packingList = packingList
     }
     
+    //MARK: - MODIFY ITEMS
+    
     func addItem(to category: Category, itemTitle: String) {
         guard !itemTitle.isEmpty else { return }
             let newItem = Item(
@@ -65,6 +67,8 @@ class ListViewModel: ObservableObject {
             reassignItemPositions(for: safeItem)
         }
     }
+    
+    //MARK: - MODIFY CATEGORIES
     
     func addNewCategory() {
         withAnimation {
@@ -109,6 +113,25 @@ class ListViewModel: ObservableObject {
             saveContext()
     }
     
+    //MARK: - DELETE LIST
+    
+    @MainActor
+    func deleteList(dismiss: DismissAction) {
+        withAnimation {
+            
+            for category in packingList.categories {
+                modelContext.delete(category)
+            }
+            
+            modelContext.delete(packingList)
+            saveContext()
+            dismiss()
+        }
+    }
+    
+    
+    //MARK: - MODIFY ALL ITEMS
+    
     func expandAll() {
         withAnimation {
             globalIsExpanded = true
@@ -123,22 +146,6 @@ class ListViewModel: ObservableObject {
         }
     }
     
-    @MainActor
-    func deleteList(dismiss: DismissAction) {
-        withAnimation {
-            
-            // Log categories before deletion
-            print("Categories before deletion: \(packingList.categories.map { $0.name })")
-            
-            for category in packingList.categories {
-                modelContext.delete(category)
-            }
-            
-            modelContext.delete(packingList)
-            saveContext()
-            dismiss()
-        }
-    }
     
     var areAllItemsChecked: Bool {
         packingList.categories.allSatisfy { category in
@@ -184,15 +191,17 @@ class ListViewModel: ObservableObject {
         print("Sharing the list!")
     }
     
+    //MARK: - UI
+    
     func packedTextColor(for item: Item) -> Color {
-        item.isPacked ? .accentColor : .primary
+        item.isPacked ? Color.secondary : .primary
     }
     
     func packedCircleColor(for item: Item) -> (systemName: String, color: Color) {
             if item.isPacked {
-                return ("checkmark.circle.fill", .green)
+                return ("checkmark.circle.fill", Color.colorSage)
             } else {
-                return ("circle", .gray)
+                return ("circle", Color.secondary)
             }
     }
 

@@ -13,46 +13,38 @@ final class HomeListViewModel: ObservableObject {
     
     private let modelContext: ModelContext
     
-    var packingLists: [PackingList] = [] {
-        didSet {
-            print("Packing lists updated: \(packingLists.map { $0.title })")
-        }
-    }
-    
     init(modelContext: ModelContext) {
         self.modelContext = modelContext
-        fetchPackingLists()
+        //fetchPackingLists()
     }
     
-    func fetchPackingLists() {
-        let fetchDescriptor = FetchDescriptor<PackingList>()
-        do {
-            packingLists = try modelContext.fetch(fetchDescriptor)
-            print("Fetched packing lists: \(packingLists.map { $0.title })")
-        } catch {
-            print("Error fetching packing lists: \(error)")
-            packingLists = []
-        }
-    }
+//    func fetchPackingLists() {
+//        let fetchDescriptor = FetchDescriptor<PackingList>()
+//        do {
+//            packingLists = try modelContext.fetch(fetchDescriptor)
+//            print("Fetched packing lists: \(packingLists.map { $0.title })")
+//        } catch {
+//            print("Error fetching packing lists: \(error)")
+//            packingLists = []
+//        }
+//    }
     
     func addNewList() {
         withAnimation {
             let newPackingList = PackingList(title: "New List")
             modelContext.insert(newPackingList)
             saveContext()
-            fetchPackingLists()
+            //fetchPackingLists()
         }
     }
     
-    func deleteLists(offsets: IndexSet) {
-        withAnimation {
-            for index in offsets {
-                modelContext.delete(packingLists[index])
-                saveContext()
-                fetchPackingLists()
-            }
-        }
-    }
+//    func deleteLists(packingList: PackingList) {
+//        withAnimation {
+//            modelContext.delete(packingList)
+//            saveContext()
+//            
+//        }
+//    }
     
     private func saveContext() {
         do {

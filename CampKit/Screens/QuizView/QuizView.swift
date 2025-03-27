@@ -10,31 +10,39 @@ import SwiftData
 
 struct QuizView: View {
 
+    @Environment(\.modelContext) var modelContext
     @State var viewModel: QuizViewModel
     @State var weatherViewModel = WeatherViewModel(weatherFetcher: WeatherAPIClient())
     @Binding var isNewListQuizShowing: Bool
     @Binding var isStepOne: Bool
+    @Binding var navigateToListView: Bool
+    @Binding var currentPackingList: PackingList?
     @State private var location: String = ""
     @State private var elevation: Double = 0.0
     @State private var isLocationSearchOpen: Bool = false
     @State private var listName: String = ""
+    @State private var isElevationAdded: Bool = false
+        
     
     var body: some View {
         VStack {
+            
+            //QUIZ PAGES
             ZStack {
                 ScrollView {
                     if isStepOne {
-                        QuizPageOneView(viewModel: viewModel, weatherViewModel: weatherViewModel, location: $location, elevation: $elevation, isLocationSearchOpen: $isLocationSearchOpen, isStepOne: $isStepOne, listName: $listName)
+                        QuizPageOneView(viewModel: viewModel, weatherViewModel: weatherViewModel, isElevationAdded: $isElevationAdded, location: $location, elevation: $elevation, isLocationSearchOpen: $isLocationSearchOpen, isStepOne: $isStepOne, listName: $listName)
                             .transition(.move(edge: .leading))
                     } else {
-                        QuizPageTwoView(viewModel: viewModel, isStepOne: $isStepOne, location: $location, elevation: $elevation)
+                        QuizPageTwoView(viewModel: viewModel, isStepOne: $isStepOne, location: $location, elevation: $elevation, isElevationAdded: $isElevationAdded)
                             .transition(.move(edge: .trailing))
                     }
                 }
             }//:ZSTACK
             
-            Spacer()
+            //NAVIGATION BUTTONS
             
+            Spacer()
             VStack {
                 ProgressIndicatorView(isStepOne: $isStepOne)
                     .padding(.bottom, Constants.verticalSpacing)
@@ -51,6 +59,7 @@ struct QuizView: View {
                         .buttonStyle(BigButtonWide())
                     }
 
+                    
                     Button(action: {
                         if isStepOne {
                             isStepOne = false
@@ -58,17 +67,35 @@ struct QuizView: View {
                             viewModel.listTitle = listName
                             viewModel.locationName = location
                             viewModel.createPackingList()
-                            isNewListQuizShowing = false
+                            
+                            if let packingList = viewModel.currentPackingList {
+                                currentPackingList = packingList
+                                navigateToListView = true
+                                isNewListQuizShowing = false
+                            }
                         }
                     }) {
                         Text(isStepOne ? "Next" : "Create List")
                             .frame(maxWidth: .infinity)
                     }
                     .buttonStyle(BigButtonWide())
-                }
-            }
+                    .navigationDestination(isPresented: $navigateToListView) {
+                        
+                        if let currentPackingList = viewModel.currentPackingList {
+                            ListView(viewModel: ListViewModel(modelContext: modelContext, packingList: currentPackingList))
+                        } else {
+                            HomeListView(modelContext: modelContext)
+                        }
+                    }//NAVIGATION DESTINATION
+                }//:HSTACK
+            }//:VSTACK
             .padding()
-            .padding(.bottom, 20)
+            .background(
+                Rectangle()
+                    .fill(Color.colorWhite)
+                    .shadow(color: .gray.opacity(0.2), radius: 4, x: 0, y: -4)
+            )
+            
         }//VSTACK
         .fullScreenCover(isPresented: $isLocationSearchOpen, content: {
             
@@ -107,10 +134,13 @@ struct QuizView: View {
     @Previewable @State var isNewListQuizShowing: Bool = true
     @Previewable @State var isStepOne: Bool = true
     
+    @Previewable @State var navigateToListView: Bool = false
+    @Previewable @State var currentPackingList: PackingList?
+    
     let container = try! ModelContainer(
         for: PackingList.self, Category.self, Item.self,
         configurations: ModelConfiguration(isStoredInMemoryOnly: true)
     )
-    QuizView(viewModel: QuizViewModel(modelContext: container.mainContext), isNewListQuizShowing: $isNewListQuizShowing, isStepOne: $isStepOne)
+    QuizView(viewModel: QuizViewModel(modelContext: container.mainContext), isNewListQuizShowing: $isNewListQuizShowing, isStepOne: $isStepOne, navigateToListView: $navigateToListView, currentPackingList: $currentPackingList)
         .environment(WeatherViewModel(weatherFetcher: WeatherAPIClient()))
 }

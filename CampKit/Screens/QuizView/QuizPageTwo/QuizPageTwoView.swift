@@ -15,6 +15,7 @@ struct QuizPageTwoView: View {
     @Binding var isStepOne: Bool
     @Binding var location: String
     @Binding var elevation: Double
+    @Binding var isElevationAdded: Bool
     @State private var weatherCategories: Set<String> = []
     
     var body: some View {
@@ -34,9 +35,13 @@ struct QuizPageTwoView: View {
                 
                 //MARK: - WEATHER SUGGESTION
                 
-                Text("Based on the forecast, we sugget packing for ") +
+                
+                Text("Based on the five day forecast") +
+                (isElevationAdded ? Text(" and added elevation") : Text("")) +
+                Text(", we suggest packing for ") +
                 weatherViewModel.formatWeatherCategories(weatherCategories) +
                 Text(" weather.")
+                
                 
                 //MARK: - WEATHER SELECTION
                 
@@ -68,12 +73,12 @@ struct QuizPageTwoView: View {
     @Previewable @State var isStepOne: Bool = false
     @Previewable @State var location: String = ""
     @Previewable @State var elevation: Double = 0.0
-    
+    @Previewable @State var isElevationAdded: Bool = false
     
     let container = try! ModelContainer(
         for: PackingList.self, Category.self, Item.self,
         configurations: ModelConfiguration(isStoredInMemoryOnly: true)
     )
-    QuizPageTwoView(viewModel: QuizViewModel(modelContext: container.mainContext), isStepOne: $isStepOne, location: $location, elevation: $elevation)
+    QuizPageTwoView(viewModel: QuizViewModel(modelContext: container.mainContext), isStepOne: $isStepOne, location: $location, elevation: $elevation, isElevationAdded: $isElevationAdded)
         .environment(WeatherViewModel(weatherFetcher: WeatherAPIClient()))
 }

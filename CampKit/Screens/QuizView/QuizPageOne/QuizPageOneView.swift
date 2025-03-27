@@ -13,6 +13,7 @@ struct QuizPageOneView: View {
     @State var viewModel: QuizViewModel
     @State var weatherViewModel: WeatherViewModel
     @State private var isShowingElevationPopover: Bool = true
+    @Binding var isElevationAdded: Bool
     @Binding var location: String
     @Binding var elevation: Double
     @Binding var isLocationSearchOpen: Bool
@@ -36,7 +37,6 @@ struct QuizPageOneView: View {
                     Text("Create a new list")
                         .font(.title)
                         .fontWeight(.bold)
-                    Text("Bop it, shake it, customize it.")
                 }//:VSTACK
                 
                 //MARK: - NAME THE LIST
@@ -118,13 +118,18 @@ struct QuizPageOneView: View {
                 
                 //MARK: - MODIFY ELEVATION
                 
-                VStack {
-                    HStack {
-                        Text("Modify Elevation (optional)")
+                VStack(alignment: .leading) {
+                    
+                    VStack(alignment: .leading, spacing: Constants.lineSpacing) {
+                        Text("Modify elevation (optional)")
                             .font(.footnote)
                             .fontWeight(.bold)
-                        Spacer()
-                    }
+                        Text("Add additional elevation for a more accurate weather prediction")
+                            .font(.caption2)
+                            .multilineTextAlignment(.leading)
+                            .foregroundStyle(.secondary)
+                    }//:VSTACK
+                    
                     
                     ZStack(alignment: .bottomLeading) {
                         
@@ -141,21 +146,19 @@ struct QuizPageOneView: View {
                             .tint(Color.colorNeon)
                             .onChange(of: elevation) {
                                 HapticsManager.shared.triggerLightImpact()
+                                if elevation > 0 {
+                                    isElevationAdded = true
+                                }
                             }
-                            .popover(isPresented: $isShowingElevationPopover, arrowEdge: .bottom) {
-                                VStack(alignment: .leading) {
-                                    Text("Optionally add additional elevation for a more accurate weather prediction")
-                                        .font(.caption)
-                                        .multilineTextAlignment(.center)
-                                        .padding()
-                                }//:VSTACK
-                                .presentationCompactAdaptation(.popover)
-                            }//:POPOVER
                         
                     }//:ZSTACK
                     
-                    Text("+ \(Int(elevation)) ft")
-                    
+                    HStack {
+                        Spacer()
+                        Text("+ \(Int(elevation)) ft")
+                        Spacer()
+                    }//HSTACK
+                        
                     
                 }//:VSTACK
                 
@@ -191,12 +194,13 @@ struct QuizPageOneView: View {
     @Previewable @State var elevation: Double = 0.0
     @Previewable @State var isLocationSearchOpen: Bool = false
     @Previewable @State var listName: String = ""
+    @Previewable @State var isElevationAdded: Bool = true
     
     let container = try! ModelContainer(
         for: PackingList.self, Category.self, Item.self,
         configurations: ModelConfiguration(isStoredInMemoryOnly: true)
     )
     NavigationView {
-        QuizPageOneView(viewModel: QuizViewModel(modelContext: container.mainContext), weatherViewModel: WeatherViewModel(weatherFetcher: WeatherAPIClient()), location: $location, elevation: $elevation, isLocationSearchOpen: $isLocationSearchOpen, isStepOne: $isStepOne, listName: $listName)
+        QuizPageOneView(viewModel: QuizViewModel(modelContext: container.mainContext), weatherViewModel: WeatherViewModel(weatherFetcher: WeatherAPIClient()), isElevationAdded: $isElevationAdded, location: $location, elevation: $elevation, isLocationSearchOpen: $isLocationSearchOpen, isStepOne: $isStepOne, listName: $listName)
     }
 }
