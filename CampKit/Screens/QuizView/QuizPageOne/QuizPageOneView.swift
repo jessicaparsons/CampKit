@@ -19,6 +19,8 @@ struct QuizPageOneView: View {
     @Binding var isLocationSearchOpen: Bool
     @Binding var isStepOne: Bool
     @Binding var listName: String
+    @FocusState private var isTextFieldFocused: Bool
+    
     let columns: [GridItem] = Array(repeating: .init(.flexible(), spacing: 10), count: 3)
     
     var barCount: Int {
@@ -45,11 +47,17 @@ struct QuizPageOneView: View {
                         .font(.footnote)
                         .fontWeight(.bold)
                     TextField("Camping List", text: $listName)
+                        .focused($isTextFieldFocused)
                         .padding(.vertical, 10)
                         .padding(.horizontal, 15)
                         .overlay {
                             RoundedRectangle(cornerRadius: Constants.cornerRadius)
                                 .stroke(Color.colorSteel, lineWidth: 1)
+                        }
+                        .onAppear {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                isTextFieldFocused = true  // Helps focus the TextField when this view appears to avoid delay bug
+                            }
                         }
                 }//:VSTACK
                 
@@ -177,11 +185,15 @@ struct QuizPageOneView: View {
                         selectedFilters: $viewModel.selectedFilters,
                         preferenceCategory: ChoiceOptions.activities
                     )
+                    Spacer()
                     
                 }//:VSTACK
                 
             }//:VSTACK
             .padding(.horizontal, Constants.horizontalPadding)
+            .onTapGesture {
+                hideKeyboard()
+            }
         }//:ZSTACK
         
     }//:BODY
