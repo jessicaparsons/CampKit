@@ -90,6 +90,11 @@ class ListViewModel: ObservableObject {
     
     func deleteCategory(_ category: Category) {
         withAnimation {
+//            // Delete items associated with the category
+//            for item in category.items {
+//                modelContext.delete(item)
+//            }
+            
             // Remove the category from the packing list
             packingList.categories.removeAll { $0.id == category.id }
             modelContext.delete(category)

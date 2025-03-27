@@ -35,13 +35,13 @@ struct QuizPageTwoView: View {
                 
                 //MARK: - WEATHER SUGGESTION
                 
-                
-                Text("Based on the five day forecast") +
-                (isElevationAdded ? Text(" and added elevation") : Text("")) +
-                Text(", we suggest packing for ") +
-                weatherViewModel.formatWeatherCategories(weatherCategories) +
-                Text(" weather.")
-                
+                if !location.isEmpty {
+                    Text("Based on the five day forecast") +
+                    (isElevationAdded ? Text(" and added elevation") : Text("")) +
+                    Text(", we suggest packing for ") +
+                    weatherViewModel.formatWeatherCategories(weatherCategories) +
+                    Text(" weather.")
+                }
                 
                 //MARK: - WEATHER SELECTION
                 
@@ -64,6 +64,9 @@ struct QuizPageTwoView: View {
             if let weather = weatherViewModel.weather {
                 weatherCategories = weatherViewModel.categorizeWeather(for: weather, elevation: elevation)
             }
+        }
+        .onDisappear() {
+            weatherViewModel.weather = nil // Reset weather for next packing list quiz
         }
         
     }

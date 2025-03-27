@@ -21,6 +21,8 @@ struct ListDetailCardView: View {
                     Text(viewModel.packingList.title)
                         .multilineTextAlignment(.center)
                         .font(.title2.weight(.bold))
+                        .lineLimit(3)
+                        .truncationMode(.tail)
                     Spacer()
                 }//:HSTACK
                 
@@ -29,6 +31,7 @@ struct ListDetailCardView: View {
             
         }//:VSTACK
         .padding(.vertical, Constants.cardSpacing)
+        .padding(.horizontal, Constants.cardSpacing)
         .background(
             RoundedRectangle(cornerRadius: 10)
                 .fill(Color.colorWhite)
