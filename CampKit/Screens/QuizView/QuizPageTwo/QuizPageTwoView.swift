@@ -50,10 +50,10 @@ struct QuizPageTwoView: View {
                         .font(.footnote)
                         .fontWeight(.bold)
                     Spacer()
-                }
+                }//:HSTACK
                 
                 ChipSectionView(selectedFilters: $viewModel.selectedFilters, preferenceCategory: ChoiceOptions.weatherConditions)
-                
+                Spacer()
             }//:VSTACK
             
         }//:VSTACK
