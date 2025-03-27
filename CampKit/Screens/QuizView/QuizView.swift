@@ -9,7 +9,7 @@ import SwiftUI
 import SwiftData
 
 struct QuizView: View {
-
+    
     @Environment(\.modelContext) var modelContext
     @State var viewModel: QuizViewModel
     @State var weatherViewModel = WeatherViewModel(weatherFetcher: WeatherAPIClient())
@@ -22,109 +22,117 @@ struct QuizView: View {
     @State private var isLocationSearchOpen: Bool = false
     @State private var listName: String = ""
     @State private var isElevationAdded: Bool = false
-        
+    
     
     var body: some View {
-        VStack {
-            
-            //QUIZ PAGES
-            ZStack {
-                ScrollView {
-                    if isStepOne {
-                        QuizPageOneView(viewModel: viewModel, weatherViewModel: weatherViewModel, isElevationAdded: $isElevationAdded, location: $location, elevation: $elevation, isLocationSearchOpen: $isLocationSearchOpen, isStepOne: $isStepOne, listName: $listName)
-                            .transition(.move(edge: .leading))
-                    } else {
-                        QuizPageTwoView(viewModel: viewModel, isStepOne: $isStepOne, location: $location, elevation: $elevation, isElevationAdded: $isElevationAdded)
-                            .transition(.move(edge: .trailing))
-                    }
-                }
-            }//:ZSTACK
-            
-            //NAVIGATION BUTTONS
-            
-            Spacer()
+        
+        ZStack {
             VStack {
-                ProgressIndicatorView(isStepOne: $isStepOne)
-                    .padding(.bottom, Constants.verticalSpacing)
                 
-                HStack {
-                    //Show back button only on step 2
-                    if !isStepOne {
-                        Button(action: {
-                            isStepOne = true
-                        }) {
-                            Text("Back")
-                                .frame(maxWidth: .infinity)
-                        }
-                        .buttonStyle(BigButtonWide())
-                    }
-
-                    
-                    Button(action: {
+                //QUIZ PAGES
+                ZStack {
+                    ScrollView {
                         if isStepOne {
-                            isStepOne = false
+                            QuizPageOneView(viewModel: viewModel, weatherViewModel: weatherViewModel, isElevationAdded: $isElevationAdded, location: $location, elevation: $elevation, isLocationSearchOpen: $isLocationSearchOpen, isStepOne: $isStepOne, listName: $listName)
+                                .transition(.move(edge: .leading))
                         } else {
-                            viewModel.listTitle = listName
-                            viewModel.locationName = location
-                            viewModel.createPackingList()
-                            
-                            if let packingList = viewModel.currentPackingList {
-                                currentPackingList = packingList
-                                navigateToListView = true
-                                isNewListQuizShowing = false
-                            }
+                            QuizPageTwoView(viewModel: viewModel, isStepOne: $isStepOne, location: $location, elevation: $elevation, isElevationAdded: $isElevationAdded)
+                                .transition(.move(edge: .trailing))
                         }
-                    }) {
-                        Text(isStepOne ? "Next" : "Create List")
-                            .frame(maxWidth: .infinity)
                     }
-                    .buttonStyle(BigButtonWide())
-                    .navigationDestination(isPresented: $navigateToListView) {
+                }//:ZSTACK
+                
+                
+            }//VSTACK
+            //MARK: - BUTTONS
+            .overlay(
+                VStack {
+                    Spacer()
+                    VStack {
+                        ProgressIndicatorView(isStepOne: $isStepOne)
+                            .padding(.bottom, Constants.verticalSpacing)
                         
-                        if let currentPackingList = viewModel.currentPackingList {
-                            ListView(viewModel: ListViewModel(modelContext: modelContext, packingList: currentPackingList))
-                        } else {
-                            HomeListView(modelContext: modelContext)
-                        }
-                    }//NAVIGATION DESTINATION
-                }//:HSTACK
-            }//:VSTACK
-            .padding()
-            .background(
-                Rectangle()
-                    .fill(Color.colorWhite)
-                    .shadow(color: .gray.opacity(0.2), radius: 4, x: 0, y: -4)
-            )
-            
-        }//VSTACK
-        .fullScreenCover(isPresented: $isLocationSearchOpen, content: {
+                        HStack {
+                            if !isStepOne {
+                                Button(action: {
+                                    isStepOne = true
+                                }) {
+                                    Text("Back")
+                                        .frame(maxWidth: .infinity)
+                                }
+                                .buttonStyle(BigButtonWide())
+                            }
+                            
+                            Button(action: {
+                                if isStepOne {
+                                    isStepOne = false
+                                } else {
+                                    viewModel.listTitle = listName
+                                    viewModel.locationName = location
+                                    viewModel.createPackingList()
+                                    
+                                    if let packingList = viewModel.currentPackingList {
+                                        currentPackingList = packingList
+                                        navigateToListView = true
+                                        isNewListQuizShowing = false
+                                    }
+                                }
+                            }) {
+                                Text(isStepOne ? "Next" : "Create List")
+                                    .frame(maxWidth: .infinity)
+                            }
+                            .buttonStyle(BigButtonWide())
+                            .navigationDestination(isPresented: $navigateToListView) {
+                                if let currentPackingList = viewModel.currentPackingList {
+                                    ListView(viewModel: ListViewModel(modelContext: modelContext, packingList: currentPackingList))
+                                } else {
+                                    HomeListView(modelContext: modelContext)
+                                }
+                            }
+                        }//:HSTACK
+                        .padding(.bottom)
+                    }
+                    .padding()
+                    .background(
+                        Rectangle()
+                            .fill(Color.colorWhite)
+                            .shadow(color: .gray.opacity(0.2), radius: 4, x: 0, y: -4)
+                    )
+                }
+                .ignoresSafeArea(.keyboard, edges: .bottom)
+            )//:OVERLAY
             
             //MARK: - LOCATION SEARCH
-            
-            VStack(alignment: .leading, spacing: Constants.cardSpacing) {
-                LocationSearchView(location: $location, isLocationSearchOpen: $isLocationSearchOpen)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .background(Color.white)
-                    .transition(.move(edge: .trailing))
-                    .animation(.easeInOut(duration: 0.3), value: isLocationSearchOpen)
-            }
-        })
-        .toolbar {
-            ToolbarItem(placement: .topBarLeading) {
-                Button {
-                    isNewListQuizShowing = false
-                    isStepOne = true
-                } label: {
-                    Image(systemName: "xmark")
-                        .font(.footnote)
-                        .fontWeight(.bold)
-                        .tint(Color.accent)
+            .fullScreenCover(isPresented: $isLocationSearchOpen, content: {
+                
+                VStack(alignment: .leading, spacing: Constants.cardSpacing) {
+                    LocationSearchView(location: $location, isLocationSearchOpen: $isLocationSearchOpen)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .background(Color.white)
+                        .transition(.move(edge: .trailing))
+                        .animation(.easeInOut(duration: 0.3), value: isLocationSearchOpen)
+                }
+            })
+            //MARK: - MENU
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                        isNewListQuizShowing = false
+                        isStepOne = true
+                    } label: {
+                        Image(systemName: "xmark")
+                            .font(.footnote)
+                            .fontWeight(.bold)
+                            .tint(Color.accent)
+                    }
                 }
             }
-        }
-        .onDisappear {
-            isStepOne = true
-        }
+            .onDisappear {
+                isStepOne = true
+            }
+            .ignoresSafeArea(.keyboard)
+        }//:ZSTACK
+        .ignoresSafeArea(edges: .bottom)
     }//:BODY
 }
 

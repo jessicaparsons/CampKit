@@ -119,9 +119,7 @@ class ListViewModel: ObservableObject {
     func deleteList(dismiss: DismissAction) {
         withAnimation {
             
-            for category in packingList.categories {
-                modelContext.delete(category)
-            }
+            packingList.categories.removeAll()
             
             modelContext.delete(packingList)
             saveContext()

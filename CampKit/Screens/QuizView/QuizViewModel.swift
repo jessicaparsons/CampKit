@@ -42,7 +42,7 @@ class QuizViewModel {
             // inserts the choices into the context
             let newPackingList = PackingList(
                 title: listTitle.isEmpty ? "My Packing List" : listTitle,
-                locationName: locationName,
+                locationName: locationName.isEmpty ? "No Location Set" : locationName,
                 latitude: latitude,
                 longitude: longitude,
                 elevation: elevation)
