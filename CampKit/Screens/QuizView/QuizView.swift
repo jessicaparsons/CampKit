@@ -81,13 +81,6 @@ struct QuizView: View {
                                     .frame(maxWidth: .infinity)
                             }
                             .buttonStyle(BigButtonWide())
-                            .navigationDestination(isPresented: $navigateToListView) {
-                                if let currentPackingList = viewModel.currentPackingList {
-                                    ListView(viewModel: ListViewModel(modelContext: modelContext, packingList: currentPackingList))
-                                } else {
-                                    HomeListView(modelContext: modelContext)
-                                }
-                            }
                         }//:HSTACK
                         .padding(.bottom)
                     }

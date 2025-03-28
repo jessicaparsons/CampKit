@@ -10,7 +10,7 @@ import SwiftUI
 struct UpgradeToProView: View {
     
     @Binding var isUpgradeToProShowing: Bool
-    @ObservedObject var storeKitManager: StoreKitManager
+    @Bindable var storeKitManager: StoreKitManager
     
     var body: some View {
         

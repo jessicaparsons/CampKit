@@ -8,10 +8,11 @@
 import SwiftUI
 import StoreKit
 
+@Observable
 @MainActor
-class StoreKitManager: ObservableObject {
+class StoreKitManager {
     
-    @Published var isUnlimitedListsUnlocked: Bool = false
+    var isUnlimitedListsUnlocked: Bool = false
     private var updates: Task<Void, Never>? = nil
     
     init() {

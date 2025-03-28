@@ -12,19 +12,20 @@ struct HomeListView: View {
     
     @Environment(\.modelContext) var modelContext
     @State private var viewModel: HomeListViewModel
+    @Bindable var storeKitManager: StoreKitManager
     @Query(sort: \PackingList.dateCreated, order: .reverse) private var packingLists: [PackingList]
-    @StateObject private var storeKitManager = StoreKitManager()
-    @State private var isNewListQuizShowing: Bool = false
-    @State private var isStepOne: Bool = true
-    @State private var location: String = ""
-    @State private var isUpgradeToProShowing: Bool = false
-    @State private var navigateToListView = false
-    @State private var currentPackingList: PackingList?
     
-    init(modelContext: ModelContext) {
+    @State private var location: String = ""
+    
+    @Binding var isNewListQuizShowing: Bool
+    @Binding var isUpgradeToProShowing: Bool
+    
+    init(modelContext: ModelContext, storeKitManager: StoreKitManager, isNewListQuizShowing: Binding<Bool>, isUpgradeToProShowing: Binding<Bool>) {
         let viewModel = HomeListViewModel(modelContext: modelContext)
         _viewModel = State(wrappedValue: viewModel)
-        
+        self.storeKitManager = storeKitManager
+        _isNewListQuizShowing = isNewListQuizShowing
+        _isUpgradeToProShowing = isUpgradeToProShowing
     }
     
     var body: some View {
@@ -124,24 +125,6 @@ struct HomeListView: View {
                     .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
                     
                 }//:LIST
-                .sheet(isPresented: $isNewListQuizShowing) {
-                    NavigationStack {
-                        QuizView(
-                            viewModel: QuizViewModel(modelContext: modelContext),
-                            isNewListQuizShowing: $isNewListQuizShowing,
-                            isStepOne: $isStepOne,
-                            navigateToListView: $navigateToListView,
-                            currentPackingList: $currentPackingList
-                        )
-                    }
-                }
-                .navigationDestination(isPresented: $navigateToListView) {
-                    if let packingList = currentPackingList {
-                        ListView(viewModel: ListViewModel(modelContext: modelContext, packingList: packingList))
-                    } else {
-                        Text("No packing list available.")
-                    }
-                }
                 .sheet(isPresented: $isUpgradeToProShowing) {
                     UpgradeToProView(isUpgradeToProShowing: $isUpgradeToProShowing, storeKitManager: storeKitManager)
                 }
@@ -163,6 +146,11 @@ struct HomeListView: View {
 
 
 #Preview("Sample Data") {
+    
+    @Previewable @State var isNewListQuizShowing: Bool = false
+    @Previewable @State var isUpgradeToProShowing: Bool = false
+    @Previewable @Bindable var storeKitManager = StoreKitManager()
+
     let container = try! ModelContainer(
         for: PackingList.self, Category.self, Item.self,
         configurations: ModelConfiguration(isStoredInMemoryOnly: true)
@@ -170,7 +158,7 @@ struct HomeListView: View {
     
     preloadPackingListData(context: container.mainContext)
     
-    return HomeListView(modelContext: container.mainContext)
+    return HomeListView(modelContext: container.mainContext, storeKitManager: storeKitManager, isNewListQuizShowing: $isNewListQuizShowing, isUpgradeToProShowing: $isUpgradeToProShowing)
         .modelContainer(container)
         .environment(\.modelContext, container.mainContext)
 }
@@ -178,12 +166,16 @@ struct HomeListView: View {
 
 #Preview("Empty List") {
     
+    @Previewable @State var isNewListQuizShowing: Bool = false
+    @Previewable @State var isUpgradeToProShowing: Bool = false
+    @Previewable @Bindable var storeKitManager = StoreKitManager()
+    
     let container = try! ModelContainer(
         for: PackingList.self, Category.self, Item.self,
         configurations: ModelConfiguration(isStoredInMemoryOnly: true)
     )
     
-    return HomeListView(modelContext: container.mainContext)
+    return HomeListView(modelContext: container.mainContext, storeKitManager: storeKitManager, isNewListQuizShowing: $isNewListQuizShowing, isUpgradeToProShowing: $isUpgradeToProShowing)
         .modelContainer(container)
         .environment(\.modelContext, container.mainContext)
 }
