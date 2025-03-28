@@ -69,7 +69,7 @@ struct WeatherModuleView: View {
         }//:GROUPBOX
         .backgroundStyle(LinearGradient(gradient: Gradient(colors: [
             Color.colorTan,
-            Color.colorSky
+            Color.colorTan
         ]),
             startPoint: .topLeading,
             endPoint: .bottomTrailing))
