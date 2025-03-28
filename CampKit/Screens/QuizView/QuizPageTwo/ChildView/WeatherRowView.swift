@@ -20,7 +20,7 @@ struct WeatherRowView: View {
             GridItem(.fixed(80), alignment: .leading), // High Temp
             GridItem(.fixed(80), alignment: .leading)  // Low Temp
         ]) {
-            Image(systemName: symbol)
+            Text(symbol)
             Text(day)
             Text("H: \(highTemp)°")
             Text("L: \(lowTemp)°F")
