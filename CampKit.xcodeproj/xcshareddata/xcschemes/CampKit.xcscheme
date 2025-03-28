@@ -68,6 +68,13 @@
             ReferencedContainer = "container:CampKit.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
+      <EnvironmentVariables>
+         <EnvironmentVariable
+            key = "CG_NUMERICS_SHOW_BACKTRACE"
+            value = "1"
+            isEnabled = "YES">
+         </EnvironmentVariable>
+      </EnvironmentVariables>
       <StoreKitConfigurationFileReference
          identifier = "../../CampKit/StoreKit/Configuration.storekit/Configuration.storekit">
       </StoreKitConfigurationFileReference>
