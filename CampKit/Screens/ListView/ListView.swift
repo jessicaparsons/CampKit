@@ -18,6 +18,7 @@ struct ListView: View {
     @State private var bannerImageItem: PhotosPickerItem?
     @State private var bannerImage: UIImage? // Saves to SwiftData
     @State private var isEditing: Bool = false
+    @State private var isShowingDeleteConfirmation: Bool = false
     
     @State private var scrollOffset: CGFloat = 0
     private let scrollThreshold: CGFloat = 1
@@ -43,6 +44,7 @@ struct ListView: View {
                             viewModel: viewModel, isEditingTitle: $viewModel.isEditingTitle
                         )
                         .offset(y: -40)
+                        
                         
                     //MARK: - LIST CATEGORIES
                         
@@ -96,7 +98,7 @@ struct ListView: View {
                 }
                 .confirmationDialog(
                     "Are you sure you want to delete this list?",
-                    isPresented: $viewModel.showDeleteConfirmation,
+                    isPresented: $isShowingDeleteConfirmation,
                     titleVisibility: .visible
                 ) {
                     Button("Delete", role: .destructive) {
@@ -188,7 +190,7 @@ struct ListView: View {
                 
                 // Delete List
                 Button(role: .destructive) {
-                    viewModel.showDeleteConfirmation = true
+                    isShowingDeleteConfirmation = true
                 } label: {
                     Label("Delete List", systemImage: "trash")
                 }

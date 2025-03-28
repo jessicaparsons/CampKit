@@ -19,7 +19,6 @@ class ListViewModel: ObservableObject {
     @Published var globalExpandCollapseAction = UUID() // Trigger for animation
     @Published var isRearranging: Bool = false
     @Published var isEditingTitle: Bool = false
-    @Published var showDeleteConfirmation: Bool = false
     @Published var showPhotoPicker: Bool = false
     @Published var draggedCategory: Category?
     
@@ -90,10 +89,6 @@ class ListViewModel: ObservableObject {
     
     func deleteCategory(_ category: Category) {
         withAnimation {
-//            // Delete items associated with the category
-//            for item in category.items {
-//                modelContext.delete(item)
-//            }
             
             // Remove the category from the packing list
             packingList.categories.removeAll { $0.id == category.id }

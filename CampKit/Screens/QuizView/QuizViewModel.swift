@@ -72,6 +72,10 @@ class QuizViewModel {
         }
     }
     
+    func resetSelections() {
+        selectedFilters.removeAll()
+    }
+    
     private func saveContext() {
         do {
             try modelContext.save()
