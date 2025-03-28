@@ -23,7 +23,6 @@ struct QuizView: View {
     @State private var listName: String = ""
     @State private var isElevationAdded: Bool = false
     
-    
     var body: some View {
         
         ZStack {
@@ -126,6 +125,16 @@ struct QuizView: View {
                             .tint(Color.accent)
                     }
                 }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        resetQuiz()
+                    } label: {
+                        Text("Clear All")
+                            .font(.footnote)
+                            .fontWeight(.bold)
+                            .tint(Color.accent)
+                    }
+                }
             }
             .onDisappear {
                 isStepOne = true
@@ -134,6 +143,16 @@ struct QuizView: View {
         }//:ZSTACK
         .ignoresSafeArea(edges: .bottom)
     }//:BODY
+    
+    private func resetQuiz() {
+        location = ""
+        elevation = 0.0
+        isLocationSearchOpen = false
+        listName = ""
+        isElevationAdded = false
+        
+        viewModel.resetSelections()
+    }
 }
 
 
@@ -149,6 +168,9 @@ struct QuizView: View {
         for: PackingList.self, Category.self, Item.self,
         configurations: ModelConfiguration(isStoredInMemoryOnly: true)
     )
-    QuizView(viewModel: QuizViewModel(modelContext: container.mainContext), isNewListQuizShowing: $isNewListQuizShowing, isStepOne: $isStepOne, navigateToListView: $navigateToListView, currentPackingList: $currentPackingList)
-        .environment(WeatherViewModel(weatherFetcher: WeatherAPIClient()))
+    
+    NavigationStack {
+        QuizView(viewModel: QuizViewModel(modelContext: container.mainContext), isNewListQuizShowing: $isNewListQuizShowing, isStepOne: $isStepOne, navigateToListView: $navigateToListView, currentPackingList: $currentPackingList)
+            .environment(WeatherViewModel(weatherFetcher: WeatherAPIClient()))
+    }
 }
