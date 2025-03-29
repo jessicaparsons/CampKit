@@ -21,10 +21,11 @@ struct CategoriesListView: View {
                         }
                 } else if viewModel.packingList.categories.isEmpty {
                     ContentUnavailableView(
-                        "No Lists Available",
-                        systemImage: "plus.circle",
-                        description: Text("Add a new list to get started")
+                        "Fresh Start",
+                        systemImage: "tent",
+                        description: Text("Add a new category to get started")
                     )
+                    .padding(.top, Constants.emptyContentSpacing)
                 } else {
                     ForEach(viewModel.packingList.categories.sorted(by: { $0.position < $1.position })) { category in
                         
@@ -46,6 +47,31 @@ struct CategoriesListView: View {
                 }
             }//:LAZY VSTACK
             .offset(y: -30)    }
+}
+
+#Preview("Empty") {
+    // Create an in-memory ModelContainer
+    let container = try! ModelContainer(
+        for: PackingList.self, Category.self, Item.self,
+        configurations: ModelConfiguration(isStoredInMemoryOnly: true) // In-memory for preview
+    )
+    
+    // Populate the container with mock data
+    preloadPackingListData(context: container.mainContext)
+    
+    // Fetch a sample PackingList
+    let samplePackingList = PackingList(title: "None", photo: nil, dateCreated: Date(), locationName: "None", latitude: nil, longitude: nil, elevation: nil)
+    
+    // Create a mock ListViewModel
+    let viewModel = ListViewModel(modelContext: container.mainContext, packingList: samplePackingList)
+    
+    // Return the preview
+    return ScrollView {
+        LazyVStack {
+            CategoriesListView(viewModel: viewModel)
+                .modelContainer(container)
+        }
+    }
 }
 
 #Preview {

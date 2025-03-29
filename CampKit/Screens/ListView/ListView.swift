@@ -64,7 +64,7 @@ struct ListView: View {
                                 scrollOffset = geo.frame(in: .global).minY
                             }
                     }
-                )
+                )//Hide navigation title until scroll
                 .toolbar {
                     ToolbarItem(placement: .navigationBarTrailing) {
                         optionsMenu
@@ -121,6 +121,7 @@ struct ListView: View {
     
     private var addCategoryButton: some View {
         HStack {
+            Spacer()
             Button { viewModel.addNewCategory()
             } label: {
                 HStack {
