@@ -45,7 +45,8 @@ class QuizViewModel {
                 locationName: locationName.isEmpty ? "No Location Set" : locationName,
                 latitude: latitude,
                 longitude: longitude,
-                elevation: elevation)
+                elevation: elevation
+            )
             
             //Generate recommended categories and items
             let categories = generateCategories(from: newPackingList)
@@ -62,6 +63,23 @@ class QuizViewModel {
             print("✅ Setting currentPackingList successful: \(currentPackingList != nil)")
         }
         
+    }
+    
+    func createBlankPackingList() {
+        withAnimation {
+            let newPackingList = PackingList(
+                title: "My Packing List",
+                locationName: "No Location Set",
+                latitude: latitude,
+                longitude: longitude,
+                elevation: elevation
+            )
+            
+            modelContext.insert(newPackingList)
+            saveContext()
+            
+            currentPackingList = newPackingList
+        }
     }
     
     func toggleSelection(_ filter: String) {

@@ -52,16 +52,28 @@ struct QuizView: View {
                             .padding(.bottom, Constants.verticalSpacing)
                         
                         HStack {
-                            if !isStepOne {
-                                Button(action: {
-                                    isStepOne = true
-                                }) {
-                                    Text("Back")
-                                        .frame(maxWidth: .infinity)
-                                }
-                                .buttonStyle(BigButtonWide())
-                            }
+                            //MARK: - BLANK LIST / BACK BUTTON
                             
+                            Button(action: {
+                                if !isStepOne {
+                                    isStepOne = true
+                                } else {
+                                    viewModel.createBlankPackingList()
+                                    
+                                    if let packingList = viewModel.currentPackingList {
+                                        currentPackingList = packingList
+                                        navigateToListView = true
+                                        isNewListQuizShowing = false
+                                    }
+                                }
+                                    
+                            }) {
+                                Text(isStepOne ? "New Blank List" : "Back")
+                                    .frame(maxWidth: .infinity)
+                            }
+                            .buttonStyle(BigButtonWide())
+                            
+                            //MARK: - NEXT / CREATE LIST BUTTON
                             Button(action: {
                                 if isStepOne {
                                     isStepOne = false

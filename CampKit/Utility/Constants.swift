@@ -18,6 +18,7 @@ struct Constants {
     static let verticalSpacing: CGFloat = 10
     static let lineSpacing: CGFloat = 5
     static let cardSpacing: CGFloat = 20
+    static let emptyContentSpacing: CGFloat = 40
     static let horizontalPadding: CGFloat = 20
     
 }
