@@ -13,7 +13,7 @@ struct ListDetailCardView: View {
     @Binding var isEditingTitle: Bool
         
     var body: some View {
-        // Section for Updating List Name
+        //MARK: - LIST NAME
         VStack(spacing: 6) {
             HStack {
                 HStack {
@@ -25,9 +25,22 @@ struct ListDetailCardView: View {
                         .truncationMode(.tail)
                     Spacer()
                 }//:HSTACK
-                
+        //MARK: - LIST LOCATION
             }//:HSTACK
             Text(viewModel.packingList.locationName ?? "No Location Set")
+            
+        //MARK: - PROGRESS BAR
+            
+            HStack {
+                ProgressView(value: packedRatio)
+                    .padding(.top, 6)
+                    .padding(.trailing, 6)
+                    .progressViewStyle(LinearProgressViewStyle(tint: .colorNeon))
+                    .animation(.easeInOut, value: packedRatio)
+                Text("\(packedCount)/\(allItems.count)")
+                    .font(.subheadline)
+            }//:HSTCK
+            .padding(.horizontal, Constants.horizontalPadding)
             
         }//:VSTACK
         .padding(.vertical, Constants.cardSpacing)
@@ -43,8 +56,21 @@ struct ListDetailCardView: View {
         .onTapGesture {
             isEditingTitle = true
         }
+    }//:BODY
+    
+    private var allItems: [Item] {
+        viewModel.packingList.categories.flatMap( \.items )
     }
-}
+    
+    private var packedCount: Int {
+        allItems.filter { $0.isPacked }.count
+    }
+    
+    private var packedRatio: Double {
+        allItems.isEmpty ? 0 : Double(packedCount) / Double(allItems.count)
+    }
+    
+}//:STRUCT
 
 
 

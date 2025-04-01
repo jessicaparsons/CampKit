@@ -24,6 +24,7 @@ struct EditableItemView: View {
             HStack {
                 Button(action: {
                     togglePacked()
+                    HapticsManager.shared.triggerLightImpact()
                 }) {
                     let packedColor = viewModel.packedCircleColor(for: item)
                     Image(systemName: packedColor.systemName)
