@@ -50,6 +50,7 @@ struct ListView: View {
                         
                         CategoriesListView(viewModel: viewModel)
                         addCategoryButton
+                    
                         
                     }//:VSTACK
                     .padding(.horizontal)
