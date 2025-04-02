@@ -30,18 +30,27 @@ struct ListDetailCardView: View {
             Text(viewModel.packingList.locationName ?? "No Location Set")
             
         //MARK: - PROGRESS BAR
-            
-            HStack {
-                ProgressView(value: packedRatio)
-                    .padding(.top, 6)
-                    .padding(.trailing, 6)
-                    .progressViewStyle(LinearProgressViewStyle(tint: .colorNeon))
-                    .animation(.easeInOut, value: packedRatio)
-                Text("\(packedCount)/\(allItems.count)")
-                    .font(.subheadline)
-            }//:HSTCK
+            GeometryReader { geo in
+                HStack {
+                    Spacer()
+                    HStack {
+                        ProgressView(value: packedRatio)
+                            .progressViewStyle(LinearProgressViewStyle(tint: .colorNeon))
+                            .animation(.easeInOut, value: packedRatio)
+                    }//:HSTACK
+                    .frame(width: geo.size.width * 0.8)
+                    
+                    HStack {
+                        Text("\(packedCount)/\(allItems.count)")
+                            .font(.subheadline)
+                        Spacer()
+                    }//:HSTACK
+                    .frame(width: geo.size.width * 0.2)
+                    Spacer()
+                                        
+                }//:HSTACK
+            }//:GEOMETRY READER
             .padding(.horizontal, Constants.horizontalPadding)
-            
         }//:VSTACK
         .padding(.vertical, Constants.cardSpacing)
         .padding(.horizontal, Constants.cardSpacing)
