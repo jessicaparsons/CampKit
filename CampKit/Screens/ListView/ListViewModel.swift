@@ -21,6 +21,8 @@ class ListViewModel: ObservableObject {
     @Published var isEditingTitle: Bool = false
     @Published var showPhotoPicker: Bool = false
     @Published var draggedCategory: Category?
+    @Published var isConfettiVisible: Bool = false
+    @Published var trigger: Int = 0
     
     init(modelContext: ModelContext, packingList: PackingList) {
         self.modelContext = modelContext
@@ -150,15 +152,19 @@ class ListViewModel: ObservableObject {
             category.items.allSatisfy { $0.isPacked }
         }
     }
-
+    
+    @MainActor
     func toggleAllItems() {
         if areAllItemsChecked {
             uncheckAllItems()
         } else {
             checkAllItems()
+            isConfettiVisible = true
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                self.trigger += 1
+            }
         }
     }
-    
     
     func checkAllItems() {
         for category in packingList.categories {
@@ -178,12 +184,22 @@ class ListViewModel: ObservableObject {
         saveContext()
     }
     
+    @MainActor
     func togglePacked(for item: Item) {
-            withAnimation {
-                item.isPacked.toggle()
-                saveContext()
+        withAnimation {
+            item.isPacked.toggle()
+            saveContext()
+        }
+        
+        if areAllItemsChecked {
+            isConfettiVisible = true
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                self.trigger += 1
             }
         }
+            
+    }
     
     func shareList() {
         print("Sharing the list!")

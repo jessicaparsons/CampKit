@@ -8,9 +8,10 @@
 import SwiftUI
 import SwiftData
 import PhotosUI
+import ConfettiSwiftUI
 
 struct ListView: View {
-
+    
     @Environment(\.dismiss) private var dismiss
     @StateObject private var viewModel: ListViewModel
     
@@ -19,7 +20,8 @@ struct ListView: View {
     @State private var bannerImage: UIImage? // Saves to SwiftData
     @State private var isEditing: Bool = false
     @State private var isShowingDeleteConfirmation: Bool = false
-    
+    @State private var isShowingToggleAllItemsConfirmation: Bool = false
+        
     @State private var scrollOffset: CGFloat = 0
     private let scrollThreshold: CGFloat = 1
     
@@ -27,96 +29,135 @@ struct ListView: View {
     init(viewModel: ListViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
     }
-   
+    
     var body: some View {
         NavigationStack {
-            ScrollView {
-                VStack {
+            ZStack {
+                ScrollView {
                     
-                    //MARK: - BANNER IMAGE
-                    BannerImageView(viewModel: viewModel, bannerImage: $bannerImage)
-                        .frame(maxWidth: .infinity) // Ensure full width
-                        .listRowInsets(EdgeInsets()) // Remove extra padding
-                    
-                    //MARK: - LIST DETAILS HEADER
                     VStack {
-                        ListDetailCardView(
-                            viewModel: viewModel, isEditingTitle: $viewModel.isEditingTitle
-                        )
-                        .offset(y: -40)
                         
+                        //MARK: - BANNER IMAGE
+                        BannerImageView(viewModel: viewModel, bannerImage: $bannerImage)
+                            .frame(maxWidth: .infinity) // Ensure full width
+                            .listRowInsets(EdgeInsets()) // Remove extra padding
                         
-                    //MARK: - LIST CATEGORIES
-                        
-                        CategoriesListView(viewModel: viewModel)
-                        addCategoryButton
-                    
-                        
+                        //MARK: - LIST DETAILS HEADER
+                        VStack {
+                            ListDetailCardView(
+                                viewModel: viewModel, isEditingTitle: $viewModel.isEditingTitle
+                            )
+                            .offset(y: -40)
+                            
+                            
+                            //MARK: - LIST CATEGORIES
+                            
+                            CategoriesListView(viewModel: viewModel)
+                            addCategoryButton
+                            
+                            
+                        }//:VSTACK
+                        .padding(.horizontal)
                     }//:VSTACK
-                    .padding(.horizontal)
-                }//:VSTACK
+                }//:SCROLLVIEW
                 .background(Color.colorTan)
-                .navigationTitle(viewModel.packingList.title)
-                .navigationBarTitleDisplayMode(.inline)
-                .background(
-                    GeometryReader { geo in
-                        Color.clear
-                            .onChange(of: geo.frame(in: .global).minY) {
-                                scrollOffset = geo.frame(in: .global).minY
-                            }
-                    }
-                )//Hide navigation title until scroll
-                .toolbar {
-                    ToolbarItem(placement: .navigationBarTrailing) {
-                        optionsMenu
-                    }
-                    // This makes the title invisible until scrolled
-                    ToolbarItem(placement: .principal) {
-                        Text(viewModel.packingList.title)
-                            .opacity(scrollOffset < -scrollThreshold ? 1 : 0)
-                            .animation(scrollOffset < -scrollThreshold ? .default : .none, value: scrollOffset < -scrollThreshold)
-
-                    }
-                }
-                .photosPicker(isPresented: $isPhotoPickerPresented, selection: $bannerImageItem, matching: .images)
-                    .onChange(of: bannerImageItem) {
-                        Task {
-                            if let data = try? await bannerImageItem?.loadTransferable(type: Data.self),
-                               let loadedImage = UIImage(data: data)
-                            {
-                                bannerImage = loadedImage
-                                viewModel.packingList.photo = data  // Save to SwiftData PackingList Model
-                                viewModel.saveContext()
-                                
-                            } else {
-                                print("Failed to load image")
-                            }
-                        }
-                    }
-                .sheet(isPresented: $viewModel.isRearranging) {
-                    RearrangeCategoriesView(viewModel: viewModel)
-                        .environmentObject(viewModel)
-                }
-                .confirmationDialog(
-                    "Are you sure you want to delete this list?",
-                    isPresented: $isShowingDeleteConfirmation,
-                    titleVisibility: .visible
-                ) {
-                    Button("Delete", role: .destructive) {
-                        viewModel.deleteList(dismiss: dismiss) // Perform delete
-                    }
-                    Button("Cancel", role: .cancel) { }
-                }
-                .onTapGesture {
-                    hideKeyboard()
-                }
-            }//:SCROLLVIEW
+                .ignoresSafeArea(edges: .top)
+                
+                //MARK: - CONFETTI ANIMATION
+                VStack {
+                    if viewModel.isConfettiVisible {
+                        Text("🔥")
+                            .font(.largeTitle)
+                            .transition(.opacity)
+                            .confettiCannon(
+                                trigger: $viewModel.trigger,
+                                num:1,
+                                confettis: [.text("🔥")],
+                                confettiSize: 8,
+                                rainHeight: 0,
+                                radius: 150,
+                                repetitions: 10,
+                                repetitionInterval: 0.1,
+                                hapticFeedback: true)
+                    }//:CONDITION
+                }//:VSTACK
+            }//:ZSTACK
+            .animation(.easeIn(duration: 0.2), value: viewModel.isConfettiVisible)
             .background(Color.colorTan)
-            .ignoresSafeArea(edges: .top)
+            .navigationTitle(viewModel.packingList.title)
+            .navigationBarTitleDisplayMode(.inline)
+            .background(
+                GeometryReader { geo in
+                    Color.clear
+                        .onChange(of: geo.frame(in: .global).minY) {
+                            scrollOffset = geo.frame(in: .global).minY
+                        }
+                }
+            )//Hide navigation title until scroll
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    optionsMenu
+                }
+                // This makes the title invisible until scrolled
+                ToolbarItem(placement: .principal) {
+                    Text(viewModel.packingList.title)
+                        .opacity(scrollOffset < -scrollThreshold ? 1 : 0)
+                        .animation(scrollOffset < -scrollThreshold ? .default : .none, value: scrollOffset < -scrollThreshold)
+                    
+                }
+            }
+            .photosPicker(isPresented: $isPhotoPickerPresented, selection: $bannerImageItem, matching: .images)
+            .onChange(of: bannerImageItem) {
+                Task {
+                    if let data = try? await bannerImageItem?.loadTransferable(type: Data.self),
+                       let loadedImage = UIImage(data: data)
+                    {
+                        bannerImage = loadedImage
+                        viewModel.packingList.photo = data  // Save to SwiftData PackingList Model
+                        viewModel.saveContext()
+                        
+                    } else {
+                        print("Failed to load image")
+                    }
+                }
+            }
+            .onChange(of: viewModel.trigger) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                    viewModel.isConfettiVisible = false
+                }
+            }
+            .sheet(isPresented: $viewModel.isRearranging) {
+                RearrangeCategoriesView(viewModel: viewModel)
+                    .environmentObject(viewModel)
+            }
+            .confirmationDialog(
+                viewModel.areAllItemsChecked ? "Are you sure you want to uncheck all items?" : "Are you sure you want to check all items?",
+                isPresented: $isShowingToggleAllItemsConfirmation,
+                titleVisibility: .visible
+            ) {
+                Button(viewModel.areAllItemsChecked ? "Uncheck All" : "Check All") {
+                    viewModel.toggleAllItems()
+                    isShowingToggleAllItemsConfirmation = false
+                }
+                
+                Button("Cancel", role: .cancel) { }
+            }
+            .confirmationDialog(
+                "Are you sure you want to delete this list?",
+                isPresented: $isShowingDeleteConfirmation,
+                titleVisibility: .visible
+            ) {
+                Button("Delete", role: .destructive) {
+                    viewModel.deleteList(dismiss: dismiss) // Perform delete
+                }
+                Button("Cancel", role: .cancel) { }
+            }
+            .onTapGesture {
+                hideKeyboard()
+            }
         }//:NAVIGATION STACK
         
     }//:BODY
-    
     
     //MARK: - ADD CATEGORY BUTTON
     
@@ -141,10 +182,11 @@ struct ListView: View {
     //MARK: - OPTIONS MENU
     
     private var optionsMenu: some View {
-       
+        
         HStack {
+            //MARK: - CHECK ALL ITEMS BUTTON
             Button(action: {
-                viewModel.toggleAllItems()
+                isShowingToggleAllItemsConfirmation = true
             }) {
                 Label(
                     viewModel.areAllItemsChecked ? "Check All" : "Uncheck All",
@@ -152,6 +194,7 @@ struct ListView: View {
                 )
                 .foregroundStyle(scrollOffset < -scrollThreshold ? Color.primary : .white)
             }
+            //MARK: - MENU BUTTON
             Menu {
                 // Edit Title
                 Button(action: {
@@ -206,26 +249,28 @@ struct ListView: View {
     }
 }
 
+//MARK: - PREVIEWS
+
 #Preview("Sample Data") {
     NavigationStack {
         let container = try! ModelContainer(
             for: PackingList.self, Category.self, Item.self,
             configurations: ModelConfiguration(isStoredInMemoryOnly: true) // In-memory container
         )
-
+        
         // Populate the container with sample data
         preloadPackingListData(context: container.mainContext)
-
+        
         // Fetch a sample packing list from the container
         let samplePackingList = try! container.mainContext.fetch(FetchDescriptor<PackingList>()).first!
-
+        
         let viewModel = ListViewModel(modelContext: container.mainContext, packingList: samplePackingList)
         
         // Return the ListView with the in-memory container
         return ListView(viewModel: viewModel)
             .modelContainer(container)
             .environment(\.modelContext, container.mainContext)
-
+        
     }
 }
 
@@ -238,10 +283,10 @@ struct ListView: View {
         )
         
         let viewModel = ListViewModel(modelContext: container.mainContext, packingList: placeholderPackingList)
-
+        
         ListView(viewModel: viewModel)
             .modelContainer(container)
             .environment(\.modelContext, container.mainContext)
-
+        
     }
 }
