@@ -37,6 +37,8 @@ struct ListView: View {
             ZStack {
                 ScrollView {
                     
+                    
+                    
                     VStack {
                         
                         //MARK: - BANNER IMAGE
@@ -59,6 +61,15 @@ struct ListView: View {
                         }//:VSTACK
                         .padding(.horizontal)
                     }//:VSTACK
+                    .background(
+                        GeometryReader { geo in
+                            Color.clear
+                                .frame(height: 0)
+                                .onChange(of: geo.frame(in: .global).minY) {
+                                    scrollOffset = geo.frame(in: .global).minY
+                                }
+                        }
+                    )//NAV BAR UI CHANGES ON SCROLL
                 }//:SCROLLVIEW
                 .background(Color.colorTan)
                 .ignoresSafeArea(edges: .top)
@@ -92,15 +103,20 @@ struct ListView: View {
             .background(Color.colorTan)
             .navigationTitle(viewModel.packingList.title)
             .navigationBarTitleDisplayMode(.inline)
-            .background(
-                GeometryReader { geo in
-                    Color.clear
-                        .onChange(of: geo.frame(in: .global).minY) {
-                            scrollOffset = geo.frame(in: .global).minY
-                        }
-                }
-            )//Hide navigation title until scroll
+            .navigationBarBackButtonHidden(true)
             .toolbar {
+                //CUSTOM BACK BUTTON
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button {
+                        dismiss()
+                    } label: {
+                        HStack(spacing: 4) {
+                            Image(systemName: "chevron.left")
+                            Text("Back")
+                        }
+                        .dynamicForegroundStyle(trigger: scrollOffset)
+                    }
+                }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     optionsMenu
                 }
@@ -108,8 +124,6 @@ struct ListView: View {
                 ToolbarItem(placement: .principal) {
                     Text(viewModel.packingList.title)
                         .opacity(scrollOffset < -scrollThreshold ? 1 : 0)
-                        .animation(scrollOffset < -scrollThreshold ? .default : .none, value: scrollOffset < -scrollThreshold)
-                    
                 }
             }
             .photosPicker(isPresented: $isPhotoPickerPresented, selection: $bannerImageItem, matching: .images)
@@ -167,7 +181,6 @@ struct ListView: View {
                 hideKeyboard()
             }
         }//:NAVIGATION STACK
-        
     }//:BODY
     
     //MARK: - ADD CATEGORY BUTTON
@@ -193,7 +206,6 @@ struct ListView: View {
     //MARK: - OPTIONS MENU
     
     private var optionsMenu: some View {
-        
         HStack {
             //MARK: - CHECK ALL ITEMS BUTTON
             Button(action: {
@@ -203,7 +215,7 @@ struct ListView: View {
                     viewModel.areAllItemsChecked ? "Check All" : "Uncheck All",
                     systemImage: viewModel.areAllItemsChecked ? "checkmark.circle.fill" : "checkmark.circle"
                 )
-                .foregroundStyle(scrollOffset < -scrollThreshold ? Color.primary : .white)
+                .dynamicForegroundStyle(trigger: scrollOffset)
             }
             //MARK: - MENU BUTTON
             Menu {
@@ -253,10 +265,9 @@ struct ListView: View {
                 
             } label: {
                 Label("Options", systemImage: "ellipsis.circle")
-                    .foregroundStyle(scrollOffset < -scrollThreshold ? Color.primary : .white)
+                    .dynamicForegroundStyle(trigger: scrollOffset)
             }
         }
-        .tint(.white)
     }
 }
 
