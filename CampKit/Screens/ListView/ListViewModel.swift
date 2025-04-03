@@ -18,7 +18,6 @@ class ListViewModel: ObservableObject {
     @Published var globalIsExpanded: Bool = false
     @Published var globalExpandCollapseAction = UUID() // Trigger for animation
     @Published var isRearranging: Bool = false
-    @Published var isEditingTitle: Bool = false
     @Published var showPhotoPicker: Bool = false
     @Published var draggedCategory: Category?
     @Published var isConfettiVisible: Bool = false

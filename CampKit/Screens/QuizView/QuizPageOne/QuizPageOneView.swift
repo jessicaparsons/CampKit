@@ -55,115 +55,11 @@ struct QuizPageOneView: View {
                         }
                 }//:VSTACK
                 
-                //MARK: - WHO'S GOING?
-                VStack(alignment: .leading, spacing: Constants.cardSpacing) {
-                    
-                    HStack(alignment:.bottom) {
-                        Text("Who's going?")
-                            .font(.footnote)
-                            .fontWeight(.bold)
-                        Spacer()
-                    }
-                    
-                    LazyVGrid(columns: columns, alignment: .center) {
-                        CardButtonView(
-                            emoji: "👨‍🦰",
-                            title: ChoiceOptions.adults,
-                            isSelected: viewModel.selectedFilters.contains(ChoiceOptions.adults),
-                            onTap: { viewModel.toggleSelection(ChoiceOptions.adults) })
-                        CardButtonView(emoji: "🧸",
-                                       title: ChoiceOptions.kids,
-                                       isSelected: viewModel.selectedFilters.contains(ChoiceOptions.kids),
-                                       onTap: { viewModel.toggleSelection(ChoiceOptions.kids) })
-                        CardButtonView(emoji: "🐶",
-                                       title: ChoiceOptions.dogs,
-                                       isSelected: viewModel.selectedFilters.contains(ChoiceOptions.dogs),
-                                       onTap: { viewModel.toggleSelection(ChoiceOptions.dogs) })
-                    }
-                    
-                }
+                participantChoices
                 
+                locationSearch
                 
-                //MARK: - WHERE YOU HEADED?
-                Group {
-                    HStack {
-                        Text("Where you headed? (optional)")
-                            .font(.footnote)
-                            .fontWeight(.bold)
-                        Spacer()
-                    }
-                    ZStack {
-                        HStack {
-                            if location == "" {
-                                Text("Search...")
-                                    .foregroundStyle(.secondary)
-                            } else {
-                                Text(location)
-                            }
-                            Spacer()
-                            Image(systemName: "magnifyingglass")
-                        }
-                        .padding(.vertical, 10)
-                        .padding(.horizontal, 15)
-                        .overlay {
-                            RoundedRectangle(cornerRadius: Constants.cornerRadius)
-                                .stroke(Color.colorSteel, lineWidth: 1)
-                        }
-                    }//:ZSTACK
-                    .onTapGesture {
-                        withAnimation {
-                            isLocationSearchOpen.toggle()
-                        }
-                    }
-                }//:GROUP
-                
-                
-                //MARK: - MODIFY ELEVATION
-                
-                VStack(alignment: .leading) {
-                    
-                    VStack(alignment: .leading, spacing: Constants.lineSpacing) {
-                        Text("Modify elevation (optional)")
-                            .font(.footnote)
-                            .fontWeight(.bold)
-                        Text("Add additional elevation for a more accurate weather prediction")
-                            .font(.caption2)
-                            .multilineTextAlignment(.leading)
-                            .foregroundStyle(.secondary)
-                    }//:VSTACK
-                    
-                    
-                    ZStack(alignment: .bottomLeading) {
-                        
-                        // Bars grow along this axis
-                        HStack(alignment: .bottom, spacing: 2) {
-                            ForEach(0..<barCount, id: \.self) { index in
-                                ElevationBarView(height: Double(index + 1) * 2) // Height increases with index
-                            }
-                        }
-                        .frame(height: 50, alignment: .bottom)
-                        .offset(x: 15, y: -18)
-                        
-                        Slider(value: $elevation, in: 0...10000, step: 100)
-                            .tint(Color.colorNeon)
-                            .onChange(of: elevation) {
-                                HapticsManager.shared.triggerLightImpact()
-                                if elevation > 0 {
-                                    isElevationAdded = true
-                                }
-                            }
-                        
-                    }//:ZSTACK
-                    
-                    HStack {
-                        Spacer()
-                        Text("+ \(Int(elevation)) ft")
-                        Spacer()
-                    }//HSTACK
-                        
-                    
-                }//:VSTACK
-                
+                elevationChanger
                 
                 //MARK: - ACTIVITIES
                 
@@ -191,6 +87,119 @@ struct QuizPageOneView: View {
         }//:ZSTACK
         
     }//:BODY
+    
+    //MARK: - WHO'S GOING
+    private var participantChoices: some View {
+        VStack(alignment: .leading, spacing: Constants.cardSpacing) {
+            
+            HStack(alignment:.bottom) {
+                Text("Who's going?")
+                    .font(.footnote)
+                    .fontWeight(.bold)
+                Spacer()
+            }
+            
+            LazyVGrid(columns: columns, alignment: .center) {
+                CardButtonView(
+                    emoji: "👨‍🦰",
+                    title: ChoiceOptions.adults,
+                    isSelected: viewModel.selectedFilters.contains(ChoiceOptions.adults),
+                    onTap: { viewModel.toggleSelection(ChoiceOptions.adults) })
+                CardButtonView(emoji: "🧸",
+                               title: ChoiceOptions.kids,
+                               isSelected: viewModel.selectedFilters.contains(ChoiceOptions.kids),
+                               onTap: { viewModel.toggleSelection(ChoiceOptions.kids) })
+                CardButtonView(emoji: "🐶",
+                               title: ChoiceOptions.dogs,
+                               isSelected: viewModel.selectedFilters.contains(ChoiceOptions.dogs),
+                               onTap: { viewModel.toggleSelection(ChoiceOptions.dogs) })
+            }
+            
+        }
+    }//:WHOISGOING
+    
+    //MARK: - WHERE YOU HEADED
+    private var locationSearch: some View {
+        Group {
+            HStack {
+                Text("Where you headed? (optional)")
+                    .font(.footnote)
+                    .fontWeight(.bold)
+                Spacer()
+            }
+            ZStack {
+                HStack {
+                    if location == "" {
+                        Text("Search...")
+                            .foregroundStyle(.secondary)
+                    } else {
+                        Text(location)
+                    }
+                    Spacer()
+                    Image(systemName: "magnifyingglass")
+                }
+                .padding(.vertical, 10)
+                .padding(.horizontal, 15)
+                .overlay {
+                    RoundedRectangle(cornerRadius: Constants.cornerRadius)
+                        .stroke(Color.colorSteel, lineWidth: 1)
+                }
+            }//:ZSTACK
+            .onTapGesture {
+                withAnimation {
+                    isLocationSearchOpen.toggle()
+                }
+            }
+        }//:GROUP
+    }//:WHEREYOUHEADED
+    
+    //MARK: - MODIFY ELEVATOIN
+    
+    private var elevationChanger: some View {
+        VStack(alignment: .leading) {
+            
+            VStack(alignment: .leading, spacing: Constants.lineSpacing) {
+                Text("Modify elevation (optional)")
+                    .font(.footnote)
+                    .fontWeight(.bold)
+                Text("Add additional elevation for a more accurate weather prediction")
+                    .font(.caption2)
+                    .multilineTextAlignment(.leading)
+                    .foregroundStyle(.secondary)
+            }//:VSTACK
+            
+            
+            ZStack(alignment: .bottomLeading) {
+                
+                // Bars grow along this axis
+                HStack(alignment: .bottom, spacing: 2) {
+                    ForEach(0..<barCount, id: \.self) { index in
+                        ElevationBarView(height: Double(index + 1) * 2) // Height increases with index
+                    }
+                }
+                .frame(height: 50, alignment: .bottom)
+                .offset(x: 15, y: -18)
+                
+                Slider(value: $elevation, in: 0...10000, step: 100)
+                    .tint(Color.colorNeon)
+                    .onChange(of: elevation) {
+                        HapticsManager.shared.triggerLightImpact()
+                        if elevation > 0 {
+                            isElevationAdded = true
+                        }
+                    }
+                
+            }//:ZSTACK
+            
+            HStack {
+                Spacer()
+                Text("+ \(Int(elevation)) ft")
+                Spacer()
+            }//HSTACK
+                
+            
+        }//:VSTACK
+    }//:ELEVATIONCHANGER
     
 }
 
