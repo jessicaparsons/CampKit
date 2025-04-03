@@ -21,6 +21,8 @@ struct ListView: View {
     @State private var isEditing: Bool = false
     @State private var isShowingDeleteConfirmation: Bool = false
     @State private var isShowingToggleAllItemsConfirmation: Bool = false
+    @State private var fireScale: CGFloat = 0.1
+    @State private var isEditingTitle: Bool = false
         
     @State private var scrollOffset: CGFloat = 0
     private let scrollThreshold: CGFloat = 1
@@ -44,9 +46,7 @@ struct ListView: View {
                         
                         //MARK: - LIST DETAILS HEADER
                         VStack {
-                            ListDetailCardView(
-                                viewModel: viewModel, isEditingTitle: $viewModel.isEditingTitle
-                            )
+                            ListDetailCardView(viewModel: viewModel)
                             .offset(y: -40)
                             
                             
@@ -67,8 +67,15 @@ struct ListView: View {
                 VStack {
                     if viewModel.isConfettiVisible {
                         Text("🔥")
-                            .font(.largeTitle)
-                            .transition(.opacity)
+                            .font(.system(size: 50))
+                            .scaleEffect(fireScale)
+                            .shadow(color: .black.opacity(0.3), radius: 10, x: 0, y: 2)
+                            .onAppear {
+                                fireScale = 0.1
+                                withAnimation(.interpolatingSpring(stiffness: 200, damping: 8)) {
+                                    fireScale = 1.0
+                                }
+                            }
                             .confettiCannon(
                                 trigger: $viewModel.trigger,
                                 num:1,
@@ -82,7 +89,6 @@ struct ListView: View {
                     }//:CONDITION
                 }//:VSTACK
             }//:ZSTACK
-            .animation(.easeIn(duration: 0.2), value: viewModel.isConfettiVisible)
             .background(Color.colorTan)
             .navigationTitle(viewModel.packingList.title)
             .navigationBarTitleDisplayMode(.inline)
@@ -122,9 +128,14 @@ struct ListView: View {
                 }
             }
             .onChange(of: viewModel.trigger) {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-                    viewModel.isConfettiVisible = false
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.4) {
+                    withAnimation {
+                        viewModel.isConfettiVisible = false
+                    }
                 }
+            }
+            .sheet(isPresented: $isEditingTitle) {
+                EditListDetailsModal(packingList: viewModel.packingList)
             }
             .sheet(isPresented: $viewModel.isRearranging) {
                 RearrangeCategoriesView(viewModel: viewModel)
@@ -198,7 +209,7 @@ struct ListView: View {
             Menu {
                 // Edit Title
                 Button(action: {
-                    viewModel.isEditingTitle.toggle()
+                    isEditingTitle.toggle()
                 }) {
                     Label("Edit List Details", systemImage: "pencil")
                 }

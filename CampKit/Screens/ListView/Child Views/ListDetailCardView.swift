@@ -10,7 +10,10 @@ import SwiftData
 
 struct ListDetailCardView: View {
     @ObservedObject var viewModel: ListViewModel
-    @Binding var isEditingTitle: Bool
+    
+    //Map Options
+    @State private var showMapOptions = false
+    let locationQuery = "1 Infinite Loop, Cupertino, CA"
         
     var body: some View {
         //MARK: - LIST NAME
@@ -27,30 +30,12 @@ struct ListDetailCardView: View {
                 }//:HSTACK
         //MARK: - LIST LOCATION
             }//:HSTACK
-            Text(viewModel.packingList.locationName ?? "No Location Set")
+            
+            listLocation
             
         //MARK: - PROGRESS BAR
-            GeometryReader { geo in
-                HStack {
-                    Spacer()
-                    HStack {
-                        ProgressView(value: packedRatio)
-                            .progressViewStyle(LinearProgressViewStyle(tint: .colorNeon))
-                            .animation(.easeInOut, value: packedRatio)
-                    }//:HSTACK
-                    .frame(width: geo.size.width * 0.8)
-                    
-                    HStack {
-                        Text("\(packedCount)/\(allItems.count)")
-                            .font(.subheadline)
-                        Spacer()
-                    }//:HSTACK
-                    .frame(width: geo.size.width * 0.2)
-                    Spacer()
-                                        
-                }//:HSTACK
-            }//:GEOMETRY READER
-            .padding(.horizontal, Constants.horizontalPadding)
+            progressBar
+            
         }//:VSTACK
         .padding(.vertical, Constants.cardSpacing)
         .padding(.horizontal, Constants.cardSpacing)
@@ -59,13 +44,62 @@ struct ListDetailCardView: View {
                 .fill(Color.colorWhite)
                 .shadow(color: .gray.opacity(0.2), radius: 4, x: 0, y: 2)
         )
-        .sheet(isPresented: $isEditingTitle) {
-            EditListDetailsModal(packingList: viewModel.packingList)
-        }
-        .onTapGesture {
-            isEditingTitle = true
-        }
     }//:BODY
+    
+    
+    private var listLocation: some View {
+        HStack {
+            Text(viewModel.packingList.locationName ?? "No Location Set")
+            
+            if viewModel.packingList.locationName != nil {
+                Image(systemName: "arrow.up.right.square").foregroundColor(.colorSage)
+            }
+        }//:HSTACK
+        .onTapGesture {
+            if viewModel.packingList.locationName != nil {
+                showMapOptions = true
+            }
+        }
+        .confirmationDialog("Open location in:", isPresented: $showMapOptions, titleVisibility: .visible) {
+            
+            if let location = viewModel.packingList.locationName {
+                Button("Apple Maps") {
+                    openInAppleMaps(query: location)
+                }
+                
+                Button("Google Maps") {
+                    openInGoogleMaps(query: location)
+                }
+                
+                Button("Cancel", role: .cancel) {}
+            }
+        }
+    }
+    
+    private var progressBar: some View {
+        GeometryReader { geo in
+            HStack {
+                Spacer()
+                HStack {
+                    ProgressView(value: packedRatio)
+                        .progressViewStyle(LinearProgressViewStyle(tint: .colorNeon))
+                        .animation(.easeInOut, value: packedRatio)
+                }//:HSTACK
+                .frame(width: geo.size.width * 0.8)
+                
+                HStack {
+                    Text("\(packedCount)/\(allItems.count)")
+                        .font(.subheadline)
+                    Spacer()
+                }//:HSTACK
+                .frame(width: geo.size.width * 0.2)
+                Spacer()
+                                    
+            }//:HSTACK
+        }//:GEOMETRY READER
+        .padding(.horizontal, Constants.horizontalPadding)
+        .frame(height: 20)
+    }
     
     private var allItems: [Item] {
         viewModel.packingList.categories.flatMap( \.items )
@@ -79,13 +113,31 @@ struct ListDetailCardView: View {
         allItems.isEmpty ? 0 : Double(packedCount) / Double(allItems.count)
     }
     
+    //MARK: - FUNCTIONS
+    private func openInAppleMaps(query: String) {
+        let encodedQuery = query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+        if let url = URL(string: "http://maps.apple.com/?q=\(encodedQuery)") {
+            UIApplication.shared.open(url)
+        }
+    }
+
+    private func openInGoogleMaps(query: String) {
+        let encodedQuery = query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+        if let url = URL(string: "comgooglemaps://?q=\(encodedQuery)"),
+           UIApplication.shared.canOpenURL(url) {
+            UIApplication.shared.open(url)
+        } else if let fallbackURL = URL(string: "https://www.google.com/maps/search/?api=1&query=\(encodedQuery)") {
+            UIApplication.shared.open(fallbackURL)
+        }
+    }
+    
+    
 }//:STRUCT
 
 
 
 #Preview {
-        // Define a mock `isEditingTitle` state
-        @Previewable @State var isEditingTitle: Bool = false
+
 
         // Create an in-memory ModelContainer
         let container = try! ModelContainer(
@@ -103,6 +155,12 @@ struct ListDetailCardView: View {
         let viewModel = ListViewModel(modelContext: container.mainContext, packingList: samplePackingList)
         
         // Return the preview
-        return ListDetailCardView(viewModel: viewModel, isEditingTitle: $isEditingTitle)
-                .modelContainer(container) // Provide the ModelContainer
+    return ZStack {
+        
+        Color(.black)
+            .ignoresSafeArea()
+        ListDetailCardView(viewModel: viewModel)
+            .modelContainer(container) // Provide the ModelContainer
+        
+    }
 }

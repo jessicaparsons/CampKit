@@ -79,7 +79,11 @@ struct QuizView: View {
                                     isStepOne = false
                                 } else {
                                     viewModel.listTitle = listName
-                                    viewModel.locationName = location
+                                    
+                                    if location != "" {
+                                        viewModel.locationName = location
+                                    }
+                                    
                                     viewModel.createPackingList()
                                     
                                     if let packingList = viewModel.currentPackingList {

@@ -10,6 +10,8 @@ import SwiftData
 struct EditListDetailsModal: View {
     @Bindable var packingList: PackingList
     @Environment(\.dismiss) var dismiss
+    @State var isLocationSearchOpen: Bool = false
+    @State private var locationPlaceholder: String = ""
     
     var body: some View {
         NavigationStack {
@@ -24,18 +26,30 @@ struct EditListDetailsModal: View {
                 HStack {
                     Text("Location")
                     Spacer()
-                    TextField(
-                        "Enter location",
-                        text: Binding(
-                            get: { packingList.locationName ?? "" },        // Provide default empty string if nil
-                            set: { packingList.locationName = $0.isEmpty ? nil : $0 } // Set to nil if empty
-                        )
-                    )
-                    .multilineTextAlignment(.trailing)
+                    
+                    Text(locationPlaceholder)
+                        .multilineTextAlignment(.trailing)
+                        .onTapGesture {
+                            isLocationSearchOpen = true
+                        }
                 }
-
             }//:FORM
             .navigationTitle("Edit List Details")
+            .onAppear {
+                locationPlaceholder = packingList.locationName ?? "Enter Location"
+            }
+            //MARK: - LOCATION SEARCH
+            .fullScreenCover(isPresented: $isLocationSearchOpen, content: {
+                
+                VStack(alignment: .leading, spacing: Constants.cardSpacing) {
+                    LocationSearchView(location: $locationPlaceholder,
+                                       isLocationSearchOpen: $isLocationSearchOpen)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .background(Color.white)
+                        .transition(.move(edge: .trailing))
+                        .animation(.easeInOut(duration: 0.3), value: isLocationSearchOpen)
+                }
+            })
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") {
@@ -45,7 +59,7 @@ struct EditListDetailsModal: View {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Save") {
                         packingList.title = packingList.title.trimmingCharacters(in: .whitespacesAndNewlines)
-                        packingList.locationName = packingList.locationName?.trimmingCharacters(in: .whitespacesAndNewlines)
+                        packingList.locationName = locationPlaceholder.trimmingCharacters(in: .whitespacesAndNewlines)
                         dismiss()
                     }
                 }
