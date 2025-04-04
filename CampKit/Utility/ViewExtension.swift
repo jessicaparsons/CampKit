@@ -13,7 +13,7 @@ extension View {
     }
     
     func dynamicForegroundStyle(trigger: CGFloat, threshold: CGFloat = 1) -> some View {
-        self.foregroundStyle(trigger < -threshold ? Color.black : Color.white)
+        self.foregroundStyle(trigger < -threshold ? Color.primary : Color.white)
     }
 }
 

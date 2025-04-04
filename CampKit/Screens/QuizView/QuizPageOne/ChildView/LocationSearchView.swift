@@ -11,7 +11,8 @@ struct LocationSearchView: View {
     
     @Environment(\.dismiss) private var dismiss
     @State var locationSearchService = LocationSearchService()
-    @Binding var location: String
+    @Binding var locationName: String
+    @Binding var locationAddress: String
     @Binding var isLocationSearchOpen: Bool
     
     var body: some View {
@@ -23,7 +24,8 @@ struct LocationSearchView: View {
                 } else {
                     List(locationSearchService.results) { result in
                         Button {
-                            location = result.title
+                            locationName = result.title
+                            locationAddress = result.subtitle
                             isLocationSearchOpen = false
                         } label: {
                             VStack(alignment: .leading) {
@@ -53,7 +55,8 @@ struct LocationSearchView: View {
 
 #Preview {
     
-    @Previewable @State var location: String = ""
+    @Previewable @State var locationName: String = ""
+    @Previewable @State var locationAddress: String = ""
     @Previewable @State var isLocationSearchOpen: Bool = true
-    LocationSearchView(location: $location, isLocationSearchOpen: $isLocationSearchOpen)
+    LocationSearchView(locationName: $locationName, locationAddress: $locationAddress, isLocationSearchOpen: $isLocationSearchOpen)
 }

@@ -50,6 +50,7 @@ struct ListDetailCardView: View {
     private var listLocation: some View {
         HStack {
             Text(viewModel.packingList.locationName ?? "No Location Set")
+                .multilineTextAlignment(.center)
             
             if viewModel.packingList.locationName != nil {
                 Image(systemName: "arrow.up.right.square").foregroundColor(.colorSage)
@@ -62,13 +63,15 @@ struct ListDetailCardView: View {
         }
         .confirmationDialog("Open location in:", isPresented: $showMapOptions, titleVisibility: .visible) {
             
-            if let location = viewModel.packingList.locationName {
+            if let locationName = viewModel.packingList.locationName,
+               let locationAddress = viewModel.packingList.locationAddress
+            {
                 Button("Apple Maps") {
-                    openInAppleMaps(query: location)
+                    openInAppleMaps(query: locationName + ", " + locationAddress)
                 }
                 
                 Button("Google Maps") {
-                    openInGoogleMaps(query: location)
+                    openInGoogleMaps(query: locationName + ", " + locationAddress)
                 }
                 
                 Button("Cancel", role: .cancel) {}

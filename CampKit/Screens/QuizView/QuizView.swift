@@ -17,7 +17,8 @@ struct QuizView: View {
     @Binding var isStepOne: Bool
     @Binding var navigateToListView: Bool
     @Binding var currentPackingList: PackingList?
-    @State private var location: String = ""
+    @State private var locationName: String = ""
+    @State private var locationAddress: String = ""
     @State private var elevation: Double = 0.0
     @State private var isLocationSearchOpen: Bool = false
     @State private var listName: String = ""
@@ -32,10 +33,25 @@ struct QuizView: View {
                 ZStack {
                     ScrollView {
                         if isStepOne {
-                            QuizPageOneView(viewModel: viewModel, weatherViewModel: weatherViewModel, isElevationAdded: $isElevationAdded, location: $location, elevation: $elevation, isLocationSearchOpen: $isLocationSearchOpen, isStepOne: $isStepOne, listName: $listName)
+                            QuizPageOneView(
+                                viewModel: viewModel,
+                                weatherViewModel: weatherViewModel,
+                                isElevationAdded: $isElevationAdded,
+                                locationName: $locationName,
+                                locationAddress: $locationAddress,
+                                elevation: $elevation,
+                                isLocationSearchOpen: $isLocationSearchOpen,
+                                isStepOne: $isStepOne,
+                                listName: $listName)
                                 .transition(.move(edge: .leading))
                         } else {
-                            QuizPageTwoView(viewModel: viewModel, isStepOne: $isStepOne, location: $location, elevation: $elevation, isElevationAdded: $isElevationAdded)
+                            QuizPageTwoView(
+                                viewModel: viewModel,
+                                isStepOne: $isStepOne,
+                                locationName: $locationName,
+                                locationAddress: $locationAddress,
+                                elevation: $elevation,
+                                isElevationAdded: $isElevationAdded)
                                 .transition(.move(edge: .trailing))
                         }
                     }
@@ -80,8 +96,9 @@ struct QuizView: View {
                                 } else {
                                     viewModel.listTitle = listName
                                     
-                                    if location != "" {
-                                        viewModel.locationName = location
+                                    if locationName != "" {
+                                        viewModel.locationName = locationName
+                                        viewModel.locationAddress = locationAddress
                                     }
                                     
                                     viewModel.createPackingList()
@@ -114,7 +131,10 @@ struct QuizView: View {
             .fullScreenCover(isPresented: $isLocationSearchOpen, content: {
                 
                 VStack(alignment: .leading, spacing: Constants.cardSpacing) {
-                    LocationSearchView(location: $location, isLocationSearchOpen: $isLocationSearchOpen)
+                    LocationSearchView(
+                        locationName: $locationName,
+                        locationAddress: $locationAddress,
+                        isLocationSearchOpen: $isLocationSearchOpen)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                         .background(Color.white)
                         .transition(.move(edge: .trailing))
@@ -154,7 +174,8 @@ struct QuizView: View {
     }//:BODY
     
     private func resetQuiz() {
-        location = ""
+        locationName = ""
+        locationAddress = ""
         elevation = 0.0
         isLocationSearchOpen = false
         listName = ""
