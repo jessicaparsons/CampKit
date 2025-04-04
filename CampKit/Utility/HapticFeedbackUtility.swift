@@ -16,6 +16,7 @@ final class HapticsManager {
     private let mediumHaptics = UIImpactFeedbackGenerator(style: .medium)
     private let lightHaptics = UIImpactFeedbackGenerator(style: .light)
     private let heavyHaptics = UIImpactFeedbackGenerator(style: .heavy)
+    private let notificationHaptics = UINotificationFeedbackGenerator()
 
     func triggerMediumImpact() {
         //mediumHaptics.prepare()
@@ -30,6 +31,10 @@ final class HapticsManager {
     func triggerHeavyImpact() {
         //heavyHaptics.prepare()
         heavyHaptics.impactOccurred()
+    }
+    
+    func triggerSuccess() {
+        notificationHaptics.notificationOccurred(.success)
     }
 }
 

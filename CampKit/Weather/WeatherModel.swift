@@ -16,11 +16,11 @@ struct WeatherModel: Identifiable {
     let low: Double
     
     var highTemp: String {
-        return String(format: "%.1f", high)
+        return String(format: "%.0f", high)
     }
     
     var lowTemp: String {
-        return String(format: "%.1f", low)
+        return String(format: "%.0f", low)
     }
     
     var conditionName: String {

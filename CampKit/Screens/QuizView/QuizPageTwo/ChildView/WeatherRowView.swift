@@ -25,7 +25,7 @@ struct WeatherRowView: View {
             Text("H: \(highTemp)°")
             Text("L: \(lowTemp)°F")
         }
-        .font(.footnote)
+        .font(.subheadline)
         .padding(0)
     }
 }

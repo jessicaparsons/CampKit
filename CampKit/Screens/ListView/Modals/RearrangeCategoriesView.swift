@@ -14,24 +14,32 @@ struct RearrangeCategoriesView: View {
 
     var body: some View {
         NavigationStack {
-           List {
-                // Access categories from the ViewModel
-                ForEach(viewModel.packingList.categories.sorted(by: { $0.position < $1.position }), id: \.id) { category in
-                    Text(category.name)
-                        .font(.headline)
-                }
-                .onMove(perform: moveCategory)
-            }
-            .navigationTitle("Rearrange Categories")
-            .toolbar {
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Done") {
-                        dismiss()
+            VStack {
+                Text("Rearrange Categories")
+                    .font(.title2)
+                    .fontWeight(.bold)
+                    .padding(.bottom, -Constants.verticalSpacing)
+                List {
+                    // Access categories from the ViewModel
+                    ForEach(viewModel.packingList.categories.sorted(by: { $0.position < $1.position }), id: \.id) { category in
+                        Text(category.name)
+                            .font(.headline)
+                    }
+                    .onMove(perform: moveCategory)
+                }//:LIST
+                .scrollContentBackground(.hidden)
+                .toolbar {
+                    ToolbarItem(placement: .confirmationAction) {
+                        Button("Done") {
+                            dismiss()
+                        }
                     }
                 }
-            }
-            .environment(\.editMode, .constant(.active)) // Enable edit mode for reordering
-        }
+                .environment(\.editMode, .constant(.active)) // Enable edit mode for reordering
+            }//:VSTACK
+            .background(Color.colorTan)
+        }//:NAVIGATION STACK
+        
     }
     
     private func moveCategory(from source: IndexSet, to destination: Int) {

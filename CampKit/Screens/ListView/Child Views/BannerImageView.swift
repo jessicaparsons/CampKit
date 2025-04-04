@@ -24,6 +24,9 @@ struct BannerImageView: View {
                 .scaledToFill()
                 .frame(height: 200, alignment: .center)
                 .clipped()
+            
+            Color.black.opacity(0.2)
+                .ignoresSafeArea()
         }
         .ignoresSafeArea(edges: .horizontal)
     }
