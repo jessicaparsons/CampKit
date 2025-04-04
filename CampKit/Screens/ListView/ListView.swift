@@ -23,6 +23,7 @@ struct ListView: View {
     @State private var isShowingToggleAllItemsConfirmation: Bool = false
     @State private var fireScale: CGFloat = 0.1
     @State private var isEditingTitle: Bool = false
+    @State private var isShowingDuplicationConfirmation: Bool = false
         
     @State private var scrollOffset: CGFloat = 0
     private let scrollThreshold: CGFloat = 1
@@ -36,9 +37,6 @@ struct ListView: View {
         NavigationStack {
             ZStack {
                 ScrollView {
-                    
-                    
-                    
                     VStack {
                         
                         //MARK: - BANNER IMAGE
@@ -99,11 +97,52 @@ struct ListView: View {
                                 hapticFeedback: true)
                     }//:CONDITION
                 }//:VSTACK
+                
+                //MARK: - DUPLICATION SUCCESS POP UP
+                if viewModel.isShowingDuplicationConfirmation {
+                        Color.black.opacity(0.3)
+                            .ignoresSafeArea()
+                            .onTapGesture {
+                                dismiss()
+                            }
+                            .onAppear() {
+                                HapticsManager.shared.triggerSuccess()
+                            }
+
+                        VStack(spacing: 16) {
+                            Text("List Duplicated")
+                                .font(.headline)
+                                .padding(.top)
+
+                            Text("Your list has been successfully duplicated.")
+                                .font(.subheadline)
+                                .multilineTextAlignment(.center)
+                                .foregroundStyle(.secondary)
+                                .padding(.horizontal)
+
+                            Divider()
+
+                            Button("OK") {
+                                withAnimation {
+                                    dismiss()
+                                }
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding(.bottom)
+                            .padding(.horizontal)
+                        }
+                        .background(RoundedRectangle(cornerRadius: 16).fill(Color(.secondarySystemBackground)))
+                        .padding(.horizontal, 40)
+                        .transition(.scale.combined(with: .opacity))
+                    }//:DUPLICATION CONFIRMATION
+                
             }//:ZSTACK
             .background(Color.colorTan)
             .navigationTitle(viewModel.packingList.title)
             .navigationBarTitleDisplayMode(.inline)
             .navigationBarBackButtonHidden(true)
+            .animation(.easeOut(duration: 0.3), value: viewModel.isShowingDuplicationConfirmation)
+
             .toolbar {
                 //CUSTOM BACK BUTTON
                 ToolbarItem(placement: .navigationBarLeading) {
@@ -150,10 +189,12 @@ struct ListView: View {
             }
             .sheet(isPresented: $isEditingTitle) {
                 EditListDetailsModal(packingList: viewModel.packingList)
+                    .presentationDetents([.medium, .large])
             }
             .sheet(isPresented: $viewModel.isRearranging) {
                 RearrangeCategoriesView(viewModel: viewModel)
                     .environmentObject(viewModel)
+                    .presentationDetents([.medium, .large])
             }
             .confirmationDialog(
                 viewModel.areAllItemsChecked ? "Are you sure you want to uncheck all items?" : "Are you sure you want to check all items?",
@@ -163,6 +204,18 @@ struct ListView: View {
                 Button(viewModel.areAllItemsChecked ? "Uncheck All" : "Check All") {
                     viewModel.toggleAllItems()
                     isShowingToggleAllItemsConfirmation = false
+                }
+                
+                Button("Cancel", role: .cancel) { }
+            }
+            .confirmationDialog(
+                "Are you sure you want to duplicate the list?",
+                isPresented: $isShowingDuplicationConfirmation,
+                titleVisibility: .visible
+            ) {
+                Button("Duplicate") {
+                    viewModel.duplicateList()
+                    isShowingDuplicationConfirmation = false
                 }
                 
                 Button("Cancel", role: .cancel) { }
@@ -202,6 +255,7 @@ struct ListView: View {
         .listRowBackground(Color.colorTan)
         .offset(y: -20)//mine
     }
+    
     
     //MARK: - OPTIONS MENU
     
@@ -254,6 +308,13 @@ struct ListView: View {
                     }
                 }) {
                     Label("Collapse All", systemImage: "rectangle.compress.vertical")
+                }
+                
+                // Duplicate List
+                Button {
+                    isShowingDuplicationConfirmation = true
+                } label: {
+                    Label("Duplicate List", systemImage: "doc.on.doc")
                 }
                 
                 // Delete List

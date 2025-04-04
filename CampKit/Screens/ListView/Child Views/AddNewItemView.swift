@@ -20,6 +20,9 @@ struct AddNewItemView: View {
             Image(systemName: "plus.circle")
                 .foregroundColor(.gray)
                 .font(.system(size: 22))
+                .onTapGesture {
+                    isFocused = true
+                }
             TextField("Add new item", text: $newItemText)
                 .focused($isFocused)
                 .textFieldStyle(.plain)
@@ -28,7 +31,7 @@ struct AddNewItemView: View {
                     newItemText = ""
                     isFocused = false
                 }
-            if !newItemText.isEmpty {
+            if isFocused {
                 Button {
                     viewModel.addItem(to: category, itemTitle: newItemText)
                     newItemText = ""

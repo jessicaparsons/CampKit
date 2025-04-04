@@ -22,6 +22,7 @@ class ListViewModel: ObservableObject {
     @Published var draggedCategory: Category?
     @Published var isConfettiVisible: Bool = false
     @Published var trigger: Int = 0
+    @Published var isShowingDuplicationConfirmation: Bool = false
     
     init(modelContext: ModelContext, packingList: PackingList) {
         self.modelContext = modelContext
@@ -114,7 +115,38 @@ class ListViewModel: ObservableObject {
             saveContext()
     }
     
-    //MARK: - DELETE LIST
+    //MARK: - MODIFY LIST
+    
+    
+    func duplicateList() {
+        let duplicatedPackingList = PackingList(
+            title: packingList.title + " Copy",
+            locationName: packingList.locationName,
+            locationAddress: packingList.locationAddress,
+            latitude: packingList.latitude,
+            longitude: packingList.longitude,
+            elevation: packingList.elevation
+        )
+        
+        duplicatedPackingList.photo = packingList.photo
+        
+        // Duplicate categories and items
+        for category in packingList.categories {
+            let newCategory = Category(name: category.name, position: category.position)
+            for item in category.items {
+                let newItem = Item(title: item.title, isPacked: item.isPacked)
+                newItem.position = item.position
+                newCategory.items.append(newItem)
+            }
+            duplicatedPackingList.categories.append(newCategory)
+        }
+        
+        //Save
+        modelContext.insert(duplicatedPackingList)
+        saveContext()
+        
+        isShowingDuplicationConfirmation = true
+    }
     
     @MainActor
     func deleteList(dismiss: DismissAction) {

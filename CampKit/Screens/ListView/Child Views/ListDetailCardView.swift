@@ -88,14 +88,14 @@ struct ListDetailCardView: View {
                         .progressViewStyle(LinearProgressViewStyle(tint: .colorNeon))
                         .animation(.easeInOut, value: packedRatio)
                 }//:HSTACK
-                .frame(width: geo.size.width * 0.8)
+                .frame(width: geo.size.width * 0.75)
                 
                 HStack {
                     Text("\(packedCount)/\(allItems.count)")
                         .font(.subheadline)
                     Spacer()
                 }//:HSTACK
-                .frame(width: geo.size.width * 0.2)
+                .frame(width: geo.size.width * 0.25)
                 Spacer()
                                     
             }//:HSTACK
