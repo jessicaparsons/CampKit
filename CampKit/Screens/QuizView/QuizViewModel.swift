@@ -20,6 +20,7 @@ class QuizViewModel {
     
     var listTitle: String = "New Packing List"
     var locationName: String = ""
+    var locationAddress: String = ""
     var latitude: Double?
     var longitude: Double?
     var elevation: Double = 0
@@ -43,6 +44,7 @@ class QuizViewModel {
             let newPackingList = PackingList(
                 title: listTitle.isEmpty ? "My Packing List" : listTitle,
                 locationName: locationName.isEmpty ? nil : locationName,
+                locationAddress: locationAddress.isEmpty ? nil : locationAddress,
                 latitude: latitude,
                 longitude: longitude,
                 elevation: elevation
@@ -69,7 +71,8 @@ class QuizViewModel {
         withAnimation {
             let newPackingList = PackingList(
                 title: "My Packing List",
-                locationName: locationName.isEmpty ? nil : locationName,
+                locationName: nil,
+                locationAddress: nil,
                 latitude: latitude,
                 longitude: longitude,
                 elevation: elevation

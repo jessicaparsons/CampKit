@@ -11,7 +11,6 @@ import SwiftData
 struct WeatherModuleView: View {
     
     @Environment(WeatherViewModel.self) private var weatherViewModel
-    @Binding var location: String
     
     var body: some View {
         GroupBox {
@@ -78,7 +77,8 @@ struct WeatherModuleView: View {
 
 #Preview("Quiz Page Two") {
     @Previewable @State var isStepOne: Bool = false
-    @Previewable @State var location: String = "Paris"
+    @Previewable @State var locationName: String = "Paris"
+    @Previewable @State var locationAddress: String = "France"
     @Previewable @State var elevation: Double = 0.0
     @Previewable @State var isElevationAdded: Bool = true
     
@@ -87,7 +87,7 @@ struct WeatherModuleView: View {
         for: PackingList.self, Category.self, Item.self,
         configurations: ModelConfiguration(isStoredInMemoryOnly: true)
     )
-    QuizPageTwoView(viewModel: QuizViewModel(modelContext: container.mainContext), isStepOne: $isStepOne, location: $location, elevation: $elevation, isElevationAdded: $isElevationAdded)
+    QuizPageTwoView(viewModel: QuizViewModel(modelContext: container.mainContext), isStepOne: $isStepOne, locationName: $locationName, locationAddress: $locationAddress, elevation: $elevation, isElevationAdded: $isElevationAdded)
         .environment(WeatherViewModel(weatherFetcher: WeatherAPIClient()))
 }
 
@@ -95,6 +95,6 @@ struct WeatherModuleView: View {
 #Preview {
     
     @Previewable @State var location: String = "Los Angeles"
-    WeatherModuleView(location: $location)
+    WeatherModuleView()
         .environment(WeatherViewModel(weatherFetcher: WeatherAPIClient()))
 }

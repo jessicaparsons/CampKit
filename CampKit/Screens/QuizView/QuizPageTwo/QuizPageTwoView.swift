@@ -13,7 +13,8 @@ struct QuizPageTwoView: View {
     @Environment(WeatherViewModel.self) private var weatherViewModel
     @State var viewModel: QuizViewModel
     @Binding var isStepOne: Bool
-    @Binding var location: String
+    @Binding var locationName: String
+    @Binding var locationAddress: String
     @Binding var elevation: Double
     @Binding var isElevationAdded: Bool
     @State private var weatherCategories: Set<String> = []
@@ -31,11 +32,11 @@ struct QuizPageTwoView: View {
             //MARK: - WEATHER DISPLAY
             VStack(alignment: .leading, spacing: Constants.cardSpacing) {
                 
-                WeatherModuleView(location: $location)
+                WeatherModuleView()
                 
                 //MARK: - WEATHER SUGGESTION
                 
-                if !location.isEmpty {
+                if !locationName.isEmpty {
                     Text("Based on the five day forecast") +
                     (isElevationAdded ? Text(" and added elevation") : Text("")) +
                     Text(", we suggest packing for ") +
@@ -59,6 +60,8 @@ struct QuizPageTwoView: View {
         }//:VSTACK
         .padding(.horizontal, Constants.horizontalPadding)
         .task {
+            let location = locationName + ", " + locationAddress
+            
             await weatherViewModel.fetchLocation(for: location)
             
             if let weather = weatherViewModel.weather {
@@ -74,7 +77,8 @@ struct QuizPageTwoView: View {
 
 #Preview {
     @Previewable @State var isStepOne: Bool = false
-    @Previewable @State var location: String = ""
+    @Previewable @State var locationName: String = ""
+    @Previewable @State var locationAddress: String = ""
     @Previewable @State var elevation: Double = 0.0
     @Previewable @State var isElevationAdded: Bool = false
     
@@ -82,6 +86,6 @@ struct QuizPageTwoView: View {
         for: PackingList.self, Category.self, Item.self,
         configurations: ModelConfiguration(isStoredInMemoryOnly: true)
     )
-    QuizPageTwoView(viewModel: QuizViewModel(modelContext: container.mainContext), isStepOne: $isStepOne, location: $location, elevation: $elevation, isElevationAdded: $isElevationAdded)
+    QuizPageTwoView(viewModel: QuizViewModel(modelContext: container.mainContext), isStepOne: $isStepOne, locationName: $locationName, locationAddress: $locationAddress, elevation: $elevation, isElevationAdded: $isElevationAdded)
         .environment(WeatherViewModel(weatherFetcher: WeatherAPIClient()))
 }

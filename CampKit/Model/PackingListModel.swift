@@ -14,6 +14,7 @@ class PackingList: Identifiable {
     var photo: Data? // Optional photo for thumbnail
     var dateCreated: Date = Date()
     var locationName: String?
+    var locationAddress: String?
     var latitude: Double?
     var longitude: Double?
     var elevation: Double?
@@ -25,12 +26,14 @@ class PackingList: Identifiable {
         photo: Data? = nil,
         dateCreated: Date = Date(),
         locationName: String? = nil,
+        locationAddress: String? = nil,
         latitude: Double? = nil,
         longitude: Double? = nil,
         elevation: Double? = nil
     ) {
         self.title = title
         self.locationName = locationName
+        self.locationAddress = locationAddress
         self.latitude = latitude
         self.longitude = longitude
         self.elevation = elevation

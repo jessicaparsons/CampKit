@@ -71,6 +71,7 @@ struct CategorySectionView: View {
                     HStack {
                         Text(category.name)
                             .font(.headline)
+                            .foregroundStyle(Color.primary)
                             .multilineTextAlignment(.leading)
                             .offset(x: 7)
                         Spacer()

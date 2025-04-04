@@ -11,7 +11,16 @@ struct EditListDetailsModal: View {
     @Bindable var packingList: PackingList
     @Environment(\.dismiss) var dismiss
     @State var isLocationSearchOpen: Bool = false
-    @State private var locationPlaceholder: String = ""
+    @State private var locationNamePlaceholder: String = ""
+    @State private var locationAddressPlaceholder: String = ""
+    
+    private var fullLocation: String {
+        if locationNamePlaceholder != "" {
+            return locationNamePlaceholder + ", " + locationAddressPlaceholder
+        } else {
+            return "Add Location"
+        }
+    }
     
     var body: some View {
         NavigationStack {
@@ -26,8 +35,8 @@ struct EditListDetailsModal: View {
                 HStack {
                     Text("Location")
                     Spacer()
-                    
-                    Text(locationPlaceholder)
+                                        
+                    Text(fullLocation)
                         .multilineTextAlignment(.trailing)
                         .onTapGesture {
                             isLocationSearchOpen = true
@@ -36,13 +45,15 @@ struct EditListDetailsModal: View {
             }//:FORM
             .navigationTitle("Edit List Details")
             .onAppear {
-                locationPlaceholder = packingList.locationName ?? "Enter Location"
+                locationNamePlaceholder = packingList.locationName ?? ""
+                locationAddressPlaceholder = packingList.locationAddress ?? ""
             }
             //MARK: - LOCATION SEARCH
             .fullScreenCover(isPresented: $isLocationSearchOpen, content: {
                 
                 VStack(alignment: .leading, spacing: Constants.cardSpacing) {
-                    LocationSearchView(location: $locationPlaceholder,
+                    LocationSearchView(locationName: $locationNamePlaceholder,
+                                       locationAddress: $locationAddressPlaceholder,
                                        isLocationSearchOpen: $isLocationSearchOpen)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                         .background(Color.white)
@@ -59,7 +70,8 @@ struct EditListDetailsModal: View {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Save") {
                         packingList.title = packingList.title.trimmingCharacters(in: .whitespacesAndNewlines)
-                        packingList.locationName = locationPlaceholder.trimmingCharacters(in: .whitespacesAndNewlines)
+                        packingList.locationName = locationNamePlaceholder.trimmingCharacters(in: .whitespacesAndNewlines)
+                        packingList.locationAddress = locationAddressPlaceholder.trimmingCharacters(in: .whitespacesAndNewlines)
                         dismiss()
                     }
                 }

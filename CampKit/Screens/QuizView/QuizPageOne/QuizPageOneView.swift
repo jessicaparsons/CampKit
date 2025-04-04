@@ -14,7 +14,8 @@ struct QuizPageOneView: View {
     @State var weatherViewModel: WeatherViewModel
     @State private var isShowingElevationPopover: Bool = true
     @Binding var isElevationAdded: Bool
-    @Binding var location: String
+    @Binding var locationName: String
+    @Binding var locationAddress: String
     @Binding var elevation: Double
     @Binding var isLocationSearchOpen: Bool
     @Binding var isStepOne: Bool
@@ -118,7 +119,7 @@ struct QuizPageOneView: View {
         }
     }//:WHOISGOING
     
-    //MARK: - WHERE YOU HEADED
+    //MARK: - LOCATION SEARCH
     private var locationSearch: some View {
         Group {
             HStack {
@@ -129,11 +130,11 @@ struct QuizPageOneView: View {
             }
             ZStack {
                 HStack {
-                    if location == "" {
+                    if locationName == "" {
                         Text("Search...")
                             .foregroundStyle(.secondary)
                     } else {
-                        Text(location)
+                        Text(locationName + ", " + locationAddress)
                     }
                     Spacer()
                     Image(systemName: "magnifyingglass")
@@ -205,7 +206,8 @@ struct QuizPageOneView: View {
 
 #Preview {
     @Previewable @State var isStepOne: Bool = true
-    @Previewable @State var location: String = "Paris"
+    @Previewable @State var locationName: String = "Paris"
+    @Previewable @State var locationAddress: String = "France"
     @Previewable @State var elevation: Double = 0.0
     @Previewable @State var isLocationSearchOpen: Bool = false
     @Previewable @State var listName: String = ""
@@ -217,6 +219,6 @@ struct QuizPageOneView: View {
     )
     
     NavigationView {
-        QuizPageOneView(viewModel: QuizViewModel(modelContext: container.mainContext), weatherViewModel: WeatherViewModel(weatherFetcher: WeatherAPIClient()), isElevationAdded: $isElevationAdded, location: $location, elevation: $elevation, isLocationSearchOpen: $isLocationSearchOpen, isStepOne: $isStepOne, listName: $listName)
+        QuizPageOneView(viewModel: QuizViewModel(modelContext: container.mainContext), weatherViewModel: WeatherViewModel(weatherFetcher: WeatherAPIClient()), isElevationAdded: $isElevationAdded, locationName: $locationName, locationAddress: $locationAddress, elevation: $elevation, isLocationSearchOpen: $isLocationSearchOpen, isStepOne: $isStepOne, listName: $listName)
     }
 }
