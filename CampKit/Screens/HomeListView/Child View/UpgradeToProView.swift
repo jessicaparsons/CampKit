@@ -9,8 +9,7 @@ import SwiftUI
 
 struct UpgradeToProView: View {
     
-    @Binding var isUpgradeToProShowing: Bool
-    @Bindable var storeKitManager: StoreKitManager
+    @Environment(StoreKitManager.self) private var storeKitManager
     
     var body: some View {
         
@@ -61,7 +60,7 @@ struct UpgradeToProView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button {
-                        isUpgradeToProShowing = false
+                        storeKitManager.isUpgradeToProShowing = false
                     } label: {
                         Image(systemName: "xmark")
                             .font(.footnote)
@@ -75,7 +74,6 @@ struct UpgradeToProView: View {
 }
 
 #Preview {
-    @Previewable @State var isUpgradeToProShowing: Bool = true
     
-    UpgradeToProView(isUpgradeToProShowing: $isUpgradeToProShowing, storeKitManager: StoreKitManager())
+    UpgradeToProView()
 }

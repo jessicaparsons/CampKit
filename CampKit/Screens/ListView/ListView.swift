@@ -13,6 +13,7 @@ import ConfettiSwiftUI
 struct ListView: View {
     
     @Environment(\.dismiss) private var dismiss
+    @Environment(StoreKitManager.self) private var storeKitManager
     @StateObject private var viewModel: ListViewModel
     
     @State private var isPhotoPickerPresented: Bool = false
@@ -28,9 +29,12 @@ struct ListView: View {
     @State private var scrollOffset: CGFloat = 0
     private let scrollThreshold: CGFloat = 1
     
+    let packingListsCount: Int
+    
     //Initialize ListView with its corresponding ViewModel
-    init(viewModel: ListViewModel) {
+    init(viewModel: ListViewModel, packingListsCount: Int) {
         _viewModel = StateObject(wrappedValue: viewModel)
+        self.packingListsCount = packingListsCount
     }
     
     var body: some View {
@@ -100,41 +104,12 @@ struct ListView: View {
                 
                 //MARK: - DUPLICATION SUCCESS POP UP
                 if viewModel.isShowingDuplicationConfirmation {
-                        Color.black.opacity(0.3)
-                            .ignoresSafeArea()
-                            .onTapGesture {
-                                dismiss()
-                            }
-                            .onAppear() {
-                                HapticsManager.shared.triggerSuccess()
-                            }
-
-                        VStack(spacing: 16) {
-                            Text("List Duplicated")
-                                .font(.headline)
-                                .padding(.top)
-
-                            Text("Your list has been successfully duplicated.")
-                                .font(.subheadline)
-                                .multilineTextAlignment(.center)
-                                .foregroundStyle(.secondary)
-                                .padding(.horizontal)
-
-                            Divider()
-
-                            Button("OK") {
-                                withAnimation {
-                                    dismiss()
-                                }
-                            }
-                            .frame(maxWidth: .infinity)
-                            .padding(.bottom)
-                            .padding(.horizontal)
-                        }
-                        .background(RoundedRectangle(cornerRadius: 16).fill(Color(.secondarySystemBackground)))
-                        .padding(.horizontal, 40)
-                        .transition(.scale.combined(with: .opacity))
-                    }//:DUPLICATION CONFIRMATION
+                    PopUpBoxView(
+                        isPresented: $viewModel.isShowingDuplicationConfirmation,
+                        title: "List Duplicated",
+                        subtitle: "Your list has been successfully duplicated.",
+                        buttonText: "OK")
+                }//:DUPLICATION CONFIRMATION
                 
             }//:ZSTACK
             .background(Color.colorTan)
@@ -312,7 +287,12 @@ struct ListView: View {
                 
                 // Duplicate List
                 Button {
-                    isShowingDuplicationConfirmation = true
+                    if storeKitManager.isUnlimitedListsUnlocked || packingListsCount < Constants.proVersionListCount {
+                        isShowingDuplicationConfirmation = true
+                    } else {
+                        storeKitManager.isUpgradeToProShowing = true
+                    }
+                    
                 } label: {
                     Label("Duplicate List", systemImage: "doc.on.doc")
                 }
@@ -350,7 +330,7 @@ struct ListView: View {
         let viewModel = ListViewModel(modelContext: container.mainContext, packingList: samplePackingList)
         
         // Return the ListView with the in-memory container
-        return ListView(viewModel: viewModel)
+        return ListView(viewModel: viewModel, packingListsCount: 3)
             .modelContainer(container)
             .environment(\.modelContext, container.mainContext)
         
@@ -367,7 +347,7 @@ struct ListView: View {
         
         let viewModel = ListViewModel(modelContext: container.mainContext, packingList: placeholderPackingList)
         
-        ListView(viewModel: viewModel)
+        ListView(viewModel: viewModel, packingListsCount: 3)
             .modelContainer(container)
             .environment(\.modelContext, container.mainContext)
         

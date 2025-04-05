@@ -10,13 +10,14 @@ import SwiftData
 
 @Model
 class Item: Identifiable {
-    var myID: UUID = UUID()
+    var id: UUID = UUID()
     var title: String
     var isPacked: Bool
     var position: Int?
     var category: Category? // Backlink to the parent category
     
-    init(title: String, isPacked: Bool = false) {
+    init(id: UUID = UUID(), title: String, isPacked: Bool = false) {
+        self.id = id
         self.title = title
         self.isPacked = isPacked
     }

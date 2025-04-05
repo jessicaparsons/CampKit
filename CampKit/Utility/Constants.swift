@@ -21,4 +21,6 @@ struct Constants {
     static let emptyContentSpacing: CGFloat = 40
     static let horizontalPadding: CGFloat = 20
     
+    static let proVersionListCount: Int = 3
+    
 }
