@@ -10,9 +10,8 @@ import SwipeCell
 
 struct SwipeActionModifier: ViewModifier {
     
-    var viewModel: ListViewModel
-    var item: Item
     var isFocused: Bool
+    let deleteAction: () -> Void
     
     func body(content: Content) -> some View {
         if isFocused {
@@ -37,7 +36,7 @@ struct SwipeActionModifier: ViewModifier {
                                                 )},
                                             backgroundColor: .red,
                                             action: {
-                                                viewModel.deleteItem(item)
+                                                deleteAction()
                                             },
                                             feedback:true
                                            ),

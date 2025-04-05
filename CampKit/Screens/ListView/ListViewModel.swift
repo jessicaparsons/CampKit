@@ -256,19 +256,7 @@ class ListViewModel: ObservableObject {
         print("Sharing the list!")
     }
     
-    //MARK: - UI
-    
-    func packedTextColor(for item: Item) -> Color {
-        item.isPacked ? Color.secondary : .primary
-    }
-    
-    func packedCircleColor(for item: Item) -> (systemName: String, color: Color) {
-            if item.isPacked {
-                return ("checkmark.circle.fill", Color.colorSage)
-            } else {
-                return ("circle", Color.secondary)
-            }
-    }
+  
 
     func saveContext() {
         do {

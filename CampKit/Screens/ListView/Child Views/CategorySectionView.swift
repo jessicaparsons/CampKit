@@ -26,15 +26,15 @@ struct CategorySectionView: View {
                 AddNewItemView(viewModel: viewModel, category: category)
             } else {
                 LazyVStack(spacing: 0) {
-                    //Iterate through items in the category
                     ForEach(category.sortedItems) { item in
-                        
-                        EditableItemView(
-                            viewModel: viewModel,
-                            item: item,
-                            togglePacked: {
-                                viewModel.togglePacked(for: item)
-                            })
+                        if let index = category.items.firstIndex(where: { $0.id == item.id }) {
+                            EditableItemView(
+                                item: $category.items[index].title,
+                                isPacked: category.items[index].isPacked,
+                                togglePacked: { viewModel.togglePacked(for: item) },
+                                deleteItem: { viewModel.deleteItem(item) }
+                            )
+                        }
                     }//:FOREACH
                     AddNewItemView(viewModel: viewModel, category: category)
                 }//:LAZY VSTACK
