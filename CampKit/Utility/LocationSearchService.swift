@@ -74,7 +74,7 @@ extension LocationSearchService: MKLocalSearchCompleterDelegate {
                                      subtitle.components(separatedBy: ", ").count == 2
                 
                 // Always allow nature locations
-                let natureKeywords = ["state park", "national park", "forest", "wilderness", "preserve", "recreation area"]
+                let natureKeywords = ["state park", "national park", "forest", "wilderness", "preserve", "recreation area", "campground", "camping", "camp"]
                 let isNatureLocation = natureKeywords.contains { title.contains($0) }
 
                 // Exclude businesses & street locations if it's not a nature location

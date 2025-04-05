@@ -134,7 +134,7 @@ struct HomeListView: View {
             HStack {
                 Spacer()
                 Button {
-                    if storeKitManager.isUnlimitedListsUnlocked || packingLists.count < 3 {
+                    if storeKitManager.isUnlimitedListsUnlocked || packingLists.count < 5 {
                         isNewListQuizShowing = true
                     } else {
                         isUpgradeToProShowing = true

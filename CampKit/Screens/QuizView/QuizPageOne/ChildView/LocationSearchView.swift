@@ -6,14 +6,15 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct LocationSearchView: View {
     
     @Environment(\.dismiss) private var dismiss
     @State var locationSearchService = LocationSearchService()
-    @Binding var locationName: String
-    @Binding var locationAddress: String
     @Binding var isLocationSearchOpen: Bool
+    @Binding var locationName: String?
+    @Binding var locationAddress: String?
     
     var body: some View {
         
@@ -55,8 +56,9 @@ struct LocationSearchView: View {
 
 #Preview {
     
-    @Previewable @State var locationName: String = ""
-    @Previewable @State var locationAddress: String = ""
     @Previewable @State var isLocationSearchOpen: Bool = true
-    LocationSearchView(locationName: $locationName, locationAddress: $locationAddress, isLocationSearchOpen: $isLocationSearchOpen)
+    @Previewable @State var locationNamePlaceholder: String? = "Sequoia National Forest"
+    @Previewable @State var locationAddressPlaceholder: String? = "Somwhere in the Forest, CA"
+
+    LocationSearchView(isLocationSearchOpen: $isLocationSearchOpen, locationName: $locationNamePlaceholder, locationAddress: $locationAddressPlaceholder)
 }

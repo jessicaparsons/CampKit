@@ -19,4 +19,5 @@ extension Color {
     static let customSteel = Color("ColorSteel")
     static let customTan = Color("ColorTan")
     static let customWhite = Color("ColorWhite")
+    static let customTanLight = Color("ColorTanLight")
 }

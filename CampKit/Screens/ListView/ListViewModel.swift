@@ -160,21 +160,30 @@ class ListViewModel: ObservableObject {
         }
     }
     
+    //When a new list is created, all categories will be collapsed except the first.
+    private func expandFirstCategory() {
+        
+    }
+    
     
     //MARK: - MODIFY ALL ITEMS
     
     func expandAll() {
         withAnimation {
-            globalIsExpanded = true
-            globalExpandCollapseAction = UUID()
+            for category in packingList.categories {
+                category.isExpanded = true
+            }
         }
+        saveContext()
     }
 
     func collapseAll() {
         withAnimation {
-            globalIsExpanded = false
-            globalExpandCollapseAction = UUID()
+            for category in packingList.categories {
+                category.isExpanded = false
+            }
         }
+        saveContext()
     }
     
     

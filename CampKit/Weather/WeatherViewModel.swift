@@ -27,6 +27,7 @@ class WeatherViewModel {
     
     var weather: [WeatherModel]? // 5 day forecast
     var coordinates: CLLocationCoordinate2D? // user's location input
+    var isShowingNoLocationFoundMessage: Bool = false
     
     private let weatherFetcher: WeatherFetching
     
@@ -56,9 +57,6 @@ class WeatherViewModel {
                 
                 let urlString = "\(Constants.weatherURL)?lat=\(location.latitude)&lon=\(location.longitude)&units=imperial&appid=\(Constants.apiKey)"
                 
-                print("fetchLocation called with URL: \(urlString)")
-                
-                
                 let fiveDayForecast = try await weatherFetcher.fetchWeather(with: urlString)
                 
                 await MainActor.run {
@@ -68,9 +66,10 @@ class WeatherViewModel {
             
             
         } catch let error as NetworkError {
-            print("Could not fetch location: \(error)")
+            print("Could not fetch location due to network error: \(error)")
         } catch {
             print("Could not fetch location: \(error.localizedDescription)")
+            isShowingNoLocationFoundMessage = true
         }
     }
     
@@ -100,8 +99,6 @@ class WeatherViewModel {
             avgHigh += high
             avgLow += low
             
-            print("elevation: \(elevation), high: \(day.high), low: \(day.low), elevationCompensation: \(elevationCompensation), condition: \(conditionName), high: \(high), low: \(low)")
-            
             if high >= 80 {
                 weatherCategories.insert("hot")
             }
@@ -121,9 +118,7 @@ class WeatherViewModel {
                 weatherCategories.remove("mild")
             }
         }
-        
-        print("avgHigh: \(avgHigh), avgLow: \(avgLow)")
-        
+                
         //If the average low is greater than 70, or if the average high is lower than 50, the user does not have to pack for Mild weather
         if avgLow / Double(forecast.count) > 70 || avgHigh / Double(forecast.count) < 50 {
             weatherCategories.remove("mild")

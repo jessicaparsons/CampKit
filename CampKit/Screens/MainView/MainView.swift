@@ -11,6 +11,7 @@ import SwiftData
 struct MainView: View {
     @Environment(\.modelContext) var modelContext
     @Query private var packingLists: [PackingList]
+    let weatherViewModel = WeatherViewModel(weatherFetcher: WeatherAPIClient())
     
     @State private var selection = 0
     @State private var isShowingSettings: Bool = false
@@ -90,6 +91,7 @@ struct MainView: View {
                         navigateToListView: $navigateToListView,
                         currentPackingList: $currentPackingList
                     )
+                    .environment(weatherViewModel)
                 }
             }
             .navigationDestination(isPresented: $navigateToListView) {

@@ -10,14 +10,14 @@ import SwiftData
 
 @Model
 class Category: Identifiable {
-    var myID: UUID = UUID() // Unique identifier
+    var id = UUID()
     @Attribute var name: String
     @Attribute var position: Int
     @Relationship(deleteRule: .cascade) var items: [Item]
     var packingList: PackingList?
     var isExpanded: Bool
 
-    init(name: String, position: Int, items: [Item] = [], isExpanded: Bool = true) {
+    init(name: String, position: Int, items: [Item] = [], isExpanded: Bool = false) {
         self.name = name
         self.position = position
         self.items = []

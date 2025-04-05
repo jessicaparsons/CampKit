@@ -17,8 +17,8 @@ struct WeatherRowView: View {
         LazyVGrid(columns: [
             GridItem(.fixed(30), alignment: .leading),  // Icon
             GridItem(.flexible(), alignment: .leading), // Day
-            GridItem(.fixed(80), alignment: .leading), // High Temp
-            GridItem(.fixed(80), alignment: .leading)  // Low Temp
+            GridItem(.fixed(70), alignment: .leading), // High Temp
+            GridItem(.fixed(70), alignment: .leading)  // Low Temp
         ]) {
             Text(symbol)
             Text(day)
@@ -33,8 +33,9 @@ struct WeatherRowView: View {
 #Preview("WeatherView") {
     
     @Previewable @State var location: String = "Paris"
+    @Previewable @State var isWeatherLoading: Bool = false
     
-    WeatherModuleView()
+    WeatherModuleView(isWeatherLoading: $isWeatherLoading)
         .environment(WeatherViewModel(weatherFetcher: WeatherAPIClient()))
 }
 

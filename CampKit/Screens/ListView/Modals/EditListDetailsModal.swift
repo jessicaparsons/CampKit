@@ -11,51 +11,82 @@ struct EditListDetailsModal: View {
     @Bindable var packingList: PackingList
     @Environment(\.dismiss) var dismiss
     @State var isLocationSearchOpen: Bool = false
-    @State private var locationNamePlaceholder: String = ""
-    @State private var locationAddressPlaceholder: String = ""
-    
-    private var fullLocation: String {
-        if locationNamePlaceholder != "" {
-            return locationNamePlaceholder + ", " + locationAddressPlaceholder
-        } else {
-            return "Add Location"
-        }
-    }
+    @State private var locationNamePlaceholder: String?
+    @State private var locationAddressPlaceholder: String?
     
     var body: some View {
         NavigationStack {
-            VStack {
-                Text("Edit List Details")
-                    .font(.title2)
-                    .fontWeight(.bold)
+            ZStack {
+                Color.colorTan
+                    .ignoresSafeArea()
                 
-                Form {
-                    Section("Title") {
-                        TextField("Enter new title", text: $packingList.title)
-                            .multilineTextAlignment(.leading)
+                VStack(alignment: .leading, spacing: Constants.verticalSpacing) {
+                    //MARK: - EDIT TITLE
+                    Text("Edit Title")
+                        .font(.footnote)
+                        .fontWeight(.bold)
+                    
+                    TextField("Enter new title", text: $packingList.title)
+                        .multilineTextAlignment(.leading)
+                        .padding(.vertical, 10)
+                        .padding(.horizontal, 15)
+                        .background(
+                            RoundedRectangle(cornerRadius: Constants.cornerRadius)
+                                .fill(Color.colorWhite)
+                        )
+                        .overlay {
+                            RoundedRectangle(cornerRadius: Constants.cornerRadius)
+                                .stroke(Color.colorSteel, lineWidth: 1)
+                        }
+                    
+                    //MARK: - EDIT LOCATION
+                    Text("Edit Location")
+                        .font(.footnote)
+                        .fontWeight(.bold)
+                    Text(fullLocation)
+                        .multilineTextAlignment(.leading)
+                        .lineLimit(3)
+                        .padding(.vertical, 10)
+                        .padding(.horizontal, 15)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .background(
+                            RoundedRectangle(cornerRadius: Constants.cornerRadius)
+                                .fill(Color.colorWhite)
+                        )
+                        .overlay {
+                            RoundedRectangle(cornerRadius: Constants.cornerRadius)
+                                .stroke(Color.colorSteel, lineWidth: 1)
+                        }
+                        .onTapGesture {
+                            isLocationSearchOpen = true
+                        }
+                    //MARK: - SAVE CHANGES BUTTON
+                    Button("Save Changes") {
+                        packingList.title = packingList.title.trimmingCharacters(in: .whitespacesAndNewlines)
+                        packingList.locationName = locationNamePlaceholder?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+                        packingList.locationAddress = locationAddressPlaceholder?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+                        HapticsManager.shared.triggerSuccess()
+                        dismiss()
                     }
-                    Section("Location") {
-                        Text(fullLocation)
-                            .multilineTextAlignment(.leading)
-                            .lineLimit(3)
-                            .onTapGesture {
-                                isLocationSearchOpen = true
-                            }
-                    }
-                }//:FORM
+                    .padding(.top)
+                    .buttonStyle(BigButtonWide())
+                    
+                    Spacer()
+                }//:VSTACK
+                .navigationTitle("Edit List Details")
+                .navigationBarTitleDisplayMode(.inline)
+                .padding()
                 .onAppear {
                     locationNamePlaceholder = packingList.locationName ?? ""
                     locationAddressPlaceholder = packingList.locationAddress ?? ""
                 }
                 .scrollContentBackground(.hidden)
                 
-                //MARK: - LOCATION SEARCH
+                //MARK: - LOCATION SEARCH VIEW
                 .fullScreenCover(isPresented: $isLocationSearchOpen, content: {
                     
                     VStack(alignment: .leading, spacing: Constants.cardSpacing) {
-                        LocationSearchView(locationName: $locationNamePlaceholder,
-                                           locationAddress: $locationAddressPlaceholder,
-                                           isLocationSearchOpen: $isLocationSearchOpen)
+                        LocationSearchView(isLocationSearchOpen: $isLocationSearchOpen, locationName: $locationNamePlaceholder, locationAddress: $locationAddressPlaceholder)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                         .background(Color.white)
                         .transition(.move(edge: .trailing))
@@ -68,25 +99,32 @@ struct EditListDetailsModal: View {
                             dismiss()
                         }
                     }
-                    ToolbarItem(placement: .confirmationAction) {
-                        Button("Save") {
-                            packingList.title = packingList.title.trimmingCharacters(in: .whitespacesAndNewlines)
-                            packingList.locationName = locationNamePlaceholder.trimmingCharacters(in: .whitespacesAndNewlines)
-                            packingList.locationAddress = locationAddressPlaceholder.trimmingCharacters(in: .whitespacesAndNewlines)
-                            dismiss()
-                        }
-                    }
                 }//:TOOLBAR
-            }//:VSTACK
-            .background(Color.colorTan)
+            }//:ZSTACK
         }//:NAVIGATIONSTACK
         
+    }//:BODY
+    
+    //MARK: - COMPUTED PROPERTIES
+    
+    private var fullLocation: String {
+        if let locationName = locationNamePlaceholder {
+            var fullLocation = locationName
+            
+            if let locationAddress = locationAddressPlaceholder {
+                fullLocation += ", " + locationAddress
+            }
+            
+            return fullLocation
+        } else {
+            return "Add Location"
+        }
     }
 }
 
 
 #Preview {
-    let sampleUserList = PackingList(title: "Summer List with a verylong anme", locationName: "Another very long location name and it will wrap around because it is long")
+    let sampleUserList = PackingList(title: "Summer List with a very long anme", locationName: "Joshua Tree, CA")
     NavigationStack {
         EditListDetailsModal(
             packingList: sampleUserList

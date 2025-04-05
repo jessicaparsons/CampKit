@@ -18,9 +18,6 @@ struct CategorySectionView: View {
     
     @State private var newItemText: String = ""
     @State private var isEditing: Bool = false
-    
-    let globalIsExpanded: Bool // Desired global state
-    let globalExpandCollapseAction: UUID // Unique trigger
         
     //MARK: - CATEGORY BODY
     var body: some View {
@@ -110,9 +107,6 @@ struct CategorySectionView: View {
             }//:ELSE
             
         }//:DISCLOSURE GROUP
-        .onChange(of: globalExpandCollapseAction) {
-            category.isExpanded = globalIsExpanded
-        }
         .disclosureGroupStyle(LeftDisclosureStyle())
     }//:BODY
     
@@ -177,9 +171,7 @@ struct LeftDisclosureStyle: DisclosureGroupStyle {
             viewModel: viewModel,
             category: sampleCategory,
             isRearranging: $isRearranging,
-            deleteCategory: { print("Mock delete category: \(sampleCategory.name)") },
-            globalIsExpanded: true,
-            globalExpandCollapseAction: UUID()
+            deleteCategory: { print("Mock delete category: \(sampleCategory.name)") }
         )
         .modelContainer(container) // Provide the ModelContainer
     }
@@ -212,9 +204,7 @@ struct LeftDisclosureStyle: DisclosureGroupStyle {
             viewModel: viewModel,
             category: emptyCategory,
             isRearranging: $isRearranging,
-            deleteCategory: { print("Mock delete category: \(emptyCategory.name)") },
-            globalIsExpanded: true,
-            globalExpandCollapseAction: UUID()
+            deleteCategory: { print("Mock delete category: \(emptyCategory.name)") }
         )
         .modelContainer(container) // Provide the ModelContainer
     }

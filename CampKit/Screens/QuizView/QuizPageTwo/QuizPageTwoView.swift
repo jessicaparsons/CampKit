@@ -13,11 +13,9 @@ struct QuizPageTwoView: View {
     @Environment(WeatherViewModel.self) private var weatherViewModel
     @State var viewModel: QuizViewModel
     @Binding var isStepOne: Bool
-    @Binding var locationName: String
-    @Binding var locationAddress: String
-    @Binding var elevation: Double
     @Binding var isElevationAdded: Bool
     @State private var weatherCategories: Set<String> = []
+    @State private var isWeatherLoading: Bool = false
     
     var body: some View {
         VStack(alignment: .center, spacing: Constants.cardSpacing) {
@@ -27,16 +25,17 @@ struct QuizPageTwoView: View {
                 Text("Let's get the weather")
                     .font(.title)
                     .fontWeight(.bold)
+
             }//:VSTACK
             
             //MARK: - WEATHER DISPLAY
             VStack(alignment: .leading, spacing: Constants.cardSpacing) {
                 
-                WeatherModuleView()
+                WeatherModuleView(isWeatherLoading: $isWeatherLoading)
                 
                 //MARK: - WEATHER SUGGESTION
                 
-                if !locationName.isEmpty {
+                if viewModel.locationName != nil && weatherViewModel.isShowingNoLocationFoundMessage == false {
                     Text("Based on the five day forecast") +
                     (isElevationAdded ? Text(" and added elevation") : Text("")) +
                     Text(", we suggest packing for ") +
@@ -60,13 +59,23 @@ struct QuizPageTwoView: View {
         }//:VSTACK
         .padding(.horizontal, Constants.horizontalPadding)
         .task {
-            let location = locationName + ", " + locationAddress
-            
-            await weatherViewModel.fetchLocation(for: location)
-            
-            if let weather = weatherViewModel.weather {
-                weatherCategories = weatherViewModel.categorizeWeather(for: weather, elevation: elevation)
-            }
+            if let locationName = viewModel.locationName {
+                                
+                var locationQuery = locationName
+                
+                if let locationAddress = viewModel.locationAddress {
+                    locationQuery += ", " + locationAddress
+                }
+                                
+                isWeatherLoading = true
+                
+                await weatherViewModel.fetchLocation(for: locationQuery)
+                
+                if let weather = weatherViewModel.weather {
+                    weatherCategories = weatherViewModel.categorizeWeather(for: weather, elevation: viewModel.elevation)
+                }
+                isWeatherLoading = false
+            } 
         }
         .onDisappear() {
             weatherViewModel.weather = nil // Reset weather for next packing list quiz
@@ -77,15 +86,12 @@ struct QuizPageTwoView: View {
 
 #Preview {
     @Previewable @State var isStepOne: Bool = false
-    @Previewable @State var locationName: String = ""
-    @Previewable @State var locationAddress: String = ""
-    @Previewable @State var elevation: Double = 0.0
     @Previewable @State var isElevationAdded: Bool = false
     
     let container = try! ModelContainer(
         for: PackingList.self, Category.self, Item.self,
         configurations: ModelConfiguration(isStoredInMemoryOnly: true)
     )
-    QuizPageTwoView(viewModel: QuizViewModel(modelContext: container.mainContext), isStepOne: $isStepOne, locationName: $locationName, locationAddress: $locationAddress, elevation: $elevation, isElevationAdded: $isElevationAdded)
+    QuizPageTwoView(viewModel: QuizViewModel(modelContext: container.mainContext), isStepOne: $isStepOne, isElevationAdded: $isElevationAdded)
         .environment(WeatherViewModel(weatherFetcher: WeatherAPIClient()))
 }

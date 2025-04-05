@@ -18,9 +18,9 @@ class QuizViewModel {
     
     var selectedFilters: Set<String> = []
     
-    var listTitle: String = "New Packing List"
-    var locationName: String = ""
-    var locationAddress: String = ""
+    var listTitle: String = ""
+    var locationName: String?
+    var locationAddress: String?
     var latitude: Double?
     var longitude: Double?
     var elevation: Double = 0
@@ -43,8 +43,8 @@ class QuizViewModel {
             // inserts the choices into the context
             let newPackingList = PackingList(
                 title: listTitle.isEmpty ? "My Packing List" : listTitle,
-                locationName: locationName.isEmpty ? nil : locationName,
-                locationAddress: locationAddress.isEmpty ? nil : locationAddress,
+                locationName: (locationName == nil) ? nil : locationName,
+                locationAddress: (locationAddress == nil) ? nil : locationAddress,
                 latitude: latitude,
                 longitude: longitude,
                 elevation: elevation
@@ -53,6 +53,8 @@ class QuizViewModel {
             //Generate recommended categories and items
             let categories = generateCategories(from: newPackingList)
             newPackingList.categories.append(contentsOf: categories)
+            
+            newPackingList.categories.first?.isExpanded = true
             
             //Save
             modelContext.insert(newPackingList)

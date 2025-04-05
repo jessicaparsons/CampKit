@@ -17,7 +17,7 @@ struct ElevationBarView: View {
         
         ZStack {
             Rectangle()
-                .fill(LinearGradient(gradient: Gradient(colors: [Color.colorTan, Color.colorLilac]), startPoint: .top, endPoint: .bottom))
+                .fill(LinearGradient(gradient: Gradient(colors: [Color.colorTanLight, Color.colorLilac]), startPoint: .top, endPoint: .bottom))
                 .frame(width: 15, height: CGFloat(height)) // Dynamic height
                 .scaleEffect(y: isAnimating ? 1 : 0, anchor: .bottom)
         }

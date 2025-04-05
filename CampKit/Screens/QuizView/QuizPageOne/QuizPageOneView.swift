@@ -10,21 +10,18 @@ import SwiftData
 
 struct QuizPageOneView: View {
     
+    @Environment(WeatherViewModel.self) private var weatherViewModel
     @State var viewModel: QuizViewModel
-    @State var weatherViewModel: WeatherViewModel
     @State private var isShowingElevationPopover: Bool = true
+    @FocusState var isFocused: Bool
     @Binding var isElevationAdded: Bool
-    @Binding var locationName: String
-    @Binding var locationAddress: String
-    @Binding var elevation: Double
     @Binding var isLocationSearchOpen: Bool
     @Binding var isStepOne: Bool
-    @Binding var listName: String
     
     let columns: [GridItem] = Array(repeating: .init(.flexible(), spacing: 10), count: 3)
     
     var barCount: Int {
-        Int(elevation / 500)
+        Int(viewModel.elevation / 500)
     } // Number of bars (each 550ft adds 1 bar)
     
     
@@ -46,14 +43,24 @@ struct QuizPageOneView: View {
                     Text("Name your list")
                         .font(.footnote)
                         .fontWeight(.bold)
-                    TextField("Camping List", text: $listName)
-                        .onTapGesture { print("Tapped TextField") }
-                        .padding(.vertical, 10)
-                        .padding(.horizontal, 15)
-                        .overlay {
-                            RoundedRectangle(cornerRadius: Constants.cornerRadius)
-                                .stroke(Color.colorSteel, lineWidth: 1)
+                    HStack {
+                        TextField("Camping List", text: $viewModel.listTitle)
+                            .padding(.vertical, 10)
+                            .padding(.horizontal, 15)
+                        if isFocused {
+                            Button {
+                                isFocused = false
+                            } label: {
+                                Text("Done")
+                            }
+                            .padding(.trailing)
                         }
+                    }//:HSTACK
+                    .overlay {
+                        RoundedRectangle(cornerRadius: Constants.cornerRadius)
+                            .stroke(Color.colorSteel, lineWidth: 1)
+                    }
+                    .focused($isFocused)
                 }//:VSTACK
                 
                 participantChoices
@@ -130,11 +137,15 @@ struct QuizPageOneView: View {
             }
             ZStack {
                 HStack {
-                    if locationName == "" {
-                        Text("Search...")
-                            .foregroundStyle(.secondary)
+                    if let name = viewModel.locationName {
+                        if let address = viewModel.locationAddress {
+                            Text("\(name), \(address)")
+                        } else {
+                            Text(name)
+                        }
                     } else {
-                        Text(locationName + ", " + locationAddress)
+                        Text("Search...")
+                            .foregroundColor(Color(UIColor.placeholderText))
                     }
                     Spacer()
                     Image(systemName: "magnifyingglass")
@@ -181,11 +192,11 @@ struct QuizPageOneView: View {
                 .frame(height: 50, alignment: .bottom)
                 .offset(x: 15, y: -18)
                 
-                Slider(value: $elevation, in: 0...10000, step: 100)
+                Slider(value: $viewModel.elevation, in: 0...10000, step: 100)
                     .tint(Color.colorNeon)
-                    .onChange(of: elevation) {
+                    .onChange(of: viewModel.elevation) {
                         HapticsManager.shared.triggerLightImpact()
-                        if elevation > 0 {
+                        if viewModel.elevation > 0 {
                             isElevationAdded = true
                         }
                     }
@@ -194,7 +205,7 @@ struct QuizPageOneView: View {
             
             HStack {
                 Spacer()
-                Text("+ \(Int(elevation)) ft")
+                Text("+ \(Int(viewModel.elevation)) ft")
                 Spacer()
             }//HSTACK
                 
@@ -206,11 +217,7 @@ struct QuizPageOneView: View {
 
 #Preview {
     @Previewable @State var isStepOne: Bool = true
-    @Previewable @State var locationName: String = "Paris"
-    @Previewable @State var locationAddress: String = "France"
-    @Previewable @State var elevation: Double = 0.0
     @Previewable @State var isLocationSearchOpen: Bool = false
-    @Previewable @State var listName: String = ""
     @Previewable @State var isElevationAdded: Bool = true
     
     let container = try! ModelContainer(
@@ -219,6 +226,6 @@ struct QuizPageOneView: View {
     )
     
     NavigationView {
-        QuizPageOneView(viewModel: QuizViewModel(modelContext: container.mainContext), weatherViewModel: WeatherViewModel(weatherFetcher: WeatherAPIClient()), isElevationAdded: $isElevationAdded, locationName: $locationName, locationAddress: $locationAddress, elevation: $elevation, isLocationSearchOpen: $isLocationSearchOpen, isStepOne: $isStepOne, listName: $listName)
+        QuizPageOneView(viewModel: QuizViewModel(modelContext: container.mainContext), isElevationAdded: $isElevationAdded, isLocationSearchOpen: $isLocationSearchOpen, isStepOne: $isStepOne)
     }
 }
