@@ -48,9 +48,9 @@ struct HomeListView: View {
                 if packingLists.isEmpty {
                     VStack(spacing: Constants.verticalSpacing) {
                         LazyVStack {
-                            ContentUnavailableView("Empty List", systemImage: "plus.circle", description: Text("You haven't created any lists yet. Get started!"))
+                            ContentUnavailableView("Empty List", systemImage: "tent", description: Text("You haven't created any lists yet. Get started!"))
                                 .padding(.top, Constants.emptyContentSpacing)
-                        }
+                        }//:LAZYVSTACK
                         addNewListButton
                         Spacer()
                     }//:VSTACK

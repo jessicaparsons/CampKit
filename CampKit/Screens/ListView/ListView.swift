@@ -101,23 +101,12 @@ struct ListView: View {
                                 hapticFeedback: true)
                     }//:CONDITION
                 }//:VSTACK
-                
-                //MARK: - DUPLICATION SUCCESS POP UP
-                if viewModel.isShowingDuplicationConfirmation {
-                    PopUpBoxView(
-                        isPresented: $viewModel.isShowingDuplicationConfirmation,
-                        title: "List Duplicated",
-                        subtitle: "Your list has been successfully duplicated.",
-                        buttonText: "OK")
-                }//:DUPLICATION CONFIRMATION
-                
             }//:ZSTACK
             .background(Color.colorTan)
             .navigationTitle(viewModel.packingList.title)
             .navigationBarTitleDisplayMode(.inline)
             .navigationBarBackButtonHidden(true)
             .animation(.easeOut(duration: 0.3), value: viewModel.isShowingDuplicationConfirmation)
-
             .toolbar {
                 //CUSTOM BACK BUTTON
                 ToolbarItem(placement: .navigationBarLeading) {
@@ -194,6 +183,9 @@ struct ListView: View {
                 }
                 
                 Button("Cancel", role: .cancel) { }
+            }
+            .alert(isPresented: $viewModel.isShowingDuplicationConfirmation) {
+                Alert(title: Text("Duplicate List"), message: Text("Your list has been successfully duplicated."), dismissButton: .default(Text("OK")))
             }
             .confirmationDialog(
                 "Are you sure you want to delete this list?",
@@ -316,6 +308,7 @@ struct ListView: View {
 
 #Preview("Sample Data") {
     NavigationStack {
+        let storeKitManager = StoreKitManager()
         let container = try! ModelContainer(
             for: PackingList.self, Category.self, Item.self,
             configurations: ModelConfiguration(isStoredInMemoryOnly: true) // In-memory container
@@ -332,6 +325,7 @@ struct ListView: View {
         // Return the ListView with the in-memory container
         return ListView(viewModel: viewModel, packingListsCount: 3)
             .modelContainer(container)
+            .environment(storeKitManager)
             .environment(\.modelContext, container.mainContext)
         
     }
@@ -339,6 +333,7 @@ struct ListView: View {
 
 #Preview("Basic Preview") {
     NavigationStack {
+        let storeKitManager = StoreKitManager()
         let placeholderPackingList = PackingList(title: "Sample Packing List")
         let container = try! ModelContainer(
             for: PackingList.self, Category.self, Item.self,
@@ -349,6 +344,7 @@ struct ListView: View {
         
         ListView(viewModel: viewModel, packingListsCount: 3)
             .modelContainer(container)
+            .environment(storeKitManager)
             .environment(\.modelContext, container.mainContext)
         
     }

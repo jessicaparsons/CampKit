@@ -77,8 +77,8 @@ struct EditListDetailsModal: View {
                 .navigationBarTitleDisplayMode(.inline)
                 .padding()
                 .onAppear {
-                    locationNamePlaceholder = packingList.locationName ?? ""
-                    locationAddressPlaceholder = packingList.locationAddress ?? ""
+                    locationNamePlaceholder = packingList.locationName
+                    locationAddressPlaceholder = packingList.locationAddress
                 }
                 .scrollContentBackground(.hidden)
                 
