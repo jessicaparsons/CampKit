@@ -17,17 +17,17 @@ struct BannerImageView: View {
     
     var body: some View {
         
-        ZStack(alignment: .bottomTrailing) {
+        ZStack(alignment: .center) {
             
             bannerImageView
                 .resizable()
-                .scaledToFill()
-                .frame(height: 200, alignment: .center)
+                .aspectRatio(contentMode: .fill)
+                .frame(width: UIScreen.main.bounds.width, height: 200)
                 .clipped()
             
             Color.black.opacity(0.2)
                 .ignoresSafeArea()
-        }
+        }//:ZSTACK
         .ignoresSafeArea(edges: .horizontal)
     }
     
