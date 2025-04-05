@@ -31,7 +31,7 @@ class Category: Identifiable {
 extension Category {
     var sortedItems: [Item] {
         items
-            .compactMap { $0.position != nil ? $0 : nil }
+            .filter { $0.modelContext != nil && $0.position != nil }
             .sorted { $0.position ?? 0 < $1.position ?? 0 }
     }
 }
