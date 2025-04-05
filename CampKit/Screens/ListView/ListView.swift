@@ -76,6 +76,7 @@ struct ListView: View {
                 
                 //MARK: - CONFETTI ANIMATION
                 VStack {
+                    Spacer()
                     if viewModel.isConfettiVisible {
                         Text("🔥")
                             .font(.system(size: 50))
@@ -98,6 +99,7 @@ struct ListView: View {
                                 repetitionInterval: 0.1,
                                 hapticFeedback: true)
                     }//:CONDITION
+                    Spacer()
                 }//:VSTACK
                 HStack {
                     Spacer()
@@ -110,6 +112,7 @@ struct ListView: View {
             .navigationTitle(viewModel.packingList.title)
             .navigationBarTitleDisplayMode(.inline)
             .navigationBarBackButtonHidden(true)
+            .ignoresSafeArea(.keyboard, edges: .bottom)
             .animation(.easeOut(duration: 0.3), value: viewModel.isShowingDuplicationConfirmation)
             .toolbar {
                 //CUSTOM BACK BUTTON

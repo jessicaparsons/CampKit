@@ -47,6 +47,7 @@ struct RestockView: View {
                 }
                 .padding()
             }//:ZSTACK
+            .ignoresSafeArea(.keyboard, edges: .bottom)
         }//:NAVIGATION STACK
     }
     

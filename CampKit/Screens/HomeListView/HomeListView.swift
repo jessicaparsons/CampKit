@@ -118,6 +118,7 @@ struct HomeListView: View {
             .padding()
             
         }//:ZSTACK
+        .ignoresSafeArea(.keyboard, edges: .bottom)
         }//:NAVIGATION STACK
     }//:BODY
     
