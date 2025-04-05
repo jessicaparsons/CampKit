@@ -10,7 +10,7 @@ import SwiftData
 
 struct MainView: View {
     @Environment(\.modelContext) var modelContext
-    @Query private var packingLists: [PackingList]
+    @Environment(StoreKitManager.self) private var storeKitManager
     let weatherViewModel = WeatherViewModel(weatherFetcher: WeatherAPIClient())
     
     @State private var selection = 0
@@ -19,15 +19,15 @@ struct MainView: View {
     @State private var isStepOne: Bool = true
     @State private var navigateToListView = false
     @State private var currentPackingList: PackingList?
-    private var storeKitManager = StoreKitManager()
     @State private var isUpgradeToProShowing: Bool = false
+    @State private var packingListsCount: Int = 0
     
     var body: some View {
         NavigationStack {
             ZStack(alignment: .bottom) {
                 TabView(selection: $selection) {
                     Group {
-                        HomeListView(modelContext: modelContext, storeKitManager: storeKitManager, isNewListQuizShowing: $isNewListQuizShowing, isUpgradeToProShowing: $isUpgradeToProShowing)
+                        HomeListView(modelContext: modelContext, isNewListQuizShowing: $isNewListQuizShowing)
                             .tabItem {
                                 Image(systemName: "list.bullet")
                             }
@@ -62,7 +62,7 @@ struct MainView: View {
                 }//:TABVIEW
                 
                 Button {
-                    if storeKitManager.isUnlimitedListsUnlocked || packingLists.count < 3 {
+                    if storeKitManager.isUnlimitedListsUnlocked || packingListsCount < 3 {
                         isNewListQuizShowing = true
                     } else {
                         isUpgradeToProShowing = true
@@ -94,14 +94,30 @@ struct MainView: View {
                     .environment(weatherViewModel)
                 }
             }
+            .sheet(isPresented: Binding(
+                get: { storeKitManager.isUpgradeToProShowing },
+                set: { storeKitManager.isUpgradeToProShowing = $0 })
+            ) {
+                    UpgradeToProView()
+            }
             .navigationDestination(isPresented: $navigateToListView) {
                 if let packingList = currentPackingList {
-                    ListView(viewModel: ListViewModel(modelContext: modelContext, packingList: packingList))
+                    ListView(
+                        viewModel: ListViewModel(modelContext: modelContext, packingList: packingList),
+                        packingListsCount: packingListsCount)
                 } else {
-                    HomeListView(modelContext: modelContext, storeKitManager: storeKitManager, isNewListQuizShowing: $isNewListQuizShowing, isUpgradeToProShowing: $isUpgradeToProShowing)
+                    HomeListView(modelContext: modelContext, isNewListQuizShowing: $isNewListQuizShowing)
                 }
             }//:ZSTACK
         }//:NAVIGATION STACK
+        .task {
+            do {
+                let descriptor = FetchDescriptor<PackingList>()
+                packingListsCount = try modelContext.fetchCount(descriptor)
+            } catch {
+                print("Error fetching packing list count: \(error)")
+            }
+        }
     }
     
 }

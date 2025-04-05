@@ -132,9 +132,15 @@ class ListViewModel: ObservableObject {
         
         // Duplicate categories and items
         for category in packingList.categories {
-            let newCategory = Category(name: category.name, position: category.position)
+            let newCategory = Category(
+                id: UUID(),
+                name: category.name,
+                position: category.position)
             for item in category.items {
-                let newItem = Item(title: item.title, isPacked: item.isPacked)
+                let newItem = Item(
+                    id: UUID(),
+                    title: item.title,
+                    isPacked: item.isPacked)
                 newItem.position = item.position
                 newCategory.items.append(newItem)
             }

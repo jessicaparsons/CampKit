@@ -11,21 +11,18 @@ import SwiftData
 struct HomeListView: View {
     
     @Environment(\.modelContext) var modelContext
+    @Environment(StoreKitManager.self) private var storeKitManager
     @State private var viewModel: HomeListViewModel
-    @Bindable var storeKitManager: StoreKitManager
     @Query(sort: \PackingList.dateCreated, order: .reverse) private var packingLists: [PackingList]
     
     @State private var location: String = ""
     
     @Binding var isNewListQuizShowing: Bool
-    @Binding var isUpgradeToProShowing: Bool
     
-    init(modelContext: ModelContext, storeKitManager: StoreKitManager, isNewListQuizShowing: Binding<Bool>, isUpgradeToProShowing: Binding<Bool>) {
+    init(modelContext: ModelContext, isNewListQuizShowing: Binding<Bool>) {
         let viewModel = HomeListViewModel(modelContext: modelContext)
         _viewModel = State(wrappedValue: viewModel)
-        self.storeKitManager = storeKitManager
         _isNewListQuizShowing = isNewListQuizShowing
-        _isUpgradeToProShowing = isUpgradeToProShowing
     }
     
     var body: some View {
@@ -62,7 +59,10 @@ struct HomeListView: View {
                         ForEach(packingLists) { packingList in
                             
                             NavigationLink(
-                                destination: ListView(viewModel: ListViewModel(modelContext: modelContext, packingList: packingList)),
+                                destination: ListView(
+                                    viewModel: ListViewModel(modelContext: modelContext, packingList: packingList),
+                                    packingListsCount: packingLists.count
+                                ),
                                 label: {
                                     HStack {
                                         // Optional photo thumbnail
@@ -110,8 +110,11 @@ struct HomeListView: View {
                         }
                         addNewListButton
                     }//:LIST
-                    .sheet(isPresented: $isUpgradeToProShowing) {
-                        UpgradeToProView(isUpgradeToProShowing: $isUpgradeToProShowing, storeKitManager: storeKitManager)
+                    .sheet(isPresented: Binding(
+                        get: { storeKitManager.isUpgradeToProShowing },
+                        set: { storeKitManager.isUpgradeToProShowing = $0 })
+                    ) {
+                        UpgradeToProView()
                     }
                 }//:ELSE
                 
@@ -134,10 +137,10 @@ struct HomeListView: View {
             HStack {
                 Spacer()
                 Button {
-                    if storeKitManager.isUnlimitedListsUnlocked || packingLists.count < 5 {
+                    if storeKitManager.isUnlimitedListsUnlocked || packingLists.count < Constants.proVersionListCount {
                         isNewListQuizShowing = true
                     } else {
-                        isUpgradeToProShowing = true
+                        storeKitManager.isUpgradeToProShowing = true
                     }
                 } label: {
                     HStack {
@@ -168,9 +171,10 @@ struct HomeListView: View {
     
     preloadPackingListData(context: container.mainContext)
     
-    return HomeListView(modelContext: container.mainContext, storeKitManager: storeKitManager, isNewListQuizShowing: $isNewListQuizShowing, isUpgradeToProShowing: $isUpgradeToProShowing)
+    return HomeListView(modelContext: container.mainContext, isNewListQuizShowing: $isNewListQuizShowing)
         .modelContainer(container)
         .environment(\.modelContext, container.mainContext)
+        .environment(storeKitManager)
 }
 
 
@@ -185,7 +189,8 @@ struct HomeListView: View {
         configurations: ModelConfiguration(isStoredInMemoryOnly: true)
     )
     
-    return HomeListView(modelContext: container.mainContext, storeKitManager: storeKitManager, isNewListQuizShowing: $isNewListQuizShowing, isUpgradeToProShowing: $isUpgradeToProShowing)
+    return HomeListView(modelContext: container.mainContext, isNewListQuizShowing: $isNewListQuizShowing)
         .modelContainer(container)
         .environment(\.modelContext, container.mainContext)
+        .environment(storeKitManager)
 }
