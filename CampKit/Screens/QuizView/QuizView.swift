@@ -11,17 +11,14 @@ import SwiftData
 struct QuizView: View {
     
     @Environment(\.modelContext) var modelContext
+    @Environment(WeatherViewModel.self) private var weatherViewModel
     @State var viewModel: QuizViewModel
-    @State var weatherViewModel = WeatherViewModel(weatherFetcher: WeatherAPIClient())
     @Binding var isNewListQuizShowing: Bool
     @Binding var isStepOne: Bool
     @Binding var navigateToListView: Bool
     @Binding var currentPackingList: PackingList?
-    @State private var locationName: String = ""
-    @State private var locationAddress: String = ""
-    @State private var elevation: Double = 0.0
+
     @State private var isLocationSearchOpen: Bool = false
-    @State private var listName: String = ""
     @State private var isElevationAdded: Bool = false
     
     var body: some View {
@@ -35,22 +32,14 @@ struct QuizView: View {
                         if isStepOne {
                             QuizPageOneView(
                                 viewModel: viewModel,
-                                weatherViewModel: weatherViewModel,
                                 isElevationAdded: $isElevationAdded,
-                                locationName: $locationName,
-                                locationAddress: $locationAddress,
-                                elevation: $elevation,
                                 isLocationSearchOpen: $isLocationSearchOpen,
-                                isStepOne: $isStepOne,
-                                listName: $listName)
+                                isStepOne: $isStepOne)
                                 .transition(.move(edge: .leading))
                         } else {
                             QuizPageTwoView(
                                 viewModel: viewModel,
                                 isStepOne: $isStepOne,
-                                locationName: $locationName,
-                                locationAddress: $locationAddress,
-                                elevation: $elevation,
                                 isElevationAdded: $isElevationAdded)
                                 .transition(.move(edge: .trailing))
                         }
@@ -94,12 +83,6 @@ struct QuizView: View {
                                 if isStepOne {
                                     isStepOne = false
                                 } else {
-                                    viewModel.listTitle = listName
-                                    
-                                    if locationName != "" {
-                                        viewModel.locationName = locationName
-                                        viewModel.locationAddress = locationAddress
-                                    }
                                     
                                     viewModel.createPackingList()
                                     
@@ -132,9 +115,9 @@ struct QuizView: View {
                 
                 VStack(alignment: .leading, spacing: Constants.cardSpacing) {
                     LocationSearchView(
-                        locationName: $locationName,
-                        locationAddress: $locationAddress,
-                        isLocationSearchOpen: $isLocationSearchOpen)
+                        isLocationSearchOpen: $isLocationSearchOpen,
+                        locationName: $viewModel.locationName,
+                        locationAddress: $viewModel.locationAddress)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                         .background(Color.white)
                         .transition(.move(edge: .trailing))
@@ -174,12 +157,13 @@ struct QuizView: View {
     }//:BODY
     
     private func resetQuiz() {
-        locationName = ""
-        locationAddress = ""
-        elevation = 0.0
+        viewModel.locationName = nil
+        viewModel.locationAddress = nil
+        viewModel.elevation = 0.0
         isLocationSearchOpen = false
-        listName = ""
+        viewModel.listTitle = ""
         isElevationAdded = false
+        weatherViewModel.isShowingNoLocationFoundMessage = false
         
         viewModel.resetSelections()
     }

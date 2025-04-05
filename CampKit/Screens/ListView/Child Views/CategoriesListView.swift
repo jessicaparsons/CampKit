@@ -37,9 +37,7 @@ struct CategoriesListView: View {
                                 viewModel: viewModel,
                                 category: category,
                                 isRearranging: $viewModel.isRearranging,
-                                deleteCategory: { viewModel.deleteCategory(category) },
-                                globalIsExpanded: viewModel.globalIsExpanded,
-                                globalExpandCollapseAction: viewModel.globalExpandCollapseAction
+                                deleteCategory: { viewModel.deleteCategory(category) }
                             )
                         }//:ZSTACK
 

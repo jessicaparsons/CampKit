@@ -14,11 +14,8 @@ struct RearrangeCategoriesView: View {
 
     var body: some View {
         NavigationStack {
-            VStack {
-                Text("Rearrange Categories")
-                    .font(.title2)
-                    .fontWeight(.bold)
-                    .padding(.bottom, -Constants.verticalSpacing)
+            VStack(alignment: .leading) {
+
                 List {
                     // Access categories from the ViewModel
                     ForEach(viewModel.packingList.categories.sorted(by: { $0.position < $1.position }), id: \.id) { category in
@@ -29,6 +26,11 @@ struct RearrangeCategoriesView: View {
                 }//:LIST
                 .scrollContentBackground(.hidden)
                 .toolbar {
+                    ToolbarItem(placement: .cancellationAction) {
+                        Button("Cancel") {
+                            dismiss()
+                        }
+                    }
                     ToolbarItem(placement: .confirmationAction) {
                         Button("Done") {
                             dismiss()
@@ -37,6 +39,8 @@ struct RearrangeCategoriesView: View {
                 }
                 .environment(\.editMode, .constant(.active)) // Enable edit mode for reordering
             }//:VSTACK
+            .navigationTitle("Rearrange Categories")
+            .navigationBarTitleDisplayMode(.inline)
             .background(Color.colorTan)
         }//:NAVIGATION STACK
         

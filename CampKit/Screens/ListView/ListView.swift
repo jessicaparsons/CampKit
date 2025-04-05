@@ -17,7 +17,7 @@ struct ListView: View {
     
     @State private var isPhotoPickerPresented: Bool = false
     @State private var bannerImageItem: PhotosPickerItem?
-    @State private var bannerImage: UIImage? // Saves to SwiftData
+    @State private var bannerImage: UIImage?
     @State private var isEditing: Bool = false
     @State private var isShowingDeleteConfirmation: Bool = false
     @State private var isShowingToggleAllItemsConfirmation: Bool = false

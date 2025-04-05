@@ -16,7 +16,7 @@ struct SettingsView: View {
     var body: some View {
         NavigationView {
             ScrollView(.vertical, showsIndicators: false){
-                VStack(spacing: 20){
+                VStack(spacing: Constants.verticalSpacing){
                 //MARK: - SECTION 1
                         
                     GroupBox(

@@ -11,6 +11,7 @@ import SwiftData
 struct WeatherModuleView: View {
     
     @Environment(WeatherViewModel.self) private var weatherViewModel
+    @Binding var isWeatherLoading: Bool
     
     var body: some View {
         GroupBox {
@@ -50,6 +51,20 @@ struct WeatherModuleView: View {
                             
                             
                         }//:CONDITION
+                        else if isWeatherLoading {
+                            ProgressView()
+                                .frame(minHeight: 140)
+                        } else if weatherViewModel.isShowingNoLocationFoundMessage {
+                            VStack(spacing: Constants.verticalSpacing) {
+                                Text("Weather Forecast")
+                                    .font(.headline)
+                                    .fontWeight(.bold)
+                                Text("Weather data isn’t available for this area. Try choosing a different location nearby.")
+                                    .multilineTextAlignment(.center)
+                                Image(systemName: "icloud.slash")
+                            }
+                            .padding()
+                        }
                         else {
                             VStack(spacing: Constants.verticalSpacing) {
                                 Text("Weather Forecast")
@@ -87,7 +102,7 @@ struct WeatherModuleView: View {
         for: PackingList.self, Category.self, Item.self,
         configurations: ModelConfiguration(isStoredInMemoryOnly: true)
     )
-    QuizPageTwoView(viewModel: QuizViewModel(modelContext: container.mainContext), isStepOne: $isStepOne, locationName: $locationName, locationAddress: $locationAddress, elevation: $elevation, isElevationAdded: $isElevationAdded)
+    QuizPageTwoView(viewModel: QuizViewModel(modelContext: container.mainContext), isStepOne: $isStepOne, isElevationAdded: $isElevationAdded)
         .environment(WeatherViewModel(weatherFetcher: WeatherAPIClient()))
 }
 
@@ -95,6 +110,9 @@ struct WeatherModuleView: View {
 #Preview {
     
     @Previewable @State var location: String = "Los Angeles"
-    WeatherModuleView()
+    @Previewable @State var isWeatherLoading: Bool = false
+    
+    WeatherModuleView(isWeatherLoading: $isWeatherLoading)
         .environment(WeatherViewModel(weatherFetcher: WeatherAPIClient()))
+        .padding()
 }
