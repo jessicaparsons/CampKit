@@ -7,7 +7,6 @@
 
 import SwiftUI
 import SwiftData
-import SwipeCell
 
 struct EditableItemView: View {
     
@@ -53,47 +52,11 @@ struct EditableItemView: View {
         .padding(.horizontal)
         .padding(.vertical, 8)
         //MARK: - SWIPE TO DELETE
-        .swipeCell(
-            cellPosition: .both,
-            leftSlot: nil,
-            rightSlot:
-                SwipeCellSlot(
-                    slots: [
-                        SwipeCellButton(buttonStyle: .view,
-                                        title: "",
-                                        systemImage: "",
-                                        view: {
-                                            AnyView(
-                                                Image(systemName: "trash")
-                                                    .resizable()
-                                                    .aspectRatio(contentMode: .fit)
-                                                    .frame(width: 20, height: 20)
-                                                    .foregroundColor(.white)
-                                            )},
-                                        backgroundColor: .red,
-                                        action: {
-                                            viewModel.deleteItem(item)
-                                        },
-                                        feedback:true
-                                       ),
-                        
-                    ],
-                    slotStyle: .destructiveDelay),
-            swipeCellStyle: SwipeCellStyle(
-                alignment: .leading,
-                dismissWidth: 20,
-                appearWidth: 20,
-                destructiveWidth: 240,
-                vibrationForButton: .error,
-                vibrationForDestructive: .heavy,
-                autoResetTime: 3)
-        )
-        .dismissSwipeCellForScrollViewForLazyVStack()
+        .modifier(SwipeActionModifier(viewModel: viewModel, item: item, isFocused: isFocused))
+        
     }//:BODY
-    
+
 }
-
-
 
 #Preview(traits: .sizeThatFitsLayout) {
     let container = try! ModelContainer(
