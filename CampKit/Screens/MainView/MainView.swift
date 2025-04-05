@@ -39,48 +39,24 @@ struct MainView: View {
                             }
                             .tag(1)
                         
-                        Spacer()
-                            .tabItem {
-                                EmptyView()
-                            }
-                            .tag(2)
-                        
                         RestockView()
                             .tabItem {
                                 Image(systemName: "arrow.clockwise.square")
                             }
-                            .tag(3)
+                            .tag(2)
                         
                         SettingsView()
                             .padding(.horizontal)
                             .tabItem {
                                 Image(systemName: "gearshape")
                             }
-                            .tag(4)
+                            .tag(3)
                     }//:GROUP
                     .toolbarBackground(Color(UIColor.tertiarySystemBackground), for: .tabBar)
                 }//:TABVIEW
-                
-                Button {
-                    if storeKitManager.isUnlimitedListsUnlocked || packingListsCount < 3 {
-                        isNewListQuizShowing = true
-                    } else {
-                        isUpgradeToProShowing = true
-                    }
-                } label: {
-                    Image(systemName: "plus.circle.fill")
-                        .symbolRenderingMode(.palette)
-                        .font(.system(size: 38))
-                        .foregroundStyle(.black, Color(Color.colorNeon))
-                        .offset(y: -10)
-                }
             }//:ZSTACK
             .ignoresSafeArea(.keyboard) // So the button doesn't move on keyboard appearance
-            .onChange(of: selection) { oldValue, newValue in
-                if newValue == 2 {
-                    selection = oldValue // Revert to the previous tab
-                }
-            }
+            
             //MARK: - SHOW PACKING LIST QUIZ
             .sheet(isPresented: $isNewListQuizShowing) {
                 NavigationStack {
@@ -108,7 +84,7 @@ struct MainView: View {
                 } else {
                     HomeListView(modelContext: modelContext, isNewListQuizShowing: $isNewListQuizShowing)
                 }
-            }//:ZSTACK
+            }
         }//:NAVIGATION STACK
         .task {
             do {
@@ -124,13 +100,20 @@ struct MainView: View {
 
 #Preview {
     let container = try! ModelContainer(
-        for: PackingList.self, Category.self, Item.self,
+        for: PackingList.self, Category.self, Item.self, RestockItem.self,
         configurations: ModelConfiguration(isStoredInMemoryOnly: true)
     )
     
+    for item in RestockItem.restockItems {
+        container.mainContext.insert(item)
+    }
+    
     preloadPackingListData(context: container.mainContext)
     
-    return MainView()
-        .modelContainer(container)
+    return NavigationView {
+        MainView()
+            .modelContainer(container)
+            .environment(StoreKitManager())
+    }
 }
 

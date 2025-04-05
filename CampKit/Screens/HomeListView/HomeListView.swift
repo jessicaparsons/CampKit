@@ -27,21 +27,10 @@ struct HomeListView: View {
     
     var body: some View {
         NavigationStack {
-            
+            ZStack(alignment: .bottom) {
             //MARK: - HEADER
             VStack {
-                ZStack(alignment: .bottom) {
-                    LinearGradient(colors: [.customGold, .customSage, .customSky, .customLilac], startPoint: .bottomLeading, endPoint: .topTrailing)
-                        .ignoresSafeArea()
-                    VStack {
-                        Text("Howdy, Camper!")
-                            .font(.title)
-                            .fontWeight(.light)
-                            .foregroundColor(.black)
-                            .padding(.bottom, 30)
-                    }//:VSTACK
-                }//:ZSTACK
-                .frame(height: 150)
+                GradientHeaderView(label: "Howdy, Camper!")
                 
                 //MARK: - PACKING LISTS
                 
@@ -51,7 +40,6 @@ struct HomeListView: View {
                             ContentUnavailableView("Empty List", systemImage: "tent", description: Text("You haven't created any lists yet. Get started!"))
                                 .padding(.top, Constants.emptyContentSpacing)
                         }//:LAZYVSTACK
-                        addNewListButton
                         Spacer()
                     }//:VSTACK
                 } else {
@@ -108,7 +96,6 @@ struct HomeListView: View {
                                 }
                             }
                         }
-                        addNewListButton
                     }//:LIST
                     .sheet(isPresented: Binding(
                         get: { storeKitManager.isUpgradeToProShowing },
@@ -117,45 +104,41 @@ struct HomeListView: View {
                         UpgradeToProView()
                     }
                 }//:ELSE
-                
-                
-                
             }//:VSTACK
             .navigationTitle("Packing Lists")
             .navigationBarHidden(true)
             .scrollContentBackground(.hidden)
             .background(Color.customTan)
-            .offset(y: -10)
             .ignoresSafeArea()
+            
+            HStack {
+                Spacer()
+                addNewListButton
+            }//:HSTACK
+            .padding()
+            
+        }//:ZSTACK
         }//:NAVIGATION STACK
     }//:BODY
     
     //MARK: - ADD NEW LIST BUTTON
     
     private var addNewListButton: some View {
-        Section {
-            HStack {
-                Spacer()
-                Button {
-                    if storeKitManager.isUnlimitedListsUnlocked || packingLists.count < Constants.proVersionListCount {
-                        isNewListQuizShowing = true
-                    } else {
-                        storeKitManager.isUpgradeToProShowing = true
-                    }
-                } label: {
-                    HStack {
-                        Image(systemName: "plus")
-                        Text("Add New List")
-                            .padding(5)
-                    }
-                }//:BUTTON
-                .buttonStyle(BigButton())
-                Spacer()
-            }//:HSTACK
-        }//:SECTION
-        .listRowBackground(Color.customTan)
-        .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
+        
+        Button {
+            if storeKitManager.isUnlimitedListsUnlocked || packingLists.count < Constants.proVersionListCount {
+                isNewListQuizShowing = true
+            } else {
+                storeKitManager.isUpgradeToProShowing = true
+            }
+        } label: {
+            BigButtonLabel(label: "Add List")
+        }
+        .buttonStyle(BigButton())
+        
     }//:ADDNEWLISTBUTTON
+    
+    
 }//:STRUCT
 
 #Preview("Sample Data") {
