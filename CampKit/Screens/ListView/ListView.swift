@@ -39,7 +39,7 @@ struct ListView: View {
     
     var body: some View {
         NavigationStack {
-            ZStack {
+            ZStack(alignment: .bottom) {
                 ScrollView {
                     VStack {
                         
@@ -57,8 +57,6 @@ struct ListView: View {
                             //MARK: - LIST CATEGORIES
                             
                             CategoriesListView(viewModel: viewModel)
-                            addCategoryButton
-                            
                             
                         }//:VSTACK
                         .padding(.horizontal)
@@ -101,6 +99,12 @@ struct ListView: View {
                                 hapticFeedback: true)
                     }//:CONDITION
                 }//:VSTACK
+                HStack {
+                    Spacer()
+                    addCategoryButton
+                }//:HSTACK
+                .padding()
+                
             }//:ZSTACK
             .background(Color.colorTan)
             .navigationTitle(viewModel.packingList.title)
@@ -206,21 +210,13 @@ struct ListView: View {
     //MARK: - ADD CATEGORY BUTTON
     
     private var addCategoryButton: some View {
-        HStack {
-            Spacer()
-            Button { viewModel.addNewCategory()
-            } label: {
-                HStack {
-                    Image(systemName: "plus")
-                    Text("New Category")
-                        .padding(5)//mine
-                }
-            }
-            .buttonStyle(BigButton())
-            Spacer()
+        
+        Button {
+            viewModel.addNewCategory()
+        } label: {
+            BigButtonLabel(label: "Add Category")
         }
-        .listRowBackground(Color.colorTan)
-        .offset(y: -20)//mine
+        .buttonStyle(BigButton())
     }
     
     

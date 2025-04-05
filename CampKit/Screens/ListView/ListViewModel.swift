@@ -74,11 +74,15 @@ class ListViewModel: ObservableObject {
     func addNewCategory() {
         withAnimation {
             let newPosition = packingList.categories.count
-            let newCategory = Category(name: "New Category", position: newPosition)
+            let newCategory = Category(
+                name: "New Category",
+                position: newPosition,
+                isExpanded: true)
             packingList.categories.append(newCategory)
             modelContext.insert(newCategory)
             reassignCategoryPositions(for: packingList)
         }
+        saveContext()
     }
     
     func reassignCategoryPositions(for packingList: PackingList) {
@@ -97,6 +101,7 @@ class ListViewModel: ObservableObject {
             modelContext.delete(category)
             reassignCategoryPositions(for: packingList)
         }
+        saveContext()
     }
     
     func moveCategory(from source: IndexSet, to destination: Int) {

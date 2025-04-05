@@ -40,6 +40,23 @@ struct BigButtonWide: ButtonStyle {
     }
 }
 
+struct BigButtonLabel: View {
+    
+    let label: String
+    
+    var body: some View {
+        HStack {
+            Group {
+                Image(systemName: "plus")
+                    .fontWeight(.bold)
+                Text(label)
+                    .padding(3)
+            }
+            .font(.subheadline)
+        }
+    }
+}
+
 
 #Preview {
     //CustomButton()
