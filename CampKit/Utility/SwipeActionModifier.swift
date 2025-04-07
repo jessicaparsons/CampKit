@@ -11,12 +11,11 @@ import SwipeCell
 struct SwipeActionModifier: ViewModifier {
     
     var isFocused: Bool
+    var isList: Bool
     let deleteAction: () -> Void
     
     func body(content: Content) -> some View {
-        if isFocused {
-            content
-        } else {
+        if !isFocused && !isList {
             content.swipeCell(
                 cellPosition: .both,
                 leftSlot: nil,
@@ -28,7 +27,7 @@ struct SwipeActionModifier: ViewModifier {
                                             systemImage: "",
                                             view: {
                                                 AnyView(
-                                                    Image(systemName: "trash")
+                                                    Image(systemName: "pencil")
                                                         .resizable()
                                                         .aspectRatio(contentMode: .fit)
                                                         .frame(width: 20, height: 20)
@@ -53,6 +52,8 @@ struct SwipeActionModifier: ViewModifier {
                     autoResetTime: 3)
             )
             .dismissSwipeCellForScrollViewForLazyVStack()
+        } else {
+            content
         }
     }
 }

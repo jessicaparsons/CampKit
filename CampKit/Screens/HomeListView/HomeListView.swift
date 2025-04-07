@@ -9,136 +9,182 @@ import SwiftUI
 import SwiftData
 
 struct HomeListView: View {
+    //Live Data
+    @Query(sort: \PackingList.position) var fetchedLists: [PackingList]
+    // Editable state for drag/delete
+    @State private var packingLists: [PackingList] = []
     
     @Environment(\.modelContext) var modelContext
     @Environment(StoreKitManager.self) private var storeKitManager
-    @State private var viewModel: HomeListViewModel
-    @Query(sort: \PackingList.dateCreated, order: .reverse) private var packingLists: [PackingList]
+    @StateObject private var viewModel: HomeListViewModel
     
     @State private var location: String = ""
-    
+    @State private var editMode: EditMode = .inactive
     @Binding var isNewListQuizShowing: Bool
     
     init(modelContext: ModelContext, isNewListQuizShowing: Binding<Bool>) {
-        let viewModel = HomeListViewModel(modelContext: modelContext)
-        _viewModel = State(wrappedValue: viewModel)
+        _viewModel = StateObject(wrappedValue: HomeListViewModel(modelContext: modelContext))
         _isNewListQuizShowing = isNewListQuizShowing
     }
     
     var body: some View {
-        NavigationStack {
-            ZStack(alignment: .bottom) {
             //MARK: - HEADER
-            VStack {
-                GradientHeaderView(label: "Howdy, Camper!")
+        ZStack(alignment: .top) {
                 
-                //MARK: - PACKING LISTS
+                gradientHeaderView
                 
-                if packingLists.isEmpty {
-                    VStack(spacing: Constants.verticalSpacing) {
-                        LazyVStack {
-                            ContentUnavailableView("Empty List", systemImage: "tent", description: Text("You haven't created any lists yet. Get started!"))
-                                .padding(.top, Constants.emptyContentSpacing)
-                        }//:LAZYVSTACK
-                        Spacer()
-                    }//:VSTACK
-                } else {
-                    List {
-                        ForEach(packingLists) { packingList in
-                            
-                            NavigationLink(
-                                destination: ListView(
-                                    viewModel: ListViewModel(modelContext: modelContext, packingList: packingList),
-                                    packingListsCount: packingLists.count
-                                ),
-                                label: {
-                                    HStack {
-                                        // Optional photo thumbnail
-                                        if let photoData = packingList.photo, let image = UIImage(data: photoData) {
-                                            Image(uiImage: image)
-                                                .resizable()
-                                                .scaledToFill()
-                                                .frame(width: 50, height: 50)
-                                                .cornerRadius(Constants.cornerRadius)
-                                                .padding(.trailing, 8)
-                                        } else {
-                                            Image("TopographyDesign")
-                                                .resizable()
-                                                .scaledToFill()
-                                                .frame(width: 50, height: 50)
-                                                .cornerRadius(Constants.cornerRadius)
-                                                .padding(.trailing, 8)
-                                        }
-                                        
-                                        VStack(alignment: .leading) {
-                                            Text(packingList.title)
-                                                .font(.headline)
-                                                .lineLimit(1)
-                                                .truncationMode(.tail)
-                                            Text(packingList.dateCreated, style: .date)
-                                                .font(.subheadline)
-                                                .foregroundColor(.secondary)
+                VStack {
+                    //MARK: - PACKING LISTS
+                  
+                    if packingLists.isEmpty {
+                        VStack(spacing: Constants.verticalSpacing) {
+                                ContentUnavailableView("Let's Get Packing", systemImage: "tent", description: Text("You haven't created any lists yet. Hit the \"+\" to get started!"))
+                                    .padding(.top, Constants.emptyContentSpacing)
+                        }//:VSTACK
+                    } else {
+                        
+                        List {
+                            ForEach(packingLists) { packingList in
+
+                                NavigationLink(
+                                    destination: ListView(
+                                        viewModel: ListViewModel(modelContext: modelContext, packingList: packingList),
+                                        packingListsCount: packingLists.count
+                                    ),
+                                    label: {
+                                        HStack {
+                                            // Optional photo thumbnail
+                                            if let photoData = packingList.photo, let image = UIImage(data: photoData) {
+                                                Image(uiImage: image)
+                                                    .resizable()
+                                                    .scaledToFill()
+                                                    .frame(width: 50, height: 50)
+                                                    .cornerRadius(Constants.cornerRadius)
+                                                    .padding(.trailing, 8)
+                                            } else {
+                                                Image("TopographyDesign")
+                                                    .resizable()
+                                                    .scaledToFill()
+                                                    .frame(width: 50, height: 50)
+                                                    .cornerRadius(Constants.cornerRadius)
+                                                    .padding(.trailing, 8)
+                                            }
+                                            
+                                            VStack(alignment: .leading) {
+                                                Text(packingList.title)
+                                                    .font(.headline)
+                                                    .lineLimit(1)
+                                                    .truncationMode(.tail)
+                                                Text(packingList.dateCreated, style: .date)
+                                                    .font(.subheadline)
+                                                    .foregroundColor(.secondary)
+                                            }
                                         }
                                     }
+                                )//:NAVIGATION LINK
+                            } //:FOR EACH
+                            .onMove { source, destination in
+                                packingLists.move(fromOffsets: source, toOffset: destination)
+
+                                for (index, list) in packingLists.enumerated() {
+                                    list.position = index
                                 }
-                            )//:NAVIGATION LINK
-                        } //:FOR EACH
-                        .onDelete { indexSet in
-                            for index in indexSet {
-                                let packingListToDelete = packingLists[index]
-                                modelContext.delete(packingListToDelete)
-                                
-                                do {
-                                    try modelContext.save() // Save changes
-                                    print("Packing list deleted successfully.")
-                                } catch {
-                                    print("Failed to delete packing list: \(error)")
-                                }
+
+                                viewModel.saveContext()
                             }
+                            .onDelete { offsets in
+                                for index in offsets {
+                                    modelContext.delete(packingLists[index])
+                                }
+
+                                packingLists.remove(atOffsets: offsets)
+
+                                for (index, list) in packingLists.enumerated() {
+                                    list.position = index
+                                }
+
+                                viewModel.saveContext()
+                            }
+                        
+                            
+                        }//:LIST
+                        .sheet(isPresented: Binding(
+                            get: { storeKitManager.isUpgradeToProShowing },
+                            set: { storeKitManager.isUpgradeToProShowing = $0 })
+                        ) {
+                            UpgradeToProView()
                         }
-                    }//:LIST
-                    .sheet(isPresented: Binding(
-                        get: { storeKitManager.isUpgradeToProShowing },
-                        set: { storeKitManager.isUpgradeToProShowing = $0 })
-                    ) {
-                        UpgradeToProView()
-                    }
-                }//:ELSE
-            }//:VSTACK
-            .navigationTitle("Packing Lists")
-            .navigationBarHidden(true)
+                    }//:ELSE
+                }//:VSTACK
+                .background(
+                    RoundedRectangle(cornerRadius: Constants.cornerRadius)
+                        .fill(Color.customTan)
+                        .ignoresSafeArea(.container, edges: [.bottom])
+                        .shadow(color: .gray.opacity(0.2), radius: 4, x: 0, y: -2)
+                )
+                .padding(.top, 60)
+            }//:ZSTACK
             .scrollContentBackground(.hidden)
-            .background(Color.customTan)
-            .ignoresSafeArea()
-            
-            HStack {
-                Spacer()
-                addNewListButton
-            }//:HSTACK
-            .padding()
-            
-        }//:ZSTACK
-        .ignoresSafeArea(.keyboard, edges: .bottom)
-        }//:NAVIGATION STACK
-    }//:BODY
-    
-    //MARK: - ADD NEW LIST BUTTON
-    
-    private var addNewListButton: some View {
-        
-        Button {
-            if storeKitManager.isUnlimitedListsUnlocked || packingLists.count < Constants.proVersionListCount {
-                isNewListQuizShowing = true
-            } else {
-                storeKitManager.isUpgradeToProShowing = true
+            .environment(\.editMode, $editMode)
+            .onAppear {
+                packingLists = fetchedLists
             }
-        } label: {
-            BigButtonLabel(label: "Add List")
-        }
-        .buttonStyle(BigButton())
+            .onChange(of: fetchedLists) {
+                packingLists = fetchedLists
+            }
         
-    }//:ADDNEWLISTBUTTON
-    
+    }//:BODY
+        
+    //MARK: - GRADIENT HEADER
+        
+   private var gradientHeaderView: some View {
+       ZStack(alignment: .center) {
+            LinearGradient(colors: [.customGold, .customSage, .customSky, .customLilac], startPoint: .topLeading, endPoint: .topTrailing)
+                
+            HStack{
+                Text("Howdy, Camper!")
+                    .font(.title)
+                    .fontWeight(.light)
+                    .foregroundColor(.black)
+                Spacer()
+                HStack(spacing: Constants.horizontalPadding) {
+                    if editMode == .inactive {
+                        // REARRANGE BUTTON
+                        Button {
+                            editMode = (editMode == .active) ? .inactive : .active
+                        } label: {
+                            Image(systemName: "arrow.up.and.down.text.horizontal")
+                            
+                        }
+                        // ADD BUTTON
+                        Button {
+                            if storeKitManager.isUnlimitedListsUnlocked || packingLists.count < Constants.proVersionListCount {
+                                isNewListQuizShowing = true
+                            } else {
+                                storeKitManager.isUpgradeToProShowing = true
+                            }
+                        } label: {
+                            Image(systemName: "plus")
+                        }
+                    } else {
+                        Button {
+                            editMode = (editMode == .active) ? .inactive : .active
+                        } label: {
+                            Text("Done")
+                                .font(.body)
+                        }
+                    }
+                }//:HSTACK
+                .foregroundStyle(.black)
+                .font(.title3)
+            }//:HSTACK
+            .padding(.vertical)
+            .padding(.horizontal, Constants.horizontalPadding)
+        }//:ZSTACK
+        .ignoresSafeArea()
+        .frame(height: Constants.gradientBannerHeight)
+    }
+  
     
 }//:STRUCT
 
@@ -155,10 +201,12 @@ struct HomeListView: View {
     
     preloadPackingListData(context: container.mainContext)
     
-    return HomeListView(modelContext: container.mainContext, isNewListQuizShowing: $isNewListQuizShowing)
-        .modelContainer(container)
-        .environment(\.modelContext, container.mainContext)
-        .environment(storeKitManager)
+    return NavigationStack {
+        HomeListView(modelContext: container.mainContext, isNewListQuizShowing: $isNewListQuizShowing)
+            .modelContainer(container)
+            .environment(\.modelContext, container.mainContext)
+            .environment(storeKitManager)
+    }
 }
 
 

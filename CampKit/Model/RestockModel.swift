@@ -10,15 +10,16 @@ import Foundation
 
 @Model
 class RestockItem: Identifiable {
+    
     var id: UUID = UUID()
+    @Attribute var position: Int
     var title: String
     var dateCreated: Date = Date()
     var isPacked: Bool
     
-    init(id: UUID, title: String, dateCreated: Date, isPacked: Bool) {
-        self.id = id
+    init(position: Int, title: String, isPacked: Bool) {
+        self.position = position
         self.title = title
-        self.dateCreated = dateCreated
         self.isPacked = isPacked
     }
 }

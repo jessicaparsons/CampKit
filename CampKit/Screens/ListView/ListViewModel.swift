@@ -10,7 +10,7 @@ import SwiftData
 
 class ListViewModel: ObservableObject {
     
-    private let modelContext: ModelContext
+    let modelContext: ModelContext
     
     @Published var packingList: PackingList
     
@@ -22,7 +22,7 @@ class ListViewModel: ObservableObject {
     @Published var draggedCategory: Category?
     @Published var isConfettiVisible: Bool = false
     @Published var trigger: Int = 0
-    @Published var isShowingDuplicationConfirmation: Bool = false
+    @Published var isShowingSuccessfulDuplication: Bool = false
     
     init(modelContext: ModelContext, packingList: PackingList) {
         self.modelContext = modelContext
@@ -71,11 +71,11 @@ class ListViewModel: ObservableObject {
     
     //MARK: - MODIFY CATEGORIES
     
-    func addNewCategory() {
+    func addNewCategory(title: String) {
         withAnimation {
             let newPosition = packingList.categories.count
             let newCategory = Category(
-                name: "New Category",
+                name: title,
                 position: newPosition,
                 isExpanded: true)
             packingList.categories.append(newCategory)
@@ -123,8 +123,9 @@ class ListViewModel: ObservableObject {
     //MARK: - MODIFY LIST
     
     
-    func duplicateList() {
+    func duplicateList(packingListCount: Int) {
         let duplicatedPackingList = PackingList(
+            position: packingListCount,
             title: packingList.title + " Copy",
             locationName: packingList.locationName,
             locationAddress: packingList.locationAddress,
@@ -156,24 +157,20 @@ class ListViewModel: ObservableObject {
         modelContext.insert(duplicatedPackingList)
         saveContext()
         
-        isShowingDuplicationConfirmation = true
+        print("duplicated packing lists position is: \(duplicatedPackingList.position)")
+        
+        isShowingSuccessfulDuplication = true
     }
     
     @MainActor
     func deleteList(dismiss: DismissAction) {
         withAnimation {
-            
-            packingList.categories.removeAll()
-            
+            dismiss()
+
             modelContext.delete(packingList)
             saveContext()
-            dismiss()
+            
         }
-    }
-    
-    //When a new list is created, all categories will be collapsed except the first.
-    private func expandFirstCategory() {
-        
     }
     
     
@@ -199,7 +196,8 @@ class ListViewModel: ObservableObject {
     
     
     var areAllItemsChecked: Bool {
-        packingList.categories.allSatisfy { category in
+        guard !packingList.isDeleted else { return false }
+        return packingList.categories.allSatisfy { category in
             category.items.allSatisfy { $0.isPacked }
         }
     }
@@ -261,7 +259,7 @@ class ListViewModel: ObservableObject {
     func saveContext() {
         do {
             try modelContext.save()
-            print("Packing list and categories deleted successfully.")
+            print("Packing list and categories saved successfully.")
         } catch {
             print("Failed to save context: \(error.localizedDescription)")
         }

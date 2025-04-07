@@ -17,6 +17,7 @@ struct QuizView: View {
     @Binding var isStepOne: Bool
     @Binding var navigateToListView: Bool
     @Binding var currentPackingList: PackingList?
+    let packingListCount: Int
 
     @State private var isLocationSearchOpen: Bool = false
     @State private var isElevationAdded: Bool = false
@@ -84,7 +85,7 @@ struct QuizView: View {
                                     isStepOne = false
                                 } else {
                                     
-                                    viewModel.createPackingList()
+                                    viewModel.createPackingList(packingListCount: packingListCount)
                                     
                                     if let packingList = viewModel.currentPackingList {
                                         currentPackingList = packingList
@@ -184,7 +185,7 @@ struct QuizView: View {
     )
     
     NavigationStack {
-        QuizView(viewModel: QuizViewModel(modelContext: container.mainContext), isNewListQuizShowing: $isNewListQuizShowing, isStepOne: $isStepOne, navigateToListView: $navigateToListView, currentPackingList: $currentPackingList)
+        QuizView(viewModel: QuizViewModel(modelContext: container.mainContext), isNewListQuizShowing: $isNewListQuizShowing, isStepOne: $isStepOne, navigateToListView: $navigateToListView, currentPackingList: $currentPackingList, packingListCount: 3)
             .environment(WeatherViewModel(weatherFetcher: WeatherAPIClient()))
     }
 }
