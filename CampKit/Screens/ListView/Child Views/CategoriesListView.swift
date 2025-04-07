@@ -27,10 +27,10 @@ struct CategoriesListView: View {
                     )
                     .padding(.top, Constants.emptyContentSpacing)
                 } else {
-                    ForEach(viewModel.packingList.categories.sorted(by: { $0.position < $1.position })) { category in
+                    ForEach(viewModel.packingList.categories.sorted(by: { $0.position > $1.position })) { category in
                         
                         ZStack {
-                            RoundedRectangle(cornerRadius: 10)
+                            RoundedRectangle(cornerRadius: Constants.cornerRadius)
                                 .fill(Color.customWhite)
                                 .shadow(color: .gray.opacity(0.2), radius: 4, x: 0, y: 2)
                             CategorySectionView(
@@ -58,7 +58,7 @@ struct CategoriesListView: View {
     preloadPackingListData(context: container.mainContext)
     
     // Fetch a sample PackingList
-    let samplePackingList = PackingList(title: "None", photo: nil, dateCreated: Date(), locationName: "None", latitude: nil, longitude: nil, elevation: nil)
+    let samplePackingList = PackingList.samplePackingList
     
     // Create a mock ListViewModel
     let viewModel = ListViewModel(modelContext: container.mainContext, packingList: samplePackingList)

@@ -25,11 +25,15 @@ struct ListView: View {
     @State private var fireScale: CGFloat = 0.1
     @State private var isEditingTitle: Bool = false
     @State private var isShowingDuplicationConfirmation: Bool = false
-        
+    @State private var isAddNewCategoryShowing: Bool = false
+    @State private var newCategoryTitle: String = ""
+    
     @State private var scrollOffset: CGFloat = 0
     private let scrollThreshold: CGFloat = 1
     
     let packingListsCount: Int
+    
+    
     
     //Initialize ListView with its corresponding ViewModel
     init(viewModel: ListViewModel, packingListsCount: Int) {
@@ -38,82 +42,82 @@ struct ListView: View {
     }
     
     var body: some View {
-        NavigationStack {
-            ZStack(alignment: .bottom) {
-                ScrollView {
-                    VStack {
-                        
-                        //MARK: - BANNER IMAGE
-                        BannerImageView(viewModel: viewModel, bannerImage: $bannerImage)
-                            .frame(maxWidth: .infinity) // Ensure full width
-                            .listRowInsets(EdgeInsets()) // Remove extra padding
-                        
-                        //MARK: - LIST DETAILS HEADER
+        if viewModel.packingList.isDeleted {
+           EmptyView()
+        }
+        else {
+            Group {
+                ZStack(alignment: .center) {
+                    ScrollView {
                         VStack {
-                            ListDetailCardView(viewModel: viewModel)
-                            .offset(y: -40)
                             
+                            //MARK: - BANNER IMAGE
+                            BannerImageView(viewModel: viewModel, bannerImage: $bannerImage)
+                                .frame(maxWidth: .infinity) // Ensure full width
+                                .listRowInsets(EdgeInsets()) // Remove extra padding
                             
-                            //MARK: - LIST CATEGORIES
-                            
-                            CategoriesListView(viewModel: viewModel)
-                            
+                            //MARK: - LIST DETAILS HEADER
+                            VStack {
+                                ListDetailCardView(viewModel: viewModel)
+                                    .offset(y: -40)
+                                
+                                
+                                //MARK: - LIST CATEGORIES
+                                
+                                CategoriesListView(viewModel: viewModel)
+                                
+                            }//:VSTACK
+                            .padding(.horizontal)
                         }//:VSTACK
-                        .padding(.horizontal)
-                    }//:VSTACK
-                    .background(
-                        GeometryReader { geo in
-                            Color.clear
-                                .frame(height: 0)
-                                .onChange(of: geo.frame(in: .global).minY) {
-                                    scrollOffset = geo.frame(in: .global).minY
-                                }
-                        }
-                    )//NAV BAR UI CHANGES ON SCROLL
-                }//:SCROLLVIEW
-                .background(Color.colorTan)
-                .ignoresSafeArea(edges: .top)
-                
-                //MARK: - CONFETTI ANIMATION
-                VStack {
-                    Spacer()
-                    if viewModel.isConfettiVisible {
-                        Text("🔥")
-                            .font(.system(size: 50))
-                            .scaleEffect(fireScale)
-                            .shadow(color: .black.opacity(0.3), radius: 10, x: 0, y: 2)
-                            .onAppear {
-                                fireScale = 0.1
-                                withAnimation(.interpolatingSpring(stiffness: 200, damping: 8)) {
-                                    fireScale = 1.0
-                                }
+                        .background(
+                            GeometryReader { geo in
+                                Color.clear
+                                    .frame(height: 0)
+                                    .onChange(of: geo.frame(in: .global).minY) {
+                                        scrollOffset = geo.frame(in: .global).minY
+                                    }
                             }
-                            .confettiCannon(
-                                trigger: $viewModel.trigger,
-                                num:1,
-                                confettis: [.text("🔥")],
-                                confettiSize: 8,
-                                rainHeight: 0,
-                                radius: 150,
-                                repetitions: 10,
-                                repetitionInterval: 0.1,
-                                hapticFeedback: true)
-                    }//:CONDITION
-                    Spacer()
-                }//:VSTACK
-                HStack {
-                    Spacer()
-                    addCategoryButton
-                }//:HSTACK
-                .padding()
-                
-            }//:ZSTACK
+                        )//NAV BAR UI CHANGES ON SCROLL
+                    }//:SCROLLVIEW
+                    .background(Color.colorTan)
+                    .ignoresSafeArea(edges: .top)
+                    
+                    //MARK: - CONFETTI ANIMATION
+                    VStack {
+                        Spacer()
+                        if viewModel.isConfettiVisible {
+                            Text("🔥")
+                                .font(.system(size: 50))
+                                .scaleEffect(fireScale)
+                                .shadow(color: .black.opacity(0.3), radius: 10, x: 0, y: 2)
+                                .onAppear {
+                                    fireScale = 0.1
+                                    withAnimation(.interpolatingSpring(stiffness: 200, damping: 8)) {
+                                        fireScale = 1.0
+                                    }
+                                }
+                                .confettiCannon(
+                                    trigger: $viewModel.trigger,
+                                    num:1,
+                                    confettis: [.text("🔥")],
+                                    confettiSize: 8,
+                                    rainHeight: 0,
+                                    radius: 150,
+                                    repetitions: 10,
+                                    repetitionInterval: 0.1,
+                                    hapticFeedback: true)
+                        }//:CONDITION
+                        Spacer()
+                    }//:VSTACK
+                    
+                }//:ZSTACK
+            }//:GROUP
             .background(Color.colorTan)
             .navigationTitle(viewModel.packingList.title)
             .navigationBarTitleDisplayMode(.inline)
             .navigationBarBackButtonHidden(true)
             .ignoresSafeArea(.keyboard, edges: .bottom)
-            .animation(.easeOut(duration: 0.3), value: viewModel.isShowingDuplicationConfirmation)
+            .animation(.easeOut(duration: 0.3), value: viewModel.isShowingSuccessfulDuplication)
             .toolbar {
                 //CUSTOM BACK BUTTON
                 ToolbarItem(placement: .navigationBarLeading) {
@@ -136,7 +140,6 @@ struct ListView: View {
                         .opacity(scrollOffset < -scrollThreshold ? 1 : 0)
                 }
             }
-            .photosPicker(isPresented: $isPhotoPickerPresented, selection: $bannerImageItem, matching: .images)
             .onChange(of: bannerImageItem) {
                 Task {
                     if let data = try? await bannerImageItem?.loadTransferable(type: Data.self),
@@ -158,69 +161,11 @@ struct ListView: View {
                     }
                 }
             }
-            .sheet(isPresented: $isEditingTitle) {
-                EditListDetailsModal(packingList: viewModel.packingList)
-                    .presentationDetents([.medium, .large])
-            }
-            .sheet(isPresented: $viewModel.isRearranging) {
-                RearrangeCategoriesView(viewModel: viewModel)
-                    .environmentObject(viewModel)
-                    .presentationDetents([.medium, .large])
-            }
-            .confirmationDialog(
-                viewModel.areAllItemsChecked ? "Are you sure you want to uncheck all items?" : "Are you sure you want to check all items?",
-                isPresented: $isShowingToggleAllItemsConfirmation,
-                titleVisibility: .visible
-            ) {
-                Button(viewModel.areAllItemsChecked ? "Uncheck All" : "Check All") {
-                    viewModel.toggleAllItems()
-                    isShowingToggleAllItemsConfirmation = false
-                }
-                
-                Button("Cancel", role: .cancel) { }
-            }
-            .confirmationDialog(
-                "Are you sure you want to duplicate the list?",
-                isPresented: $isShowingDuplicationConfirmation,
-                titleVisibility: .visible
-            ) {
-                Button("Duplicate") {
-                    viewModel.duplicateList()
-                    isShowingDuplicationConfirmation = false
-                }
-                
-                Button("Cancel", role: .cancel) { }
-            }
-            .alert(isPresented: $viewModel.isShowingDuplicationConfirmation) {
-                Alert(title: Text("Duplicate List"), message: Text("Your list has been successfully duplicated."), dismissButton: .default(Text("OK")))
-            }
-            .confirmationDialog(
-                "Are you sure you want to delete this list?",
-                isPresented: $isShowingDeleteConfirmation,
-                titleVisibility: .visible
-            ) {
-                Button("Delete", role: .destructive) {
-                    viewModel.deleteList(dismiss: dismiss) // Perform delete
-                }
-                Button("Cancel", role: .cancel) { }
-            }
             .onTapGesture {
                 hideKeyboard()
             }
-        }//:NAVIGATION STACK
+        }//:CONDITION
     }//:BODY
-    
-    //MARK: - ADD CATEGORY BUTTON
-    
-    private var addCategoryButton: some View {
-        
-        Button {
-            viewModel.addNewCategory()
-        } label: {
-            BigButtonLabel(label: "Add Category")
-        }
-        .buttonStyle(BigButton())
-    }
     
     
     //MARK: - OPTIONS MENU
@@ -237,28 +182,45 @@ struct ListView: View {
                 )
                 .dynamicForegroundStyle(trigger: scrollOffset)
             }
+            .confirmationDialog(
+                viewModel.areAllItemsChecked ? "Are you sure you want to uncheck all items?" : "Are you sure you want to check all items?",
+                isPresented: $isShowingToggleAllItemsConfirmation,
+                titleVisibility: .visible
+            ) {
+                Button(viewModel.areAllItemsChecked ? "Uncheck All" : "Check All") {
+                    viewModel.toggleAllItems()
+                    isShowingToggleAllItemsConfirmation = false
+                }
+                
+                Button("Cancel", role: .cancel) { }
+            }
             //MARK: - MENU BUTTON
             Menu {
-                // Edit Title
+                // EDIT TITLE
                 Button(action: {
-                    isEditingTitle.toggle()
+                    isEditingTitle = true
                 }) {
                     Label("Edit List Details", systemImage: "pencil")
                 }
                 
-                // Change banner image
-                Button(action: { isPhotoPickerPresented = true }) {
+                
+                // CHANGE BANNER IMAGE
+                Button(action: {
+                    isPhotoPickerPresented = true
+                }) {
                     Label("Edit Photo", systemImage: "camera")
                 }
                 
-                // Rearrange option
+                
+                // REARRANGE
                 Button(action: {
                     viewModel.isRearranging = true
                 }) {
                     Label("Rearrange", systemImage: "arrow.up.arrow.down")
                 }
                 
-                // Expand All
+                
+                // EXPAND ALL
                 Button(action: {
                     withAnimation {
                         viewModel.expandAll()
@@ -267,7 +229,7 @@ struct ListView: View {
                     Label("Expand All", systemImage: "rectangle.expand.vertical")
                 }
                 
-                // Collapse All
+                // COLLAPSE ALL
                 Button(action: {
                     withAnimation {
                         viewModel.collapseAll()
@@ -276,7 +238,7 @@ struct ListView: View {
                     Label("Collapse All", systemImage: "rectangle.compress.vertical")
                 }
                 
-                // Duplicate List
+                // DUPLICATE LIST
                 Button {
                     if storeKitManager.isUnlimitedListsUnlocked || packingListsCount < Constants.proVersionListCount {
                         isShowingDuplicationConfirmation = true
@@ -288,17 +250,82 @@ struct ListView: View {
                     Label("Duplicate List", systemImage: "doc.on.doc")
                 }
                 
-                // Delete List
+                
+                // DELETE LIST
                 Button(role: .destructive) {
                     isShowingDeleteConfirmation = true
                 } label: {
                     Label("Delete List", systemImage: "trash")
                 }
                 
+                
             } label: {
                 Label("Options", systemImage: "ellipsis.circle")
                     .dynamicForegroundStyle(trigger: scrollOffset)
             }
+            
+            //ADD NEW CATEGORY
+            Button {
+                isAddNewCategoryShowing = true
+            } label: {
+                Image(systemName: "plus")
+                    .dynamicForegroundStyle(trigger: scrollOffset)
+            }
+            .alert("Add New Category", isPresented: $isAddNewCategoryShowing) {
+                TextField("New category", text: $newCategoryTitle)
+                Button("Add Item", action: {
+                    if newCategoryTitle != "" {
+                        viewModel.addNewCategory(title: newCategoryTitle)
+                        newCategoryTitle = ""
+                    }
+                    isAddNewCategoryShowing = false
+                })
+                Button("Cancel", role: .cancel) { }
+            }
+        }//:HSTACK
+        .sheet(isPresented: $isEditingTitle) {
+            EditListDetailsModal(packingList: viewModel.packingList)
+                .presentationDetents([.medium, .large])
+        }
+        .photosPicker(isPresented: $isPhotoPickerPresented, selection: $bannerImageItem, matching: .images)
+        .sheet(isPresented: $viewModel.isRearranging) {
+            RearrangeCategoriesView(viewModel: viewModel)
+                .environmentObject(viewModel)
+                .presentationDetents([.medium, .large])
+        }
+        .confirmationDialog(
+            "Are you sure you want to duplicate the list?",
+            isPresented: $isShowingDuplicationConfirmation,
+            titleVisibility: .visible
+        ) {
+            Button("Duplicate") {
+                viewModel.duplicateList(packingListCount: packingListsCount)
+                isShowingDuplicationConfirmation = false
+            }
+            
+            Button("Cancel", role: .cancel) { }
+        }
+        .alert("Duplicate List", isPresented: $viewModel.isShowingSuccessfulDuplication) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text("Your list has been successfully duplicated.")
+        }
+        .confirmationDialog(
+            "Are you sure you want to delete this list?",
+            isPresented: $isShowingDeleteConfirmation,
+            titleVisibility: .visible
+        ) {
+            Button("Delete", role: .destructive) {
+                    // Step 1: Exit the view
+                    dismiss()
+                    // Step 2: After a short delay, safely delete
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+                        let listToDelete = viewModel.packingList
+                        viewModel.modelContext.delete(listToDelete)
+                        viewModel.saveContext()
+                    }
+            }
+            Button("Cancel", role: .cancel) { }
         }
     }
 }
@@ -333,7 +360,7 @@ struct ListView: View {
 #Preview("Basic Preview") {
     NavigationStack {
         let storeKitManager = StoreKitManager()
-        let placeholderPackingList = PackingList(title: "Sample Packing List")
+        let placeholderPackingList = PackingList.samplePackingList
         let container = try! ModelContainer(
             for: PackingList.self, Category.self, Item.self,
             configurations: ModelConfiguration(isStoredInMemoryOnly: true)

@@ -29,6 +29,7 @@ func preloadPackingListData(context: ModelContext) {
 
     // Create a sample PackingList
     let sampleList = PackingList(
+        position: 0,
         title: "Sample Camping Trip",
         photo: placeholderImageData,
         dateCreated: Date(),

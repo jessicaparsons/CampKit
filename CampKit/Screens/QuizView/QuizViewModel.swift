@@ -35,13 +35,14 @@ class QuizViewModel {
     //MARK: - METHODS
     
     @MainActor
-    func createPackingList() {
+    func createPackingList(packingListCount: Int) {
         withAnimation {
             
             // filters the choices to include only the selected items
             // where 'isSelected' is true, then maps the filtered result to an array of their names
             // inserts the choices into the context
             let newPackingList = PackingList(
+                position: packingListCount,
                 title: listTitle.isEmpty ? "My Packing List" : listTitle,
                 locationName: (locationName == nil) ? nil : locationName,
                 locationAddress: (locationAddress == nil) ? nil : locationAddress,
@@ -54,7 +55,7 @@ class QuizViewModel {
             let categories = generateCategories(from: newPackingList)
             newPackingList.categories.append(contentsOf: categories)
             
-            newPackingList.categories.first?.isExpanded = true
+            newPackingList.categories.last?.isExpanded = true
             
             //Save
             modelContext.insert(newPackingList)
@@ -72,6 +73,7 @@ class QuizViewModel {
     func createBlankPackingList() {
         withAnimation {
             let newPackingList = PackingList(
+                position: 0,
                 title: "My Packing List",
                 locationName: nil,
                 locationAddress: nil,

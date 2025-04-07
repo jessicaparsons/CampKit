@@ -13,6 +13,7 @@ struct EditListDetailsModal: View {
     @State var isLocationSearchOpen: Bool = false
     @State private var locationNamePlaceholder: String?
     @State private var locationAddressPlaceholder: String?
+    @State private var listTitlePlaceholder: String = ""
     
     var body: some View {
         NavigationStack {
@@ -26,7 +27,7 @@ struct EditListDetailsModal: View {
                         .font(.footnote)
                         .fontWeight(.bold)
                     
-                    TextField("Enter new title", text: $packingList.title)
+                    TextField("Enter new title", text: $listTitlePlaceholder)
                         .multilineTextAlignment(.leading)
                         .padding(.vertical, 10)
                         .padding(.horizontal, 15)
@@ -62,7 +63,7 @@ struct EditListDetailsModal: View {
                         }
                     //MARK: - SAVE CHANGES BUTTON
                     Button("Save Changes") {
-                        packingList.title = packingList.title.trimmingCharacters(in: .whitespacesAndNewlines)
+                        packingList.title = listTitlePlaceholder.trimmingCharacters(in: .whitespacesAndNewlines)
                         packingList.locationName = locationNamePlaceholder?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
                         packingList.locationAddress = locationAddressPlaceholder?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
                         HapticsManager.shared.triggerSuccess()
@@ -77,6 +78,7 @@ struct EditListDetailsModal: View {
                 .navigationBarTitleDisplayMode(.inline)
                 .padding()
                 .onAppear {
+                    listTitlePlaceholder = packingList.title
                     locationNamePlaceholder = packingList.locationName
                     locationAddressPlaceholder = packingList.locationAddress
                 }
@@ -124,7 +126,7 @@ struct EditListDetailsModal: View {
 
 
 #Preview {
-    let sampleUserList = PackingList(title: "Summer List with a very long anme", locationName: "Joshua Tree, CA")
+    let sampleUserList = PackingList(position: 0, title: "Summer List with a very long anme", locationName: "Joshua Tree, CA")
     NavigationStack {
         EditListDetailsModal(
             packingList: sampleUserList

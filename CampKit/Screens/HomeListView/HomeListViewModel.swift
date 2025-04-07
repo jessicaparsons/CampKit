@@ -8,45 +8,17 @@
 import SwiftUI
 import SwiftData
 
-@Observable
+
 final class HomeListViewModel: ObservableObject {
     
     private let modelContext: ModelContext
     
     init(modelContext: ModelContext) {
         self.modelContext = modelContext
-        //fetchPackingLists()
     }
     
-//    func fetchPackingLists() {
-//        let fetchDescriptor = FetchDescriptor<PackingList>()
-//        do {
-//            packingLists = try modelContext.fetch(fetchDescriptor)
-//            print("Fetched packing lists: \(packingLists.map { $0.title })")
-//        } catch {
-//            print("Error fetching packing lists: \(error)")
-//            packingLists = []
-//        }
-//    }
     
-    func addNewList() {
-        withAnimation {
-            let newPackingList = PackingList(title: "New List")
-            modelContext.insert(newPackingList)
-            saveContext()
-            //fetchPackingLists()
-        }
-    }
-    
-//    func deleteLists(packingList: PackingList) {
-//        withAnimation {
-//            modelContext.delete(packingList)
-//            saveContext()
-//            
-//        }
-//    }
-    
-    private func saveContext() {
+    func saveContext() {
         do {
             try modelContext.save()
             print("Context saved successfully.")
@@ -54,5 +26,6 @@ final class HomeListViewModel: ObservableObject {
             print("Failed to save context: \(error.localizedDescription)")
         }
     }
+    
 }
 

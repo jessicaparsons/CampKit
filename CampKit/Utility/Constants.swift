@@ -20,7 +20,11 @@ struct Constants {
     static let cardSpacing: CGFloat = 20
     static let emptyContentSpacing: CGFloat = 40
     static let horizontalPadding: CGFloat = 20
-    
+
     static let proVersionListCount: Int = 30
+    
+    static let gradientBannerHeight: CGFloat = 120
+    
+    static let navSpacing: CGFloat = 20
     
 }

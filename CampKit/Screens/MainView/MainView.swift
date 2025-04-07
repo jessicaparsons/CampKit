@@ -9,6 +9,9 @@ import SwiftUI
 import SwiftData
 
 struct MainView: View {
+    
+    @Query var packingLists: [PackingList]
+
     @Environment(\.modelContext) var modelContext
     @Environment(StoreKitManager.self) private var storeKitManager
     let weatherViewModel = WeatherViewModel(weatherFetcher: WeatherAPIClient())
@@ -20,42 +23,52 @@ struct MainView: View {
     @State private var navigateToListView = false
     @State private var currentPackingList: PackingList?
     @State private var isUpgradeToProShowing: Bool = false
-    @State private var packingListsCount: Int = 0
+    
+    var packingListsCount: Int {
+        packingLists.count
+    }
     
     var body: some View {
+        
         NavigationStack {
-            ZStack(alignment: .bottom) {
+            ZStack {
                 TabView(selection: $selection) {
                     Group {
-                        HomeListView(modelContext: modelContext, isNewListQuizShowing: $isNewListQuizShowing)
-                            .tabItem {
-                                Image(systemName: "list.bullet")
-                            }
-                            .tag(0)
+                        NavigationStack {
+                            HomeListView(modelContext: modelContext, isNewListQuizShowing: $isNewListQuizShowing)
+                        }
+                        .tabItem {
+                            Image(systemName: "list.bullet")
+                        }
+                        .tag(0)
                         
-                        RemindersView()
-                            .tabItem {
-                                Image(systemName: "bell")
-                            }
-                            .tag(1)
+                        NavigationStack {
+                            RemindersView()
+                        }
+                        .tabItem {
+                            Image(systemName: "bell")
+                        }
+                        .tag(1)
                         
-                        RestockView()
-                            .tabItem {
-                                Image(systemName: "arrow.clockwise.square")
-                            }
-                            .tag(2)
-                        
-                        SettingsView()
-                            .padding(.horizontal)
-                            .tabItem {
-                                Image(systemName: "gearshape")
-                            }
-                            .tag(3)
+                        NavigationStack {
+                            RestockView(viewModel: RestockViewModel(modelContext: modelContext))
+                        }
+                        .tabItem {
+                            Image(systemName: "arrow.clockwise.square")
+                        }
+                        .tag(2)
+                        NavigationStack {
+                            SettingsView()
+                        }
+                        .padding(.horizontal)
+                        .tabItem {
+                            Image(systemName: "gearshape")
+                        }
+                        .tag(3)
                     }//:GROUP
                     .toolbarBackground(Color(UIColor.tertiarySystemBackground), for: .tabBar)
                 }//:TABVIEW
             }//:ZSTACK
-            .ignoresSafeArea(.keyboard) // So the button doesn't move on keyboard appearance
             
             //MARK: - SHOW PACKING LIST QUIZ
             .sheet(isPresented: $isNewListQuizShowing) {
@@ -65,7 +78,8 @@ struct MainView: View {
                         isNewListQuizShowing: $isNewListQuizShowing,
                         isStepOne: $isStepOne,
                         navigateToListView: $navigateToListView,
-                        currentPackingList: $currentPackingList
+                        currentPackingList: $currentPackingList,
+                        packingListCount: packingListsCount
                     )
                     .environment(weatherViewModel)
                 }
@@ -74,7 +88,7 @@ struct MainView: View {
                 get: { storeKitManager.isUpgradeToProShowing },
                 set: { storeKitManager.isUpgradeToProShowing = $0 })
             ) {
-                    UpgradeToProView()
+                UpgradeToProView()
             }
             .navigationDestination(isPresented: $navigateToListView) {
                 if let packingList = currentPackingList {
@@ -85,15 +99,7 @@ struct MainView: View {
                     HomeListView(modelContext: modelContext, isNewListQuizShowing: $isNewListQuizShowing)
                 }
             }
-        }//:NAVIGATION STACK
-        .task {
-            do {
-                let descriptor = FetchDescriptor<PackingList>()
-                packingListsCount = try modelContext.fetchCount(descriptor)
-            } catch {
-                print("Error fetching packing list count: \(error)")
-            }
-        }
+        }//:NAVIGATIONSTACK
     }
     
 }
@@ -110,10 +116,9 @@ struct MainView: View {
     
     preloadPackingListData(context: container.mainContext)
     
-    return NavigationView {
-        MainView()
+    return MainView()
             .modelContainer(container)
             .environment(StoreKitManager())
-    }
+    
 }
 

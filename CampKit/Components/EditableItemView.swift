@@ -12,6 +12,7 @@ struct EditableItemView: View {
     
     @Binding var item: String
     @FocusState private var isFocused: Bool
+    var isList: Bool
     var isPacked: Bool
     let togglePacked: () -> Void
     let deleteItem: () -> Void
@@ -34,6 +35,9 @@ struct EditableItemView: View {
                     .strikethrough(isPacked)
                     .italic(isPacked)
                     .focused($isFocused)
+                    .onTapGesture {
+                        isFocused = true
+                    }
                     .onSubmit {
                         isFocused = false
                     }
@@ -44,12 +48,12 @@ struct EditableItemView: View {
                         Text("Done")
                     }
                 }
-            }
+            }//:HSTACK
         }//:ZSTACK
         .padding(.horizontal)
         .padding(.vertical, 8)
         //MARK: - SWIPE TO DELETE
-        .modifier(SwipeActionModifier(isFocused: isFocused, deleteAction: deleteItem))
+        .modifier(SwipeActionModifier(isFocused: isFocused, isList: isList, deleteAction: deleteItem))
         
     }//:BODY
     
@@ -61,6 +65,7 @@ struct EditableItemView: View {
     
     EditableItemView(
         item: $title,
+        isList: false,
         isPacked: true,
         togglePacked: { print("Toggle packed for \(title)") },
         deleteItem: { print("Delete item: \(title)") }
@@ -68,6 +73,7 @@ struct EditableItemView: View {
     
     EditableItemView(
         item: $title,
+        isList: false,
         isPacked: false,
         togglePacked: { print("Toggle packed for \(title)") },
         deleteItem: { print("Delete item: \(title)") }

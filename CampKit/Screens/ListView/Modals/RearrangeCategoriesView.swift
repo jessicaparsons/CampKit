@@ -61,7 +61,7 @@ struct RearrangeCategoriesView: View {
     )
     
     // Create a mock PackingList and populate it with sample categories
-    let samplePackingList = PackingList(title: "Sample Trip")
+    let samplePackingList = PackingList.samplePackingList
     let sampleCategories = [
         Category(name: "Clothes", position: 0),
         Category(name: "Food", position: 1),

@@ -30,6 +30,7 @@ struct CategorySectionView: View {
                         if let index = category.items.firstIndex(where: { $0.id == item.id }) {
                             EditableItemView(
                                 item: $category.items[index].title,
+                                isList: false,
                                 isPacked: category.items[index].isPacked,
                                 togglePacked: { viewModel.togglePacked(for: item) },
                                 deleteItem: { viewModel.deleteItem(item) }
@@ -93,6 +94,7 @@ struct CategorySectionView: View {
                                 .padding(.leading, 10)
                                 .padding(.vertical, 10)
                                 .padding(.trailing, 0)
+                                .foregroundStyle(Color.primary)
                         } //:MENU
                         .labelStyle(.iconOnly)
                     }//:HSTACK
@@ -187,7 +189,7 @@ struct LeftDisclosureStyle: DisclosureGroupStyle {
     )
     
     // Create a mock PackingList and empty Category
-    let samplePackingList = PackingList(title: "Sample Packing List")
+    let samplePackingList = PackingList.samplePackingList
     let emptyCategory = Category(name: "Lounge", position: 0)
     samplePackingList.categories.append(emptyCategory)
     

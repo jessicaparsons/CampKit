@@ -16,13 +16,14 @@ struct CampKitApp: App {
     
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
-            Item.self, PackingList.self, Category.self
+            Item.self, PackingList.self, Category.self, RestockItem.self
         ])
-        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)//change to false in production
+        
+        let isPreview = ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PREVIEWS"] == "1"
+        let modelConfig = ModelConfiguration(schema: schema, isStoredInMemoryOnly: isPreview)
 
         do {
-            return try ModelContainer(for: schema, configurations: [modelConfiguration])
-            
+            return try ModelContainer(for: schema, configurations: [modelConfig])
         } catch {
             fatalError("Could not create ModelContainer: \(error)")
         }

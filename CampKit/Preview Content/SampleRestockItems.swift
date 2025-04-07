@@ -11,26 +11,18 @@ extension RestockItem {
     
     static var restockItems: [RestockItem] {
         return [
-            RestockItem(id: UUID(), title: "Propane", dateCreated: Date(), isPacked: false),
-            RestockItem(id: UUID(), title: "Paper Towels", dateCreated: Date(), isPacked: false),
-            RestockItem(id: UUID(), title: "Fire Starter", dateCreated: Date(), isPacked: false),
-            RestockItem(id: UUID(), title: "Gloves", dateCreated: Date(), isPacked: false),
-            RestockItem(id: UUID(), title: "Propane", dateCreated: Date(), isPacked: false),
-            RestockItem(id: UUID(), title: "Paper Towels", dateCreated: Date(), isPacked: false),
-            RestockItem(id: UUID(), title: "Fire Starter", dateCreated: Date(), isPacked: false),
-            RestockItem(id: UUID(), title: "Gloves", dateCreated: Date(), isPacked: false),
-            RestockItem(id: UUID(), title: "Propane", dateCreated: Date(), isPacked: false),
-            RestockItem(id: UUID(), title: "Paper Towels", dateCreated: Date(), isPacked: false),
-            RestockItem(id: UUID(), title: "Fire Starter", dateCreated: Date(), isPacked: false),
-            RestockItem(id: UUID(), title: "Gloves", dateCreated: Date(), isPacked: false),
-            RestockItem(id: UUID(), title: "Propane", dateCreated: Date(), isPacked: false),
-            RestockItem(id: UUID(), title: "Paper Towels", dateCreated: Date(), isPacked: false),
-            RestockItem(id: UUID(), title: "Fire Starter", dateCreated: Date(), isPacked: false),
-            RestockItem(id: UUID(), title: "Gloves", dateCreated: Date(), isPacked: false),
-            RestockItem(id: UUID(), title: "Propane", dateCreated: Date(), isPacked: false),
-            RestockItem(id: UUID(), title: "Paper Towels", dateCreated: Date(), isPacked: false),
-            RestockItem(id: UUID(), title: "Fire Starter", dateCreated: Date(), isPacked: false),
-            RestockItem(id: UUID(), title: "Gloves", dateCreated: Date(), isPacked: false)
+            RestockItem(position: 0, title: "Propane", isPacked: false),
+            RestockItem(position: 1, title: "Paper Towels", isPacked: false),
+            RestockItem(position: 2, title: "Fire Starter", isPacked: false),
+            RestockItem(position: 3, title: "Gloves", isPacked: false),
+            RestockItem(position: 4, title: "Propane", isPacked: false),
+            RestockItem(position: 5, title: "Paper Towels", isPacked: false),
+            RestockItem(position: 6, title: "Fire Starter", isPacked: false),
+            RestockItem(position: 7, title: "Gloves", isPacked: false),
+            RestockItem(position: 8, title: "Propane", isPacked: false),
+            RestockItem(position: 9, title: "Paper Towels", isPacked: false),
+            RestockItem(position: 10, title: "Fire Starter", isPacked: false),
+            RestockItem(position: 11, title: "Gloves", isPacked: false),
         ]
     }
 }

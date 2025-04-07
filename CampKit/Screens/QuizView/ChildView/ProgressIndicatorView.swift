@@ -46,7 +46,7 @@ struct ProgressIndicatorView: View {
         for: PackingList.self, Category.self, Item.self,
         configurations: ModelConfiguration(isStoredInMemoryOnly: true)
     )
-    QuizView(viewModel: QuizViewModel(modelContext: container.mainContext), isNewListQuizShowing: $isNewListQuizShowing, isStepOne: $isStepOne,     navigateToListView: $navigateToListView, currentPackingList: $currentPackingList
+    QuizView(viewModel: QuizViewModel(modelContext: container.mainContext), isNewListQuizShowing: $isNewListQuizShowing, isStepOne: $isStepOne,     navigateToListView: $navigateToListView, currentPackingList: $currentPackingList, packingListCount: 3
 )
 }
 

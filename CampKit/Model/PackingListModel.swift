@@ -10,18 +10,21 @@ import SwiftData
 
 @Model
 class PackingList: Identifiable {
+    @Attribute var position: Int
     var title: String
-    var photo: Data? // Optional photo for thumbnail
+    var photo: Data?
     var dateCreated: Date = Date()
     var locationName: String?
     var locationAddress: String?
     var latitude: Double?
     var longitude: Double?
     var elevation: Double?
+
     
     @Relationship(deleteRule: .cascade) var categories: [Category]
 
     init(
+        position: Int,
         title: String,
         photo: Data? = nil,
         dateCreated: Date = Date(),
@@ -31,6 +34,7 @@ class PackingList: Identifiable {
         longitude: Double? = nil,
         elevation: Double? = nil
     ) {
+        self.position = position
         self.title = title
         self.locationName = locationName
         self.locationAddress = locationAddress
