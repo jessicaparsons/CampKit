@@ -36,9 +36,9 @@ struct WeatherRowView: View {
             
             if temperatureUnit == TemperatureUnit.celsius.rawValue {
                 let celsius = (fahrenheit - 32) * 5 / 9
-                return String(format: "%.0f°C", celsius)
+                return String(format: "%.0f", celsius)
             } else {
-                return String(format: "%.0f°F", fahrenheit)
+                return String(format: "%.0f", fahrenheit)
             }
         }
 }

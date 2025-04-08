@@ -51,7 +51,7 @@ struct MainView: View {
                         .tag(0)
                         
                         NavigationStack {
-                            RemindersView()
+                            RemindersView(viewModel: RestockViewModel(modelContext: modelContext))
                         }
                         .tabItem {
                             Image(systemName: "bell")
