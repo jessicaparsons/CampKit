@@ -28,27 +28,34 @@ struct HomeListView: View {
     }
     
     var body: some View {
-            //MARK: - HEADER
+        //MARK: - HEADER
         ZStack(alignment: .top) {
+            
+            
+            //MARK: - BACKGROUND STYLES
+            GradientTanBackgroundView()
+            
+            
+            VStack {
+                //MARK: - PACKING LISTS
                 
-                gradientHeaderView
-                
-                VStack {
-                    //MARK: - PACKING LISTS
-                  
-                    if packingLists.isEmpty {
-                        VStack(spacing: Constants.verticalSpacing) {
-                                ContentUnavailableView("Let's Get Packing", systemImage: "tent", description: Text("""
+                if packingLists.isEmpty {
+                    ScrollView {
+                        ContentUnavailableView("Let's Get Packing", systemImage: "tent", description: Text("""
 You haven't created any lists yet. 
 Hit the \"+\" to get started!
 """))
-                                    .padding(.top, Constants.emptyContentSpacing)
-                        }//:VSTACK
-                    } else {
-                        
-                        List {
+                        .padding(.top, Constants.emptyContentSpacing)
+                    }
+                } else {
+                    
+                    List {
+                        Section(header:
+                                    Color.clear
+                            .frame(height: 1) // 👈 tweak to desired spacing
+                        ) {
                             ForEach(packingLists) { packingList in
-
+                                
                                 NavigationLink(
                                     destination: ListView(
                                         viewModel: ListViewModel(modelContext: modelContext, packingList: packingList),
@@ -88,74 +95,58 @@ Hit the \"+\" to get started!
                             } //:FOR EACH
                             .onMove { source, destination in
                                 packingLists.move(fromOffsets: source, toOffset: destination)
-
+                                
                                 for (index, list) in packingLists.enumerated() {
                                     list.position = index
                                 }
-
+                                
                                 viewModel.saveContext()
                             }
                             .onDelete { offsets in
                                 for index in offsets {
                                     modelContext.delete(packingLists[index])
                                 }
-
+                                
                                 packingLists.remove(atOffsets: offsets)
-
+                                
                                 for (index, list) in packingLists.enumerated() {
                                     list.position = index
                                 }
-
+                                
                                 viewModel.saveContext()
                             }
-                        
-                            
-                        }//:LIST
-                        .sheet(isPresented: Binding(
-                            get: { storeKitManager.isUpgradeToProShowing },
-                            set: { storeKitManager.isUpgradeToProShowing = $0 })
-                        ) {
-                            UpgradeToProView()
                         }
-                    }//:ELSE
-                }//:VSTACK
-                .background(
-                    RoundedRectangle(cornerRadius: Constants.cornerRadius)
-                        .fill(Color.customTan)
-                        .ignoresSafeArea(.container, edges: [.bottom])
-                        .shadow(color: .gray.opacity(0.2), radius: 4, x: 0, y: -2)
-                )
-                .padding(.top, Constants.bodyPadding)
-            }//:ZSTACK
-            .scrollContentBackground(.hidden)
-            .environment(\.editMode, $editMode)
-            .onAppear {
-                packingLists = fetchedLists
-            }
-            .onChange(of: fetchedLists) {
-                packingLists = fetchedLists
-            }
+                    }//:LIST
+                    .sheet(isPresented: Binding(
+                        get: { storeKitManager.isUpgradeToProShowing },
+                        set: { storeKitManager.isUpgradeToProShowing = $0 })
+                    ) {
+                        UpgradeToProView()
+                    }
+                }//:ELSE
+            }//:VSTACK
+        }//:ZSTACK
+        .navigationTitle("Howdy, Camper")
+        .navigationBarTitleDisplayMode(.large)
+        .scrollContentBackground(.hidden)
+        .environment(\.editMode, $editMode)
+        .onAppear {
+            packingLists = fetchedLists
+        }
+        .onChange(of: fetchedLists) {
+            packingLists = fetchedLists
+        }
         
-    }//:BODY
-        
-    //MARK: - GRADIENT HEADER
-        
-   private var gradientHeaderView: some View {
-       ZStack(alignment: .center) {
-            LinearGradient(colors: [.customGold, .customSage, .customSky, .customLilac], startPoint: .bottomLeading, endPoint: .topTrailing)
-                
-            HStack{
-                Text("Howdy, Camper")
-                    .font(.system(size: Constants.titleFont, weight: .bold, design: .default))
-                    .foregroundColor(.black)
-                Spacer()
-                HStack(spacing: Constants.verticalSpacing) {
+        //MARK: - MENU
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                HStack {
                     if editMode == .inactive {
                         // REARRANGE BUTTON
                         Button {
                             editMode = (editMode == .active) ? .inactive : .active
                         } label: {
-                            Image(systemName: "arrow.up.and.down.text.horizontal")
+                            Image(systemName: "pencil.circle")
                                 .font(.body)
                         }
                         // ADD BUTTON
@@ -167,26 +158,21 @@ Hit the \"+\" to get started!
                             }
                         } label: {
                             Image(systemName: "plus")
-                                .font(.title2)
                         }
                     } else {
                         Button {
                             editMode = (editMode == .active) ? .inactive : .active
                         } label: {
                             Text("Done")
-                                .font(.body)
                         }
                     }
                 }//:HSTACK
-                .foregroundStyle(.black)
-            }//:HSTACK
-            .padding(.top, Constants.navSpacing)
-            .padding(.horizontal)
-        }//:ZSTACK
-        .ignoresSafeArea()
-        .frame(height: Constants.gradientBannerHeight)
-    }
-  
+                .foregroundStyle(Color.primary)
+            }//:TOOL BAR ITEM
+        }//:TOOLBAR
+        
+    }//:BODY
+    
     
 }//:STRUCT
 
@@ -196,10 +182,7 @@ Hit the \"+\" to get started!
     @Previewable @State var isUpgradeToProShowing: Bool = false
     @Previewable @Bindable var storeKitManager = StoreKitManager()
     
-    let container = try! ModelContainer(
-        for: PackingList.self, Category.self, Item.self,
-        configurations: ModelConfiguration(isStoredInMemoryOnly: true)
-    )
+    let container = PreviewContainer.shared
     
     preloadPackingListData(context: container.mainContext)
     
@@ -218,13 +201,12 @@ Hit the \"+\" to get started!
     @Previewable @State var isUpgradeToProShowing: Bool = false
     @Previewable @Bindable var storeKitManager = StoreKitManager()
     
-    let container = try! ModelContainer(
-        for: PackingList.self, Category.self, Item.self,
-        configurations: ModelConfiguration(isStoredInMemoryOnly: true)
-    )
+    let container = PreviewContainer.shared
     
-    return HomeListView(modelContext: container.mainContext, isNewListQuizShowing: $isNewListQuizShowing)
-        .modelContainer(container)
-        .environment(\.modelContext, container.mainContext)
-        .environment(storeKitManager)
+    return NavigationStack {
+        HomeListView(modelContext: container.mainContext, isNewListQuizShowing: $isNewListQuizShowing)
+            .modelContainer(container)
+            .environment(\.modelContext, container.mainContext)
+            .environment(storeKitManager)
+    }
 }

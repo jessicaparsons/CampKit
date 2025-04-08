@@ -90,6 +90,7 @@ struct ListView: View {
                                 .font(.system(size: 50))
                                 .scaleEffect(fireScale)
                                 .shadow(color: .black.opacity(0.3), radius: 10, x: 0, y: 2)
+                                .opacity(viewModel.isConfettiVisible ? 1 : 0)
                                 .onAppear {
                                     fireScale = 0.1
                                     withAnimation(.interpolatingSpring(stiffness: 200, damping: 8)) {
@@ -273,7 +274,7 @@ struct ListView: View {
             }
             .alert("Add New Category", isPresented: $isAddNewCategoryShowing) {
                 TextField("New category", text: $newCategoryTitle)
-                Button("Add Item", action: {
+                Button("Add", action: {
                     if newCategoryTitle != "" {
                         viewModel.addNewCategory(title: newCategoryTitle)
                         newCategoryTitle = ""
@@ -335,10 +336,7 @@ struct ListView: View {
 #Preview("Sample Data") {
     NavigationStack {
         let storeKitManager = StoreKitManager()
-        let container = try! ModelContainer(
-            for: PackingList.self, Category.self, Item.self,
-            configurations: ModelConfiguration(isStoredInMemoryOnly: true) // In-memory container
-        )
+        let container = PreviewContainer.shared
         
         // Populate the container with sample data
         preloadPackingListData(context: container.mainContext)
@@ -361,10 +359,7 @@ struct ListView: View {
     NavigationStack {
         let storeKitManager = StoreKitManager()
         let placeholderPackingList = PackingList(position: 0, title: "Empty Camping List", locationName: "Ojai")
-        let container = try! ModelContainer(
-            for: PackingList.self, Category.self, Item.self,
-            configurations: ModelConfiguration(isStoredInMemoryOnly: true)
-        )
+        let container = PreviewContainer.shared
         
         let viewModel = ListViewModel(modelContext: container.mainContext, packingList: placeholderPackingList)
         
