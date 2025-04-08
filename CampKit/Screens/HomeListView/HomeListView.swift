@@ -38,7 +38,10 @@ struct HomeListView: View {
                   
                     if packingLists.isEmpty {
                         VStack(spacing: Constants.verticalSpacing) {
-                                ContentUnavailableView("Let's Get Packing", systemImage: "tent", description: Text("You haven't created any lists yet. Hit the \"+\" to get started!"))
+                                ContentUnavailableView("Let's Get Packing", systemImage: "tent", description: Text("""
+You haven't created any lists yet. 
+Hit the \"+\" to get started!
+"""))
                                     .padding(.top, Constants.emptyContentSpacing)
                         }//:VSTACK
                     } else {
@@ -122,7 +125,7 @@ struct HomeListView: View {
                         .ignoresSafeArea(.container, edges: [.bottom])
                         .shadow(color: .gray.opacity(0.2), radius: 4, x: 0, y: -2)
                 )
-                .padding(.top, 60)
+                .padding(.top, Constants.bodyPadding)
             }//:ZSTACK
             .scrollContentBackground(.hidden)
             .environment(\.editMode, $editMode)
@@ -139,22 +142,21 @@ struct HomeListView: View {
         
    private var gradientHeaderView: some View {
        ZStack(alignment: .center) {
-            LinearGradient(colors: [.customGold, .customSage, .customSky, .customLilac], startPoint: .topLeading, endPoint: .topTrailing)
+            LinearGradient(colors: [.customGold, .customSage, .customSky, .customLilac], startPoint: .bottomLeading, endPoint: .topTrailing)
                 
             HStack{
-                Text("Howdy, Camper!")
-                    .font(.title)
-                    .fontWeight(.light)
+                Text("Howdy, Camper")
+                    .font(.system(size: Constants.titleFont, weight: .bold, design: .default))
                     .foregroundColor(.black)
                 Spacer()
-                HStack(spacing: Constants.horizontalPadding) {
+                HStack(spacing: Constants.verticalSpacing) {
                     if editMode == .inactive {
                         // REARRANGE BUTTON
                         Button {
                             editMode = (editMode == .active) ? .inactive : .active
                         } label: {
                             Image(systemName: "arrow.up.and.down.text.horizontal")
-                            
+                                .font(.body)
                         }
                         // ADD BUTTON
                         Button {
@@ -165,6 +167,7 @@ struct HomeListView: View {
                             }
                         } label: {
                             Image(systemName: "plus")
+                                .font(.title2)
                         }
                     } else {
                         Button {
@@ -176,10 +179,9 @@ struct HomeListView: View {
                     }
                 }//:HSTACK
                 .foregroundStyle(.black)
-                .font(.title3)
             }//:HSTACK
-            .padding(.vertical)
-            .padding(.horizontal, Constants.horizontalPadding)
+            .padding(.top, Constants.navSpacing)
+            .padding(.horizontal)
         }//:ZSTACK
         .ignoresSafeArea()
         .frame(height: Constants.gradientBannerHeight)

@@ -11,7 +11,7 @@ import SwiftData
 struct MainView: View {
     
     @Query var packingLists: [PackingList]
-
+    
     @Environment(\.modelContext) var modelContext
     @Environment(StoreKitManager.self) private var storeKitManager
     let weatherViewModel = WeatherViewModel(weatherFetcher: WeatherAPIClient())
@@ -30,12 +30,20 @@ struct MainView: View {
     
     var body: some View {
         
-        NavigationStack {
-            ZStack {
+            ZStack(alignment: .bottom) {
                 TabView(selection: $selection) {
                     Group {
                         NavigationStack {
                             HomeListView(modelContext: modelContext, isNewListQuizShowing: $isNewListQuizShowing)
+                                .navigationDestination(isPresented: $navigateToListView) {
+                                    if let packingList = currentPackingList {
+                                        ListView(
+                                            viewModel: ListViewModel(modelContext: modelContext, packingList: packingList),
+                                            packingListsCount: packingListsCount)
+                                    } else {
+                                        HomeListView(modelContext: modelContext, isNewListQuizShowing: $isNewListQuizShowing)
+                                    }
+                                }
                         }
                         .tabItem {
                             Image(systemName: "list.bullet")
@@ -50,25 +58,49 @@ struct MainView: View {
                         }
                         .tag(1)
                         
+                        Spacer()
+                            .tabItem {
+                                EmptyView()
+                            }
+                            .tag(2)
+                        
                         NavigationStack {
                             RestockView(viewModel: RestockViewModel(modelContext: modelContext))
                         }
                         .tabItem {
                             Image(systemName: "arrow.clockwise.square")
                         }
-                        .tag(2)
+                        .tag(3)
+                        
                         NavigationStack {
                             SettingsView()
                         }
-                        .padding(.horizontal)
                         .tabItem {
                             Image(systemName: "gearshape")
                         }
-                        .tag(3)
+                        .tag(4)
                     }//:GROUP
                     .toolbarBackground(Color(UIColor.tertiarySystemBackground), for: .tabBar)
                 }//:TABVIEW
+                
+                //MARK: - CENTER ADD NEW LIST BUTTON
+                Button {
+                    isNewListQuizShowing = true
+                } label: {
+                    Image(systemName: "plus.circle.fill")
+                        .symbolRenderingMode(.palette)
+                        .font(.system(size: 38))
+                        .foregroundStyle(.black, Color(Color.colorNeon))
+                        .offset(y: -10)
+                }
+                
             }//:ZSTACK
+            .ignoresSafeArea(.keyboard) // So the button doesn't move on keyboard appearance
+            .onChange(of: selection) { oldValue, newValue in
+                if newValue == 2 {
+                    selection = oldValue // Revert to the previous tab
+                }
+            }
             
             //MARK: - SHOW PACKING LIST QUIZ
             .sheet(isPresented: $isNewListQuizShowing) {
@@ -90,16 +122,7 @@ struct MainView: View {
             ) {
                 UpgradeToProView()
             }
-            .navigationDestination(isPresented: $navigateToListView) {
-                if let packingList = currentPackingList {
-                    ListView(
-                        viewModel: ListViewModel(modelContext: modelContext, packingList: packingList),
-                        packingListsCount: packingListsCount)
-                } else {
-                    HomeListView(modelContext: modelContext, isNewListQuizShowing: $isNewListQuizShowing)
-                }
-            }
-        }//:NAVIGATIONSTACK
+            
     }
     
 }
@@ -117,8 +140,8 @@ struct MainView: View {
     preloadPackingListData(context: container.mainContext)
     
     return MainView()
-            .modelContainer(container)
-            .environment(StoreKitManager())
+        .modelContainer(container)
+        .environment(StoreKitManager())
     
 }
 

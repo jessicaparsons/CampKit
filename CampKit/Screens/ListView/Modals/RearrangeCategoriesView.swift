@@ -18,7 +18,7 @@ struct RearrangeCategoriesView: View {
 
                 List {
                     // Access categories from the ViewModel
-                    ForEach(viewModel.packingList.categories.sorted(by: { $0.position < $1.position }), id: \.id) { category in
+                    ForEach(viewModel.packingList.categories.sorted(by: { $0.position > $1.position }), id: \.id) { category in
                         Text(category.name)
                             .font(.headline)
                     }

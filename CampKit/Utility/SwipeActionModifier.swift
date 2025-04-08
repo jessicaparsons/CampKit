@@ -27,7 +27,7 @@ struct SwipeActionModifier: ViewModifier {
                                             systemImage: "",
                                             view: {
                                                 AnyView(
-                                                    Image(systemName: "pencil")
+                                                    Image(systemName: "trash")
                                                         .resizable()
                                                         .aspectRatio(contentMode: .fit)
                                                         .frame(width: 20, height: 20)

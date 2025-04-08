@@ -73,22 +73,25 @@ class ListViewModel: ObservableObject {
     
     func addNewCategory(title: String) {
         withAnimation {
-            let newPosition = packingList.categories.count
+            // Get the max current position, default to -1 if no categories exist
+            let maxPosition = packingList.categories.map(\.position).max() ?? -1
+            
             let newCategory = Category(
                 name: title,
-                position: newPosition,
-                isExpanded: true)
+                position: maxPosition + 1,
+                isExpanded: true
+            )
+
             packingList.categories.append(newCategory)
             modelContext.insert(newCategory)
-            reassignCategoryPositions(for: packingList)
+            saveContext()
         }
-        saveContext()
     }
     
     func reassignCategoryPositions(for packingList: PackingList) {
-        let sortedCategories = packingList.categories.sorted(by: { $0.position < $1.position })
+        let sortedCategories = packingList.categories.sorted(by: { $0.position > $1.position }) // descending
         for (index, category) in sortedCategories.enumerated() {
-            category.position = index // Assign new sequential position
+            category.position = sortedCategories.count - 1 - index // max = top
         }
         saveContext()
     }
@@ -105,27 +108,30 @@ class ListViewModel: ObservableObject {
     }
     
     func moveCategory(from source: IndexSet, to destination: Int) {
-            // Sort categories by position before reordering
-        var sortedCategories = packingList.categories.sorted(by: { $0.position < $1.position })
-            
-            // Perform the move operation
-            sortedCategories.move(fromOffsets: source, toOffset: destination)
-            
-            // Update the original categories array to reflect the new order
-            for (index, category) in sortedCategories.enumerated() {
-                category.position = index
-            }
-            packingList.categories = sortedCategories // Update the binding
-            
-            saveContext()
+        var sortedCategories = packingList.categories.sorted(by: { $0.position > $1.position })
+
+        sortedCategories.move(fromOffsets: source, toOffset: destination)
+
+        for (index, category) in sortedCategories.enumerated() {
+            category.position = sortedCategories.count - 1 - index // Highest = top
+        }
+
+        packingList.categories = sortedCategories
+        saveContext()
     }
     
     //MARK: - MODIFY LIST
     
     
-    func duplicateList(packingListCount: Int) {
+    func duplicateList() {
+        
+        let lists = try! modelContext.fetch(FetchDescriptor<PackingList>())
+                for list in lists {
+                    list.position += 1
+                }
+        
         let duplicatedPackingList = PackingList(
-            position: packingListCount,
+            position: 0,
             title: packingList.title + " Copy",
             locationName: packingList.locationName,
             locationAddress: packingList.locationAddress,

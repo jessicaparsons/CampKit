@@ -85,7 +85,7 @@ struct QuizView: View {
                                     isStepOne = false
                                 } else {
                                     
-                                    viewModel.createPackingList(packingListCount: packingListCount)
+                                    viewModel.createPackingList()
                                     
                                     if let packingList = viewModel.currentPackingList {
                                         currentPackingList = packingList
