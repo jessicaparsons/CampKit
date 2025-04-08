@@ -20,17 +20,17 @@ struct GradientHeaderView: View {
                  
              HStack{
                  Text(label)
-                     .font(.title)
-                     .fontWeight(.light)
+                     .font(.system(size: Constants.titleFont, weight: .bold, design: .default))
                      .foregroundColor(.black)
                  Spacer()
-                 HStack(spacing: Constants.horizontalPadding) {
+                 HStack(spacing: Constants.verticalSpacing) {
                      if editMode == .inactive {
                          // REARRANGE BUTTON
                          Button {
                              editMode = (editMode == .active) ? .inactive : .active
                          } label: {
                              Image(systemName: "arrow.up.and.down.text.horizontal")
+                                 .font(.body)
                          }
                          // ADD BUTTON
                          Button {
@@ -38,6 +38,7 @@ struct GradientHeaderView: View {
                              
                          } label: {
                              Image(systemName: "plus")
+                                 .font(.title2)
                          }
                      } else {
                          Button {
@@ -49,10 +50,9 @@ struct GradientHeaderView: View {
                      }
                  }//:HSTACK
                  .foregroundStyle(.black)
-                 .font(.title3)
              }//:HSTACK
-             .padding(.vertical)
-             .padding(.horizontal, Constants.horizontalPadding)
+             .padding(.top, Constants.navSpacing)
+             .padding(.horizontal)
          }//:ZSTACK
          .ignoresSafeArea()
          .frame(height: Constants.gradientBannerHeight)

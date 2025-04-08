@@ -20,7 +20,6 @@ struct RestockView: View {
     }
     
     var body: some View {
-        NavigationStack {
             ZStack(alignment: .top) {
                 GradientHeaderView(
                     label: "Restock",
@@ -33,7 +32,10 @@ struct RestockView: View {
                     if viewModel.restockItems.isEmpty {
                         VStack(spacing: Constants.verticalSpacing) {
                             LazyVStack {
-                                ContentUnavailableView("Empty List", systemImage: "arrow.clockwise.circle", description: Text("You haven't created any restock items yet. Get started!"))
+                                ContentUnavailableView("Empty List", systemImage: "arrow.clockwise.circle", description: Text("""
+You haven't created any restock items yet. 
+Hit the \"+\" to get started!
+"""))
                                     .padding(.top, Constants.emptyContentSpacing)
                             }//:LAZYVSTACK
                             Spacer()
@@ -41,7 +43,7 @@ struct RestockView: View {
                     } else {
 
                         List {
-                            ForEach(viewModel.restockItems) { item in
+                            ForEach(viewModel.sortedItems) { item in
                                 
                                 
                                 if let index = viewModel.restockItems.firstIndex(where: { $0.id == item.id }) { //Allows binding item
@@ -68,7 +70,7 @@ struct RestockView: View {
                         .ignoresSafeArea(.container, edges: [.bottom])
                         .shadow(color: .gray.opacity(0.2), radius: 4, x: 0, y: -2)
                 )
-                .padding(.top, 60)
+                .padding(.top, Constants.bodyPadding)
             }//:ZSTACK
             .scrollContentBackground(.hidden)
             .environment(\.editMode, $editMode)
@@ -92,7 +94,6 @@ struct RestockView: View {
                 Button("Cancel", role: .cancel) { }
             }
             .environment(\.editMode, $editMode)
-        }//:NAVIGATION STACK
     }
 }
 

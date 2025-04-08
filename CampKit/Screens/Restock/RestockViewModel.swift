@@ -12,6 +12,9 @@ class RestockViewModel: ObservableObject {
     
     private let modelContext: ModelContext
     @Published var restockItems: [RestockItem] = []
+    var sortedItems: [RestockItem] {
+        restockItems.sorted(by: { $0.position > $1.position })
+    }
     
     init(modelContext: ModelContext) {
         self.modelContext = modelContext
@@ -29,45 +32,44 @@ class RestockViewModel: ObservableObject {
     @MainActor
     func addNewItem(title: String) {
         withAnimation {
-            let newItem = RestockItem(
-                position: restockItems.count,
-                title: title,
-                isPacked: false)
-                modelContext.insert(newItem)
-        }
-        saveContext()
-        do {
-            restockItems = try fetchRestockItems()
-        } catch {
-            print("could not fetch restock items: \(error)")
+            let newPosition = (restockItems.map(\.position).max() ?? -1) + 1
+            let newItem = RestockItem(position: newPosition, title: title, isPacked: false)
+            modelContext.insert(newItem)
+            saveContext()
+            restockItems = try! fetchRestockItems()
         }
     }
     
     func onMove(source: IndexSet, destination: Int) {
-        restockItems.move(fromOffsets: source, toOffset: destination)
+        let sorted = sortedItems
+        var mutable = sorted
+        mutable.move(fromOffsets: source, toOffset: destination)
 
-        // Reassign position to match array order (ascending)
-        for (index, item) in restockItems.enumerated() {
-            item.position = index
+        for (i, item) in mutable.enumerated() {
+            item.position = mutable.count - i // Highest position = top
         }
 
         saveContext()
+        restockItems = mutable
     }
 
     func deleteItem(at offsets: IndexSet) {
+        let sorted = sortedItems
+        var mutable = sorted
+
         for index in offsets {
-            let item = restockItems[index]
+            let item = mutable[index]
             modelContext.delete(item)
         }
 
-        restockItems.remove(atOffsets: offsets)
+        mutable.remove(atOffsets: offsets)
 
-        // Reassign positions in ascending order
-        for (index, item) in restockItems.enumerated() {
-            item.position = index
+        for (index, item) in mutable.enumerated() {
+            item.position = mutable.count - index
         }
 
         saveContext()
+        restockItems = mutable
     }
     
     func fetchRestockItems() throws -> [RestockItem] {

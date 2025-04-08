@@ -23,7 +23,7 @@ struct CategoriesListView: View {
                     ContentUnavailableView(
                         "Fresh Start",
                         systemImage: "tent",
-                        description: Text("Add a new category to get started")
+                        description: Text("Hit the \"+\" to add a new category and get started")
                     )
                     .padding(.top, Constants.emptyContentSpacing)
                 } else {

@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct WeatherRowView: View {
+    @AppStorage("temperatureUnit") private var temperatureUnit: String = TemperatureUnit.fahrenheit.rawValue
+
     let symbol: String
     let day: String
     let highTemp: String
@@ -22,12 +24,23 @@ struct WeatherRowView: View {
         ]) {
             Text(symbol)
             Text(day)
-            Text("H: \(highTemp)°")
-            Text("L: \(lowTemp)°F")
+            Text("H: \(displayedTemperature(from: highTemp))°")
+            Text("L: \(displayedTemperature(from: lowTemp))°")
         }
         .font(.subheadline)
         .padding(0)
     }
+    
+    private func displayedTemperature(from fahrenheitString: String) -> String {
+            guard let fahrenheit = Double(fahrenheitString) else { return fahrenheitString }
+            
+            if temperatureUnit == TemperatureUnit.celsius.rawValue {
+                let celsius = (fahrenheit - 32) * 5 / 9
+                return String(format: "%.0f°C", celsius)
+            } else {
+                return String(format: "%.0f°F", fahrenheit)
+            }
+        }
 }
 
 #Preview("WeatherView") {

@@ -35,14 +35,21 @@ class QuizViewModel {
     //MARK: - METHODS
     
     @MainActor
-    func createPackingList(packingListCount: Int) {
+    func createPackingList() {
         withAnimation {
             
             // filters the choices to include only the selected items
             // where 'isSelected' is true, then maps the filtered result to an array of their names
             // inserts the choices into the context
+            
+            let lists = try! modelContext.fetch(FetchDescriptor<PackingList>())
+
+            for list in lists {
+                list.position += 1
+            }
+            
             let newPackingList = PackingList(
-                position: packingListCount,
+                position: 0,
                 title: listTitle.isEmpty ? "My Packing List" : listTitle,
                 locationName: (locationName == nil) ? nil : locationName,
                 locationAddress: (locationAddress == nil) ? nil : locationAddress,
@@ -62,15 +69,18 @@ class QuizViewModel {
             saveContext()
             
             currentPackingList = newPackingList
-            print("✅ Packing List Created: \(newPackingList.title)")
-            print("✅ Location Name: \(newPackingList.locationName ?? "None")")
-            print("✅ Categories Count: \(newPackingList.categories.count)")
-            print("✅ Setting currentPackingList successful: \(currentPackingList != nil)")
         }
         
     }
     
     func createBlankPackingList() {
+        
+        let lists = try! modelContext.fetch(FetchDescriptor<PackingList>())
+
+        for list in lists {
+            list.position += 1
+        }
+        
         withAnimation {
             let newPackingList = PackingList(
                 position: 0,

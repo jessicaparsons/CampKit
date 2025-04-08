@@ -299,7 +299,7 @@ struct ListView: View {
             titleVisibility: .visible
         ) {
             Button("Duplicate") {
-                viewModel.duplicateList(packingListCount: packingListsCount)
+                viewModel.duplicateList()
                 isShowingDuplicationConfirmation = false
             }
             
@@ -360,7 +360,7 @@ struct ListView: View {
 #Preview("Basic Preview") {
     NavigationStack {
         let storeKitManager = StoreKitManager()
-        let placeholderPackingList = PackingList.samplePackingList
+        let placeholderPackingList = PackingList(position: 0, title: "Empty Camping List", locationName: "Ojai")
         let container = try! ModelContainer(
             for: PackingList.self, Category.self, Item.self,
             configurations: ModelConfiguration(isStoredInMemoryOnly: true)
