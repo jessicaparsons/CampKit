@@ -10,7 +10,7 @@ import SwiftData
 import CoreLocation
 
 @Observable
-class QuizViewModel {
+final class QuizViewModel {
     
     //MARK: - PROPERTIES
     
@@ -66,7 +66,7 @@ class QuizViewModel {
             
             //Save
             modelContext.insert(newPackingList)
-            saveContext()
+            save(modelContext)
             
             currentPackingList = newPackingList
         }
@@ -93,7 +93,7 @@ class QuizViewModel {
             )
             
             modelContext.insert(newPackingList)
-            saveContext()
+            save(modelContext)
             
             currentPackingList = newPackingList
         }
@@ -111,15 +111,7 @@ class QuizViewModel {
         selectedFilters.removeAll()
     }
     
-    private func saveContext() {
-        do {
-            try modelContext.save()
-            print("Context saved successfully.")
-        } catch {
-            print("Failed to save context: \(error.localizedDescription)")
-        }
-    }
-    
+   
     //Generate Packing Categories
     
     @MainActor

@@ -16,14 +16,12 @@ struct HomeListView: View {
     
     @Environment(\.modelContext) var modelContext
     @Environment(StoreKitManager.self) private var storeKitManager
-    @StateObject private var viewModel: HomeListViewModel
     
     @State private var location: String = ""
     @State private var editMode: EditMode = .inactive
     @Binding var isNewListQuizShowing: Bool
     
     init(modelContext: ModelContext, isNewListQuizShowing: Binding<Bool>) {
-        _viewModel = StateObject(wrappedValue: HomeListViewModel(modelContext: modelContext))
         _isNewListQuizShowing = isNewListQuizShowing
     }
     
@@ -100,7 +98,7 @@ Hit the \"+\" to get started!
                                     list.position = index
                                 }
                                 
-                                viewModel.saveContext()
+                                save(modelContext)
                             }
                             .onDelete { offsets in
                                 for index in offsets {
@@ -113,7 +111,7 @@ Hit the \"+\" to get started!
                                     list.position = index
                                 }
                                 
-                                viewModel.saveContext()
+                                save(modelContext)
                             }
                         }
                     }//:LIST

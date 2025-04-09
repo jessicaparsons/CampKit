@@ -8,7 +8,7 @@
 import SwiftUI
 import SwiftData
 
-class RestockViewModel: ObservableObject {
+final class RestockViewModel: ObservableObject {
     
     private let modelContext: ModelContext
     @Published var restockItems: [RestockItem] = []
@@ -24,7 +24,7 @@ class RestockViewModel: ObservableObject {
     func togglePacked(for item: RestockItem) {
         withAnimation {
             item.isPacked.toggle()
-            saveContext()
+            save(modelContext)
         }
             
     }
@@ -35,7 +35,7 @@ class RestockViewModel: ObservableObject {
             let newPosition = (restockItems.map(\.position).max() ?? -1) + 1
             let newItem = RestockItem(position: newPosition, title: title, isPacked: false)
             modelContext.insert(newItem)
-            saveContext()
+            save(modelContext)
             restockItems = try! fetchRestockItems()
         }
     }
@@ -49,7 +49,7 @@ class RestockViewModel: ObservableObject {
             item.position = mutable.count - i // Highest position = top
         }
 
-        saveContext()
+        save(modelContext)
         restockItems = mutable
     }
 
@@ -68,22 +68,14 @@ class RestockViewModel: ObservableObject {
             item.position = mutable.count - index
         }
 
-        saveContext()
+        save(modelContext)
         restockItems = mutable
     }
     
     func fetchRestockItems() throws -> [RestockItem] {
         try modelContext.fetch(FetchDescriptor<RestockItem>())
     }
-    
-    func saveContext() {
-        do {
-            try modelContext.save()
-            print("Packing list and categories saved successfully.")
-        } catch {
-            print("Failed to save context: \(error.localizedDescription)")
-        }
-    }
+
     
     
 }

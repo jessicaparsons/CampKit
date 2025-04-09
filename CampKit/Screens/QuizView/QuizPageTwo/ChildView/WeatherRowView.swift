@@ -49,7 +49,7 @@ struct WeatherRowView: View {
     @Previewable @State var isWeatherLoading: Bool = false
     
     WeatherModuleView(isWeatherLoading: $isWeatherLoading)
-        .environment(WeatherViewModel(weatherFetcher: WeatherAPIClient()))
+        .environment(WeatherViewModel(weatherFetcher: WeatherAPIClient(), geoCoder: Geocoder()))
 }
 
 

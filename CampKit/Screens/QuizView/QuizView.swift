@@ -186,6 +186,6 @@ struct QuizView: View {
     
     NavigationStack {
         QuizView(viewModel: QuizViewModel(modelContext: container.mainContext), isNewListQuizShowing: $isNewListQuizShowing, isStepOne: $isStepOne, navigateToListView: $navigateToListView, currentPackingList: $currentPackingList, packingListCount: 3)
-            .environment(WeatherViewModel(weatherFetcher: WeatherAPIClient()))
+            .environment(WeatherViewModel(weatherFetcher: WeatherAPIClient(), geoCoder: Geocoder()))
     }
 }

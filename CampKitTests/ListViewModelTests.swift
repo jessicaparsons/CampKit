@@ -13,16 +13,46 @@ final class ListViewModelTests: XCTestCase {
     
     private var context: ModelContext!
     private var packingList: PackingList!
+    private var viewModel: ListViewModel!
     
     @MainActor
     override func setUp() {
         super.setUp()
         
         context = mockContainer.mainContext
-        packingList = PackingList(title: "Test Packing List")
+        packingList = PackingList(position: 0,
+                                  title: "Test Packing List")
         context.insert(packingList)
-        
+        viewModel = ListViewModel(modelContext: context, packingList: packingList)
     }
+    
+    @MainActor
+    override func tearDown() {
+        context = nil
+        print("context: \(String(describing: context))")
+        packingList = nil
+        viewModel = nil
+        super.tearDown()
+    }
+    
+    func testAddItemSuccess() {
+        
+        let category = Category(name: "Test Category", position: 0)
+        context.insert(category)
+        
+        viewModel.addItem(to: category, itemTitle: "Backpack")
+        
+        XCTAssertEqual(category.items.count, 1)
+        XCTAssertEqual(category.items.first?.title, "Backpack")
+        XCTAssertEqual(category.items.first?.position, 0)
+        
+        viewModel.addItem(to: category, itemTitle: "Sleeping Bag")
+        
+        XCTAssertEqual(category.items.count, 2)
+        XCTAssertEqual(category.items[1].title, "Sleeping Bag")
+        XCTAssertEqual(category.items[1].position, 1)
+    }
+    
 
     func testAddNewCategorySuccess() {
         
@@ -32,13 +62,12 @@ final class ListViewModelTests: XCTestCase {
          Check that modelContext.insert(newItem) is called. */
         
         //Given (Arrange) set up the scenario you want to test
-        
-        let viewModel = ListViewModel(modelContext: context, packingList: packingList)
+
         
         let initialCategoriesCount = packingList.categories.count
         
         //When (Act)
-        viewModel.addNewCategory()
+        viewModel.addNewCategory(title: "New Category")
         
         //Then (Assert)
         XCTAssertEqual(packingList.categories.count, initialCategoriesCount + 1)
@@ -48,7 +77,7 @@ final class ListViewModelTests: XCTestCase {
     
     func testDeleteCategorySuccess() {
         //Given
-        let viewModel = ListViewModel(modelContext: context, packingList: packingList)
+
         let category = Category(name: "Sleeping Bag", position: 2, items: [], isExpanded: true)
         
         //When
@@ -60,7 +89,7 @@ final class ListViewModelTests: XCTestCase {
     }
     
     func testExpandAllSuccess() {
-        let viewModel = ListViewModel(modelContext: context, packingList: packingList)
+
         viewModel.globalIsExpanded = false
         let oldUUID = viewModel.globalExpandCollapseAction
         
@@ -69,15 +98,7 @@ final class ListViewModelTests: XCTestCase {
         XCTAssertTrue(viewModel.globalIsExpanded)
         XCTAssertNotEqual(viewModel.globalExpandCollapseAction, oldUUID)
     }
-    
-    @MainActor
-    override func tearDown() {
-        context = nil
-        print("context: \(String(describing: context))")
-        packingList = nil
-        super.tearDown()
-    }
-    
+
 
 }
 

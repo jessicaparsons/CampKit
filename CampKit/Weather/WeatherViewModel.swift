@@ -16,6 +16,10 @@ protocol WeatherFetching {
     func getDailyWeather(from forecastList: [WeatherEntry]) async -> [DailyWeather]
 }
 
+protocol Geocoding {
+    func getCoordinates(for cityName: String) async throws -> CLLocationCoordinate2D?
+}
+
 enum NetworkError: Error {
     case invalidURL
     case requestFailed
@@ -23,23 +27,21 @@ enum NetworkError: Error {
 }
 
 @Observable
-class WeatherViewModel {
+final class WeatherViewModel {
     
     var weather: [WeatherModel]? // 5 day forecast
     var coordinates: CLLocationCoordinate2D? // user's location input
     var isShowingNoLocationFoundMessage: Bool = false
+    let geoCoder: Geocoding
     
     private let weatherFetcher: WeatherFetching
     
-    init(weatherFetcher: WeatherFetching) {
+    init(weatherFetcher: WeatherFetching, geoCoder: Geocoding) {
         self.weatherFetcher = weatherFetcher
+        self.geoCoder = geoCoder
     }
     
-    //Get coordinates from city name
-    func getCoordinatesFrom(cityName: String) async throws -> CLLocationCoordinate2D? {
-        let coordinates = try await CLGeocoder().geocodeAddressString(cityName)
-        return coordinates.first?.location?.coordinate
-    }
+    
     
     //Fetch weather by city and coordinates that are stored in the Packing List
     
@@ -48,7 +50,7 @@ class WeatherViewModel {
         
         do {
             try await Task {
-                guard let location = try await getCoordinatesFrom(cityName: cityName) else {
+                guard let location = try await geoCoder.getCoordinates(for: cityName) else {
                     throw NetworkError.requestFailed
                 }
                 
@@ -182,6 +184,14 @@ class WeatherViewModel {
         }
         return dailyLow.min()
     }
+}
+
+struct Geocoder: Geocoding {
+    func getCoordinates(for cityName: String) async throws -> CLLocationCoordinate2D? {
+            let coordinates = try await CLGeocoder().geocodeAddressString(cityName)
+            return coordinates.first?.location?.coordinate
+    }
+    
 }
 
 class WeatherAPIClient: WeatherFetching {
