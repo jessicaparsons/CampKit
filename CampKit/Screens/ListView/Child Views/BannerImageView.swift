@@ -55,10 +55,7 @@ struct BannerImageView: View {
     
     @Previewable @State var bannerImage = UIImage(named: "TopographyDesign")
     
-    let container = try! ModelContainer(
-        for: PackingList.self, Category.self, Item.self,
-        configurations: ModelConfiguration(isStoredInMemoryOnly: true) // In-memory container
-    )
+    let container = PreviewContainer.shared
     
     // Populate the container with sample data
     preloadPackingListData(context: container.mainContext)

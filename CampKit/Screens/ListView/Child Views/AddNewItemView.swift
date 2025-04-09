@@ -49,10 +49,7 @@ struct AddNewItemView: View {
 
 #Preview {
     
-    let container = try! ModelContainer(
-        for: PackingList.self, Category.self, Item.self,
-        configurations: ModelConfiguration(isStoredInMemoryOnly: true) // In-memory for preview
-    )
+    let container = PreviewContainer.shared
     
     // Populate the container with mock data
     preloadPackingListData(context: container.mainContext)

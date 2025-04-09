@@ -8,7 +8,7 @@
 import SwiftUI
 import SwiftData
 
-class ListViewModel: ObservableObject {
+final class ListViewModel: ObservableObject {
     
     let modelContext: ModelContext
     
@@ -54,7 +54,7 @@ class ListViewModel: ObservableObject {
             item.position = index
         }
         
-        saveContext()
+        save(modelContext)
     }
     
     func deleteItem(_ item: Item) {
@@ -84,7 +84,7 @@ class ListViewModel: ObservableObject {
 
             packingList.categories.append(newCategory)
             modelContext.insert(newCategory)
-            saveContext()
+            save(modelContext)
         }
     }
     
@@ -93,7 +93,7 @@ class ListViewModel: ObservableObject {
         for (index, category) in sortedCategories.enumerated() {
             category.position = sortedCategories.count - 1 - index // max = top
         }
-        saveContext()
+        save(modelContext)
     }
     
     func deleteCategory(_ category: Category) {
@@ -104,7 +104,7 @@ class ListViewModel: ObservableObject {
             modelContext.delete(category)
             reassignCategoryPositions(for: packingList)
         }
-        saveContext()
+        save(modelContext)
     }
     
     func moveCategory(from source: IndexSet, to destination: Int) {
@@ -117,7 +117,7 @@ class ListViewModel: ObservableObject {
         }
 
         packingList.categories = sortedCategories
-        saveContext()
+        save(modelContext)
     }
     
     //MARK: - MODIFY LIST
@@ -161,7 +161,7 @@ class ListViewModel: ObservableObject {
         
         //Save
         modelContext.insert(duplicatedPackingList)
-        saveContext()
+        save(modelContext)
         
         print("duplicated packing lists position is: \(duplicatedPackingList.position)")
         
@@ -174,7 +174,7 @@ class ListViewModel: ObservableObject {
             dismiss()
 
             modelContext.delete(packingList)
-            saveContext()
+            save(modelContext)
             
         }
     }
@@ -188,7 +188,7 @@ class ListViewModel: ObservableObject {
                 category.isExpanded = true
             }
         }
-        saveContext()
+        save(modelContext)
     }
 
     func collapseAll() {
@@ -197,7 +197,7 @@ class ListViewModel: ObservableObject {
                 category.isExpanded = false
             }
         }
-        saveContext()
+        save(modelContext)
     }
     
     
@@ -227,7 +227,7 @@ class ListViewModel: ObservableObject {
                 item.isPacked = true
             }
         }
-        saveContext()
+        save(modelContext)
     }
 
     func uncheckAllItems() {
@@ -236,14 +236,14 @@ class ListViewModel: ObservableObject {
                 item.isPacked = false
             }
         }
-        saveContext()
+        save(modelContext)
     }
     
     @MainActor
     func togglePacked(for item: Item) {
         withAnimation {
             item.isPacked.toggle()
-            saveContext()
+            save(modelContext)
         }
         
         if areAllItemsChecked {
@@ -260,16 +260,7 @@ class ListViewModel: ObservableObject {
         print("Sharing the list!")
     }
     
-  
 
-    func saveContext() {
-        do {
-            try modelContext.save()
-            print("Packing list and categories saved successfully.")
-        } catch {
-            print("Failed to save context: \(error.localizedDescription)")
-        }
-    }
     
 }
 

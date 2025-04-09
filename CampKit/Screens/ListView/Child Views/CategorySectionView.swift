@@ -10,6 +10,7 @@ import SwiftData
 
 
 struct CategorySectionView: View {
+    @Environment(\.modelContext) private var modelContext
     @ObservedObject var viewModel: ListViewModel
     @Bindable var category: Category
     @Binding var isRearranging: Bool
@@ -53,11 +54,11 @@ struct CategorySectionView: View {
                         .multilineTextAlignment(.leading)
                         .onSubmit {
                             isEditing = false // Disable editing after submit
-                            viewModel.saveContext()
+                            save(modelContext)
                         }
                     Button {
                         isEditing = false // Disable editing after submit
-                        viewModel.saveContext()
+                        save(modelContext)
                     } label: {
                         Text("Done")
                     }
@@ -152,10 +153,7 @@ struct LeftDisclosureStyle: DisclosureGroupStyle {
     @Previewable @State var isRearranging: Bool = false
     
     // Create an in-memory ModelContainer
-    let container = try! ModelContainer(
-        for: PackingList.self, Category.self, Item.self,
-        configurations: ModelConfiguration(isStoredInMemoryOnly: true) // In-memory for preview
-    )
+    let container = PreviewContainer.shared
     
     // Populate the container with mock data
     preloadPackingListData(context: container.mainContext)
@@ -183,10 +181,7 @@ struct LeftDisclosureStyle: DisclosureGroupStyle {
     @Previewable @State var isRearranging: Bool = false
     
     // Create an in-memory ModelContainer
-    let container = try! ModelContainer(
-        for: PackingList.self, Category.self, Item.self,
-        configurations: ModelConfiguration(isStoredInMemoryOnly: true) // In-memory for preview
-    )
+    let container = PreviewContainer.shared
     
     // Create a mock PackingList and empty Category
     let samplePackingList = PackingList.samplePackingList

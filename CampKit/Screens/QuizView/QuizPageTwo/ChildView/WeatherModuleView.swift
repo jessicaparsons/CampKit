@@ -103,7 +103,7 @@ struct WeatherModuleView: View {
         configurations: ModelConfiguration(isStoredInMemoryOnly: true)
     )
     QuizPageTwoView(viewModel: QuizViewModel(modelContext: container.mainContext), isStepOne: $isStepOne, isElevationAdded: $isElevationAdded)
-        .environment(WeatherViewModel(weatherFetcher: WeatherAPIClient()))
+        .environment(WeatherViewModel(weatherFetcher: WeatherAPIClient(), geoCoder: Geocoder()))
 }
 
 
@@ -113,6 +113,6 @@ struct WeatherModuleView: View {
     @Previewable @State var isWeatherLoading: Bool = false
     
     WeatherModuleView(isWeatherLoading: $isWeatherLoading)
-        .environment(WeatherViewModel(weatherFetcher: WeatherAPIClient()))
+        .environment(WeatherViewModel(weatherFetcher: WeatherAPIClient(), geoCoder: Geocoder()))
         .padding()
 }

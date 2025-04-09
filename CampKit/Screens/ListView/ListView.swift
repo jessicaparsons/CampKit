@@ -12,6 +12,7 @@ import ConfettiSwiftUI
 
 struct ListView: View {
     
+    @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
     @Environment(StoreKitManager.self) private var storeKitManager
     @StateObject private var viewModel: ListViewModel
@@ -148,7 +149,7 @@ struct ListView: View {
                     {
                         bannerImage = loadedImage
                         viewModel.packingList.photo = data  // Save to SwiftData PackingList Model
-                        viewModel.saveContext()
+                        save(modelContext)
                         
                     } else {
                         print("Failed to load image")
@@ -322,8 +323,8 @@ struct ListView: View {
                     // Step 2: After a short delay, safely delete
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
                         let listToDelete = viewModel.packingList
-                        viewModel.modelContext.delete(listToDelete)
-                        viewModel.saveContext()
+                        modelContext.delete(listToDelete)
+                        save(modelContext)
                     }
             }
             Button("Cancel", role: .cancel) { }

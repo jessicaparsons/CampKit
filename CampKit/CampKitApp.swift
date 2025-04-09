@@ -11,7 +11,7 @@ import SwiftData
 @main
 struct CampKitApp: App {
     
-    var weatherViewModel = WeatherViewModel(weatherFetcher: WeatherAPIClient())
+    var weatherViewModel = WeatherViewModel(weatherFetcher: WeatherAPIClient(), geoCoder: Geocoder())
     let storeKitManager = StoreKitManager()
     
     var sharedModelContainer: ModelContainer = {

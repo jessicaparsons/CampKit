@@ -8,7 +8,7 @@
 import SwiftUI
 import SwiftData
 
-class RemindersViewModel: ObservableObject {
+final class RemindersViewModel: ObservableObject {
     
     
     private let modelContext: ModelContext

@@ -14,7 +14,7 @@ struct MainView: View {
     
     @Environment(\.modelContext) var modelContext
     @Environment(StoreKitManager.self) private var storeKitManager
-    let weatherViewModel = WeatherViewModel(weatherFetcher: WeatherAPIClient())
+    let weatherViewModel = WeatherViewModel(weatherFetcher: WeatherAPIClient(), geoCoder: Geocoder())
     
     @State private var selection = 0
     @State private var isShowingSettings: Bool = false
