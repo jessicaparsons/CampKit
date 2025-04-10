@@ -9,7 +9,7 @@ import SwiftUI
 import SwiftData
 
 struct RearrangeCategoriesView: View {
-    @ObservedObject var viewModel: ListViewModel
+    @State var viewModel: ListViewModel
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {

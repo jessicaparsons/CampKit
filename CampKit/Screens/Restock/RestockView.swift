@@ -10,13 +10,13 @@ import SwiftData
 
 struct RestockView: View {
     
-    @StateObject private var viewModel: RestockViewModel
+    var viewModel: RestockViewModel
     @State private var isAddNewItemShowing: Bool = false
     @State private var newItemTitle: String = ""
     @State private var editMode: EditMode = .inactive
     
-    init(viewModel: RestockViewModel) {
-        _viewModel = StateObject(wrappedValue: viewModel)
+    init(modelContext: ModelContext) {
+        self.viewModel = RestockViewModel(modelContext: modelContext)
     }
     
     var body: some View {
@@ -45,18 +45,14 @@ Hit the \"+\" to get started!
                     ) {
                         ForEach(viewModel.sortedItems) { item in
                             
-                            
-                            if let index = viewModel.restockItems.firstIndex(where: { $0.id == item.id }) { //Allows binding item
-                                
-                                EditableItemView(
-                                    item: $viewModel.restockItems[index].title,
+                                EditableItemView<RestockItem>(
+                                    item: item,
                                     isList: true,
-                                    isPacked: item.isPacked,
                                     togglePacked: { viewModel.togglePacked(for: item) },
                                     deleteItem: { }
                                 )
                                 .listRowInsets(EdgeInsets(top: Constants.lineSpacing, leading: 0, bottom: Constants.lineSpacing, trailing: 0))
-                            }
+                            
                         }//:FOREACH
                         .onMove(perform: viewModel.onMove)
                         .onDelete(perform: viewModel.deleteItem)
@@ -75,11 +71,7 @@ Hit the \"+\" to get started!
             hideKeyboard()
         }
         .task {
-            do {
-                viewModel.restockItems = try viewModel.fetchRestockItems()
-            } catch {
-                print("Failed to fetch items")
-            }
+            await viewModel.loadItems()
         }
         //MARK: - ADD NEW ITEM POP UP
         .alert("Add New Item", isPresented: $isAddNewItemShowing) {
@@ -128,32 +120,29 @@ Hit the \"+\" to get started!
     }
 }
 
-#Preview {
+#Preview("Sample Data") {
     let container = PreviewContainer.shared
 
-    
-    for item in RestockItem.restockItems {
-        container.mainContext.insert(item)
+    // Inject mock data
+    RestockItem.restockItems.forEach {
+        container.mainContext.insert($0)
     }
-    
-    var viewModel = RestockViewModel(modelContext: container.mainContext)
-    viewModel.restockItems = try! viewModel.fetchRestockItems()
-    
+
     return NavigationStack {
-        RestockView(viewModel: viewModel)
+        RestockView(modelContext: container.mainContext)
             .modelContainer(container)
             .environment(\.modelContext, container.mainContext)
     }
 }
+
 
 #Preview("Empty") {
-    
     let container = PreviewContainer.shared
 
-    
     return NavigationStack {
-        RestockView(viewModel: RestockViewModel(modelContext: container.mainContext))
+        RestockView(modelContext: container.mainContext)
             .modelContainer(container)
             .environment(\.modelContext, container.mainContext)
     }
 }
+

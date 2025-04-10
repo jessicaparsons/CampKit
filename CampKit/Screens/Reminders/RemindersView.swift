@@ -6,16 +6,22 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct RemindersView: View {
     
-    @StateObject private var viewModel: RestockViewModel
+    @Environment(\.modelContext) var modelContext
+    var viewModel: RemindersViewModel
     @State private var isAddNewReminderShowing: Bool = false
+    @State private var editReminder: ReminderItem?
+    
+    @Query var reminderItems: [ReminderItem]
+    
     @State private var newReminderTitle: String = ""
     @State private var editMode: EditMode = .inactive
     
-    init(viewModel: RestockViewModel) {
-        _viewModel = StateObject(wrappedValue: viewModel)
+    init(modelContext: ModelContext) {
+        self.viewModel = RemindersViewModel(modelContext: modelContext)
     }
     
     var body: some View {
@@ -25,7 +31,7 @@ struct RemindersView: View {
             GradientTanBackgroundView()
             
             //MARK: - EMPTY VIEW
-            if viewModel.restockItems.isEmpty {
+            if reminderItems.isEmpty {
                 ScrollView {
                     ContentUnavailableView("Empty List", systemImage: "bell.circle", description: Text("""
 You haven't created any reminders yet. 
@@ -42,10 +48,13 @@ Hit the \"+\" to get started!
                                 Color.clear
                         .frame(height: 1)//Top Spacing
                     ) {
-                        //FOREACH
+                        ForEach(reminderItems) { reminder in
+                            
+                            
+                        }
                     }
                 }//:LIST
-                //.animation(.easeInOut, value: viewModel.restockItems.count)
+                .animation(.easeInOut, value: reminderItems.count)
             }
         }//:ZSTACK
         .navigationTitle("Reminders")
@@ -115,7 +124,7 @@ Hit the \"+\" to get started!
 
     
     return NavigationStack {
-        RemindersView(viewModel: RestockViewModel(modelContext: container.mainContext))
+        RemindersView(modelContext: container.mainContext)
             .modelContainer(container)
             .environment(\.modelContext, container.mainContext)
     }

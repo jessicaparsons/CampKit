@@ -16,7 +16,7 @@ struct CampKitApp: App {
     
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
-            Item.self, PackingList.self, Category.self, RestockItem.self
+            Item.self, PackingList.self, Category.self, RestockItem.self, ReminderItem.self
         ])
         
         let isPreview = ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PREVIEWS"] == "1"

@@ -8,21 +8,21 @@
 import SwiftUI
 import SwiftData
 
-final class ListViewModel: ObservableObject {
+@Observable
+final class ListViewModel {
     
     let modelContext: ModelContext
     
-    @Published var packingList: PackingList
+    var packingList: PackingList
     
-    @Published var item: String = ""
-    @Published var globalIsExpanded: Bool = false
-    @Published var globalExpandCollapseAction = UUID() // Trigger for animation
-    @Published var isRearranging: Bool = false
-    @Published var showPhotoPicker: Bool = false
-    @Published var draggedCategory: Category?
-    @Published var isConfettiVisible: Bool = false
-    @Published var trigger: Int = 0
-    @Published var isShowingSuccessfulDuplication: Bool = false
+    var item: String = ""
+    var globalIsExpanded: Bool = false
+    var globalExpandCollapseAction = UUID() // Trigger for animation
+    var showPhotoPicker: Bool = false
+    var draggedCategory: Category?
+    var isConfettiVisible: Bool = false
+    var trigger: Int = 0
+    var isShowingSuccessfulDuplication: Bool = false
     
     init(modelContext: ModelContext, packingList: PackingList) {
         self.modelContext = modelContext

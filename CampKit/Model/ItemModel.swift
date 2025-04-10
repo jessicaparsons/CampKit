@@ -9,7 +9,7 @@ import Foundation
 import SwiftData
 
 @Model
-class Item: Identifiable {
+class Item: Identifiable, EditablePackableItem {
     var id: UUID = UUID()
     var title: String
     var isPacked: Bool

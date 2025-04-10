@@ -34,12 +34,15 @@ struct MainView: View {
                 TabView(selection: $selection) {
                     Group {
                         NavigationStack {
+                            //MARK: - HOME
                             HomeListView(modelContext: modelContext, isNewListQuizShowing: $isNewListQuizShowing)
                                 .navigationDestination(isPresented: $navigateToListView) {
                                     if let packingList = currentPackingList {
                                         ListView(
-                                            viewModel: ListViewModel(modelContext: modelContext, packingList: packingList),
-                                            packingListsCount: packingListsCount)
+                                            modelContext: modelContext,
+                                            packingList: packingList,
+                                            packingListsCount: packingListsCount
+                                        )
                                     } else {
                                         HomeListView(modelContext: modelContext, isNewListQuizShowing: $isNewListQuizShowing)
                                     }
@@ -50,28 +53,32 @@ struct MainView: View {
                         }
                         .tag(0)
                         
+                        //MARK: - REMINDERS
                         NavigationStack {
-                            RemindersView(viewModel: RestockViewModel(modelContext: modelContext))
+                           RemindersView(modelContext: modelContext)
                         }
                         .tabItem {
                             Image(systemName: "bell")
                         }
                         .tag(1)
                         
+                        //MARK: - CENTER BUTTON
                         Spacer()
                             .tabItem {
                                 EmptyView()
                             }
                             .tag(2)
                         
+                        //MARK: - RESTOCK
                         NavigationStack {
-                            RestockView(viewModel: RestockViewModel(modelContext: modelContext))
+                           RestockView(modelContext: modelContext)
                         }
                         .tabItem {
                             Image(systemName: "arrow.clockwise.square")
                         }
                         .tag(3)
                         
+                        //MARK: - SETTINGS
                         NavigationStack {
                             SettingsView()
                         }

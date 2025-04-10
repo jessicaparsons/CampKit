@@ -9,7 +9,7 @@ import SwiftData
 import Foundation
 
 @Model
-class RestockItem: Identifiable {
+class RestockItem: Identifiable, EditablePackableItem {
     
     var id: UUID = UUID()
     @Attribute var position: Int
