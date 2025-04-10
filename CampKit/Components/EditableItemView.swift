@@ -8,12 +8,16 @@
 import SwiftUI
 import SwiftData
 
-struct EditableItemView: View {
+protocol EditablePackableItem: AnyObject {
+    var title: String { get set }
+    var isPacked: Bool { get set }
+}
+
+struct EditableItemView<T: EditablePackableItem>: View {
     
-    @Binding var item: String
+    var item: T
     @FocusState private var isFocused: Bool
     var isList: Bool
-    var isPacked: Bool
     let togglePacked: () -> Void
     let deleteItem: () -> Void
     
@@ -24,16 +28,18 @@ struct EditableItemView: View {
                     togglePacked()
                     HapticsManager.shared.triggerLightImpact()
                 }) {
-                    Image(systemName: isPacked ? "checkmark.circle.fill" : "circle")
-                        .foregroundStyle(isPacked ? Color.colorSage : .secondary)
+                    Image(systemName: item.isPacked ? "checkmark.circle.fill" : "circle")
+                        .foregroundStyle(item.isPacked ? Color.colorSage : .secondary)
                         .font(.system(size: 22))
                 }
                 .buttonStyle(BorderlessButtonStyle()) // Prevent button from triggering NavigationLink
                 
-                TextField("Item Name", text: $item)
-                    .foregroundStyle(isPacked ? Color.secondary : .primary)
-                    .strikethrough(isPacked)
-                    .italic(isPacked)
+                TextField("Item Name", text: Binding(
+                    get: { item.title },
+                    set: { item.title = $0 }))
+                .foregroundStyle(item.isPacked ? Color.secondary : .primary)
+                .strikethrough(item.isPacked)
+                .italic(item.isPacked)
                     .focused($isFocused)
                     .onTapGesture {
                         isFocused = true
@@ -62,19 +68,18 @@ struct EditableItemView: View {
 #Preview(traits: .sizeThatFitsLayout) {
     
     @Previewable @State var title = "Tent"
+    let item = RestockItem(position: 0, title: "Sleeping Bag", isPacked: false)
     
     EditableItemView(
-        item: $title,
+        item: item,
         isList: false,
-        isPacked: true,
         togglePacked: { print("Toggle packed for \(title)") },
         deleteItem: { print("Delete item: \(title)") }
     )
     
     EditableItemView(
-        item: $title,
+        item: item,
         isList: false,
-        isPacked: false,
         togglePacked: { print("Toggle packed for \(title)") },
         deleteItem: { print("Delete item: \(title)") }
     )

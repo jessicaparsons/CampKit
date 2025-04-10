@@ -9,7 +9,7 @@ import SwiftUI
 import SwiftData
 
 struct ListDetailCardView: View {
-    @ObservedObject var viewModel: ListViewModel
+    var viewModel: ListViewModel
     
     //Map Options
     @State private var showMapOptions = false

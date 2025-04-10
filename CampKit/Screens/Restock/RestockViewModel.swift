@@ -8,10 +8,13 @@
 import SwiftUI
 import SwiftData
 
-final class RestockViewModel: ObservableObject {
+@Observable
+@MainActor
+final class RestockViewModel {
     
     private let modelContext: ModelContext
-    @Published var restockItems: [RestockItem] = []
+    var restockItems: [RestockItem] = []
+    
     var sortedItems: [RestockItem] {
         restockItems.sorted(by: { $0.position > $1.position })
     }
@@ -20,7 +23,6 @@ final class RestockViewModel: ObservableObject {
         self.modelContext = modelContext
     }
     
-    @MainActor
     func togglePacked(for item: RestockItem) {
         withAnimation {
             item.isPacked.toggle()
@@ -29,7 +31,6 @@ final class RestockViewModel: ObservableObject {
             
     }
     
-    @MainActor
     func addNewItem(title: String) {
         withAnimation {
             let newPosition = (restockItems.map(\.position).max() ?? -1) + 1
@@ -71,6 +72,16 @@ final class RestockViewModel: ObservableObject {
         save(modelContext)
         restockItems = mutable
     }
+    
+    func loadItems() async {
+        do {
+            restockItems = try fetchRestockItems()
+        } catch {
+            print("Failed to fetch restock items: \(error)")
+            
+        }
+    }
+    
     
     func fetchRestockItems() throws -> [RestockItem] {
         try modelContext.fetch(FetchDescriptor<RestockItem>())

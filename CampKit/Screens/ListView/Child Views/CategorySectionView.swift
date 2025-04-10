@@ -11,7 +11,7 @@ import SwiftData
 
 struct CategorySectionView: View {
     @Environment(\.modelContext) private var modelContext
-    @ObservedObject var viewModel: ListViewModel
+    var viewModel: ListViewModel
     @Bindable var category: Category
     @Binding var isRearranging: Bool
     
@@ -28,15 +28,12 @@ struct CategorySectionView: View {
             } else {
                 LazyVStack(spacing: 0) {
                     ForEach(category.sortedItems) { item in
-                        if let index = category.items.firstIndex(where: { $0.id == item.id }) {
-                            EditableItemView(
-                                item: $category.items[index].title,
+                            EditableItemView<Item>(
+                                item: item,
                                 isList: false,
-                                isPacked: category.items[index].isPacked,
                                 togglePacked: { viewModel.togglePacked(for: item) },
                                 deleteItem: { viewModel.deleteItem(item) }
                             )
-                        }
                     }//:FOREACH
                     AddNewItemView(viewModel: viewModel, category: category)
                 }//:LAZY VSTACK

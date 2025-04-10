@@ -50,13 +50,14 @@ Hit the \"+\" to get started!
                     List {
                         Section(header:
                                     Color.clear
-                            .frame(height: 1) // 👈 tweak to desired spacing
+                            .frame(height: 1)//For top spacing
                         ) {
                             ForEach(packingLists) { packingList in
                                 
                                 NavigationLink(
                                     destination: ListView(
-                                        viewModel: ListViewModel(modelContext: modelContext, packingList: packingList),
+                                        modelContext: modelContext,
+                                        packingList: packingList,
                                         packingListsCount: packingLists.count
                                     ),
                                     label: {

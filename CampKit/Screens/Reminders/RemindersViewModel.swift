@@ -8,11 +8,12 @@
 import SwiftUI
 import SwiftData
 
-final class RemindersViewModel: ObservableObject {
+@Observable
+final class RemindersViewModel {
     
     
     private let modelContext: ModelContext
-    //@Published var restockItems: [RestockItem] = []
+    //var reminderItems: [ReminderItem] = []
     
     init(modelContext: ModelContext) {
         self.modelContext = modelContext

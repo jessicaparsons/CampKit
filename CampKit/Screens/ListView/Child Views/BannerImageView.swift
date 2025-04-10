@@ -11,7 +11,7 @@ import PhotosUI
 
 struct BannerImageView: View {
     
-    @State var viewModel: ListViewModel
+    var viewModel: ListViewModel
     @Binding var bannerImage: UIImage?
     private let placeholderImage: String = "TopographyDesign"
     

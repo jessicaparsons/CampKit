@@ -15,7 +15,7 @@ struct ListView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
     @Environment(StoreKitManager.self) private var storeKitManager
-    @StateObject private var viewModel: ListViewModel
+    var viewModel: ListViewModel
     
     @State private var isPhotoPickerPresented: Bool = false
     @State private var bannerImageItem: PhotosPickerItem?
@@ -28,6 +28,7 @@ struct ListView: View {
     @State private var isShowingDuplicationConfirmation: Bool = false
     @State private var isAddNewCategoryShowing: Bool = false
     @State private var newCategoryTitle: String = ""
+    @State private var isRearranging: Bool = false
     
     @State private var scrollOffset: CGFloat = 0
     private let scrollThreshold: CGFloat = 1
@@ -37,9 +38,10 @@ struct ListView: View {
     
     
     //Initialize ListView with its corresponding ViewModel
-    init(viewModel: ListViewModel, packingListsCount: Int) {
-        _viewModel = StateObject(wrappedValue: viewModel)
+    init(modelContext: ModelContext, packingList: PackingList, packingListsCount: Int) {
+        self.viewModel = ListViewModel(modelContext: modelContext, packingList: packingList)
         self.packingListsCount = packingListsCount
+
     }
     
     var body: some View {
@@ -65,7 +67,10 @@ struct ListView: View {
                                 
                                 //MARK: - LIST CATEGORIES
                                 
-                                CategoriesListView(viewModel: viewModel)
+                                CategoriesListView(
+                                    viewModel: viewModel,
+                                    isRearranging: $isRearranging
+                                )
                                 
                             }//:VSTACK
                             .padding(.horizontal)
@@ -99,7 +104,10 @@ struct ListView: View {
                                     }
                                 }
                                 .confettiCannon(
-                                    trigger: $viewModel.trigger,
+                                    trigger: Binding(
+                                        get: { viewModel.trigger },
+                                        set: { viewModel.trigger = $0 }
+                                    ),
                                     num:1,
                                     confettis: [.text("🔥")],
                                     confettiSize: 8,
@@ -216,7 +224,7 @@ struct ListView: View {
                 
                 // REARRANGE
                 Button(action: {
-                    viewModel.isRearranging = true
+                    isRearranging = true
                 }) {
                     Label("Rearrange", systemImage: "arrow.up.arrow.down")
                 }
@@ -290,9 +298,9 @@ struct ListView: View {
                 .presentationDetents([.medium, .large])
         }
         .photosPicker(isPresented: $isPhotoPickerPresented, selection: $bannerImageItem, matching: .images)
-        .sheet(isPresented: $viewModel.isRearranging) {
+        .sheet(isPresented: $isRearranging) {
             RearrangeCategoriesView(viewModel: viewModel)
-                .environmentObject(viewModel)
+                .environment(viewModel)
                 .presentationDetents([.medium, .large])
         }
         .confirmationDialog(
@@ -307,7 +315,10 @@ struct ListView: View {
             
             Button("Cancel", role: .cancel) { }
         }
-        .alert("Duplicate List", isPresented: $viewModel.isShowingSuccessfulDuplication) {
+        .alert("Duplicate List", isPresented: Binding(
+            get: { viewModel.isShowingSuccessfulDuplication },
+            set: { viewModel.isShowingSuccessfulDuplication = $0 }
+        )) {
             Button("OK", role: .cancel) { }
         } message: {
             Text("Your list has been successfully duplicated.")
@@ -344,11 +355,13 @@ struct ListView: View {
         
         // Fetch a sample packing list from the container
         let samplePackingList = try! container.mainContext.fetch(FetchDescriptor<PackingList>()).first!
-        
-        let viewModel = ListViewModel(modelContext: container.mainContext, packingList: samplePackingList)
-        
+                
         // Return the ListView with the in-memory container
-        return ListView(viewModel: viewModel, packingListsCount: 3)
+        return ListView(
+            modelContext: container.mainContext,
+            packingList: samplePackingList,
+            packingListsCount: 3
+        )
             .modelContainer(container)
             .environment(storeKitManager)
             .environment(\.modelContext, container.mainContext)
@@ -362,9 +375,11 @@ struct ListView: View {
         let placeholderPackingList = PackingList(position: 0, title: "Empty Camping List", locationName: "Ojai")
         let container = PreviewContainer.shared
         
-        let viewModel = ListViewModel(modelContext: container.mainContext, packingList: placeholderPackingList)
-        
-        ListView(viewModel: viewModel, packingListsCount: 3)
+        ListView(
+            modelContext: container.mainContext,
+            packingList: placeholderPackingList,
+            packingListsCount: 3
+        )
             .modelContainer(container)
             .environment(storeKitManager)
             .environment(\.modelContext, container.mainContext)

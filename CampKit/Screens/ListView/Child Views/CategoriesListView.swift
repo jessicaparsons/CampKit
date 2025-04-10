@@ -9,8 +9,9 @@ import SwiftUI
 import SwiftData
 
 struct CategoriesListView: View {
-    @ObservedObject var viewModel: ListViewModel
+    var viewModel: ListViewModel
     @Environment(\.dismiss) private var dismiss
+    @Binding var isRearranging: Bool
     
     var body: some View {
             LazyVStack(spacing: 10) {
@@ -36,7 +37,7 @@ struct CategoriesListView: View {
                             CategorySectionView(
                                 viewModel: viewModel,
                                 category: category,
-                                isRearranging: $viewModel.isRearranging,
+                                isRearranging: $isRearranging,
                                 deleteCategory: { viewModel.deleteCategory(category) }
                             )
                         }//:ZSTACK
@@ -48,6 +49,9 @@ struct CategoriesListView: View {
 }
 
 #Preview("Empty") {
+    
+    @Previewable @State var isRearranging: Bool = false
+    
     // Create an in-memory ModelContainer
     let container = PreviewContainer.shared
     
@@ -63,14 +67,15 @@ struct CategoriesListView: View {
     // Return the preview
     return ScrollView {
         LazyVStack {
-            CategoriesListView(viewModel: viewModel)
+            CategoriesListView(viewModel: viewModel, isRearranging: $isRearranging)
                 .modelContainer(container)
         }
     }
 }
 
 #Preview {
-    
+    @Previewable @State var isRearranging: Bool = false
+
     // Create an in-memory ModelContainer
     let container = PreviewContainer.shared
     
@@ -86,7 +91,7 @@ struct CategoriesListView: View {
     // Return the preview
     return ScrollView {
         LazyVStack {
-            CategoriesListView(viewModel: viewModel)
+            CategoriesListView(viewModel: viewModel, isRearranging: $isRearranging)
                 .modelContainer(container)
         }
     }
