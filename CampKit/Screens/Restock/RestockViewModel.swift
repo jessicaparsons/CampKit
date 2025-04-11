@@ -24,10 +24,10 @@ final class RestockViewModel {
     }
     
     func togglePacked(for item: RestockItem) {
-        withAnimation {
-            item.isPacked.toggle()
-            save(modelContext)
-        }
+        
+        item.isPacked.toggle()
+        save(modelContext)
+        restockItems = restockItems.map { $0 }
             
     }
     

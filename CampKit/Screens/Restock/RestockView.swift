@@ -10,10 +10,14 @@ import SwiftData
 
 struct RestockView: View {
     
-    var viewModel: RestockViewModel
+    @State private var viewModel: RestockViewModel
     @State private var isAddNewItemShowing: Bool = false
     @State private var newItemTitle: String = ""
     @State private var editMode: EditMode = .inactive
+    
+    private var isFormValid: Bool {
+        !newItemTitle.isEmptyOrWhiteSpace
+    }
     
     init(modelContext: ModelContext) {
         self.viewModel = RestockViewModel(modelContext: modelContext)
@@ -67,25 +71,21 @@ Hit the \"+\" to get started!
         .navigationBarTitleDisplayMode(.large)
         .scrollContentBackground(.hidden)
         .environment(\.editMode, $editMode)
-        .onTapGesture {
-            hideKeyboard()
-        }
         .task {
             await viewModel.loadItems()
         }
         //MARK: - ADD NEW ITEM POP UP
         .alert("Add New Item", isPresented: $isAddNewItemShowing) {
             TextField("New restock item", text: $newItemTitle)
-            Button("Add Item", action: {
-                if newItemTitle != "" {
+            Button("Done", action: {
+                if isFormValid {
                     viewModel.addNewItem(title: newItemTitle)
                     newItemTitle = ""
                 }
                 isAddNewItemShowing = false
-            })
+            }).disabled(!isFormValid)
             Button("Cancel", role: .cancel) { }
         }
-        .environment(\.editMode, $editMode)
         
         //MARK: - MENU
         .toolbar {

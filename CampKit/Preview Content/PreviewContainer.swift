@@ -15,7 +15,7 @@ import SwiftData
 enum PreviewContainer {
     static let shared: ModelContainer = {
         let schema = Schema([
-            PackingList.self, Category.self, Item.self, RestockItem.self
+            PackingList.self, Category.self, Item.self, RestockItem.self, ReminderItem.self
         ])
         
         let configuration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
@@ -23,9 +23,26 @@ enum PreviewContainer {
         do {
             let container = try ModelContainer(for: schema, configurations: [configuration])
             preloadPackingListData(context: container.mainContext)
+            for reminder in SampleReminders.reminders {
+                container.mainContext.insert(reminder)
+            }
             return container
         } catch {
             fatalError("Failed to create preview container: \(error)")
         }
+        
     }()
+}
+
+
+
+struct SampleReminders {
+    
+    static var reminders: [ReminderItem] {
+        return [
+            ReminderItem(title: "Charge Batteries"),
+            ReminderItem(title: "Check propane"),
+            ReminderItem(title: "Fill up water bottles")
+        ]
+    }
 }

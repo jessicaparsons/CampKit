@@ -15,7 +15,7 @@ struct ListView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
     @Environment(StoreKitManager.self) private var storeKitManager
-    var viewModel: ListViewModel
+    @State var viewModel: ListViewModel
     
     @State private var isPhotoPickerPresented: Bool = false
     @State private var bannerImageItem: PhotosPickerItem?
@@ -29,24 +29,29 @@ struct ListView: View {
     @State private var isAddNewCategoryShowing: Bool = false
     @State private var newCategoryTitle: String = ""
     @State private var isRearranging: Bool = false
+    @State private var trigger: Int = 0
+    
+    @State private var isConfettiVisible: Bool = false
     
     @State private var scrollOffset: CGFloat = 0
     private let scrollThreshold: CGFloat = 1
     
     let packingListsCount: Int
     
-    
+    private var isFormValid: Bool {
+        !newCategoryTitle.isEmptyOrWhiteSpace
+    }
     
     //Initialize ListView with its corresponding ViewModel
     init(modelContext: ModelContext, packingList: PackingList, packingListsCount: Int) {
         self.viewModel = ListViewModel(modelContext: modelContext, packingList: packingList)
         self.packingListsCount = packingListsCount
-
+        
     }
     
     var body: some View {
         if viewModel.packingList.isDeleted {
-           EmptyView()
+            EmptyView()
         }
         else {
             Group {
@@ -88,38 +93,37 @@ struct ListView: View {
                     .background(Color.colorTan)
                     .ignoresSafeArea(edges: .top)
                     
-                    //MARK: - CONFETTI ANIMATION
-                    VStack {
-                        Spacer()
-                        if viewModel.isConfettiVisible {
-                            Text("🔥")
-                                .font(.system(size: 50))
-                                .scaleEffect(fireScale)
-                                .shadow(color: .black.opacity(0.3), radius: 10, x: 0, y: 2)
-                                .opacity(viewModel.isConfettiVisible ? 1 : 0)
-                                .onAppear {
-                                    fireScale = 0.1
-                                    withAnimation(.interpolatingSpring(stiffness: 200, damping: 8)) {
-                                        fireScale = 1.0
-                                    }
-                                }
-                                .confettiCannon(
-                                    trigger: Binding(
-                                        get: { viewModel.trigger },
-                                        set: { viewModel.trigger = $0 }
-                                    ),
-                                    num:1,
-                                    confettis: [.text("🔥")],
-                                    confettiSize: 8,
-                                    rainHeight: 0,
-                                    radius: 150,
-                                    repetitions: 10,
-                                    repetitionInterval: 0.1,
-                                    hapticFeedback: true)
-                        }//:CONDITION
-                        Spacer()
-                    }//:VSTACK
                     
+                    
+                    //MARK: - CONFETTI ANIMATION
+                    
+                        if viewModel.isConfettiVisible {
+                            ZStack {
+                                Text("🔥")
+                                    .font(.system(size: 50))
+                                    .scaleEffect(fireScale)
+                                    .shadow(color: .black.opacity(0.3), radius: 10, x: 0, y: 2)
+                                
+                                    .onAppear {
+                                        fireScale = 0.1
+                                        withAnimation(.interpolatingSpring(stiffness: 200, damping: 8)) {
+                                            fireScale = 1.0
+                                        }
+                                        trigger += 1
+                                    }
+                                    .confettiCannon(
+                                        trigger: $trigger,
+                                        num:1,
+                                        confettis: [.text("🔥")],
+                                        confettiSize: 8,
+                                        rainHeight: 0,
+                                        radius: 150,
+                                        repetitions: 10,
+                                        repetitionInterval: 0.1,
+                                        hapticFeedback: true)
+                            }//:ZSTACK
+                            .animation(.easeOut(duration: 0.5), value: isConfettiVisible)
+                        }//:CONDITION
                 }//:ZSTACK
             }//:GROUP
             .background(Color.colorTan)
@@ -161,13 +165,6 @@ struct ListView: View {
                         
                     } else {
                         print("Failed to load image")
-                    }
-                }
-            }
-            .onChange(of: viewModel.trigger) {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1.4) {
-                    withAnimation {
-                        viewModel.isConfettiVisible = false
                     }
                 }
             }
@@ -283,13 +280,13 @@ struct ListView: View {
             }
             .alert("Add New Category", isPresented: $isAddNewCategoryShowing) {
                 TextField("New category", text: $newCategoryTitle)
-                Button("Add", action: {
-                    if newCategoryTitle != "" {
+                Button("Done", action: {
+                    if isFormValid {
                         viewModel.addNewCategory(title: newCategoryTitle)
                         newCategoryTitle = ""
                     }
                     isAddNewCategoryShowing = false
-                })
+                }).disabled(!isFormValid)
                 Button("Cancel", role: .cancel) { }
             }
         }//:HSTACK
@@ -329,14 +326,14 @@ struct ListView: View {
             titleVisibility: .visible
         ) {
             Button("Delete", role: .destructive) {
-                    // Step 1: Exit the view
-                    dismiss()
-                    // Step 2: After a short delay, safely delete
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
-                        let listToDelete = viewModel.packingList
-                        modelContext.delete(listToDelete)
-                        save(modelContext)
-                    }
+                // Step 1: Exit the view
+                dismiss()
+                // Step 2: After a short delay, safely delete
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+                    let listToDelete = viewModel.packingList
+                    modelContext.delete(listToDelete)
+                    save(modelContext)
+                }
             }
             Button("Cancel", role: .cancel) { }
         }
@@ -355,16 +352,16 @@ struct ListView: View {
         
         // Fetch a sample packing list from the container
         let samplePackingList = try! container.mainContext.fetch(FetchDescriptor<PackingList>()).first!
-                
+        
         // Return the ListView with the in-memory container
         return ListView(
             modelContext: container.mainContext,
             packingList: samplePackingList,
             packingListsCount: 3
         )
-            .modelContainer(container)
-            .environment(storeKitManager)
-            .environment(\.modelContext, container.mainContext)
+        .modelContainer(container)
+        .environment(storeKitManager)
+        .environment(\.modelContext, container.mainContext)
         
     }
 }
@@ -380,9 +377,9 @@ struct ListView: View {
             packingList: placeholderPackingList,
             packingListsCount: 3
         )
-            .modelContainer(container)
-            .environment(storeKitManager)
-            .environment(\.modelContext, container.mainContext)
+        .modelContainer(container)
+        .environment(storeKitManager)
+        .environment(\.modelContext, container.mainContext)
         
     }
 }

@@ -17,11 +17,9 @@ final class ListViewModel {
     
     var item: String = ""
     var globalIsExpanded: Bool = false
-    var globalExpandCollapseAction = UUID() // Trigger for animation
     var showPhotoPicker: Bool = false
     var draggedCategory: Category?
     var isConfettiVisible: Bool = false
-    var trigger: Int = 0
     var isShowingSuccessfulDuplication: Bool = false
     
     init(modelContext: ModelContext, packingList: PackingList) {
@@ -215,9 +213,13 @@ final class ListViewModel {
         } else {
             checkAllItems()
             isConfettiVisible = true
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                self.trigger += 1
+            print("is confetti visible set from toggle all items/check all items: \(isConfettiVisible)")
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.4) {
+                withAnimation {
+                    self.isConfettiVisible = false
+                }
             }
+           
         }
     }
     
@@ -228,6 +230,7 @@ final class ListViewModel {
             }
         }
         save(modelContext)
+        print("Check All Items fired")
     }
 
     func uncheckAllItems() {
@@ -247,10 +250,13 @@ final class ListViewModel {
         }
         
         if areAllItemsChecked {
-            isConfettiVisible = true
             
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                self.trigger += 1
+            isConfettiVisible = true
+            print("are all items checked boolean: \(areAllItemsChecked), then isConfettiVisible: \(isConfettiVisible)")
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.4) {
+                withAnimation {
+                    self.isConfettiVisible = false
+                }
             }
         }
             

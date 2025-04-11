@@ -12,13 +12,17 @@ struct RemindersView: View {
     
     @Environment(\.modelContext) var modelContext
     var viewModel: RemindersViewModel
-    @State private var isAddNewReminderShowing: Bool = false
+    @State private var isAddNewReminderAlertShowing: Bool = false
     @State private var editReminder: ReminderItem?
     
     @Query var reminderItems: [ReminderItem]
     
     @State private var newReminderTitle: String = ""
     @State private var editMode: EditMode = .inactive
+    
+    private var isFormValid: Bool {
+        !newReminderTitle.isEmptyOrWhiteSpace
+    }
     
     init(modelContext: ModelContext) {
         self.viewModel = RemindersViewModel(modelContext: modelContext)
@@ -49,8 +53,18 @@ Hit the \"+\" to get started!
                         .frame(height: 1)//Top Spacing
                     ) {
                         ForEach(reminderItems) { reminder in
+                            ReminderListItemView(
+                                item: reminder,
+                                onTap: {
+                                editReminder = reminder }
+                            )
                             
-                            
+                        }//:FOREACH
+                        .onDelete { indexSet in
+                            for index in indexSet {
+                                modelContext.delete(reminderItems[index])
+                            }
+                            save(modelContext)
                         }
                     }
                 }//:LIST
@@ -60,30 +74,26 @@ Hit the \"+\" to get started!
         .navigationTitle("Reminders")
         .navigationBarTitleDisplayMode(.large)
         .scrollContentBackground(.hidden)
-        .environment(\.editMode, $editMode)
         .onTapGesture {
             hideKeyboard()
         }
-        .task {
-//            do {
-//                viewModel.restockItems = try viewModel.fetchRestockItems()
-//            } catch {
-//                print("Failed to fetch items")
-//            }
+        .sheet(item: $editReminder) { reminder in
+            UpdateReminderView(reminder: reminder)
         }
-        //MARK: - ADD NEW ITEM POP UP
-//        .alert("Add New Reminder", isPresented: $isAddNewReminderShowing) {
-//            TextField("New restock item", text: $newReminderTitle)
-//            Button("Add Item", action: {
-//                if newItemTitle != "" {
-//                    viewModel.addNewReminder(title: newReminderTitle)
-//                    newItemReminder = ""
-//                }
-//                isAddNewReminderShowing = false
-//            })
-//            Button("Cancel", role: .cancel) { }
-//        }
         .environment(\.editMode, $editMode)
+        //MARK: - ADD NEW ITEM ALERT
+        .alert("Add New Reminder", isPresented: $isAddNewReminderAlertShowing) {
+            TextField("New Reminder", text: $newReminderTitle)
+            Button("Done", action: {
+                if isFormValid {
+                    modelContext.insert(ReminderItem(title: newReminderTitle))
+                    newReminderTitle = ""
+                }
+                isAddNewReminderAlertShowing = false
+            }).disabled(!isFormValid)
+            Button("Cancel", role: .cancel) { }
+        }
+        
         
         //MARK: - MENU
         .toolbar {
@@ -99,7 +109,7 @@ Hit the \"+\" to get started!
                         }
                         // ADD BUTTON
                         Button {
-                            isAddNewReminderShowing = true
+                            isAddNewReminderAlertShowing = true
                             
                         } label: {
                             Image(systemName: "plus")
@@ -125,9 +135,10 @@ Hit the \"+\" to get started!
     
     return NavigationStack {
         RemindersView(modelContext: container.mainContext)
-            .modelContainer(container)
-            .environment(\.modelContext, container.mainContext)
+            
     }
+    .modelContainer(container)
+    .environment(\.modelContext, container.mainContext)
 }
 
 

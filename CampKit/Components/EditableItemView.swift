@@ -40,13 +40,13 @@ struct EditableItemView<T: EditablePackableItem>: View {
                 .foregroundStyle(item.isPacked ? Color.secondary : .primary)
                 .strikethrough(item.isPacked)
                 .italic(item.isPacked)
-                    .focused($isFocused)
-                    .onTapGesture {
-                        isFocused = true
-                    }
-                    .onSubmit {
-                        isFocused = false
-                    }
+                .focused($isFocused)
+                .onTapGesture {
+                    isFocused = true
+                }
+                .onSubmit {
+                    isFocused = false
+                }
                 if isFocused {
                     Button {
                         isFocused = false
