@@ -18,4 +18,8 @@ final class RemindersViewModel {
     init(modelContext: ModelContext) {
         self.modelContext = modelContext
     }
+ 
+    func fetchReminderItems() async throws -> [ReminderItem] {
+        return try modelContext.fetch(FetchDescriptor<ReminderItem>())
+    }
 }
