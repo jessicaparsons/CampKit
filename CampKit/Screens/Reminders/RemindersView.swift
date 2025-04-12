@@ -54,11 +54,16 @@ Hit the \"+\" to get started!
                     ) {
                         ForEach(reminderItems) { reminder in
                             ReminderListItemView(
-                                item: reminder,
-                                onTap: {
-                                editReminder = reminder }
-                            )
-                            
+                                reminder: reminder,
+                                isSelected: false) { event in
+                                    switch event {
+                                    case .onChecked(let reminder, let checked): print("OnChecked")
+                                    case .onSelect(let reminder):
+                                        print("onSelect")
+                                    case .onInfoSelected(let reminder):
+                                        print("onInfoSelected")
+                                    }
+                                }
                         }//:FOREACH
                         .onDelete { indexSet in
                             for index in indexSet {
@@ -74,12 +79,6 @@ Hit the \"+\" to get started!
         .navigationTitle("Reminders")
         .navigationBarTitleDisplayMode(.large)
         .scrollContentBackground(.hidden)
-        .onTapGesture {
-            hideKeyboard()
-        }
-        .sheet(item: $editReminder) { reminder in
-            UpdateReminderView(reminder: reminder)
-        }
         .environment(\.editMode, $editMode)
         //MARK: - ADD NEW ITEM ALERT
         .alert("Add New Reminder", isPresented: $isAddNewReminderAlertShowing) {

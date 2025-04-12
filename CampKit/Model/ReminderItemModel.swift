@@ -13,12 +13,14 @@ class ReminderItem: Identifiable {
     
     var id: UUID = UUID()
     var title: String
+    var notes: String?
     var isCompleted: Bool
     var reminderDate: Date?
     var reminderTime: Date?
     
-    init(title: String, isCompleted: Bool = false, reminderDate: Date? = nil, reminderTime: Date? = nil) {
+    init(title: String, notes: String = "", isCompleted: Bool = false, reminderDate: Date? = nil, reminderTime: Date? = nil) {
         self.title = title
+        self.notes = notes
         self.isCompleted = isCompleted
         self.reminderDate = reminderDate
         self.reminderTime = reminderTime

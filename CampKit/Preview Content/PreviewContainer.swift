@@ -40,7 +40,7 @@ struct SampleReminders {
     
     static var reminders: [ReminderItem] {
         return [
-            ReminderItem(title: "Charge Batteries"),
+            ReminderItem(title: "Charge Batteries", notes: "Ollie's collar", reminderDate: Date(), reminderTime: Date()),
             ReminderItem(title: "Check propane"),
             ReminderItem(title: "Fill up water bottles")
         ]
