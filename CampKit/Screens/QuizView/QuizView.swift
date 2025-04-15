@@ -11,7 +11,7 @@ struct QuizView: View {
     
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(WeatherViewModel.self) private var weatherViewModel
-    @State var viewModel: QuizViewModel
+    @Bindable var viewModel: QuizViewModel
     @Binding var isNewListQuizShowing: Bool
     @Binding var isStepOne: Bool
     @Binding var navigateToListView: Bool

@@ -10,7 +10,7 @@ import SwiftUI
 struct QuizPageOneView: View {
     
     @Environment(WeatherViewModel.self) private var weatherViewModel
-    @State var viewModel: QuizViewModel
+    @Bindable var viewModel: QuizViewModel
     @State private var isShowingElevationPopover: Bool = true
     @FocusState var isFocused: Bool
     @Binding var isElevationAdded: Bool

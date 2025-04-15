@@ -10,7 +10,7 @@ import CoreData
 
 struct RestockView: View {
     
-    @Bindable var viewModel: RestockViewModel
+    @State var viewModel: RestockViewModel
     @State private var isAddNewItemShowing: Bool = false
     @State private var newItemTitle: String = ""
     @State private var editMode: EditMode = .inactive
@@ -20,7 +20,7 @@ struct RestockView: View {
     }
     
     init(context: NSManagedObjectContext) {
-        self.viewModel = RestockViewModel(context: context)
+        _viewModel = State(wrappedValue: RestockViewModel(context: context))
     }
     
     var body: some View {
