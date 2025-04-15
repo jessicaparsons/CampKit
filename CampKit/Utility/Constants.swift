@@ -28,4 +28,6 @@ struct Constants {
     
     static let navSpacing: CGFloat = 20
     
+    static let newPackingListTitle: String = "New Packing List"
+    
 }

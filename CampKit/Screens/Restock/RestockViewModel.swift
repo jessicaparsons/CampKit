@@ -6,40 +6,42 @@
 //
 
 import SwiftUI
-import SwiftData
+import CoreData
 
 @Observable
 @MainActor
 final class RestockViewModel {
     
-    private let modelContext: ModelContext
+    private let viewContext: NSManagedObjectContext
     var restockItems: [RestockItem] = []
     
     var sortedItems: [RestockItem] {
         restockItems.sorted(by: { $0.position > $1.position })
     }
     
-    init(modelContext: ModelContext) {
-        self.modelContext = modelContext
+    init(context: NSManagedObjectContext) {
+        self.viewContext = context
     }
     
     func togglePacked(for item: RestockItem) {
         
         item.isPacked.toggle()
-        save(modelContext)
+        save(viewContext)
         restockItems = restockItems.map { $0 }
             
     }
     
     func addNewItem(title: String) {
         withAnimation {
-            let newPosition = (restockItems.map(\.position).max() ?? -1) + 1
-            let newItem = RestockItem(position: newPosition, title: title, isPacked: false)
-            modelContext.insert(newItem)
-            save(modelContext)
-            restockItems = try! fetchRestockItems()
+            let newPosition = (restockItems.map(\.positionInt).max() ?? -1) + 1
+            let newItem = RestockItem(context: viewContext, title: title, position: newPosition, isPacked: false)
+            save(viewContext)
+            restockItems = try! fetchRestockItems(using: viewContext)
         }
     }
+
+
+    
     
     func onMove(source: IndexSet, destination: Int) {
         let sorted = sortedItems
@@ -47,10 +49,10 @@ final class RestockViewModel {
         mutable.move(fromOffsets: source, toOffset: destination)
 
         for (i, item) in mutable.enumerated() {
-            item.position = mutable.count - i // Highest position = top
+            item.positionInt = mutable.count - i // Highest position = top
         }
 
-        save(modelContext)
+        save(viewContext)
         restockItems = mutable
     }
 
@@ -60,22 +62,22 @@ final class RestockViewModel {
 
         for index in offsets {
             let item = mutable[index]
-            modelContext.delete(item)
+            viewContext.delete(item)
         }
 
         mutable.remove(atOffsets: offsets)
 
         for (index, item) in mutable.enumerated() {
-            item.position = mutable.count - index
+            item.positionInt = mutable.count - index
         }
 
-        save(modelContext)
+        save(viewContext)
         restockItems = mutable
     }
     
     func loadItems() async {
         do {
-            restockItems = try fetchRestockItems()
+            restockItems = try fetchRestockItems(using: viewContext)
         } catch {
             print("Failed to fetch restock items: \(error)")
             
@@ -83,10 +85,12 @@ final class RestockViewModel {
     }
     
     
-    func fetchRestockItems() throws -> [RestockItem] {
-        try modelContext.fetch(FetchDescriptor<RestockItem>())
+    func fetchRestockItems(using context: NSManagedObjectContext) throws -> [RestockItem] {
+        let request = NSFetchRequest<RestockItem>(entityName: "RestockItem")
+        request.sortDescriptors = []
+        
+        return try context.fetch(request)
     }
 
-    
     
 }

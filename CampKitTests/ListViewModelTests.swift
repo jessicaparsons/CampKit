@@ -6,12 +6,11 @@
 //
 
 import XCTest
-import SwiftData
 @testable import CampKit
 
 final class ListViewModelTests: XCTestCase {
     
-    private var context: ModelContext!
+    private var context: viewContext!
     private var packingList: PackingList!
     private var viewModel: ListViewModel!
     
@@ -23,7 +22,7 @@ final class ListViewModelTests: XCTestCase {
         packingList = PackingList(position: 0,
                                   title: "Test Packing List")
         context.insert(packingList)
-        viewModel = ListViewModel(modelContext: context, packingList: packingList)
+        viewModel = ListViewModel(viewContext: context, packingList: packingList)
     }
     
     @MainActor
@@ -59,7 +58,7 @@ final class ListViewModelTests: XCTestCase {
         /*Test that an item is added correctly to a category.
          Ensure an empty title does not add an item.
          Verify that positions are reassigned properly.
-         Check that modelContext.insert(newItem) is called. */
+         Check that viewContext.insert(newItem) is called. */
         
         //Given (Arrange) set up the scenario you want to test
 

@@ -6,12 +6,11 @@
 //
 
 import SwiftUI
-import SwiftData
 import PhotosUI
 
 struct BannerImageView: View {
     
-    var viewModel: ListViewModel
+    @ObservedObject var viewModel: ListViewModel
     @Binding var bannerImage: UIImage?
     private let placeholderImage: String = "TopographyDesign"
     
@@ -55,20 +54,11 @@ struct BannerImageView: View {
     
     @Previewable @State var bannerImage = UIImage(named: "TopographyDesign")
     
-    let container = PreviewContainer.shared
+    let context = PersistenceController.preview.container.viewContext
     
-    // Populate the container with sample data
-    preloadPackingListData(context: container.mainContext)
-    
-    // Fetch a sample packing list from the container
-    let samplePackingList = try! container.mainContext.fetch(FetchDescriptor<PackingList>()).first!
-    
-    // Create the ListViewModel
-    let viewModel = ListViewModel(modelContext: container.mainContext, packingList: samplePackingList)
-    
-    
+    let samplePackingList = PackingList.samplePackingList(context: context)
+        
     // Return the ListView with the in-memory container
-    return BannerImageView(viewModel: viewModel, bannerImage: $bannerImage)
-        .modelContainer(container)
+    return BannerImageView(viewModel: ListViewModel(viewContext: context, packingList: samplePackingList), bannerImage: $bannerImage)
     
 }

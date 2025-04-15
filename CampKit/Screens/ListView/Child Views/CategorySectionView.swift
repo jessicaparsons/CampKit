@@ -6,14 +6,14 @@
 //
 
 import SwiftUI
-import SwiftData
 
 
 struct CategorySectionView: View {
-    @Environment(\.modelContext) private var modelContext
-    var viewModel: ListViewModel
-    @Bindable var category: Category
+    @Environment(\.managedObjectContext) private var viewContext
+    @ObservedObject var viewModel: ListViewModel
+    @ObservedObject var category: Category
     @Binding var isRearranging: Bool
+    @State private var isExpandedLocal: Bool = false
     
     let deleteCategory: () -> Void
     
@@ -22,10 +22,8 @@ struct CategorySectionView: View {
         
     //MARK: - CATEGORY BODY
     var body: some View {
-        DisclosureGroup(isExpanded: $category.isExpanded) {
-            if category.items.isEmpty {
-                AddNewItemView(viewModel: viewModel, category: category)
-            } else {
+        DisclosureGroup(isExpanded: $isExpandedLocal) {
+            if !category.sortedItems.isEmpty {
                 LazyVStack(spacing: 0) {
                     ForEach(category.sortedItems) { item in
                             EditableItemView<Item>(
@@ -38,6 +36,8 @@ struct CategorySectionView: View {
                     AddNewItemView(viewModel: viewModel, category: category)
                 }//:LAZY VSTACK
                 
+            } else {
+                AddNewItemView(viewModel: viewModel, category: category)
             }//:ELSE
             //MARK: - MENU
         } label: {
@@ -51,11 +51,11 @@ struct CategorySectionView: View {
                         .multilineTextAlignment(.leading)
                         .onSubmit {
                             isEditing = false // Disable editing after submit
-                            save(modelContext)
+                            save(viewContext)
                         }
                     Button {
                         isEditing = false // Disable editing after submit
-                        save(modelContext)
+                        save(viewContext)
                     } label: {
                         Text("Done")
                     }
@@ -108,6 +108,16 @@ struct CategorySectionView: View {
             
         }//:DISCLOSURE GROUP
         .disclosureGroupStyle(LeftDisclosureStyle())
+        //ANIMATION WORKAROUNDS
+        .onAppear {
+            isExpandedLocal = category.isExpanded
+        }
+        .onChange(of: isExpandedLocal) {
+            withAnimation {
+                category.isExpanded = isExpandedLocal
+                try? viewContext.save()
+            }
+        }
     }//:BODY
     
 }
@@ -149,57 +159,21 @@ struct LeftDisclosureStyle: DisclosureGroupStyle {
 #Preview {
     @Previewable @State var isRearranging: Bool = false
     
-    // Create an in-memory ModelContainer
-    let container = PreviewContainer.shared
+    let context = PersistenceController.preview.container.viewContext
     
-    // Populate the container with mock data
-    preloadPackingListData(context: container.mainContext)
+    let samplePackingList = PackingList.samplePackingList(context: context)
     
-    // Fetch a sample category
-    let samplePackingList = try! container.mainContext.fetch(FetchDescriptor<PackingList>()).first!
-    let sampleCategory = samplePackingList.categories.first!
-    
-    // Create a mock ListViewModel
-    let viewModel = ListViewModel(modelContext: container.mainContext, packingList: samplePackingList)
+    let categories = Category.sampleCategories(context: context)
     
     // Return the preview
-    return NavigationStack {
+    NavigationStack {
         CategorySectionView(
-            viewModel: viewModel,
-            category: sampleCategory,
+            viewModel: ListViewModel(viewContext: context, packingList: samplePackingList),
+            category: categories.first!,
             isRearranging: $isRearranging,
-            deleteCategory: { print("Mock delete category: \(sampleCategory.name)") }
+            deleteCategory: { print("Mock delete category") }
         )
-        .modelContainer(container) // Provide the ModelContainer
     }
 }
 
-#Preview("Empty Category") {
-    @Previewable @State var isRearranging: Bool = false
-    
-    // Create an in-memory ModelContainer
-    let container = PreviewContainer.shared
-    
-    // Create a mock PackingList and empty Category
-    let samplePackingList = PackingList.samplePackingList
-    let emptyCategory = Category(name: "Lounge", position: 0)
-    samplePackingList.categories.append(emptyCategory)
-    
-    // Insert data into the context
-    container.mainContext.insert(samplePackingList)
-    container.mainContext.insert(emptyCategory)
-    
-    // Create a mock ListViewModel
-    let viewModel = ListViewModel(modelContext: container.mainContext, packingList: samplePackingList)
-    
-    // Return the view with the empty category
-    return NavigationStack {
-        CategorySectionView(
-            viewModel: viewModel,
-            category: emptyCategory,
-            isRearranging: $isRearranging,
-            deleteCategory: { print("Mock delete category: \(emptyCategory.name)") }
-        )
-        .modelContainer(container) // Provide the ModelContainer
-    }
-}
+

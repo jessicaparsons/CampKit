@@ -6,16 +6,17 @@
 //
 
 import SwiftUI
-import SwiftData
+import CoreData
 
 struct RemindersView: View {
     
-    @Environment(\.modelContext) var modelContext
+    @Environment(\.managedObjectContext) private var viewContext
     var viewModel: RemindersViewModel
     @State private var isAddNewReminderAlertShowing: Bool = false
-    @State private var editReminder: ReminderItem?
+    @State private var editReminder: Reminder?
     
-    @Query var reminderItems: [ReminderItem]
+    @FetchRequest(
+        sortDescriptors: []) var reminderItems: FetchedResults<Reminder>
     
     @State private var newReminderTitle: String = ""
     @State private var editMode: EditMode = .inactive
@@ -24,8 +25,8 @@ struct RemindersView: View {
         !newReminderTitle.isEmptyOrWhiteSpace
     }
     
-    init(modelContext: ModelContext) {
-        self.viewModel = RemindersViewModel(modelContext: modelContext)
+    init(context: NSManagedObjectContext) {
+        self.viewModel = RemindersViewModel(context: context)
     }
     
     var body: some View {
@@ -67,9 +68,9 @@ Hit the \"+\" to get started!
                         }//:FOREACH
                         .onDelete { indexSet in
                             for index in indexSet {
-                                modelContext.delete(reminderItems[index])
+                                viewContext.delete(reminderItems[index])
                             }
-                            save(modelContext)
+                            save(viewContext)
                         }
                     }
                 }//:LIST
@@ -82,14 +83,23 @@ Hit the \"+\" to get started!
         .environment(\.editMode, $editMode)
         //MARK: - ADD NEW ITEM ALERT
         .alert("Add New Reminder", isPresented: $isAddNewReminderAlertShowing) {
+            
             TextField("New Reminder", text: $newReminderTitle)
+            
             Button("Done", action: {
                 if isFormValid {
-                    modelContext.insert(ReminderItem(title: newReminderTitle))
+                    let newReminder = (Reminder(
+                        context: viewContext,
+                        title: newReminderTitle))
+                    
+                    try? viewContext.save()
                     newReminderTitle = ""
                 }
                 isAddNewReminderAlertShowing = false
-            }).disabled(!isFormValid)
+                
+            })
+            .disabled(!isFormValid)
+            
             Button("Cancel", role: .cancel) { }
         }
         
@@ -103,7 +113,7 @@ Hit the \"+\" to get started!
                         Button {
                             editMode = (editMode == .active) ? .inactive : .active
                         } label: {
-                            Image(systemName: "pencil.circle")
+                            Image(systemName: "ellipsis.circle")
                                 .font(.body)
                         }
                         // ADD BUTTON
@@ -129,15 +139,13 @@ Hit the \"+\" to get started!
 
 #Preview("Empty") {
     
-    let container = PreviewContainer.shared
-
+    let context = PersistenceController.preview.container.viewContext
     
-    return NavigationStack {
-        RemindersView(modelContext: container.mainContext)
-            
+    NavigationStack {
+        RemindersView(context: context)
     }
-    .modelContainer(container)
-    .environment(\.modelContext, container.mainContext)
+    .environment(\.managedObjectContext, context)
+    
 }
 
 

@@ -28,6 +28,28 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		C823BCF42DAC5E9B00379FDC /* Exceptions for "CoreData" folder in "CampKitTests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				"Category+CoreDataClass.swift",
+				"Category+CoreDataProperties.swift",
+				"Category+Extensions.swift",
+				"Item+CoreDataClass.swift",
+				"Item+CoreDataProperties.swift",
+				"Item+Extensions.swift",
+				"PackingList+CoreDataClass.swift",
+				"PackingList+CoreDataProperties.swift",
+				"PackingList+Extensions.swift",
+				PersistenceController.swift,
+				"Reminder+CoreDataClass.swift",
+				"Reminder+CoreDataProperties.swift",
+				"Reminder+Extensions.swift",
+				"RestockItem+CoreDataClass.swift",
+				"RestockItem+CoreDataProperties.swift",
+				"RestockItem+Extensions.swift",
+			);
+			target = C8C0F23A2D56B13200D3499A /* CampKitTests */;
+		};
 		C85DEC462D39E6070023A1BD /* Exceptions for "CampKit" folder in "CampKit" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -38,6 +60,14 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		C823BCDD2DAC5E9B00379FDC /* CoreData */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				C823BCF42DAC5E9B00379FDC /* Exceptions for "CoreData" folder in "CampKitTests" target */,
+			);
+			path = CoreData;
+			sourceTree = "<group>";
+		};
 		C85DEC2B2D39E6070023A1BD /* CampKit */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
@@ -80,6 +110,7 @@
 				C85DEC2B2D39E6070023A1BD /* CampKit */,
 				C8C0F23C2D56B13200D3499A /* CampKitTests */,
 				C8B614F32D27078500E1DB8D /* Products */,
+				C823BCDD2DAC5E9B00379FDC /* CoreData */,
 			);
 			sourceTree = "<group>";
 		};
@@ -108,6 +139,7 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
+				C823BCDD2DAC5E9B00379FDC /* CoreData */,
 				C85DEC2B2D39E6070023A1BD /* CampKit */,
 			);
 			name = CampKit;

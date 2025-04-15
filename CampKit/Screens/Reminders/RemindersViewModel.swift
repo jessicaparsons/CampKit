@@ -6,20 +6,21 @@
 //
 
 import SwiftUI
-import SwiftData
+import CoreData
 
 @Observable
 final class RemindersViewModel {
     
     
-    private let modelContext: ModelContext
+    private let viewContext: NSManagedObjectContext
     //var reminderItems: [ReminderItem] = []
     
-    init(modelContext: ModelContext) {
-        self.modelContext = modelContext
+    init(context: NSManagedObjectContext) {
+        self.viewContext = context
     }
  
-    func fetchReminderItems() async throws -> [ReminderItem] {
-        return try modelContext.fetch(FetchDescriptor<ReminderItem>())
+    func fetchReminderItems() async throws -> [Reminder] {
+        let request: NSFetchRequest<Reminder> = Reminder.fetchRequest()
+        return try viewContext.fetch(request)
     }
 }

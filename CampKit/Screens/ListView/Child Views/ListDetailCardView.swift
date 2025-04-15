@@ -6,10 +6,9 @@
 //
 
 import SwiftUI
-import SwiftData
 
 struct ListDetailCardView: View {
-    var viewModel: ListViewModel
+    @ObservedObject var viewModel: ListViewModel
     
     //Map Options
     @State private var showMapOptions = false
@@ -21,7 +20,7 @@ struct ListDetailCardView: View {
             HStack {
                 HStack {
                     Spacer()
-                    Text(viewModel.packingList.title)
+                    Text(viewModel.packingList.title ?? Constants.newPackingListTitle)
                         .multilineTextAlignment(.center)
                         .font(.title2.weight(.bold))
                         .lineLimit(3)
@@ -84,14 +83,14 @@ struct ListDetailCardView: View {
             HStack {
                 Spacer()
                 HStack {
-                    ProgressView(value: packedRatio)
+                    ProgressView(value: viewModel.packedRatio)
                         .progressViewStyle(LinearProgressViewStyle(tint: .colorNeon))
-                        .animation(.easeInOut, value: packedRatio)
+                        .animation(.easeInOut, value: viewModel.packedRatio)
                 }//:HSTACK
                 .frame(width: geo.size.width * 0.75)
                 
                 HStack {
-                    Text("\(packedCount)/\(allItems.count)")
+                    Text("\(viewModel.packedCount)/\(viewModel.allItems.count)")
                         .font(.subheadline)
                     Spacer()
                 }//:HSTACK
@@ -104,17 +103,6 @@ struct ListDetailCardView: View {
         .frame(height: 20)
     }
     
-    private var allItems: [Item] {
-        viewModel.packingList.categories.flatMap( \.items )
-    }
-    
-    private var packedCount: Int {
-        allItems.filter { $0.isPacked }.count
-    }
-    
-    private var packedRatio: Double {
-        allItems.isEmpty ? 0 : Double(packedCount) / Double(allItems.count)
-    }
     
     //MARK: - FUNCTIONS
     private func openInAppleMaps(query: String) {
@@ -141,26 +129,15 @@ struct ListDetailCardView: View {
 
 #Preview {
 
-
-        // Create an in-memory ModelContainer
-    let container = PreviewContainer.shared
+    let context = PersistenceController.preview.container.viewContext
+    
+    let samplePackingList = PackingList.samplePackingList(context: context)
         
-        // Populate the container with mock data
-        preloadPackingListData(context: container.mainContext)
-        
-        // Fetch a sample PackingList
-        let samplePackingList = try! container.mainContext.fetch(FetchDescriptor<PackingList>()).first!
-        
-        // Create a mock ListViewModel
-        let viewModel = ListViewModel(modelContext: container.mainContext, packingList: samplePackingList)
-        
-        // Return the preview
-    return ZStack {
+    ZStack {
         
         Color(.black)
             .ignoresSafeArea()
-        ListDetailCardView(viewModel: viewModel)
-            .modelContainer(container) // Provide the ModelContainer
+        ListDetailCardView(viewModel: ListViewModel(viewContext: context, packingList: samplePackingList))
         
     }
 }

@@ -8,16 +8,16 @@
 import SwiftUI
 
 enum ReminderCellEvents {
-    case onChecked(ReminderItem, Bool)
-    case onSelect(ReminderItem)
-    case onInfoSelected(ReminderItem)
+    case onChecked(Reminder, Bool)
+    case onSelect(Reminder)
+    case onInfoSelected(Reminder)
 }
 
 struct ReminderListItemView: View {
     
     @FocusState private var isFocused: Bool
     
-    var reminder: ReminderItem
+    var reminder: Reminder
     let isSelected: Bool
     let onEvent: (ReminderCellEvents) -> Void
     @State private var isChecked: Bool = false
@@ -38,7 +38,7 @@ struct ReminderListItemView: View {
                     //.foregroundStyle(item.isPacked ? Color.colorSage : .secondary)
                 
             VStack {
-                Text(reminder.title)
+                Text(reminder.title ?? "")
                     .frame(maxWidth: .infinity, alignment: .leading)
                 
                 if let notes = reminder.notes {
@@ -79,7 +79,9 @@ struct ReminderListItemView: View {
 
 #Preview {
     
-    let reminder = ReminderItem(title: "Recharge batteries", notes: "Get Ollie's Collar", reminderDate: Date(), reminderTime: Date())
+    let context = PersistenceController.preview.container.viewContext
+    
+    let reminder = Reminder(context: context, title: "Recharge batteries", notes: "Get Ollie's Collar", reminderDate: Date(), reminderTime: Date())
                                 
     ReminderListItemView(reminder: reminder, isSelected: false, onEvent: { _ in })
 }

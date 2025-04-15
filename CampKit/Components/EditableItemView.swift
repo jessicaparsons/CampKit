@@ -6,16 +6,15 @@
 //
 
 import SwiftUI
-import SwiftData
 
-protocol EditablePackableItem: AnyObject {
-    var title: String { get set }
+protocol EditablePackableItem: ObservableObject {
+    var title: String? { get set }
     var isPacked: Bool { get set }
 }
 
 struct EditableItemView<T: EditablePackableItem>: View {
     
-    var item: T
+    @ObservedObject var item: T
     @FocusState private var isFocused: Bool
     var isList: Bool
     let togglePacked: () -> Void
@@ -27,6 +26,7 @@ struct EditableItemView<T: EditablePackableItem>: View {
                 Button(action: {
                     togglePacked()
                     HapticsManager.shared.triggerLightImpact()
+                        
                 }) {
                     Image(systemName: item.isPacked ? "checkmark.circle.fill" : "circle")
                         .foregroundStyle(item.isPacked ? Color.colorSage : .secondary)
@@ -35,7 +35,7 @@ struct EditableItemView<T: EditablePackableItem>: View {
                 .buttonStyle(BorderlessButtonStyle()) // Prevent button from triggering NavigationLink
                 
                 TextField("Item Name", text: Binding(
-                    get: { item.title },
+                    get: { item.title ?? "" },
                     set: { item.title = $0 }))
                 .foregroundStyle(item.isPacked ? Color.secondary : .primary)
                 .strikethrough(item.isPacked)
@@ -65,23 +65,15 @@ struct EditableItemView<T: EditablePackableItem>: View {
     
 }
 
-#Preview(traits: .sizeThatFitsLayout) {
-    
-    @Previewable @State var title = "Tent"
-    let item = RestockItem(position: 0, title: "Sleeping Bag", isPacked: false)
-    
-    EditableItemView(
+#Preview {
+    let context = PersistenceController.preview.container.viewContext
+    let item = RestockItem(context: context, title: "Sleeping Bag", position: 0)
+
+    return EditableItemView(
         item: item,
         isList: false,
-        togglePacked: { print("Toggle packed for \(title)") },
-        deleteItem: { print("Delete item: \(title)") }
+        togglePacked: { },
+        deleteItem: { }
     )
-    
-    EditableItemView(
-        item: item,
-        isList: false,
-        togglePacked: { print("Toggle packed for \(title)") },
-        deleteItem: { print("Delete item: \(title)") }
-    )
-    
+    .environment(\.managedObjectContext, context)
 }

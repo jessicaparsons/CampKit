@@ -6,13 +6,12 @@
 //
 
 import SwiftUI
-import SwiftData
 
 struct MainView: View {
     
-    @Query var packingLists: [PackingList]
+    @FetchRequest(sortDescriptors: []) var packingLists: FetchedResults<PackingList>
     
-    @Environment(\.modelContext) var modelContext
+    @Environment(\.managedObjectContext) private var viewContext
     @Environment(StoreKitManager.self) private var storeKitManager
     let weatherViewModel = WeatherViewModel(weatherFetcher: WeatherAPIClient(), geoCoder: Geocoder())
     
@@ -32,19 +31,21 @@ struct MainView: View {
         
             ZStack(alignment: .bottom) {
                 TabView(selection: $selection) {
-                    Group {
                         NavigationStack {
                             //MARK: - HOME
-                            HomeListView(modelContext: modelContext, isNewListQuizShowing: $isNewListQuizShowing)
+                            HomeListView(
+                                context: viewContext,
+                                isNewListQuizShowing: $isNewListQuizShowing
+                            )
                                 .navigationDestination(isPresented: $navigateToListView) {
                                     if let packingList = currentPackingList {
                                         ListView(
-                                            modelContext: modelContext,
+                                            context: viewContext,
                                             packingList: packingList,
                                             packingListsCount: packingListsCount
                                         )
                                     } else {
-                                        HomeListView(modelContext: modelContext, isNewListQuizShowing: $isNewListQuizShowing)
+                                        HomeListView(context: viewContext, isNewListQuizShowing: $isNewListQuizShowing)
                                     }
                                 }
                         }
@@ -55,7 +56,7 @@ struct MainView: View {
                         
                         //MARK: - REMINDERS
                         NavigationStack {
-                           RemindersView(modelContext: modelContext)
+                            RemindersView(context: viewContext)
                         }
                         .tabItem {
                             Image(systemName: "bell")
@@ -71,7 +72,7 @@ struct MainView: View {
                         
                         //MARK: - RESTOCK
                         NavigationStack {
-                           RestockView(modelContext: modelContext)
+                            RestockView(context: viewContext)
                         }
                         .tabItem {
                             Image(systemName: "arrow.clockwise.square")
@@ -86,9 +87,9 @@ struct MainView: View {
                             Image(systemName: "gearshape")
                         }
                         .tag(4)
-                    }//:GROUP
-                    .toolbarBackground(Color(UIColor.tertiarySystemBackground), for: .tabBar)
+                    
                 }//:TABVIEW
+                .toolbarBackground(Color(UIColor.tertiarySystemBackground), for: .tabBar)
                 
                 //MARK: - CENTER ADD NEW LIST BUTTON
                 Button {
@@ -113,7 +114,7 @@ struct MainView: View {
             .sheet(isPresented: $isNewListQuizShowing) {
                 NavigationStack {
                     QuizView(
-                        viewModel: QuizViewModel(modelContext: modelContext),
+                        viewModel: QuizViewModel(context: viewContext),
                         isNewListQuizShowing: $isNewListQuizShowing,
                         isStepOne: $isStepOne,
                         navigateToListView: $navigateToListView,
@@ -135,20 +136,9 @@ struct MainView: View {
 }
 
 #Preview {
-    let container = try! ModelContainer(
-        for: PackingList.self, Category.self, Item.self, RestockItem.self,
-        configurations: ModelConfiguration(isStoredInMemoryOnly: true)
-    )
-    
-    for item in RestockItem.restockItems {
-        container.mainContext.insert(item)
-    }
-    
-    preloadPackingListData(context: container.mainContext)
-    
-    return MainView()
-        .modelContainer(container)
-        .environment(StoreKitManager())
-    
-}
+    let context = PersistenceController.preview.container.viewContext
 
+    MainView()
+        .environment(\.managedObjectContext, context)
+        .environment(StoreKitManager())
+}

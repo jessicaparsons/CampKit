@@ -6,14 +6,13 @@
 //
 
 import SwiftUI
-import SwiftData
 
 struct AddNewItemView: View {
-    var viewModel: ListViewModel
+    @ObservedObject var viewModel: ListViewModel
     
     @FocusState var isFocused : Bool
     @State private var newItemText: String = ""
-    @Bindable var category: Category
+    @ObservedObject var category: Category
     
     var body: some View {
         HStack {
@@ -49,20 +48,13 @@ struct AddNewItemView: View {
 
 #Preview {
     
-    let container = PreviewContainer.shared
+    let context = PersistenceController.preview.container.viewContext
     
-    // Populate the container with mock data
-    preloadPackingListData(context: container.mainContext)
+    let samplePackingList = PackingList.samplePackingList(context: context)
     
-    // Fetch a sample PackingList
-    let samplePackingList = try! container.mainContext.fetch(FetchDescriptor<PackingList>()).first!
+    let categories = Category.sampleCategories(context: context)
     
-    let sampleCategory = samplePackingList.categories.first!
-    
-    let sampleViewModel = ListViewModel(modelContext: container.mainContext, packingList: samplePackingList)
-    
-    return AddNewItemView(viewModel: sampleViewModel, category: sampleCategory)
-        .modelContainer(container)
+    return AddNewItemView(viewModel: ListViewModel(viewContext: context, packingList: samplePackingList), category: categories.first!)
         .background(Color.customTan)
     
 }
