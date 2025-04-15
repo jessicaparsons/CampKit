@@ -6,24 +6,36 @@
 //
 
 import SwiftUI
-import SwiftData
+import CoreData
 
-@Observable
-final class ListViewModel {
+
+final class ListViewModel: ObservableObject {
     
-    let modelContext: ModelContext
+    let viewContext: NSManagedObjectContext
     
-    var packingList: PackingList
+    @Published var packingList: PackingList
     
-    var item: String = ""
-    var globalIsExpanded: Bool = false
-    var showPhotoPicker: Bool = false
-    var draggedCategory: Category?
-    var isConfettiVisible: Bool = false
-    var isShowingSuccessfulDuplication: Bool = false
+    @Published var item: String = ""
+    @Published var globalIsExpanded: Bool = false
+    @Published var showPhotoPicker: Bool = false
+    @Published var draggedCategory: Category?
+    @Published var isConfettiVisible: Bool = false
+    @Published var isShowingSuccessfulDuplication: Bool = false
     
-    init(modelContext: ModelContext, packingList: PackingList) {
-        self.modelContext = modelContext
+    var allItems: [Item] {
+        packingList.sortedCategories.flatMap { $0.sortedItems }
+    }
+    
+    var packedCount: Int {
+        allItems.filter { $0.isPacked }.count
+    }
+    
+    var packedRatio: Double {
+        allItems.isEmpty ? 0 : Double(packedCount) / Double(allItems.count)
+    }
+    
+    init(viewContext: NSManagedObjectContext, packingList: PackingList) {
+        self.viewContext = viewContext
         self.packingList = packingList
     }
     
@@ -31,39 +43,39 @@ final class ListViewModel {
     
     func addItem(to category: Category, itemTitle: String) {
         guard !itemTitle.isEmpty else { return }
+        
             let newItem = Item(
-                title: itemTitle,
+                context: viewContext, title: itemTitle,
                 isPacked: false)
-            newItem.position = category.items.count
+            newItem.position = Int64(category.sortedItems.count)
             newItem.category = category
-            category.items.append(newItem)
-            modelContext.insert(newItem)
+        
+            category.addToItems(newItem)
             reassignItemPositions(for: category)
+            save(viewContext)
+            objectWillChange.send()
     }
     
     //Keeps items arranged when a new item is added to a category
     func reassignItemPositions(for category: Category) {
         
-        let sortedItems = category.items
-            .compactMap { $0.position != nil ? $0 : nil }
-            .sorted { ($0.position ?? 0) < ($1.position ?? 0) }
-        
+        let sortedItems = category.sortedItems
         for (index, item) in sortedItems.enumerated() {
-            item.position = index
+            item.position = Int64(index)
         }
         
-        save(modelContext)
+        save(viewContext)
     }
     
     func deleteItem(_ item: Item) {
-        guard let safeItem = item.category else {
+        guard let category = item.category else {
             print("Error: Item does not belong to a category.")
             return
         }
         
         withAnimation {
-            modelContext.delete(item)
-            reassignItemPositions(for: safeItem)
+            viewContext.delete(item)
+            reassignItemPositions(for: category)
         }
     }
     
@@ -72,50 +84,54 @@ final class ListViewModel {
     func addNewCategory(title: String) {
         withAnimation {
             // Get the max current position, default to -1 if no categories exist
-            let maxPosition = packingList.categories.map(\.position).max() ?? -1
+            let maxPosition = packingList.sortedCategories.map(\.position).max() ?? -1
             
             let newCategory = Category(
+                context: viewContext,
+                isExpanded: true,
                 name: title,
-                position: maxPosition + 1,
-                isExpanded: true
+                position: Int(maxPosition + 1)
             )
 
-            packingList.categories.append(newCategory)
-            modelContext.insert(newCategory)
-            save(modelContext)
+            newCategory.packingList = packingList
+            packingList.addToCategories(newCategory)
+            save(viewContext)
+            objectWillChange.send()
         }
     }
     
     func reassignCategoryPositions(for packingList: PackingList) {
-        let sortedCategories = packingList.categories.sorted(by: { $0.position > $1.position }) // descending
+        let sortedCategories = packingList.sortedCategories
         for (index, category) in sortedCategories.enumerated() {
-            category.position = sortedCategories.count - 1 - index // max = top
+            category.position = Int64(sortedCategories.count - 1 - index) // max = top
         }
-        save(modelContext)
+        save(viewContext)
     }
     
     func deleteCategory(_ category: Category) {
         withAnimation {
             
             // Remove the category from the packing list
-            packingList.categories.removeAll { $0.id == category.id }
-            modelContext.delete(category)
+            packingList.removeFromCategories(category)
+            viewContext.delete(category)
             reassignCategoryPositions(for: packingList)
         }
-        save(modelContext)
+        save(viewContext)
+        objectWillChange.send()
     }
     
     func moveCategory(from source: IndexSet, to destination: Int) {
-        var sortedCategories = packingList.categories.sorted(by: { $0.position > $1.position })
+        var sortedCategories = packingList.sortedCategories
 
         sortedCategories.move(fromOffsets: source, toOffset: destination)
 
         for (index, category) in sortedCategories.enumerated() {
-            category.position = sortedCategories.count - 1 - index // Highest = top
+            category.position = Int64(sortedCategories.count - 1 - index) // Highest = top
         }
 
-        packingList.categories = sortedCategories
-        save(modelContext)
+        //packingList.categories = sortedCategories
+        save(viewContext)
+        objectWillChange.send()
     }
     
     //MARK: - MODIFY LIST
@@ -123,43 +139,49 @@ final class ListViewModel {
     
     func duplicateList() {
         
-        let lists = try! modelContext.fetch(FetchDescriptor<PackingList>())
-                for list in lists {
-                    list.position += 1
-                }
+        let lists = try? viewContext.fetch(PackingList.fetchRequest())
+        
+        lists?.forEach {
+            $0.position += 1
+        }
         
         let duplicatedPackingList = PackingList(
+            context: viewContext,
+            title: (packingList.title ?? Constants.newPackingListTitle) + " Copy",
             position: 0,
-            title: packingList.title + " Copy",
             locationName: packingList.locationName,
             locationAddress: packingList.locationAddress,
-            latitude: packingList.latitude,
-            longitude: packingList.longitude,
-            elevation: packingList.elevation
+            latitude: packingList.latitude?.doubleValue,
+            longitude: packingList.longitude?.doubleValue,
+            elevation: packingList.elevation?.doubleValue
         )
         
         duplicatedPackingList.photo = packingList.photo
         
         // Duplicate categories and items
-        for category in packingList.categories {
+        for category in packingList.sortedCategories {
             let newCategory = Category(
+                context: viewContext,
                 id: UUID(),
                 name: category.name,
-                position: category.position)
-            for item in category.items {
+                position: Int(category.position)
+            )
+            
+            for item in category.sortedItems {
                 let newItem = Item(
-                    id: UUID(),
-                    title: item.title,
+                    context: viewContext,
+                    title: item.title ?? "Packing Item",
                     isPacked: item.isPacked)
                 newItem.position = item.position
-                newCategory.items.append(newItem)
+                
+                newCategory.addToItems(newItem)
             }
-            duplicatedPackingList.categories.append(newCategory)
+            
+            duplicatedPackingList.addToCategories(newCategory)
         }
         
         //Save
-        modelContext.insert(duplicatedPackingList)
-        save(modelContext)
+        save(viewContext)
         
         print("duplicated packing lists position is: \(duplicatedPackingList.position)")
         
@@ -169,11 +191,9 @@ final class ListViewModel {
     @MainActor
     func deleteList(dismiss: DismissAction) {
         withAnimation {
+            viewContext.delete(packingList)
+            save(viewContext)
             dismiss()
-
-            modelContext.delete(packingList)
-            save(modelContext)
-            
         }
     }
     
@@ -182,27 +202,23 @@ final class ListViewModel {
     
     func expandAll() {
         withAnimation {
-            for category in packingList.categories {
-                category.isExpanded = true
-            }
+            packingList.sortedCategories.forEach { $0.isExpanded = true }
         }
-        save(modelContext)
+        save(viewContext)
     }
 
     func collapseAll() {
         withAnimation {
-            for category in packingList.categories {
-                category.isExpanded = false
-            }
+            packingList.sortedCategories.forEach { $0.isExpanded = false }
         }
-        save(modelContext)
+        save(viewContext)
     }
     
     
     var areAllItemsChecked: Bool {
         guard !packingList.isDeleted else { return false }
-        return packingList.categories.allSatisfy { category in
-            category.items.allSatisfy { $0.isPacked }
+        return packingList.sortedCategories.allSatisfy { category in
+            category.sortedItems.allSatisfy { $0.isPacked }
         }
     }
     
@@ -221,32 +237,37 @@ final class ListViewModel {
             }
            
         }
+        save(viewContext)
     }
     
     func checkAllItems() {
-        for category in packingList.categories {
-            for item in category.items {
+        
+        for category in packingList.sortedCategories {
+            for item in category.sortedItems {
                 item.isPacked = true
             }
         }
-        save(modelContext)
-        print("Check All Items fired")
+        
+        save(viewContext)
+        objectWillChange.send()
     }
 
     func uncheckAllItems() {
-        for category in packingList.categories {
-            for item in category.items {
+        for category in packingList.sortedCategories {
+            for item in category.sortedItems {
                 item.isPacked = false
             }
         }
-        save(modelContext)
+        save(viewContext)
+        objectWillChange.send()
     }
     
     @MainActor
     func togglePacked(for item: Item) {
         withAnimation {
             item.isPacked.toggle()
-            save(modelContext)
+            save(viewContext)
+            objectWillChange.send()
         }
         
         if areAllItemsChecked {

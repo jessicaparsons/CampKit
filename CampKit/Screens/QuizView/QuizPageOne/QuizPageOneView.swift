@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import SwiftData
 
 struct QuizPageOneView: View {
     
@@ -198,6 +197,8 @@ struct QuizPageOneView: View {
                         HapticsManager.shared.triggerLightImpact()
                         if viewModel.elevation > 0 {
                             isElevationAdded = true
+                        } else {
+                            isElevationAdded = false
                         }
                     }
                 
@@ -220,12 +221,13 @@ struct QuizPageOneView: View {
     @Previewable @State var isLocationSearchOpen: Bool = false
     @Previewable @State var isElevationAdded: Bool = true
     
-    let container = try! ModelContainer(
-        for: PackingList.self, Category.self, Item.self,
-        configurations: ModelConfiguration(isStoredInMemoryOnly: true)
-    )
+    let context = PersistenceController.preview.container.viewContext
     
     NavigationView {
-        QuizPageOneView(viewModel: QuizViewModel(modelContext: container.mainContext), isElevationAdded: $isElevationAdded, isLocationSearchOpen: $isLocationSearchOpen, isStepOne: $isStepOne)
+        ScrollView {
+            QuizPageOneView(viewModel: QuizViewModel(context: context), isElevationAdded: $isElevationAdded, isLocationSearchOpen: $isLocationSearchOpen, isStepOne: $isStepOne)
+                .environment(\.managedObjectContext, context)
+                .environment(WeatherViewModel(weatherFetcher: WeatherAPIClient(), geoCoder: Geocoder()))
+        }
     }
 }

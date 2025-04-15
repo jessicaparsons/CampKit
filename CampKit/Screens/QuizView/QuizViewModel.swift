@@ -6,15 +6,15 @@
 //
 
 import SwiftUI
-import SwiftData
 import CoreLocation
+import CoreData
 
 @Observable
 final class QuizViewModel {
     
     //MARK: - PROPERTIES
     
-    private let modelContext: ModelContext
+    private let viewContext: NSManagedObjectContext
     
     var selectedFilters: Set<String> = []
     
@@ -28,8 +28,8 @@ final class QuizViewModel {
     //Stores the packing list so the user gets sent to it after creation
     var currentPackingList: PackingList?
     
-    init(modelContext: ModelContext) {
-        self.modelContext = modelContext
+    init(context: NSManagedObjectContext) {
+        self.viewContext = context
     }
     
     //MARK: - METHODS
@@ -42,15 +42,15 @@ final class QuizViewModel {
             // where 'isSelected' is true, then maps the filtered result to an array of their names
             // inserts the choices into the context
             
-            let lists = try! modelContext.fetch(FetchDescriptor<PackingList>())
-
+            let lists = fetchPackingLists()
+            
             for list in lists {
                 list.position += 1
             }
             
             let newPackingList = PackingList(
-                position: 0,
-                title: listTitle.isEmpty ? "My Packing List" : listTitle,
+                context: viewContext,
+                title: listTitle.isEmpty ? "My Packing List" : listTitle, position: 0,
                 locationName: (locationName == nil) ? nil : locationName,
                 locationAddress: (locationAddress == nil) ? nil : locationAddress,
                 latitude: latitude,
@@ -59,14 +59,14 @@ final class QuizViewModel {
             )
             
             //Generate recommended categories and items
-            let categories = generateCategories(from: newPackingList)
-            newPackingList.categories.append(contentsOf: categories)
+            let categories = generateCategories(from: newPackingList, using: viewContext)
+            categories.forEach { newPackingList.addToCategories($0)
+            }
             
-            newPackingList.categories.last?.isExpanded = true
+            //Expand the first category in the UI
+            newPackingList.sortedCategories.last?.isExpanded = true
             
-            //Save
-            modelContext.insert(newPackingList)
-            save(modelContext)
+            save(viewContext)
             
             currentPackingList = newPackingList
         }
@@ -75,16 +75,13 @@ final class QuizViewModel {
     
     func createBlankPackingList() {
         
-        let lists = try! modelContext.fetch(FetchDescriptor<PackingList>())
-
-        for list in lists {
-            list.position += 1
-        }
+        let lists = try? viewContext.fetch(PackingList.fetchRequest())
+        lists?.forEach{ $0.position += 1 }
         
         withAnimation {
             let newPackingList = PackingList(
-                position: 0,
-                title: "My Packing List",
+                context: viewContext,
+                title: "My Packing List", position: 0,
                 locationName: nil,
                 locationAddress: nil,
                 latitude: latitude,
@@ -92,9 +89,7 @@ final class QuizViewModel {
                 elevation: elevation
             )
             
-            modelContext.insert(newPackingList)
-            save(modelContext)
-            
+            save(viewContext)
             currentPackingList = newPackingList
         }
     }
@@ -111,55 +106,56 @@ final class QuizViewModel {
         selectedFilters.removeAll()
     }
     
-   
+    
     //Generate Packing Categories
     
     @MainActor
-    private func generateCategories(from packingList: PackingList) -> [Category] {
+    private func generateCategories(from packingList: PackingList, using context: NSManagedObjectContext) -> [Category] {
         
         var selectedCategories: [Category] = []
         
         let defaultCategories = ["Clothing", "Camping Gear", "First Aid"]
         
+        // Grab category templates with real Core Data items
+        let templates = generateCategoryTemplates(using: context)
         
-        //Always include essential categories first
+        let filters = defaultCategories + Array(selectedFilters)
         
-        for categoryName in defaultCategories {
-            if let itemTemplates = categoryTemplates[categoryName] {
+        for (index, filter) in filters.enumerated() {
+            guard let items = templates[filter] else { continue }
+            
+            
+            // Essential Categories
+            let category = Category(
+                context: context,
+                isExpanded: false,
+                name: filter,
+                position: index,
+                packingList: packingList
+            )
+            
+            items.enumerated().forEach { index, itemTemplate in
+               let newItem = Item(
+                context: context,
+                title: itemTemplate.title ?? "Packing item",
+                isPacked: false
+               )
                 
-                //Create the categories
-                let category = Category(name: categoryName, position: selectedCategories.count)
+                newItem.position = Int64(index)
+                newItem.category = category
                 
-                //Assign position dynamically and link items to the category
-                category.items = itemTemplates.enumerated().map { index, itemTemplate in
-                    let newItem = Item(title: itemTemplate.title, isPacked: false)
-                    newItem.position = index //Assign a position
-                    newItem.category = category //Assign the category
-                    
-                    return newItem
-                }
-                
-                selectedCategories.append(category)
+                category.addToItems(newItem)
             }
-        }
-        
-        //Add user selected categories
-        
-        for filter in selectedFilters {
-            if let itemTemplates = categoryTemplates[filter] {
-                let category = Category(name: filter, position: selectedCategories.count)
                 
-                category.items = itemTemplates.enumerated().map { index, itemTemplate in
-                    let newItem = Item(title: itemTemplate.title, isPacked: false)
-                    newItem.position = index
-                    newItem.category = category
-                    return newItem
-                }
-                
-                selectedCategories.append(category)
-            }
+            selectedCategories.append(category)
         }
         
         return selectedCategories
+    }
+
+    
+    func fetchPackingLists() -> [PackingList] {
+        let request = NSFetchRequest<PackingList>(entityName: "PackingList")
+        return (try? viewContext.fetch(request)) ?? []
     }
 }

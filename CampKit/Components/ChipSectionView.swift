@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import SwiftData
 
 struct ChipSectionView: View {
     
@@ -97,13 +96,13 @@ struct FlowLayout: Layout {
 
 #Preview {
     
-
+    @Previewable @Bindable var viewModel = QuizViewModel(
+        context: PersistenceController.preview.container.viewContext
+    )
     
-    @Previewable @State var viewModel = QuizViewModel(modelContext: try! ModelContainer(
-        for: PackingList.self, Category.self, Item.self,
-        configurations: ModelConfiguration(isStoredInMemoryOnly: true)
-    ).mainContext)
-    
-    
-    ChipSectionView(selectedFilters: $viewModel.selectedFilters, preferenceCategory: ChoiceOptions.activities)
+    ChipSectionView(
+        selectedFilters: $viewModel.selectedFilters,
+        preferenceCategory: ChoiceOptions.activities
+    )
+    .environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
 }

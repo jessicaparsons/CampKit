@@ -6,16 +6,16 @@
 //
 
 import SwiftUI
-import SwiftData
 import PhotosUI
 import ConfettiSwiftUI
+import CoreData
 
 struct ListView: View {
     
-    @Environment(\.modelContext) private var modelContext
+    @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.dismiss) private var dismiss
     @Environment(StoreKitManager.self) private var storeKitManager
-    @State var viewModel: ListViewModel
+    @StateObject var viewModel: ListViewModel
     
     @State private var isPhotoPickerPresented: Bool = false
     @State private var bannerImageItem: PhotosPickerItem?
@@ -43,8 +43,12 @@ struct ListView: View {
     }
     
     //Initialize ListView with its corresponding ViewModel
-    init(modelContext: ModelContext, packingList: PackingList, packingListsCount: Int) {
-        self.viewModel = ListViewModel(modelContext: modelContext, packingList: packingList)
+    init(
+        context: NSManagedObjectContext,
+        packingList: PackingList,
+        packingListsCount: Int
+    ) {
+        _viewModel = StateObject(wrappedValue: ListViewModel(viewContext: context, packingList: packingList))
         self.packingListsCount = packingListsCount
         
     }
@@ -127,7 +131,7 @@ struct ListView: View {
                 }//:ZSTACK
             }//:GROUP
             .background(Color.colorTan)
-            .navigationTitle(viewModel.packingList.title)
+            .navigationTitle(viewModel.packingList.title ?? Constants.newPackingListTitle)
             .navigationBarTitleDisplayMode(.inline)
             .navigationBarBackButtonHidden(true)
             .ignoresSafeArea(.keyboard, edges: .bottom)
@@ -150,7 +154,7 @@ struct ListView: View {
                 }
                 // This makes the title invisible until scrolled
                 ToolbarItem(placement: .principal) {
-                    Text(viewModel.packingList.title)
+                    Text(viewModel.packingList.title ?? Constants.newPackingListTitle)
                         .opacity(scrollOffset < -scrollThreshold ? 1 : 0)
                 }
             }
@@ -161,7 +165,7 @@ struct ListView: View {
                     {
                         bannerImage = loadedImage
                         viewModel.packingList.photo = data  // Save to SwiftData PackingList Model
-                        save(modelContext)
+                        save(viewContext)
                         
                     } else {
                         print("Failed to load image")
@@ -291,13 +295,13 @@ struct ListView: View {
             }
         }//:HSTACK
         .sheet(isPresented: $isEditingTitle) {
-            EditListDetailsModal(packingList: viewModel.packingList)
+            EditListDetailsModal(viewModel: viewModel)
                 .presentationDetents([.medium, .large])
         }
         .photosPicker(isPresented: $isPhotoPickerPresented, selection: $bannerImageItem, matching: .images)
         .sheet(isPresented: $isRearranging) {
             RearrangeCategoriesView(viewModel: viewModel)
-                .environment(viewModel)
+                .environmentObject(viewModel)
                 .presentationDetents([.medium, .large])
         }
         .confirmationDialog(
@@ -331,8 +335,8 @@ struct ListView: View {
                 // Step 2: After a short delay, safely delete
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
                     let listToDelete = viewModel.packingList
-                    modelContext.delete(listToDelete)
-                    save(modelContext)
+                    viewContext.delete(listToDelete)
+                    save(viewContext)
                 }
             }
             Button("Cancel", role: .cancel) { }
@@ -343,43 +347,37 @@ struct ListView: View {
 //MARK: - PREVIEWS
 
 #Preview("Sample Data") {
-    NavigationStack {
+   
         let storeKitManager = StoreKitManager()
-        let container = PreviewContainer.shared
+        let context = PersistenceController.preview.container.viewContext
         
-        // Populate the container with sample data
-        preloadPackingListData(context: container.mainContext)
+        let samplePackingList = PackingList.samplePackingList(context: context)
         
-        // Fetch a sample packing list from the container
-        let samplePackingList = try! container.mainContext.fetch(FetchDescriptor<PackingList>()).first!
-        
-        // Return the ListView with the in-memory container
-        return ListView(
-            modelContext: container.mainContext,
+    NavigationStack {
+        ListView(
+            context: context,
             packingList: samplePackingList,
             packingListsCount: 3
         )
-        .modelContainer(container)
         .environment(storeKitManager)
-        .environment(\.modelContext, container.mainContext)
-        
+        .environment(\.managedObjectContext, context)
     }
 }
 
 #Preview("Basic Preview") {
+    let storeKitManager = StoreKitManager()
+    let context = PersistenceController.preview.container.viewContext
+    
+    let emptySamplePackingList = PackingList(context: context, title: "Empty List", position: 0)
+    
     NavigationStack {
-        let storeKitManager = StoreKitManager()
-        let placeholderPackingList = PackingList(position: 0, title: "Empty Camping List", locationName: "Ojai")
-        let container = PreviewContainer.shared
-        
         ListView(
-            modelContext: container.mainContext,
-            packingList: placeholderPackingList,
+            context: context,
+            packingList: emptySamplePackingList,
             packingListsCount: 3
         )
-        .modelContainer(container)
         .environment(storeKitManager)
-        .environment(\.modelContext, container.mainContext)
+        .environment(\.managedObjectContext, context)
         
     }
 }

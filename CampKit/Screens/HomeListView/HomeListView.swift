@@ -6,22 +6,23 @@
 //
 
 import SwiftUI
-import SwiftData
+import CoreData
 
 struct HomeListView: View {
     //Live Data
-    @Query(sort: \PackingList.position) var fetchedLists: [PackingList]
-    // Editable state for drag/delete
-    @State private var packingLists: [PackingList] = []
+    @FetchRequest(
+        entity: CampKit.PackingList.entity(),
+        sortDescriptors: [NSSortDescriptor(keyPath: \PackingList.position, ascending: true)]) private var packingLists: FetchedResults<PackingList>
     
-    @Environment(\.modelContext) var modelContext
+    
+    @Environment(\.managedObjectContext) private var viewContext
     @Environment(StoreKitManager.self) private var storeKitManager
     
     @State private var location: String = ""
     @State private var editMode: EditMode = .inactive
     @Binding var isNewListQuizShowing: Bool
     
-    init(modelContext: ModelContext, isNewListQuizShowing: Binding<Bool>) {
+    init(context: NSManagedObjectContext, isNewListQuizShowing: Binding<Bool>) {
         _isNewListQuizShowing = isNewListQuizShowing
     }
     
@@ -56,7 +57,7 @@ Hit the \"+\" to get started!
                                 
                                 NavigationLink(
                                     destination: ListView(
-                                        modelContext: modelContext,
+                                        context: viewContext,
                                         packingList: packingList,
                                         packingListsCount: packingLists.count
                                     ),
@@ -80,40 +81,38 @@ Hit the \"+\" to get started!
                                             }
                                             
                                             VStack(alignment: .leading) {
-                                                Text(packingList.title)
+                                                Text(packingList.title ?? Constants.newPackingListTitle)
                                                     .font(.headline)
                                                     .lineLimit(1)
                                                     .truncationMode(.tail)
                                                 Text(packingList.dateCreated, style: .date)
                                                     .font(.subheadline)
                                                     .foregroundColor(.secondary)
-                                            }
-                                        }
+                                            }//:VSTACK
+                                        }//:HSTACK
                                     }
                                 )//:NAVIGATION LINK
                             } //:FOR EACH
-                            .onMove { source, destination in
-                                packingLists.move(fromOffsets: source, toOffset: destination)
-                                
-                                for (index, list) in packingLists.enumerated() {
-                                    list.position = index
+                            .onMove { indices, newOffset in
+                                var reorderedLists = packingLists.map { $0 }
+
+                                reorderedLists.move(fromOffsets: indices, toOffset: newOffset)
+
+                                for (index, item) in reorderedLists.enumerated() {
+                                    item.position = Int64(index)
                                 }
-                                
-                                save(modelContext)
+
+                                save(viewContext)
                             }
+
+
                             .onDelete { offsets in
                                 for index in offsets {
-                                    modelContext.delete(packingLists[index])
+                                    viewContext.delete(packingLists[index])
                                 }
-                                
-                                packingLists.remove(atOffsets: offsets)
-                                
-                                for (index, list) in packingLists.enumerated() {
-                                    list.position = index
-                                }
-                                
-                                save(modelContext)
+                                save(viewContext)
                             }
+
                         }
                     }//:LIST
                     .sheet(isPresented: Binding(
@@ -129,12 +128,6 @@ Hit the \"+\" to get started!
         .navigationBarTitleDisplayMode(.large)
         .scrollContentBackground(.hidden)
         .environment(\.editMode, $editMode)
-        .onAppear {
-            packingLists = fetchedLists
-        }
-        .onChange(of: fetchedLists) {
-            packingLists = fetchedLists
-        }
         
         //MARK: - MENU
         .toolbar {
@@ -145,7 +138,7 @@ Hit the \"+\" to get started!
                         Button {
                             editMode = (editMode == .active) ? .inactive : .active
                         } label: {
-                            Image(systemName: "pencil.circle")
+                            Image(systemName: "ellipsis.circle")
                                 .font(.body)
                         }
                         // ADD BUTTON
@@ -175,37 +168,17 @@ Hit the \"+\" to get started!
     
 }//:STRUCT
 
-#Preview("Sample Data") {
+#Preview() {
     
     @Previewable @State var isNewListQuizShowing: Bool = false
     @Previewable @State var isUpgradeToProShowing: Bool = false
     @Previewable @Bindable var storeKitManager = StoreKitManager()
     
-    let container = PreviewContainer.shared
-    
-    preloadPackingListData(context: container.mainContext)
-    
-    return NavigationStack {
-        HomeListView(modelContext: container.mainContext, isNewListQuizShowing: $isNewListQuizShowing)
-            .modelContainer(container)
-            .environment(\.modelContext, container.mainContext)
-            .environment(storeKitManager)
-    }
-}
+    let context = PersistenceController.preview.container.viewContext
 
-
-#Preview("Empty List") {
-    
-    @Previewable @State var isNewListQuizShowing: Bool = false
-    @Previewable @State var isUpgradeToProShowing: Bool = false
-    @Previewable @Bindable var storeKitManager = StoreKitManager()
-    
-    let container = PreviewContainer.shared
-    
-    return NavigationStack {
-        HomeListView(modelContext: container.mainContext, isNewListQuizShowing: $isNewListQuizShowing)
-            .modelContainer(container)
-            .environment(\.modelContext, container.mainContext)
+    NavigationStack {
+        HomeListView(context: context, isNewListQuizShowing: $isNewListQuizShowing)
+            .environment(\.managedObjectContext, context)
             .environment(storeKitManager)
     }
 }

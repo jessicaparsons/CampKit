@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import SwiftData
 @testable import CampKit
 
 @MainActor

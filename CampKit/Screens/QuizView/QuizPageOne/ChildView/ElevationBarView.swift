@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import SwiftData
 
 struct ElevationBarView: View {
     
@@ -37,11 +36,12 @@ struct ElevationBarView: View {
     @Previewable @State var navigateToListView: Bool = false
     @Previewable @State var currentPackingList: PackingList?
     
-    let container = try! ModelContainer(
-        for: PackingList.self, Category.self, Item.self,
-        configurations: ModelConfiguration(isStoredInMemoryOnly: true)
-    )
-    QuizView(viewModel: QuizViewModel(modelContext: container.mainContext), isNewListQuizShowing: $isNewListQuizShowing, isStepOne: $isStepOne,    navigateToListView: $navigateToListView, currentPackingList: $currentPackingList, packingListCount: 3)
+    
+    let context = PersistenceController.preview.container.viewContext
+    
+    QuizView(viewModel: QuizViewModel(context: context), isNewListQuizShowing: $isNewListQuizShowing, isStepOne: $isStepOne,    navigateToListView: $navigateToListView, currentPackingList: $currentPackingList, packingListCount: 3)
+        .environment(\.managedObjectContext, context)
+        .environment(WeatherViewModel(weatherFetcher: WeatherAPIClient(), geoCoder: Geocoder()))
 }
 
 

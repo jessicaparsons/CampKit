@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import SwiftData
 
 struct QuizPageTwoView: View {
     
@@ -88,10 +87,13 @@ struct QuizPageTwoView: View {
     @Previewable @State var isStepOne: Bool = false
     @Previewable @State var isElevationAdded: Bool = false
     
-    let container = try! ModelContainer(
-        for: PackingList.self, Category.self, Item.self,
-        configurations: ModelConfiguration(isStoredInMemoryOnly: true)
+    let context = PersistenceController.preview.container.viewContext
+    
+    QuizPageTwoView(
+        viewModel: QuizViewModel(context: context),
+        isStepOne: $isStepOne,
+        isElevationAdded: $isElevationAdded
     )
-    QuizPageTwoView(viewModel: QuizViewModel(modelContext: container.mainContext), isStepOne: $isStepOne, isElevationAdded: $isElevationAdded)
         .environment(WeatherViewModel(weatherFetcher: WeatherAPIClient(), geoCoder: Geocoder()))
+        .environment(\.managedObjectContext, context)
 }

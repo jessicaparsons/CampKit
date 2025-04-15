@@ -6,11 +6,11 @@
 //
 
 import SwiftUI
-import SwiftData
+import CoreData
 
 struct RestockView: View {
     
-    @State private var viewModel: RestockViewModel
+    @Bindable var viewModel: RestockViewModel
     @State private var isAddNewItemShowing: Bool = false
     @State private var newItemTitle: String = ""
     @State private var editMode: EditMode = .inactive
@@ -19,8 +19,8 @@ struct RestockView: View {
         !newItemTitle.isEmptyOrWhiteSpace
     }
     
-    init(modelContext: ModelContext) {
-        self.viewModel = RestockViewModel(modelContext: modelContext)
+    init(context: NSManagedObjectContext) {
+        self.viewModel = RestockViewModel(context: context)
     }
     
     var body: some View {
@@ -96,7 +96,7 @@ Hit the \"+\" to get started!
                         Button {
                             editMode = (editMode == .active) ? .inactive : .active
                         } label: {
-                            Image(systemName: "pencil.circle")
+                            Image(systemName: "ellipsis.circle")
                                 .font(.body)
                         }
                         // ADD BUTTON
@@ -121,28 +121,26 @@ Hit the \"+\" to get started!
 }
 
 #Preview("Sample Data") {
-    let container = PreviewContainer.shared
-
-    // Inject mock data
-    RestockItem.restockItems.forEach {
-        container.mainContext.insert($0)
-    }
-
-    return NavigationStack {
-        RestockView(modelContext: container.mainContext)
-            .modelContainer(container)
-            .environment(\.modelContext, container.mainContext)
+    do {
+        let context = PersistenceController.preview.container.viewContext
+        RestockItem.generateSampleItems(context: context)
+        try? context.save()
+        
+        return NavigationStack {
+            RestockView(context: context)
+                .environment(\.managedObjectContext, context)
+        }
     }
 }
 
 
 #Preview("Empty") {
-    let container = PreviewContainer.shared
+    let context = PersistenceController.preview.container.viewContext
 
-    return NavigationStack {
-        RestockView(modelContext: container.mainContext)
-            .modelContainer(container)
-            .environment(\.modelContext, container.mainContext)
+    NavigationStack {
+        RestockView(context: context)
+            .environment(\.managedObjectContext, context)
+
     }
 }
 

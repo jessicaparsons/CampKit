@@ -5,10 +5,11 @@
 //  Created by Jessica Parsons on 1/9/25.
 //
 import SwiftUI
-import SwiftData
 
 struct EditListDetailsModal: View {
-    @Bindable var packingList: PackingList
+    
+    @ObservedObject var viewModel: ListViewModel
+    @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.dismiss) var dismiss
     @State var isLocationSearchOpen: Bool = false
     @State private var locationNamePlaceholder: String?
@@ -63,10 +64,12 @@ struct EditListDetailsModal: View {
                         }
                     //MARK: - SAVE CHANGES BUTTON
                     Button("Save Changes") {
-                        packingList.title = listTitlePlaceholder.trimmingCharacters(in: .whitespacesAndNewlines)
-                        packingList.locationName = locationNamePlaceholder?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-                        packingList.locationAddress = locationAddressPlaceholder?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+                        viewModel.packingList.title = listTitlePlaceholder.trimmingCharacters(in: .whitespacesAndNewlines)
+                        viewModel.packingList.locationName = locationNamePlaceholder?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+                        viewModel.packingList.locationAddress = locationAddressPlaceholder?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+                        try? viewContext.save()
                         HapticsManager.shared.triggerSuccess()
+                        viewModel.objectWillChange.send()
                         dismiss()
                     }
                     .padding(.top)
@@ -74,13 +77,13 @@ struct EditListDetailsModal: View {
                     
                     Spacer()
                 }//:VSTACK
-                .navigationTitle("Edit List Details")
+                .navigationTitle("Details")
                 .navigationBarTitleDisplayMode(.inline)
                 .padding()
                 .onAppear {
-                    listTitlePlaceholder = packingList.title
-                    locationNamePlaceholder = packingList.locationName
-                    locationAddressPlaceholder = packingList.locationAddress
+                    listTitlePlaceholder = viewModel.packingList.title ?? Constants.newPackingListTitle
+                    locationNamePlaceholder = viewModel.packingList.locationName
+                    locationAddressPlaceholder = viewModel.packingList.locationAddress
                 }
                 .scrollContentBackground(.hidden)
                 
@@ -126,10 +129,13 @@ struct EditListDetailsModal: View {
 
 
 #Preview {
-    let sampleUserList = PackingList(position: 0, title: "Summer List with a very long anme", locationName: "Joshua Tree, CA")
+    let context = PersistenceController.preview.container.viewContext
+    
+    let samplePackingList = PackingList.samplePackingList(context: context)
+    
+    
     NavigationStack {
-        EditListDetailsModal(
-            packingList: sampleUserList
-        )
+        EditListDetailsModal(viewModel: ListViewModel(viewContext: context, packingList: samplePackingList))
+            .environment(\.managedObjectContext, context)
     }
 }

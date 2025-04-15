@@ -6,10 +6,9 @@
 //
 
 import SwiftUI
-import SwiftData
 
 struct CategoriesListView: View {
-    var viewModel: ListViewModel
+    @ObservedObject var viewModel: ListViewModel
     @Environment(\.dismiss) private var dismiss
     @Binding var isRearranging: Bool
     
@@ -20,7 +19,7 @@ struct CategoriesListView: View {
                         .onAppear {
                             dismiss() // Trigger dismissal as a side effect
                         }
-                } else if viewModel.packingList.categories.isEmpty {
+                } else if viewModel.packingList.sortedCategories.isEmpty {
                     ContentUnavailableView(
                         "Fresh Start",
                         systemImage: "tent",
@@ -28,7 +27,7 @@ struct CategoriesListView: View {
                     )
                     .padding(.top, Constants.emptyContentSpacing)
                 } else {
-                    ForEach(viewModel.packingList.categories.sorted(by: { $0.position > $1.position })) { category in
+                    ForEach(viewModel.packingList.sortedCategories, id: \.objectID) { category in
                         
                         ZStack {
                             RoundedRectangle(cornerRadius: Constants.cornerRadius)
@@ -48,51 +47,19 @@ struct CategoriesListView: View {
             .offset(y: -30)    }
 }
 
-#Preview("Empty") {
+#Preview() {
     
     @Previewable @State var isRearranging: Bool = false
     
-    // Create an in-memory ModelContainer
-    let container = PreviewContainer.shared
+    let context = PersistenceController.preview.container.viewContext
     
-    // Populate the container with mock data
-    preloadPackingListData(context: container.mainContext)
-    
-    // Fetch a sample PackingList
-    let samplePackingList = PackingList.samplePackingList
-    
-    // Create a mock ListViewModel
-    let viewModel = ListViewModel(modelContext: container.mainContext, packingList: samplePackingList)
-    
+    let samplePackingList = PackingList.samplePackingList(context: context)
+        
     // Return the preview
-    return ScrollView {
+    ScrollView {
         LazyVStack {
-            CategoriesListView(viewModel: viewModel, isRearranging: $isRearranging)
-                .modelContainer(container)
+            CategoriesListView(viewModel: ListViewModel(viewContext: context, packingList: samplePackingList), isRearranging: $isRearranging)
         }
     }
 }
 
-#Preview {
-    @Previewable @State var isRearranging: Bool = false
-
-    // Create an in-memory ModelContainer
-    let container = PreviewContainer.shared
-    
-    // Populate the container with mock data
-    preloadPackingListData(context: container.mainContext)
-    
-    // Fetch a sample PackingList
-    let samplePackingList = try! container.mainContext.fetch(FetchDescriptor<PackingList>()).first!
-    
-    // Create a mock ListViewModel
-    let viewModel = ListViewModel(modelContext: container.mainContext, packingList: samplePackingList)
-    
-    // Return the preview
-    return ScrollView {
-        LazyVStack {
-            CategoriesListView(viewModel: viewModel, isRearranging: $isRearranging)
-                .modelContainer(container)
-        }
-    }
-}

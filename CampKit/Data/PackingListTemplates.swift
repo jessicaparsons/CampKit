@@ -5,7 +5,9 @@
 //  Created by Jessica Parsons on 3/11/25.
 //
 
-import Foundation
+import SwiftUI
+import CoreData
+
 
 
 //Dictionary with all category templates
@@ -17,105 +19,102 @@ let packingPreferenceCategories: [String: [String]] = [
     ]
 
 
-@MainActor
-let categoryTemplates: [String: [Item]] = [
-    
-    
-    //DEFAULTS
-    
-    "Clothing": [
-        Item(title: "Tshirts"),
-        Item(title: "Jacket"),
-        Item(title: "Hiking Boots"),
-        Item(title: "Rain Jacket")
-    ],
-    "Camping Gear": [
-        Item(title: "Tent"),
-        Item(title: "Sleeping Bag"),
-        Item(title: "Camp Stove")
-    ],
-    
-    "First Aid": [
-        Item(title: "First Aid Kit"),
-        Item(title: "Bandaids"),
-        Item(title: "Poison Ivy Kit")
-    ],
-    
-    //PARTICIPANTS
-    
-    ChoiceOptions.kids: [
-        Item(title: "Diapers"),
-        Item(title: "Toys"),
-        Item(title: "Extra Clothes")
-    ],
-    ChoiceOptions.dogs: [
-        Item(title: "Dog Food"),
-        Item(title: "Leash"),
-        Item(title: "Dog Bed")
-    ],
-    
-    
-    //ACTIVITIES
-    ChoiceOptions.hiking: [
-            Item(title: "Hiking Boots"),
-            Item(title: "Trekking Poles"),
-            Item(title: "Trail Map")
-    ],
-    ChoiceOptions.fishing: [
-        Item(title: "Fishing Rod"),
-        Item(title: "Bait & Lures"),
-        Item(title: "Tackle Box")
-    ],
-    ChoiceOptions.bouldering: [
-        Item(title: "Climbing Shoes"),
-        Item(title: "Chalk Bag"),
-        Item(title: "Crash Pad")
-    ],
-    ChoiceOptions.waterSports: [
-        Item(title: "Swimsuit"),
-        Item(title: "Dry Bag"),
-        Item(title: "Snorkel Gear")
-    ],
-    ChoiceOptions.biking: [
-        Item(title: "Helmet"),
-        Item(title: "Bike Repair Kit"),
-        Item(title: "Gloves")
-    ],
-    ChoiceOptions.backpacking: [
-        Item(title: "Backpack"),
-        Item(title: "Water Filter"),
-        Item(title: "Sleeping Bag")
-    ],
-    ChoiceOptions.kayaking: [
-        Item(title: "Paddle"),
-        Item(title: "Life Jacket"),
-        Item(title: "Waterproof Bag")
-    ],
-    
-    //WEATHER
-    
-    ChoiceOptions.hot: [
-        Item(title: "Sunscreen"),
-        Item(title: "Bathing Suit"),
-        Item(title: "Extra Water")
-    ],
-    
-    ChoiceOptions.cold: [
-        Item(title: "Hand Warmers"),
-        Item(title: "Extra Blankets"),
-        Item(title: "Wool Socks")
-    ],
-    
-    ChoiceOptions.snowy: [
-        Item(title: "Hand Warmers"),
-        Item(title: "Extra Blankets"),
-        Item(title: "Wool Socks")
-    ],
-    
-    ChoiceOptions.rainy: [
-        Item(title: "Hand Warmers"),
-        Item(title: "Extra Blankets"),
-        Item(title: "Wool Socks")
+func generateCategoryTemplates(using viewContext: NSManagedObjectContext) -> [String: [Item]] {
+    return [
+        "Clothing": [
+            Item(context: viewContext, title: "Tshirts"),
+            Item(context: viewContext, title: "Jacket"),
+            Item(context: viewContext, title: "Hiking Boots"),
+            Item(context: viewContext, title: "Rain Jacket")
+        ],
+        "Camping Gear": [
+            Item(context: viewContext, title: "Tent"),
+            Item(context: viewContext, title: "Sleeping Bag"),
+            Item(context: viewContext, title: "Camp Stove")
+        ],
+        
+        "First Aid": [
+            Item(context: viewContext, title: "First Aid Kit"),
+            Item(context: viewContext, title: "Bandaids"),
+            Item(context: viewContext, title: "Poison Ivy Kit")
+        ],
+        
+        //PARTICIPANTS
+        
+        ChoiceOptions.kids: [
+            Item(context: viewContext, title: "Diapers"),
+            Item(context: viewContext, title: "Toys"),
+            Item(context: viewContext, title: "Extra Clothes")
+        ],
+        ChoiceOptions.dogs: [
+            Item(context: viewContext, title: "Dog Food"),
+            Item(context: viewContext, title: "Leash"),
+            Item(context: viewContext, title: "Dog Bed")
+        ],
+        
+        
+        //ACTIVITIES
+        ChoiceOptions.hiking: [
+                Item(context: viewContext, title: "Hiking Boots"),
+                Item(context: viewContext, title: "Trekking Poles"),
+                Item(context: viewContext, title: "Trail Map")
+        ],
+        ChoiceOptions.fishing: [
+            Item(context: viewContext, title: "Fishing Rod"),
+            Item(context: viewContext, title: "Bait & Lures"),
+            Item(context: viewContext, title: "Tackle Box")
+        ],
+        ChoiceOptions.bouldering: [
+            Item(context: viewContext, title: "Climbing Shoes"),
+            Item(context: viewContext, title: "Chalk Bag"),
+            Item(context: viewContext, title: "Crash Pad")
+        ],
+        ChoiceOptions.waterSports: [
+            Item(context: viewContext, title: "Swimsuit"),
+            Item(context: viewContext, title: "Dry Bag"),
+            Item(context: viewContext, title: "Snorkel Gear")
+        ],
+        ChoiceOptions.biking: [
+            Item(context: viewContext, title: "Helmet"),
+            Item(context: viewContext, title: "Bike Repair Kit"),
+            Item(context: viewContext, title: "Gloves")
+        ],
+        ChoiceOptions.backpacking: [
+            Item(context: viewContext, title: "Backpack"),
+            Item(context: viewContext, title: "Water Filter"),
+            Item(context: viewContext, title: "Sleeping Bag")
+        ],
+        ChoiceOptions.kayaking: [
+            Item(context: viewContext, title: "Paddle"),
+            Item(context: viewContext, title: "Life Jacket"),
+            Item(context: viewContext, title: "Waterproof Bag")
+        ],
+        
+        //WEATHER
+        
+        ChoiceOptions.hot: [
+            Item(context: viewContext, title: "Sunscreen"),
+            Item(context: viewContext, title: "Bathing Suit"),
+            Item(context: viewContext, title: "Extra Water")
+        ],
+        
+        ChoiceOptions.cold: [
+            Item(context: viewContext, title: "Hand Warmers"),
+            Item(context: viewContext, title: "Extra Blankets"),
+            Item(context: viewContext, title: "Wool Socks")
+        ],
+        
+        ChoiceOptions.snowy: [
+            Item(context: viewContext, title: "Hand Warmers"),
+            Item(context: viewContext, title: "Extra Blankets"),
+            Item(context: viewContext, title: "Wool Socks")
+        ],
+        
+        ChoiceOptions.rainy: [
+            Item(context: viewContext, title: "Hand Warmers"),
+            Item(context: viewContext, title: "Extra Blankets"),
+            Item(context: viewContext, title: "Wool Socks")
+        ]
+        
     ]
-    
-]
+}

@@ -10,13 +10,13 @@ import SwiftUI
 struct UpdateReminderView: View {
     
     @Environment(\.dismiss) private var dismiss
-    var reminder: ReminderItem
+    var reminder: Reminder
     
     var body: some View {
         NavigationStack {
             Form {
                 TextField("Reminder Name", text: Binding(
-                    get: { reminder.title },
+                    get: { reminder.title ?? "" },
                     set: { reminder.title = $0 })
                 )
             }
@@ -35,5 +35,8 @@ struct UpdateReminderView: View {
 }
 
 #Preview {
-    UpdateReminderView(reminder: ReminderItem(title: "Charge batteries"))
+    
+    let context = PersistenceController.preview.container.viewContext
+    
+    UpdateReminderView(reminder: Reminder(context: context, title: "Charge batteries"))
 }

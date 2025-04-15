@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import SwiftData
 
 struct CardButtonView: View {
     
@@ -56,12 +55,19 @@ struct CardButtonView: View {
     @Previewable @State var navigateToListView: Bool = false
     @Previewable @State var currentPackingList: PackingList?
     
-    let container = try! ModelContainer(
-        for: PackingList.self, Category.self, Item.self,
-        configurations: ModelConfiguration(isStoredInMemoryOnly: true)
+    let previewContext = PersistenceController.preview.container.viewContext
+
+    QuizView(
+        viewModel: QuizViewModel(context: previewContext),
+        isNewListQuizShowing: $isNewListQuizShowing,
+        isStepOne: $isStepOne,
+        navigateToListView: $navigateToListView,
+        currentPackingList: $currentPackingList,
+        packingListCount: 3
     )
-    QuizView(viewModel: QuizViewModel(modelContext: container.mainContext), isNewListQuizShowing: $isNewListQuizShowing, isStepOne: $isStepOne,     navigateToListView: $navigateToListView, currentPackingList: $currentPackingList, packingListCount: 3)
+    .environment(\.managedObjectContext, previewContext)
 }
+
 
 
 //#Preview {
@@ -70,5 +76,5 @@ struct CardButtonView: View {
 //        for: PackingList.self, Category.self, Item.self,
 //        configurations: ModelConfiguration(isStoredInMemoryOnly: true)
 //    )
-//    CardButtonView(viewModel: QuizViewModel(modelContext: container.mainContext), emoji: "🧍‍♂️", title: "Adults")
+//    CardButtonView(viewModel: QuizViewModel(viewContext: container.mainContext), emoji: "🧍‍♂️", title: "Adults")
 //}

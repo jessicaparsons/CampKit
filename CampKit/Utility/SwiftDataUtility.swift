@@ -5,10 +5,10 @@
 //  Created by Jessica Parsons on 4/8/25.
 //
 
-import SwiftData
+import CoreData
 
 
-func save(_ context: ModelContext) {
+func save(_ context: NSManagedObjectContext) {
     do {
         try context.save()
         print("SwiftData context saved.")

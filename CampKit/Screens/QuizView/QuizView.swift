@@ -6,11 +6,10 @@
 //
 
 import SwiftUI
-import SwiftData
 
 struct QuizView: View {
     
-    @Environment(\.modelContext) var modelContext
+    @Environment(\.managedObjectContext) private var viewContext
     @Environment(WeatherViewModel.self) private var weatherViewModel
     @State var viewModel: QuizViewModel
     @Binding var isNewListQuizShowing: Bool
@@ -179,13 +178,11 @@ struct QuizView: View {
     @Previewable @State var navigateToListView: Bool = false
     @Previewable @State var currentPackingList: PackingList?
     
-    let container = try! ModelContainer(
-        for: PackingList.self, Category.self, Item.self,
-        configurations: ModelConfiguration(isStoredInMemoryOnly: true)
-    )
+    let context = PersistenceController.preview.container.viewContext
+    
     
     NavigationStack {
-        QuizView(viewModel: QuizViewModel(modelContext: container.mainContext), isNewListQuizShowing: $isNewListQuizShowing, isStepOne: $isStepOne, navigateToListView: $navigateToListView, currentPackingList: $currentPackingList, packingListCount: 3)
+        QuizView(viewModel: QuizViewModel(context: context), isNewListQuizShowing: $isNewListQuizShowing, isStepOne: $isStepOne, navigateToListView: $navigateToListView, currentPackingList: $currentPackingList, packingListCount: 3)
             .environment(WeatherViewModel(weatherFetcher: WeatherAPIClient(), geoCoder: Geocoder()))
     }
 }
