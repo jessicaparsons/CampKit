@@ -10,7 +10,7 @@ import SwiftUI
 struct QuizPageTwoView: View {
     
     @Environment(WeatherViewModel.self) private var weatherViewModel
-    @State var viewModel: QuizViewModel
+    @Bindable var viewModel: QuizViewModel
     @Binding var isStepOne: Bool
     @Binding var isElevationAdded: Bool
     @State private var weatherCategories: Set<String> = []

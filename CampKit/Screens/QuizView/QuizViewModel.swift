@@ -64,7 +64,7 @@ final class QuizViewModel {
             }
             
             //Expand the first category in the UI
-            newPackingList.sortedCategories.last?.isExpanded = true
+            newPackingList.sortedCategories.first?.isExpanded = true
             
             save(viewContext)
             
