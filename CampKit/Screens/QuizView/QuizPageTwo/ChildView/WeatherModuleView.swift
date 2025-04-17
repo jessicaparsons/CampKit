@@ -53,7 +53,7 @@ struct WeatherModuleView: View {
                         else if isWeatherLoading {
                             ProgressView()
                                 .frame(minHeight: 140)
-                        } else if weatherViewModel.isShowingNoLocationFoundMessage {
+                        } else if weatherViewModel.isNoLocationFoundMessagePresented {
                             VStack(spacing: Constants.verticalSpacing) {
                                 Text("Weather Forecast")
                                     .font(.headline)

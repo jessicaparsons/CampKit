@@ -20,10 +20,10 @@ struct HomeListView: View {
     
     @State private var location: String = ""
     @State private var editMode: EditMode = .inactive
-    @Binding var isNewListQuizShowing: Bool
+    @Binding var isNewListQuizPresented: Bool
     
-    init(context: NSManagedObjectContext, isNewListQuizShowing: Binding<Bool>) {
-        _isNewListQuizShowing = isNewListQuizShowing
+    init(context: NSManagedObjectContext, isNewListQuizPresented: Binding<Bool>) {
+        _isNewListQuizPresented = isNewListQuizPresented
     }
     
     var body: some View {
@@ -116,8 +116,8 @@ Hit the \"+\" to get started!
                         }
                     }//:LIST
                     .sheet(isPresented: Binding(
-                        get: { storeKitManager.isUpgradeToProShowing },
-                        set: { storeKitManager.isUpgradeToProShowing = $0 })
+                        get: { storeKitManager.isUpgradeToProPresented },
+                        set: { storeKitManager.isUpgradeToProPresented = $0 })
                     ) {
                         UpgradeToProView()
                     }
@@ -144,9 +144,9 @@ Hit the \"+\" to get started!
                         // ADD BUTTON
                         Button {
                             if storeKitManager.isUnlimitedListsUnlocked || packingLists.count < Constants.proVersionListCount {
-                                isNewListQuizShowing = true
+                                isNewListQuizPresented = true
                             } else {
-                                storeKitManager.isUpgradeToProShowing = true
+                                storeKitManager.isUpgradeToProPresented = true
                             }
                         } label: {
                             Image(systemName: "plus")
@@ -170,14 +170,14 @@ Hit the \"+\" to get started!
 
 #Preview() {
     
-    @Previewable @State var isNewListQuizShowing: Bool = false
-    @Previewable @State var isUpgradeToProShowing: Bool = false
+    @Previewable @State var isNewListQuizPresented: Bool = false
+    @Previewable @State var isUpgradeToProPresented: Bool = false
     @Previewable @Bindable var storeKitManager = StoreKitManager()
     
     let context = PersistenceController.preview.container.viewContext
 
     NavigationStack {
-        HomeListView(context: context, isNewListQuizShowing: $isNewListQuizShowing)
+        HomeListView(context: context, isNewListQuizPresented: $isNewListQuizPresented)
             .environment(\.managedObjectContext, context)
             .environment(storeKitManager)
     }

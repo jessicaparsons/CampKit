@@ -31,7 +31,7 @@ final class WeatherViewModel {
     
     var weather: [WeatherModel]? // 5 day forecast
     var coordinates: CLLocationCoordinate2D? // user's location input
-    var isShowingNoLocationFoundMessage: Bool = false
+    var isNoLocationFoundMessagePresented: Bool = false
     let geoCoder: Geocoding
     
     private let weatherFetcher: WeatherFetching
@@ -71,7 +71,7 @@ final class WeatherViewModel {
             print("Could not fetch location due to network error: \(error)")
         } catch {
             print("Could not fetch location: \(error.localizedDescription)")
-            isShowingNoLocationFoundMessage = true
+            isNoLocationFoundMessagePresented = true
         }
     }
     

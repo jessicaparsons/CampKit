@@ -36,7 +36,7 @@ struct ProgressIndicatorView: View {
 
 #Preview {
     
-    @Previewable @State var isNewListQuizShowing: Bool = true
+    @Previewable @State var isNewListQuizPresented: Bool = true
     @Previewable @State var isStepOne: Bool = true
     
     @Previewable @State var navigateToListView: Bool = false
@@ -46,7 +46,7 @@ struct ProgressIndicatorView: View {
     
     
     NavigationStack {
-        QuizView(viewModel: QuizViewModel(context: context), isNewListQuizShowing: $isNewListQuizShowing, isStepOne: $isStepOne, navigateToListView: $navigateToListView, currentPackingList: $currentPackingList, packingListCount: 3)
+        QuizView(viewModel: QuizViewModel(context: context), isNewListQuizPresented: $isNewListQuizPresented, isStepOne: $isStepOne, navigateToListView: $navigateToListView, currentPackingList: $currentPackingList, packingListCount: 3)
             .environment(WeatherViewModel(weatherFetcher: WeatherAPIClient(), geoCoder: Geocoder()))
     }
 }

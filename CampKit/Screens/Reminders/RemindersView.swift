@@ -8,16 +8,38 @@
 import SwiftUI
 import CoreData
 
+
 struct RemindersView: View {
     
     @Environment(\.managedObjectContext) private var viewContext
-    var viewModel: RemindersViewModel
-    @State private var isAddNewReminderAlertShowing: Bool = false
-    @State private var editReminder: Reminder?
-    
-    @FetchRequest(
-        sortDescriptors: []) var reminderItems: FetchedResults<Reminder>
-    
+    @State var viewModel: RemindersViewModel
+    @State private var isAddNewReminderAlertPresented: Bool = false
+    @State private var selectedReminder: Reminder?
+    @State private var showReminderEditScreen: Bool = false
+    @AppStorage("isShowingCompletedReminders") private var isShowingCompleted: Bool = false
+    @State private var selectedSort: String = "Date"
+    @State private var dataRefreshTrigger = false
+
+        
+    var reminderItems: [Reminder] {
+        _ = dataRefreshTrigger
+        
+        let request = NSFetchRequest<Reminder>(entityName: "Reminder")
+        
+        request.sortDescriptors = selectedSort == "Date"
+            ? [NSSortDescriptor(keyPath: \Reminder.reminderDate, ascending: true)]
+            : [NSSortDescriptor(keyPath: \Reminder.title, ascending: true)]
+        
+        request.predicate = isShowingCompleted ? nil : NSPredicate(format: "isCompleted == NO")
+
+        do {
+            return try viewContext.fetch(request)
+        } catch {
+            print("Fetch failed:", error)
+            return []
+        }
+    }
+     
     @State private var newReminderTitle: String = ""
     @State private var editMode: EditMode = .inactive
     
@@ -25,8 +47,12 @@ struct RemindersView: View {
         !newReminderTitle.isEmptyOrWhiteSpace
     }
     
+    private func isSelectedReminder(_ reminder: Reminder) -> Bool {
+        reminder.objectID == selectedReminder?.objectID
+    }
+    
     init(context: NSManagedObjectContext) {
-        self.viewModel = RemindersViewModel(context: context)
+        _viewModel = State(wrappedValue: RemindersViewModel(context: context))
     }
     
     var body: some View {
@@ -56,13 +82,15 @@ Hit the \"+\" to get started!
                         ForEach(reminderItems) { reminder in
                             ReminderListItemView(
                                 reminder: reminder,
-                                isSelected: false) { event in
+                                isSelected: isSelectedReminder(reminder)) { event in
                                     switch event {
-                                    case .onChecked(let reminder, let checked): print("OnChecked")
+                                    case .onChecked(let reminder, let checked): reminder.isCompleted = checked
+                                        dataRefreshTrigger.toggle()
                                     case .onSelect(let reminder):
-                                        print("onSelect")
+                                        selectedReminder = reminder
                                     case .onInfoSelected(let reminder):
-                                        print("onInfoSelected")
+                                        showReminderEditScreen = true
+                                        selectedReminder = reminder
                                     }
                                 }
                         }//:FOREACH
@@ -82,26 +110,24 @@ Hit the \"+\" to get started!
         .scrollContentBackground(.hidden)
         .environment(\.editMode, $editMode)
         //MARK: - ADD NEW ITEM ALERT
-        .alert("Add New Reminder", isPresented: $isAddNewReminderAlertShowing) {
+        .sheet(isPresented: $isAddNewReminderAlertPresented, content: {
+            let newReminder = Reminder(
+                context: viewContext,
+                title: "New Reminder",
+                isCompleted: false)
             
-            TextField("New Reminder", text: $newReminderTitle)
-            
-            Button("Done", action: {
-                if isFormValid {
-                    let newReminder = (Reminder(
-                        context: viewContext,
-                        title: newReminderTitle))
-                    
-                    try? viewContext.save()
-                    newReminderTitle = ""
-                }
-                isAddNewReminderAlertShowing = false
+                NavigationStack {
+                    UpdateReminderView(reminder: newReminder, dataRefreshTrigger: $dataRefreshTrigger)
                 
-            })
-            .disabled(!isFormValid)
-            
-            Button("Cancel", role: .cancel) { }
-        }
+            }
+        })
+        .sheet(isPresented: $showReminderEditScreen, content: {
+            if let selectedReminder {
+                NavigationStack {
+                    UpdateReminderView(reminder: selectedReminder, dataRefreshTrigger: $dataRefreshTrigger)
+                }
+            }
+        })
         
         
         //MARK: - MENU
@@ -109,16 +135,48 @@ Hit the \"+\" to get started!
             ToolbarItem(placement: .topBarTrailing) {
                 HStack {
                     if editMode == .inactive {
-                        // REARRANGE BUTTON
-                        Button {
-                            editMode = (editMode == .active) ? .inactive : .active
+                        Menu {
+                            //SORT BY
+                            Label("Sort By", systemImage: "arrow.up.arrow.down")
+                                .font(.body)
+
+                            Button {
+                                withAnimation {
+                                    selectedSort = "Date"
+                                }
+                            } label: {
+                                Label("Date", systemImage: selectedSort == "Date" ? "checkmark" : "")
+                            }
+                            Button {
+                                withAnimation {
+                                    selectedSort = "Name"
+                                }
+                            } label: {
+                                Label("Name", systemImage: selectedSort == "Name" ? "checkmark" : "")
+                            }
+                            Divider()
+                            
+                            // REARRANGE BUTTON
+                            Button {
+                                editMode = (editMode == .active) ? .inactive : .active
+                            } label: {
+                                Label("Delete Multiple", systemImage: "trash")
+                                    .font(.body)
+                            }
+                            //SHOW / HIDE COMPLETED
+                            Button {
+                                isShowingCompleted.toggle()
+                            } label: {
+                                Label(isShowingCompleted ? "Hide Completed" : "Show Completed", systemImage: isShowingCompleted ? "eye.slash" : "eye")
+                                    .font(.body)
+                            }
                         } label: {
                             Image(systemName: "ellipsis.circle")
                                 .font(.body)
                         }
                         // ADD BUTTON
                         Button {
-                            isAddNewReminderAlertShowing = true
+                            isAddNewReminderAlertPresented = true
                             
                         } label: {
                             Image(systemName: "plus")
@@ -132,19 +190,28 @@ Hit the \"+\" to get started!
                     }
                 }//:HSTACK
                 .foregroundStyle(Color.primary)
+
             }//:TOOL BAR ITEM
         }//:TOOLBAR
     }
 }
 
-#Preview("Empty") {
-    
-    let context = PersistenceController.preview.container.viewContext
-    
-    NavigationStack {
-        RemindersView(context: context)
+#Preview() {
+    do {
+        let context = PersistenceController.preview.container.viewContext
+        
+        // Reset the AppStorage value BEFORE view init
+        UserDefaults.standard.set(false, forKey: "isShowingCompletedReminders")
+        
+        Reminder.generateSampleReminders(context: context)
+        try? context.save()
+        
+        return NavigationStack {
+            RemindersView(context: context)
+                .environment(\.managedObjectContext, context)
+        }
     }
-    .environment(\.managedObjectContext, context)
+    
     
 }
 

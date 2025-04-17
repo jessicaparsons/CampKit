@@ -21,12 +21,12 @@ struct ListView: View {
     @State private var bannerImageItem: PhotosPickerItem?
     @State private var bannerImage: UIImage?
     @State private var isEditing: Bool = false
-    @State private var isShowingDeleteConfirmation: Bool = false
-    @State private var isShowingToggleAllItemsConfirmation: Bool = false
+    @State private var isDeleteConfirmationPresented: Bool = false
+    @State private var isToggleAllItemsConfirmationPresented: Bool = false
     @State private var fireScale: CGFloat = 0.1
     @State private var isEditingTitle: Bool = false
-    @State private var isShowingDuplicationConfirmation: Bool = false
-    @State private var isAddNewCategoryShowing: Bool = false
+    @State private var isDuplicationConfirmationPresented: Bool = false
+    @State private var isAddNewCategoryPresented: Bool = false
     @State private var newCategoryTitle: String = ""
     @State private var isRearranging: Bool = false
     @State private var trigger: Int = 0
@@ -135,7 +135,7 @@ struct ListView: View {
             .navigationBarTitleDisplayMode(.inline)
             .navigationBarBackButtonHidden(true)
             .ignoresSafeArea(.keyboard, edges: .bottom)
-            .animation(.easeOut(duration: 0.3), value: viewModel.isShowingSuccessfulDuplication)
+            .animation(.easeOut(duration: 0.3), value: viewModel.isSuccessfulDuplicationPresented)
             .toolbar {
                 //CUSTOM BACK BUTTON
                 ToolbarItem(placement: .navigationBarLeading) {
@@ -185,7 +185,7 @@ struct ListView: View {
         HStack {
             //MARK: - CHECK ALL ITEMS BUTTON
             Button(action: {
-                isShowingToggleAllItemsConfirmation = true
+                isToggleAllItemsConfirmationPresented = true
             }) {
                 Label(
                     viewModel.areAllItemsChecked ? "Check All" : "Uncheck All",
@@ -195,12 +195,12 @@ struct ListView: View {
             }
             .confirmationDialog(
                 viewModel.areAllItemsChecked ? "Are you sure you want to uncheck all items?" : "Are you sure you want to check all items?",
-                isPresented: $isShowingToggleAllItemsConfirmation,
+                isPresented: $isToggleAllItemsConfirmationPresented,
                 titleVisibility: .visible
             ) {
                 Button(viewModel.areAllItemsChecked ? "Uncheck All" : "Check All") {
                     viewModel.toggleAllItems()
-                    isShowingToggleAllItemsConfirmation = false
+                    isToggleAllItemsConfirmationPresented = false
                 }
                 
                 Button("Cancel", role: .cancel) { }
@@ -252,9 +252,9 @@ struct ListView: View {
                 // DUPLICATE LIST
                 Button {
                     if storeKitManager.isUnlimitedListsUnlocked || packingListsCount < Constants.proVersionListCount {
-                        isShowingDuplicationConfirmation = true
+                        isDuplicationConfirmationPresented = true
                     } else {
-                        storeKitManager.isUpgradeToProShowing = true
+                        storeKitManager.isUpgradeToProPresented = true
                     }
                     
                 } label: {
@@ -264,7 +264,7 @@ struct ListView: View {
                 
                 // DELETE LIST
                 Button(role: .destructive) {
-                    isShowingDeleteConfirmation = true
+                    isDeleteConfirmationPresented = true
                 } label: {
                     Label("Delete List", systemImage: "trash")
                 }
@@ -277,19 +277,19 @@ struct ListView: View {
             
             //ADD NEW CATEGORY
             Button {
-                isAddNewCategoryShowing = true
+                isAddNewCategoryPresented = true
             } label: {
                 Image(systemName: "plus")
                     .dynamicForegroundStyle(trigger: scrollOffset)
             }
-            .alert("Add New Category", isPresented: $isAddNewCategoryShowing) {
+            .alert("Add New Category", isPresented: $isAddNewCategoryPresented) {
                 TextField("New category", text: $newCategoryTitle)
                 Button("Done", action: {
                     if isFormValid {
                         viewModel.addNewCategory(title: newCategoryTitle)
                         newCategoryTitle = ""
                     }
-                    isAddNewCategoryShowing = false
+                    isAddNewCategoryPresented = false
                 }).disabled(!isFormValid)
                 Button("Cancel", role: .cancel) { }
             }
@@ -306,19 +306,19 @@ struct ListView: View {
         }
         .confirmationDialog(
             "Are you sure you want to duplicate the list?",
-            isPresented: $isShowingDuplicationConfirmation,
+            isPresented: $isDuplicationConfirmationPresented,
             titleVisibility: .visible
         ) {
             Button("Duplicate") {
                 viewModel.duplicateList()
-                isShowingDuplicationConfirmation = false
+                isDuplicationConfirmationPresented = false
             }
             
             Button("Cancel", role: .cancel) { }
         }
         .alert("Duplicate List", isPresented: Binding(
-            get: { viewModel.isShowingSuccessfulDuplication },
-            set: { viewModel.isShowingSuccessfulDuplication = $0 }
+            get: { viewModel.isSuccessfulDuplicationPresented },
+            set: { viewModel.isSuccessfulDuplicationPresented = $0 }
         )) {
             Button("OK", role: .cancel) { }
         } message: {
@@ -326,7 +326,7 @@ struct ListView: View {
         }
         .confirmationDialog(
             "Are you sure you want to delete this list?",
-            isPresented: $isShowingDeleteConfirmation,
+            isPresented: $isDeleteConfirmationPresented,
             titleVisibility: .visible
         ) {
             Button("Delete", role: .destructive) {

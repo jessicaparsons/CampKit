@@ -12,7 +12,7 @@ struct QuizView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(WeatherViewModel.self) private var weatherViewModel
     @Bindable var viewModel: QuizViewModel
-    @Binding var isNewListQuizShowing: Bool
+    @Binding var isNewListQuizPresented: Bool
     @Binding var isStepOne: Bool
     @Binding var navigateToListView: Bool
     @Binding var currentPackingList: PackingList?
@@ -68,7 +68,7 @@ struct QuizView: View {
                                     if let packingList = viewModel.currentPackingList {
                                         currentPackingList = packingList
                                         navigateToListView = true
-                                        isNewListQuizShowing = false
+                                        isNewListQuizPresented = false
                                     }
                                 }
                                     
@@ -89,7 +89,7 @@ struct QuizView: View {
                                     if let packingList = viewModel.currentPackingList {
                                         currentPackingList = packingList
                                         navigateToListView = true
-                                        isNewListQuizShowing = false
+                                        isNewListQuizPresented = false
                                     }
                                 }
                             }) {
@@ -128,7 +128,7 @@ struct QuizView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button {
-                        isNewListQuizShowing = false
+                        isNewListQuizPresented = false
                         isStepOne = true
                     } label: {
                         Image(systemName: "xmark")
@@ -163,7 +163,7 @@ struct QuizView: View {
         isLocationSearchOpen = false
         viewModel.listTitle = ""
         isElevationAdded = false
-        weatherViewModel.isShowingNoLocationFoundMessage = false
+        weatherViewModel.isNoLocationFoundMessagePresented = false
         
         viewModel.resetSelections()
     }
@@ -172,7 +172,7 @@ struct QuizView: View {
 
 #Preview {
     
-    @Previewable @State var isNewListQuizShowing: Bool = true
+    @Previewable @State var isNewListQuizPresented: Bool = true
     @Previewable @State var isStepOne: Bool = true
     
     @Previewable @State var navigateToListView: Bool = false
@@ -182,7 +182,7 @@ struct QuizView: View {
     
     
     NavigationStack {
-        QuizView(viewModel: QuizViewModel(context: context), isNewListQuizShowing: $isNewListQuizShowing, isStepOne: $isStepOne, navigateToListView: $navigateToListView, currentPackingList: $currentPackingList, packingListCount: 3)
+        QuizView(viewModel: QuizViewModel(context: context), isNewListQuizPresented: $isNewListQuizPresented, isStepOne: $isStepOne, navigateToListView: $navigateToListView, currentPackingList: $currentPackingList, packingListCount: 3)
             .environment(WeatherViewModel(weatherFetcher: WeatherAPIClient(), geoCoder: Geocoder()))
     }
 }
