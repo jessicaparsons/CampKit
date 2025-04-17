@@ -60,7 +60,7 @@ struct UpgradeToProView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button {
-                        storeKitManager.isUpgradeToProShowing = false
+                        storeKitManager.isUpgradeToProPresented = false
                     } label: {
                         Image(systemName: "xmark")
                             .font(.footnote)

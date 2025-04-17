@@ -11,7 +11,7 @@ import CoreData
 struct RestockView: View {
     
     @State var viewModel: RestockViewModel
-    @State private var isAddNewItemShowing: Bool = false
+    @State private var isAddNewItemPresented: Bool = false
     @State private var newItemTitle: String = ""
     @State private var editMode: EditMode = .inactive
     
@@ -75,14 +75,14 @@ Hit the \"+\" to get started!
             await viewModel.loadItems()
         }
         //MARK: - ADD NEW ITEM POP UP
-        .alert("Add New Item", isPresented: $isAddNewItemShowing) {
+        .alert("Add New Item", isPresented: $isAddNewItemPresented) {
             TextField("New restock item", text: $newItemTitle)
             Button("Done", action: {
                 if isFormValid {
                     viewModel.addNewItem(title: newItemTitle)
                     newItemTitle = ""
                 }
-                isAddNewItemShowing = false
+                isAddNewItemPresented = false
             }).disabled(!isFormValid)
             Button("Cancel", role: .cancel) { }
         }
@@ -101,7 +101,7 @@ Hit the \"+\" to get started!
                         }
                         // ADD BUTTON
                         Button {
-                            isAddNewItemShowing = true
+                            isAddNewItemPresented = true
                             
                         } label: {
                             Image(systemName: "plus")

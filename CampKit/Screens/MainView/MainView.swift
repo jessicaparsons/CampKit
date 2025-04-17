@@ -16,12 +16,12 @@ struct MainView: View {
     let weatherViewModel = WeatherViewModel(weatherFetcher: WeatherAPIClient(), geoCoder: Geocoder())
     
     @State private var selection = 0
-    @State private var isShowingSettings: Bool = false
-    @State private var isNewListQuizShowing: Bool = false
+    @State private var isSettingsPresented: Bool = false
+    @State private var isNewListQuizPresented: Bool = false
     @State private var isStepOne: Bool = true
     @State private var navigateToListView = false
     @State private var currentPackingList: PackingList?
-    @State private var isUpgradeToProShowing: Bool = false
+    @State private var isUpgradeToProPresented: Bool = false
     
     var packingListsCount: Int {
         packingLists.count
@@ -35,7 +35,7 @@ struct MainView: View {
                             //MARK: - HOME
                             HomeListView(
                                 context: viewContext,
-                                isNewListQuizShowing: $isNewListQuizShowing
+                                isNewListQuizPresented: $isNewListQuizPresented
                             )
                                 .navigationDestination(isPresented: $navigateToListView) {
                                     if let packingList = currentPackingList {
@@ -45,7 +45,7 @@ struct MainView: View {
                                             packingListsCount: packingListsCount
                                         )
                                     } else {
-                                        HomeListView(context: viewContext, isNewListQuizShowing: $isNewListQuizShowing)
+                                        HomeListView(context: viewContext, isNewListQuizPresented: $isNewListQuizPresented)
                                     }
                                 }
                         }
@@ -93,7 +93,7 @@ struct MainView: View {
                 
                 //MARK: - CENTER ADD NEW LIST BUTTON
                 Button {
-                    isNewListQuizShowing = true
+                    isNewListQuizPresented = true
                 } label: {
                     Image(systemName: "plus.circle.fill")
                         .symbolRenderingMode(.palette)
@@ -111,11 +111,11 @@ struct MainView: View {
             }
             
             //MARK: - SHOW PACKING LIST QUIZ
-            .sheet(isPresented: $isNewListQuizShowing) {
+            .sheet(isPresented: $isNewListQuizPresented) {
                 NavigationStack {
                     QuizView(
                         viewModel: QuizViewModel(context: viewContext),
-                        isNewListQuizShowing: $isNewListQuizShowing,
+                        isNewListQuizPresented: $isNewListQuizPresented,
                         isStepOne: $isStepOne,
                         navigateToListView: $navigateToListView,
                         currentPackingList: $currentPackingList,
@@ -125,8 +125,8 @@ struct MainView: View {
                 }
             }
             .sheet(isPresented: Binding(
-                get: { storeKitManager.isUpgradeToProShowing },
-                set: { storeKitManager.isUpgradeToProShowing = $0 })
+                get: { storeKitManager.isUpgradeToProPresented },
+                set: { storeKitManager.isUpgradeToProPresented = $0 })
             ) {
                 UpgradeToProView()
             }

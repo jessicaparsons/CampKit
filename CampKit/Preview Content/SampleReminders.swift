@@ -8,13 +8,11 @@
 import Foundation
 import CoreData
 
-struct SampleReminders {
+
+extension Reminder {
     
-    
-    static var reminders: [Reminder] {
-        
-        let context = PersistenceController.shared.container.viewContext
-        return [
+    static func generateSampleReminders(context: NSManagedObjectContext) {
+        let reminders = [
             Reminder(context: context, title: "Charge Batteries", notes: "Ollie's collar", reminderDate: Date(), reminderTime: Date()),
             Reminder(context: context, title: "Check propane"),
             Reminder(context: context, title: "Fill up water bottles")

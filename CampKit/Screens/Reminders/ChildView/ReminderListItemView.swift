@@ -15,28 +15,50 @@ enum ReminderCellEvents {
 
 struct ReminderListItemView: View {
     
+    @Environment(\.managedObjectContext) private var viewContext
     @FocusState private var isFocused: Bool
     
     var reminder: Reminder
     let isSelected: Bool
     let onEvent: (ReminderCellEvents) -> Void
     @State private var isChecked: Bool = false
+    let delay = Delay()
+    
+    private func formatReminderDate(_ date: Date) -> String {
+        if date.isToday {
+            return "Today"
+        } else if date.isTomorrow {
+            return "Tomorrow"
+        } else {
+            return date.formatted(date: .numeric, time: .omitted)
+        }
+    }
     
     var body: some View {
         HStack(alignment: .top) {
-             
-            Image(systemName: "circle")
+            
+             //MARK: - CHECK MARK BUBBLE
+            Image(systemName: isChecked ? "inset.filled.circle" : "circle")
+                .foregroundStyle(isChecked ? Color.colorSage : .secondary)
                 .font(.system(size: 22))
                 .padding(.trailing, Constants.lineSpacing)
                 .onTapGesture {
-                    isChecked.toggle()
-                    onEvent(.onChecked(reminder, isChecked))
-                    HapticsManager.shared.triggerLightImpact()
+                    Task {
+                        // Immediate UI feedback
+                        isChecked.toggle()
+                        HapticsManager.shared.triggerLightImpact()
+
+                        // Delay, then send event back on main thread
+                        await delay.performWork {
+                            await MainActor.run {
+                                onEvent(.onChecked(reminder, isChecked))
+                                try? viewContext.save()
+                                
+                            }
+                        }
+                    }
                 }
- 
-//                Image(systemName: item.isPacked ? "checkmark.circle.fill" : "circle")
-                    //.foregroundStyle(item.isPacked ? Color.colorSage : .secondary)
-                
+                //MARK: - REMINDER INFO
             VStack {
                 Text(reminder.title ?? "")
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -50,10 +72,10 @@ struct ReminderListItemView: View {
                 
                 HStack {
                     if let reminderDate = reminder.reminderDate {
-                        Text(reminderDate.formatted())
+                        Text(formatReminderDate(reminderDate))
                     }
                     if let reminderTime = reminder.reminderTime {
-                        Text(reminderTime.formatted())
+                        Text(reminderTime, style: .time)
                     }
                 }//:HSTACK
                 .font(.caption)
@@ -61,11 +83,13 @@ struct ReminderListItemView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
             
+            //MARK: - INFO ICON
             Spacer()
             Image(systemName: "info.circle.fill")
+                .foregroundStyle(.colorSage)
                 .opacity(isSelected ? 1 : 0)
                 .onTapGesture {
-                    onEvent(.onSelect(reminder))
+                    onEvent(.onInfoSelected(reminder))
                 }
             
         }//:HSTACK
@@ -79,9 +103,12 @@ struct ReminderListItemView: View {
 
 #Preview {
     
-    let context = PersistenceController.preview.container.viewContext
-    
-    let reminder = Reminder(context: context, title: "Recharge batteries", notes: "Get Ollie's Collar", reminderDate: Date(), reminderTime: Date())
-                                
-    ReminderListItemView(reminder: reminder, isSelected: false, onEvent: { _ in })
+    do {
+        let context = PersistenceController.preview.container.viewContext
+        
+        let reminder = Reminder(context: context, title: "Recharge batteries", notes: "Get Ollie's Collar", reminderDate: Date(), reminderTime: Date())
+        try? context.save()
+        
+        return ReminderListItemView(reminder: reminder, isSelected: true, onEvent: { _ in })
+    }
 }

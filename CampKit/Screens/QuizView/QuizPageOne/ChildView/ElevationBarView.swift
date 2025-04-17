@@ -31,7 +31,7 @@ struct ElevationBarView: View {
   
 #Preview("QuizView") {
     
-    @Previewable @State var isNewListQuizShowing: Bool = true
+    @Previewable @State var isNewListQuizPresented: Bool = true
     @Previewable @State var isStepOne: Bool = true
     @Previewable @State var navigateToListView: Bool = false
     @Previewable @State var currentPackingList: PackingList?
@@ -39,7 +39,7 @@ struct ElevationBarView: View {
     
     let context = PersistenceController.preview.container.viewContext
     
-    QuizView(viewModel: QuizViewModel(context: context), isNewListQuizShowing: $isNewListQuizShowing, isStepOne: $isStepOne,    navigateToListView: $navigateToListView, currentPackingList: $currentPackingList, packingListCount: 3)
+    QuizView(viewModel: QuizViewModel(context: context), isNewListQuizPresented: $isNewListQuizPresented, isStepOne: $isStepOne,    navigateToListView: $navigateToListView, currentPackingList: $currentPackingList, packingListCount: 3)
         .environment(\.managedObjectContext, context)
         .environment(WeatherViewModel(weatherFetcher: WeatherAPIClient(), geoCoder: Geocoder()))
 }

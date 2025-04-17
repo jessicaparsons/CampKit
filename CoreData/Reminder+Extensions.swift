@@ -10,7 +10,7 @@ import CoreData
 extension Reminder {
     convenience init(
         context: NSManagedObjectContext,
-        title: String? = nil,
+        title: String,
         isCompleted: Bool = false,
         notes: String? = nil,
         reminderDate: Date? = nil,

@@ -11,7 +11,7 @@ struct QuizPageOneView: View {
     
     @Environment(WeatherViewModel.self) private var weatherViewModel
     @Bindable var viewModel: QuizViewModel
-    @State private var isShowingElevationPopover: Bool = true
+    @State private var isElevationPopoverPresented: Bool = true
     @FocusState var isFocused: Bool
     @Binding var isElevationAdded: Bool
     @Binding var isLocationSearchOpen: Bool

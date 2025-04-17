@@ -23,4 +23,22 @@ final class RemindersViewModel {
         let request: NSFetchRequest<Reminder> = Reminder.fetchRequest()
         return try viewContext.fetch(request)
     }
+    
+    func deleteCompletedReminders() {
+        let request: NSFetchRequest<Reminder> = Reminder.fetchRequest()
+        request.predicate = NSPredicate(format: "isCompleted == NO")
+        
+        do {
+            let completedReminders = try viewContext.fetch(request)
+            
+            for reminder in completedReminders {
+                viewContext.delete(reminder)
+            }
+            try viewContext.save()
+        } catch {
+            print("Failed to delete completed remiders: \(error.localizedDescription)")
+        }
+        
+    }
+    
 }

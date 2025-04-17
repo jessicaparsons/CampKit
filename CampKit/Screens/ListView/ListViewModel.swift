@@ -20,7 +20,7 @@ final class ListViewModel: ObservableObject {
     @Published var showPhotoPicker: Bool = false
     @Published var draggedCategory: Category?
     @Published var isConfettiVisible: Bool = false
-    @Published var isShowingSuccessfulDuplication: Bool = false
+    @Published var isSuccessfulDuplicationPresented: Bool = false
     
     var allItems: [Item] {
         packingList.sortedCategories.flatMap { $0.sortedItems }
@@ -185,7 +185,7 @@ final class ListViewModel: ObservableObject {
         
         print("duplicated packing lists position is: \(duplicatedPackingList.position)")
         
-        isShowingSuccessfulDuplication = true
+        isSuccessfulDuplicationPresented = true
     }
     
     @MainActor

@@ -12,7 +12,7 @@ import StoreKit
 @MainActor
 class StoreKitManager {
     
-    var isUpgradeToProShowing: Bool = false
+    var isUpgradeToProPresented: Bool = false
     var isUnlimitedListsUnlocked: Bool = false
     private var updates: Task<Void, Never>? = nil
     
