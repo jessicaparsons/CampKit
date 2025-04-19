@@ -24,22 +24,16 @@ struct ReminderListItemView: View {
     @State private var isChecked: Bool = false
     let delay = Delay()
     
-    private func formatReminderDate(_ date: Date) -> String {
-        if date.isToday {
-            return "Today"
-        } else if date.isTomorrow {
-            return "Tomorrow"
-        } else {
-            return date.formatted(date: .numeric, time: .omitted)
-        }
+    var isTitleOnly: Bool {
+        reminder.notes == nil && reminder.reminderDate == nil && reminder.reminderTime == nil
     }
     
     var body: some View {
         HStack(alignment: .top) {
             
              //MARK: - CHECK MARK BUBBLE
-            Image(systemName: isChecked ? "inset.filled.circle" : "circle")
-                .foregroundStyle(isChecked ? Color.colorSage : .secondary)
+            Image(systemName: isChecked || reminder.isCompleted ? "inset.filled.circle" : "circle")
+                .foregroundStyle(isChecked || reminder.isCompleted ? Color.colorSage : .secondary)
                 .font(.system(size: 22))
                 .padding(.trailing, Constants.lineSpacing)
                 .onTapGesture {
@@ -93,9 +87,20 @@ struct ReminderListItemView: View {
                 }
             
         }//:HSTACK
+        .padding(.vertical, isTitleOnly ? 6 : 0)
         .contentShape(Rectangle())//makes entire row clickable
         .onTapGesture {
             onEvent(.onSelect(reminder))
+        }
+    }
+    
+    private func formatReminderDate(_ date: Date) -> String {
+        if date.isToday {
+            return "Today"
+        } else if date.isTomorrow {
+            return "Tomorrow"
+        } else {
+            return date.formatted(date: .numeric, time: .omitted)
         }
     }
 }

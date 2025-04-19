@@ -11,7 +11,8 @@ struct UpdateReminderView: View {
     
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.dismiss) private var dismiss
-    var reminder: Reminder
+    
+    var reminder: Reminder? = nil
     
     @State private var title: String = ""
     @State private var notes: String = ""
@@ -45,9 +46,12 @@ struct UpdateReminderView: View {
                 
                 Section {
                     HStack {
+                        
                         Image(systemName: "calendar")
                             .foregroundStyle(.primary)
                             .font(.title2)
+                        Text("Select Date")
+                            .foregroundStyle(.primary)
                         
                         Toggle(isOn: $showCalendar) {
                             EmptyView()
@@ -56,32 +60,32 @@ struct UpdateReminderView: View {
                     }//:HSTACK
                     
                     if showCalendar {
-                        DatePicker("Select Date", selection: $reminderDate, in: Date()..., displayedComponents: [.date])
+                        DatePicker("", selection: $reminderDate, in: Date()..., displayedComponents: [.date])
+                            .datePickerStyle(.graphical)
                     }
                     
                     HStack {
                         Image(systemName: "clock")
                             .foregroundStyle(.primary)
                             .font(.title2)
+                        Text("Select Time")
+                            .foregroundStyle(.primary)
+                        
                         Toggle(isOn: $showTime) {
                             EmptyView()
                         }
                         .tint(.colorSage)
                         
                     }//:HSTACK
-                    .onChange(of: showTime) {
-                        if showTime {
-                            showCalendar = true
-                        }
-                    }
                     
                     if showTime {
                         DatePicker(
-                            "Select Time",
+                            "",
                             selection: $reminderTime,
                             in: minAllowedTime...,
                             displayedComponents: .hourAndMinute
                         )
+                        .datePickerStyle(.wheel)
                     }
                     
                 }//:SECTION
@@ -93,12 +97,12 @@ struct UpdateReminderView: View {
             .scrollContentBackground(.hidden)
             .background(Color.colorTan)
             .onAppear {
-                title = reminder.title ?? "New Reminder"
-                notes = reminder.notes ?? ""
-                reminderDate = reminder.reminderDate ?? Date()
-                reminderTime = reminder.reminderTime ?? Date()
-                showCalendar = reminder.reminderDate != nil
-                showTime = reminder.reminderTime != nil
+                title = reminder?.title ?? "New Reminder"
+                notes = reminder?.notes ?? ""
+                reminderDate = reminder?.reminderDate ?? Date()
+                reminderTime = reminder?.reminderTime ?? Date()
+                showCalendar = reminder?.reminderDate != nil
+                showTime = reminder?.reminderTime != nil
             }
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
@@ -110,6 +114,7 @@ struct UpdateReminderView: View {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") {
                         dismiss()
+                        dataRefreshTrigger.toggle()
                     }
                 }
             }
@@ -118,12 +123,25 @@ struct UpdateReminderView: View {
     }
     
     private func updateReminder() {
-        reminder.title = title
-        reminder.notes = notes.isEmpty ? nil : notes
-        reminder.reminderDate = showCalendar ? reminderDate : nil
-        reminder.reminderTime = showTime ? reminderTime : nil
-        save(viewContext)
-        dataRefreshTrigger.toggle()
+        let isNew = reminder == nil
+        let currentReminder = reminder ?? Reminder(context: viewContext)
+        
+        currentReminder.id = currentReminder.id ?? UUID()
+        currentReminder.title = title
+        currentReminder.notes = notes.isEmpty ? nil : notes
+        currentReminder.reminderDate = showCalendar ? reminderDate : nil
+        currentReminder.reminderTime = showTime ? reminderTime : nil
+        currentReminder.isCompleted = currentReminder.isCompleted
+        
+        do {
+            try viewContext.save()
+            dataRefreshTrigger.toggle()
+        } catch {
+            print("Could not save or update reminder: \(error.localizedDescription)")
+            if isNew {
+                viewContext.delete(currentReminder)
+            }
+        }
     }
 }
 

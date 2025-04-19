@@ -9,7 +9,10 @@ import SwiftUI
 
 struct MainView: View {
     
-    @FetchRequest(sortDescriptors: []) var packingLists: FetchedResults<PackingList>
+    @FetchRequest(
+        entity: PackingList.entity(),
+        sortDescriptors: [])
+    var packingLists: FetchedResults<PackingList>
     
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(StoreKitManager.self) private var storeKitManager
@@ -59,7 +62,7 @@ struct MainView: View {
                             RemindersView(context: viewContext)
                         }
                         .tabItem {
-                            Image(systemName: "bell")
+                            Image(systemName: "alarm")
                         }
                         .tag(1)
                         
@@ -136,9 +139,8 @@ struct MainView: View {
 }
 
 #Preview {
-    let context = PersistenceController.preview.container.viewContext
 
     MainView()
-        .environment(\.managedObjectContext, context)
+        .environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
         .environment(StoreKitManager())
 }

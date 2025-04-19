@@ -63,6 +63,7 @@ final class WeatherViewModel {
                 
                 await MainActor.run {
                     self.weather = fiveDayForecast
+                    isNoLocationFoundMessagePresented = false
                 }
             }.value
             
