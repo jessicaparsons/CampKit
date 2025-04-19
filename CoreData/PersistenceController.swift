@@ -32,8 +32,19 @@ struct PersistenceController {
 }
 
 extension PersistenceController {
-    static var preview: PersistenceController {
+    @MainActor static var preview: PersistenceController = {
         let controller = PersistenceController(inMemory: true)
+        let viewContext = controller.container.viewContext
+
+        // Create a sample PackingList
+        let sampleList = PackingList.samplePackingList(context: viewContext)
+        
+        do {
+            try viewContext.save()
+        } catch {
+            fatalError("Failed to save preview context: \(error)")
+        }
+
         return controller
-    }
+    }()
 }

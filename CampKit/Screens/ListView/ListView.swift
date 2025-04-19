@@ -183,6 +183,13 @@ struct ListView: View {
     
     private var optionsMenu: some View {
         HStack {
+            //MARK: - ADD NEW CATEGORY
+            Button {
+                isAddNewCategoryPresented = true
+            } label: {
+                Image(systemName: "plus.circle.fill")
+                    .dynamicForegroundStyle(trigger: scrollOffset)
+            }
             //MARK: - CHECK ALL ITEMS BUTTON
             Button(action: {
                 isToggleAllItemsConfirmationPresented = true
@@ -272,14 +279,6 @@ struct ListView: View {
                 
             } label: {
                 Label("Options", systemImage: "ellipsis.circle")
-                    .dynamicForegroundStyle(trigger: scrollOffset)
-            }
-            
-            //ADD NEW CATEGORY
-            Button {
-                isAddNewCategoryPresented = true
-            } label: {
-                Image(systemName: "plus")
                     .dynamicForegroundStyle(trigger: scrollOffset)
             }
             .alert("Add New Category", isPresented: $isAddNewCategoryPresented) {

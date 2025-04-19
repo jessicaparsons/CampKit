@@ -134,13 +134,7 @@ Hit the \"+\" to get started!
             ToolbarItem(placement: .topBarTrailing) {
                 HStack {
                     if editMode == .inactive {
-                        // REARRANGE BUTTON
-                        Button {
-                            editMode = (editMode == .active) ? .inactive : .active
-                        } label: {
-                            Image(systemName: "ellipsis.circle")
-                                .font(.body)
-                        }
+                        
                         // ADD BUTTON
                         Button {
                             if storeKitManager.isUnlimitedListsUnlocked || packingLists.count < Constants.proVersionListCount {
@@ -149,7 +143,18 @@ Hit the \"+\" to get started!
                                 storeKitManager.isUpgradeToProPresented = true
                             }
                         } label: {
-                            Image(systemName: "plus")
+                            Image(systemName: "plus.circle.fill")
+                        }
+                        Menu {
+                            // REARRANGE BUTTON
+                            Button {
+                                editMode = (editMode == .active) ? .inactive : .active
+                            } label: {
+                                Label("Rearrange", systemImage: "arrow.up.arrow.down")
+                                    .font(.body)
+                            }
+                        } label: {
+                            Image(systemName: "ellipsis.circle")
                         }
                     } else {
                         Button {

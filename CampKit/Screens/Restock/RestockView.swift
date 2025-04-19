@@ -52,7 +52,9 @@ Hit the \"+\" to get started!
                                 EditableItemView<RestockItem>(
                                     item: item,
                                     isList: true,
-                                    togglePacked: { viewModel.togglePacked(for: item) },
+                                    togglePacked: { viewModel.togglePacked(for: item)
+                                        HapticsManager.shared.triggerLightImpact()
+                                    },
                                     deleteItem: { }
                                 )
                                 .listRowInsets(EdgeInsets(top: Constants.lineSpacing, leading: 0, bottom: Constants.lineSpacing, trailing: 0))
@@ -92,20 +94,20 @@ Hit the \"+\" to get started!
             ToolbarItem(placement: .topBarTrailing) {
                 HStack {
                     if editMode == .inactive {
-                        // REARRANGE BUTTON
-                        Button {
-                            editMode = (editMode == .active) ? .inactive : .active
-                        } label: {
-                            Image(systemName: "ellipsis.circle")
-                                .font(.body)
-                        }
                         // ADD BUTTON
                         Button {
                             isAddNewItemPresented = true
                             
                         } label: {
-                            Image(systemName: "plus")
+                            Image(systemName: "plus.circle.fill")
                         }
+                        // REARRANGE BUTTON
+                        Button {
+                            editMode = (editMode == .active) ? .inactive : .active
+                        } label: {
+                            Image(systemName: "ellipsis.circle")
+                        }
+                        
                     } else {
                         Button {
                             editMode = (editMode == .active) ? .inactive : .active

@@ -41,6 +41,7 @@ extension Category {
 
         return categoriesWithItems.map { categoryData in
             let category = Category(context: context)
+            category.id = UUID()
             category.name = categoryData.name
             category.position = Int64(categoryData.position)
             category.isExpanded = categoryData.isExpanded

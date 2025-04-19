@@ -12,12 +12,14 @@ import CoreData
 struct RemindersView: View {
     
     @Environment(\.managedObjectContext) private var viewContext
+    @Environment(\.dismiss) private var dismiss
+
     @State var viewModel: RemindersViewModel
     @State private var isAddNewReminderAlertPresented: Bool = false
     @State private var selectedReminder: Reminder?
     @State private var showReminderEditScreen: Bool = false
     @AppStorage("isShowingCompletedReminders") private var isShowingCompleted: Bool = false
-    @State private var selectedSort: String = "Date"
+    @AppStorage("selectedRemindersSort") private var selectedSort: String = "Date"
     @State private var dataRefreshTrigger = false
 
         
@@ -86,8 +88,12 @@ Hit the \"+\" to get started!
                                     switch event {
                                     case .onChecked(let reminder, let checked): reminder.isCompleted = checked
                                         dataRefreshTrigger.toggle()
-                                    case .onSelect(let reminder):
-                                        selectedReminder = reminder
+                                    case .onSelect(let tappedReminder):
+                                        if selectedReminder == tappedReminder {
+                                            selectedReminder = nil
+                                        } else {
+                                            selectedReminder = tappedReminder
+                                        }
                                     case .onInfoSelected(let reminder):
                                         showReminderEditScreen = true
                                         selectedReminder = reminder
@@ -109,18 +115,13 @@ Hit the \"+\" to get started!
         .navigationBarTitleDisplayMode(.large)
         .scrollContentBackground(.hidden)
         .environment(\.editMode, $editMode)
-        //MARK: - ADD NEW ITEM ALERT
+        //MARK: - ADD NEW ITEM SHEET
         .sheet(isPresented: $isAddNewReminderAlertPresented, content: {
-            let newReminder = Reminder(
-                context: viewContext,
-                title: "New Reminder",
-                isCompleted: false)
-            
                 NavigationStack {
-                    UpdateReminderView(reminder: newReminder, dataRefreshTrigger: $dataRefreshTrigger)
-                
+                    UpdateReminderView(dataRefreshTrigger: $dataRefreshTrigger)
             }
         })
+        //MARK: - EDIT REMINDER SHEET
         .sheet(isPresented: $showReminderEditScreen, content: {
             if let selectedReminder {
                 NavigationStack {
@@ -135,24 +136,39 @@ Hit the \"+\" to get started!
             ToolbarItem(placement: .topBarTrailing) {
                 HStack {
                     if editMode == .inactive {
+                        // ADD BUTTON
+                        Button {
+                            isAddNewReminderAlertPresented = true
+                            
+                        } label: {
+                            Image(systemName: "plus.circle.fill")
+                                
+                        }
                         Menu {
                             //SORT BY
                             Label("Sort By", systemImage: "arrow.up.arrow.down")
-                                .font(.body)
 
                             Button {
                                 withAnimation {
                                     selectedSort = "Date"
                                 }
                             } label: {
-                                Label("Date", systemImage: selectedSort == "Date" ? "checkmark" : "")
+                                if selectedSort == "Date" {
+                                    Label("Date", systemImage: "checkmark")
+                                } else {
+                                    Text("Date")
+                                }
                             }
                             Button {
                                 withAnimation {
                                     selectedSort = "Name"
                                 }
                             } label: {
-                                Label("Name", systemImage: selectedSort == "Name" ? "checkmark" : "")
+                                if selectedSort == "Name" {
+                                    Label("Name", systemImage: "checkmark")
+                                } else {
+                                    Text("Name")
+                                }
                             }
                             Divider()
                             
@@ -174,13 +190,7 @@ Hit the \"+\" to get started!
                             Image(systemName: "ellipsis.circle")
                                 .font(.body)
                         }
-                        // ADD BUTTON
-                        Button {
-                            isAddNewReminderAlertPresented = true
-                            
-                        } label: {
-                            Image(systemName: "plus")
-                        }
+                        
                     } else {
                         Button {
                             editMode = (editMode == .active) ? .inactive : .active
