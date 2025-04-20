@@ -9,6 +9,7 @@ import SwiftUI
 import PhotosUI
 import ConfettiSwiftUI
 import CoreData
+import CloudKit
 
 struct ListView: View {
     
@@ -17,24 +18,39 @@ struct ListView: View {
     @Environment(StoreKitManager.self) private var storeKitManager
     @StateObject var viewModel: ListViewModel
     
-    @State private var isPhotoPickerPresented: Bool = false
+    //CHANGING PHOTO
     @State private var bannerImageItem: PhotosPickerItem?
     @State private var bannerImage: UIImage?
+    @State private var isPhotoPickerPresented: Bool = false
+
+    //EDITING STATES
     @State private var isEditing: Bool = false
+    @State private var isEditingTitle: Bool = false
+    @State private var isRearranging: Bool = false
+
+    //CONFIRMATIONS
     @State private var isDeleteConfirmationPresented: Bool = false
     @State private var isToggleAllItemsConfirmationPresented: Bool = false
-    @State private var fireScale: CGFloat = 0.1
-    @State private var isEditingTitle: Bool = false
     @State private var isDuplicationConfirmationPresented: Bool = false
+    
+    //ADD NEW CATEGORY
     @State private var isAddNewCategoryPresented: Bool = false
     @State private var newCategoryTitle: String = ""
-    @State private var isRearranging: Bool = false
+    
+    //FIRE ANIMATION
     @State private var trigger: Int = 0
-    
     @State private var isConfettiVisible: Bool = false
-    
+    @State private var fireScale: CGFloat = 0.1
+
+    //NAVIGATION
     @State private var scrollOffset: CGFloat = 0
     private let scrollThreshold: CGFloat = 1
+    
+    //SHARING OPTIONS
+    @State private var shareURL: URL?
+    @State private var isGeneratingShare = false
+    @State private var showError = false
+    @State private var errorMessage: String?
     
     let packingListsCount: Int
     
@@ -268,6 +284,22 @@ struct ListView: View {
                     Label("Duplicate List", systemImage: "doc.on.doc")
                 }
                 
+                // SHARE LIST
+                
+                if let unwrappedURL = shareURL {
+                    ShareLink(item: unwrappedURL) {
+                        Label("Share", systemImage: "square.and.arrow.up")
+                    }
+                } else {
+                    Button {
+                        showError = true
+                    } label: {
+                        Label("Share", systemImage: "square.and.arrow.up")
+                            .tint(.secondary)
+                    }
+                }
+                
+                
                 
                 // DELETE LIST
                 Button(role: .destructive) {
@@ -291,6 +323,21 @@ struct ListView: View {
                     isAddNewCategoryPresented = false
                 }).disabled(!isFormValid)
                 Button("Cancel", role: .cancel) { }
+            }
+            .alert("Unable to Share", isPresented: $showError) {
+                Button("OK", role: .cancel) { }
+            } message: {
+                Text(errorMessage ?? "Something went wrong.")
+            }
+            .task {
+                if shareURL == nil {
+                    do {
+                        let share = try await viewModel.shareList(for: viewModel.packingList.objectID)
+                        self.shareURL = share.url
+                    } catch {
+                        errorMessage = error.localizedDescription
+                    }
+                }
             }
         }//:HSTACK
         .sheet(isPresented: $isEditingTitle) {
