@@ -282,6 +282,7 @@ final class ListViewModel: ObservableObject {
         }
             
     }
+    //MARK: - SHARING
     
     @MainActor
     func shareList(for objectID: NSManagedObjectID) async throws -> CKShare {
@@ -298,7 +299,29 @@ final class ListViewModel: ObservableObject {
         return share
     }
 
-    
+    func exportAsPlainText(packingList: PackingList) -> String {
+        var result = "Packing List: \(packingList.title ?? "Untitled")\n\n"
+        for category in packingList.sortedCategories {
+            result += "• \(category.name)\n"
+            for item in category.sortedItems {
+                result += "  - \(String(describing: item.title))\(item.isPacked ? " ✅" : "")\n"
+            }
+            result += "\n"
+        }
+        return result
+    }
+ 
+    func generatePDF(from text: String) -> Data {
+        let pdfRenderer = UIGraphicsPDFRenderer(bounds: CGRect(x: 0, y: 0, width: 612, height: 792)) // Letter size
+        return pdfRenderer.pdfData { ctx in
+            ctx.beginPage()
+            let attributes: [NSAttributedString.Key: Any] = [
+                .font: UIFont.systemFont(ofSize: 12),
+                .paragraphStyle: NSMutableParagraphStyle()
+            ]
+            text.draw(in: CGRect(x: 20, y: 20, width: 572, height: 752), withAttributes: attributes)
+        }
+    }
 
     
 }

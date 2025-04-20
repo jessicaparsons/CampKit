@@ -9,14 +9,11 @@ import SwiftUI
 import CloudKit
 
 struct SharingOptionsSheet: UIViewControllerRepresentable {
-    let share: CKShare
-    let container: CKContainer
+    let items: [Any]
 
-    func makeUIViewController(context: Context) -> UICloudSharingController {
-        let controller = UICloudSharingController(share: share, container: container)
-        controller.availablePermissions = [.allowReadWrite, .allowPrivate]
-        return controller
+    func makeUIViewController(context: Context) -> UIActivityViewController {
+        UIActivityViewController(activityItems: items, applicationActivities: nil)
     }
 
-    func updateUIViewController(_ uiViewController: UICloudSharingController, context: Context) {}
+    func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
 }
