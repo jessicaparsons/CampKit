@@ -47,10 +47,8 @@ struct ListView: View {
     private let scrollThreshold: CGFloat = 1
     
     //SHARING OPTIONS
-    @State private var shareURL: URL?
-    @State private var isGeneratingShare = false
-    @State private var showError = false
-    @State private var errorMessage: String?
+    @State private var isSharingSheetPresented: Bool = false
+    @State private var share: CKShare?
     
     let packingListsCount: Int
     
@@ -286,19 +284,21 @@ struct ListView: View {
                 
                 // SHARE LIST
                 
-                if let unwrappedURL = shareURL {
-                    ShareLink(item: unwrappedURL) {
-                        Label("Share", systemImage: "square.and.arrow.up")
+                Button {
+                    Task {
+                        do {
+                            let shareResult = try await viewModel.shareList(for: viewModel.packingList.objectID)
+                            self.share = shareResult
+                            isSharingSheetPresented = true
+                            
+                        } catch {
+                            print("Error generating share")
+                        }
                     }
-                } else {
-                    Button {
-                        showError = true
-                    } label: {
-                        Label("Share", systemImage: "square.and.arrow.up")
-                            .tint(.secondary)
-                    }
+                    
+                } label: {
+                    Label("Share", systemImage: "square.and.arrow.up")
                 }
-                
                 
                 
                 // DELETE LIST
@@ -324,19 +324,15 @@ struct ListView: View {
                 }).disabled(!isFormValid)
                 Button("Cancel", role: .cancel) { }
             }
-            .alert("Unable to Share", isPresented: $showError) {
-                Button("OK", role: .cancel) { }
-            } message: {
-                Text(errorMessage ?? "Something went wrong.")
-            }
-            .task {
-                if shareURL == nil {
-                    do {
-                        let share = try await viewModel.shareList(for: viewModel.packingList.objectID)
-                        self.shareURL = share.url
-                    } catch {
-                        errorMessage = error.localizedDescription
-                    }
+            .sheet(isPresented: $isSharingSheetPresented) {
+                if let share = share,
+                   let url = share.url {
+                    let text = viewModel.exportAsPlainText(packingList: viewModel.packingList)
+                    let pdf = viewModel.generatePDF(from: text)
+                    SharingOptionsSheet(items: [url, text, pdf])
+                } else {
+                    Text("Unable to share this list.")
+                        .foregroundColor(.secondary)
                 }
             }
         }//:HSTACK
