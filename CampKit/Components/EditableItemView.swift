@@ -15,10 +15,12 @@ protocol EditablePackableItem: ObservableObject {
 struct EditableItemView<T: EditablePackableItem>: View {
     
     @ObservedObject var item: T
-    @FocusState private var isFocused: Bool
+    @State private var disableSwipe = false
+    @FocusState var isFocused : Bool
     var isList: Bool
     let togglePacked: () -> Void
     let deleteItem: () -> Void
+
     
     var body: some View {
         ZStack {
@@ -37,16 +39,14 @@ struct EditableItemView<T: EditablePackableItem>: View {
                 TextField("Item Name", text: Binding(
                     get: { item.title ?? "" },
                     set: { item.title = $0 }))
+                .focused($isFocused)
                 .foregroundStyle(item.isPacked ? Color.secondary : .primary)
                 .strikethrough(item.isPacked)
                 .italic(item.isPacked)
-                .focused($isFocused)
-                .onTapGesture {
-                    isFocused = true
-                }
                 .onSubmit {
                     isFocused = false
                 }
+                
                 if isFocused {
                     Button {
                         isFocused = false
@@ -54,22 +54,27 @@ struct EditableItemView<T: EditablePackableItem>: View {
                         Text("Done")
                     }
                 }
+                
             }//:HSTACK
         }//:ZSTACK
         .padding(.horizontal)
         .padding(.vertical, 8)
         //MARK: - SWIPE TO DELETE
-        .modifier(SwipeActionModifier(isFocused: isFocused, isList: isList, deleteAction: deleteItem))
+        .modifier(SwipeActionModifier(
+            isFocused: disableSwipe,
+            isList: isList,
+            deleteAction: deleteItem))
         
     }//:BODY
     
 }
 
+
 #Preview {
     let context = PersistenceController.preview.container.viewContext
     let item = RestockItem(context: context, title: "Sleeping Bag", position: 0)
-
-    return EditableItemView(
+    
+    EditableItemView(
         item: item,
         isList: false,
         togglePacked: { },

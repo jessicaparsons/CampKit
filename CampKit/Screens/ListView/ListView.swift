@@ -48,7 +48,11 @@ struct ListView: View {
     
     //SHARING OPTIONS
     @State private var isSharingSheetPresented: Bool = false
+    @State private var container: CKContainer?
     @State private var share: CKShare?
+    @State private var isCloudShareSheetPresented = false
+    @State private var participants: [CKShare.Participant] = []
+    @State private var showParticipantsMenu = false
     
     let packingListsCount: Int
     
@@ -197,6 +201,49 @@ struct ListView: View {
     
     private var optionsMenu: some View {
         HStack {
+            //MARK: - LIST IS SHARED OPTIONS
+            Menu {
+                Section {
+                    if participants.isEmpty {
+                        Label("No participants", systemImage: "person.crop.circle.badge.xmark")
+                    } else {
+                        ForEach(participants, id: \.self) { participant in
+                            let name = participant.userIdentity.nameComponents?.formatted() ?? "Unknown"
+                            let permission = participant.permission == .readOnly ? "View Only" : "Can Edit"
+                            Label("\(name) • \(permission)", systemImage: "person")
+                        }
+                    }
+                } header: {
+                    Text("Current Participants")
+                }
+
+                //if !participants.isEmpty {
+                    Group {
+                        Divider()
+                        
+                        Button {
+                            prepareCloudSharingSheet()
+                        } label: {
+                            Label("Manage Shared List", systemImage: "person.crop.circle.badge.questionmark")
+                        }
+                    }//:GROUP
+                //}
+
+            } label: {
+                Label("Shared", systemImage: "person.crop.circle.badge.checkmark")
+                    .dynamicForegroundStyle(trigger: scrollOffset)
+                    .onTapGesture {
+                        if let existingShare = share {
+                            participants = viewModel.loadParticipants(from: existingShare)
+                        }
+                    }
+            }
+            .sheet(isPresented: $isCloudShareSheetPresented) {
+                if let share = share, let container = container {
+                    CloudSharingSheet(share: share, container: container)
+                }
+            }
+            
             //MARK: - ADD NEW CATEGORY
             Button {
                 isAddNewCategoryPresented = true
@@ -204,30 +251,21 @@ struct ListView: View {
                 Image(systemName: "plus.circle.fill")
                     .dynamicForegroundStyle(trigger: scrollOffset)
             }
-            //MARK: - CHECK ALL ITEMS BUTTON
-            Button(action: {
-                isToggleAllItemsConfirmationPresented = true
-            }) {
-                Label(
-                    viewModel.areAllItemsChecked ? "Check All" : "Uncheck All",
-                    systemImage: viewModel.areAllItemsChecked ? "checkmark.circle.fill" : "checkmark.circle"
-                )
-                .dynamicForegroundStyle(trigger: scrollOffset)
-            }
-            .confirmationDialog(
-                viewModel.areAllItemsChecked ? "Are you sure you want to uncheck all items?" : "Are you sure you want to check all items?",
-                isPresented: $isToggleAllItemsConfirmationPresented,
-                titleVisibility: .visible
-            ) {
-                Button(viewModel.areAllItemsChecked ? "Uncheck All" : "Check All") {
-                    viewModel.toggleAllItems()
-                    isToggleAllItemsConfirmationPresented = false
-                }
-                
-                Button("Cancel", role: .cancel) { }
-            }
+            
             //MARK: - MENU BUTTON
             Menu {
+                
+                //MARK: - CHECK ALL ITEMS BUTTON
+                Button(action: {
+                    isToggleAllItemsConfirmationPresented = true
+                }) {
+                    Label(
+                        viewModel.areAllItemsChecked ? "Uncheck All" : "Check All",
+                        systemImage: viewModel.areAllItemsChecked ? "circle" : "checkmark.circle"
+                    )
+                }
+                
+                
                 // EDIT TITLE
                 Button(action: {
                     isEditingTitle = true
@@ -279,7 +317,7 @@ struct ListView: View {
                     }
                     
                 } label: {
-                    Label("Duplicate List", systemImage: "doc.on.doc")
+                    Label("Duplicate", systemImage: "doc.on.doc")
                 }
                 
                 // SHARE LIST
@@ -312,6 +350,18 @@ struct ListView: View {
             } label: {
                 Label("Options", systemImage: "ellipsis.circle")
                     .dynamicForegroundStyle(trigger: scrollOffset)
+            }
+            .confirmationDialog(
+                viewModel.areAllItemsChecked ? "Are you sure you want to uncheck all items?" : "Are you sure you want to check all items?",
+                isPresented: $isToggleAllItemsConfirmationPresented,
+                titleVisibility: .visible
+            ) {
+                Button(viewModel.areAllItemsChecked ? "Uncheck All" : "Check All") {
+                    viewModel.toggleAllItems()
+                    isToggleAllItemsConfirmationPresented = false
+                }
+                
+                Button("Cancel", role: .cancel) { }
             }
             .alert("Add New Category", isPresented: $isAddNewCategoryPresented) {
                 TextField("New category", text: $newCategoryTitle)
@@ -382,6 +432,14 @@ struct ListView: View {
                 }
             }
             Button("Cancel", role: .cancel) { }
+        }
+    }
+    
+    private func prepareCloudSharingSheet() {
+        if let existingShare = share {
+            self.container = CKContainer.default()
+            self.participants = viewModel.loadParticipants(from: existingShare)
+            self.isCloudShareSheetPresented = true
         }
     }
 }
