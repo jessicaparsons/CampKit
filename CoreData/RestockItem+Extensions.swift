@@ -15,14 +15,14 @@ extension RestockItem: EditablePackableItem {
         position: Int,
         isPacked: Bool = false,
         dateCreated: Date? = nil,
-        id: UUID? = nil
+        id: UUID = UUID()
     ) {
         self.init(context: context)
         self.title = title
         self.position = Int64(position)
         self.isPacked = isPacked
         self.dateCreated = dateCreated ?? Date()
-        self.id = id ?? UUID()
+        self.id = id
     }
     
     var positionInt: Int {

@@ -13,16 +13,28 @@ struct CategorySectionView: View {
     @ObservedObject var viewModel: ListViewModel
     @ObservedObject var category: Category
     @Binding var isRearranging: Bool
-    @State private var isExpandedLocal: Bool = false
     
     let deleteCategory: () -> Void
     
     @State private var newItemText: String = ""
     @State private var isEditing: Bool = false
+    
+    //Refreshes the view when isExpanded is changed from the ViewModel
+    private var isExpandedBinding: Binding<Bool> {
+        Binding(
+            get: { category.isExpanded },
+            set: { newValue in
+                withAnimation {
+                    category.isExpanded = newValue
+                    save(viewContext)
+                }
+            }
+        )
+    }
         
     //MARK: - CATEGORY BODY
     var body: some View {
-        DisclosureGroup(isExpanded: $isExpandedLocal) {
+        DisclosureGroup(isExpanded: isExpandedBinding) {
             if !category.sortedItems.isEmpty {
                 LazyVStack(spacing: 0) {
                     ForEach(category.sortedItems) { item in
@@ -108,16 +120,7 @@ struct CategorySectionView: View {
             
         }//:DISCLOSURE GROUP
         .disclosureGroupStyle(LeftDisclosureStyle())
-        //ANIMATION WORKAROUNDS
-        .onAppear {
-            isExpandedLocal = category.isExpanded
-        }
-        .onChange(of: isExpandedLocal) {
-            withAnimation {
-                category.isExpanded = isExpandedLocal
-                try? viewContext.save()
-            }
-        }
+        
     }//:BODY
     
 }

@@ -42,12 +42,18 @@ struct ReminderListItemView: View {
                         isChecked.toggle()
                         HapticsManager.shared.triggerLightImpact()
 
-                        // Delay, then send event back on main thread
-                        await delay.performWork {
+                        if reminder.isCompleted {
                             await MainActor.run {
                                 onEvent(.onChecked(reminder, isChecked))
-                                try? viewContext.save()
-                                
+                                save(viewContext)
+                            }
+                        } else {
+                            // Delay, then send event back on main thread
+                            await delay.performWork {
+                                await MainActor.run {
+                                    onEvent(.onChecked(reminder, isChecked))
+                                    save(viewContext)
+                                }
                             }
                         }
                     }

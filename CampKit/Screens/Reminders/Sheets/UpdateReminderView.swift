@@ -122,6 +122,8 @@ struct UpdateReminderView: View {
         }//:NAVIGATION STACK
     }
     
+    //MARK: - CREATE OR UPDATE THE REMINDER
+    @MainActor
     private func updateReminder() {
         let isNew = reminder == nil
         let currentReminder = reminder ?? Reminder(context: viewContext)
@@ -132,6 +134,16 @@ struct UpdateReminderView: View {
         currentReminder.reminderDate = showCalendar ? reminderDate : nil
         currentReminder.reminderTime = showTime ? reminderTime : nil
         currentReminder.isCompleted = currentReminder.isCompleted
+        
+        //SCHEDULE A LOCAL NOTIFICATION
+        if let existingReminderTime = currentReminder.reminderTime {
+            NotificationManager.scheduleNotification(userData: UserData(
+                title: currentReminder.title,
+                body: currentReminder.notes ?? "",
+                date: currentReminder.reminderDate ?? Date(),
+                time: existingReminderTime
+            ))
+        }
         
         do {
             try viewContext.save()
