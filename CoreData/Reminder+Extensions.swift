@@ -15,7 +15,7 @@ extension Reminder {
         notes: String? = nil,
         reminderDate: Date? = nil,
         reminderTime: Date? = nil,
-        id: UUID? = nil
+        id: UUID = UUID()
     ) {
         self.init(context: context)
         self.title = title
@@ -23,7 +23,7 @@ extension Reminder {
         self.notes = notes
         self.reminderDate = reminderDate ?? Date()
         self.reminderTime = reminderTime ?? Date()
-        self.id = id ?? UUID()
+        self.id = id
     }
     
 }
