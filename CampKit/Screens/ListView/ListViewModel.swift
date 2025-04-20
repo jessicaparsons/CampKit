@@ -7,7 +7,7 @@
 
 import SwiftUI
 import CoreData
-
+import CloudKit
 
 final class ListViewModel: ObservableObject {
     
@@ -283,9 +283,21 @@ final class ListViewModel: ObservableObject {
             
     }
     
-    func shareList() {
-        print("Sharing the list!")
+    @MainActor
+    func shareList(for objectID: NSManagedObjectID) async throws -> CKShare {
+        let container = PersistenceController.shared.container
+        let context = container.viewContext
+
+        // Re-fetch the object on the correct thread
+        guard let packingList = try? context.existingObject(with: objectID) else {
+            throw NSError(domain: "ShareError", code: 404, userInfo: [NSLocalizedDescriptionKey: "Packing list not found"])
+        }
+
+        let (_, share, _) = try await container.share([packingList], to: nil)
+        try context.save()
+        return share
     }
+
     
 
     
