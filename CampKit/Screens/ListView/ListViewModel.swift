@@ -298,6 +298,14 @@ final class ListViewModel: ObservableObject {
         try context.save()
         return share
     }
+    
+    @MainActor
+    func loadParticipants(from share: CKShare) -> [CKShare.Participant] {
+        return share.participants
+    }
+
+
+
 
     func exportAsPlainText(packingList: PackingList) -> String {
         var result = "Packing List: \(packingList.title ?? "Untitled")\n\n"

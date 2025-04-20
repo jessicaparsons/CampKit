@@ -7,91 +7,83 @@
 
 import SwiftUI
 
+enum FocusField: Hashable {
+    case categoryTitle
+    case item(UUID)
+}
 
 struct CategorySectionView: View {
     @Environment(\.managedObjectContext) private var viewContext
+    @FocusState private var focusField: FocusField?
     @ObservedObject var viewModel: ListViewModel
     @ObservedObject var category: Category
     @Binding var isRearranging: Bool
-    
+
     let deleteCategory: () -> Void
-    
-    @State private var newItemText: String = ""
+
+    @State private var isExpanded: Bool = false
     @State private var isEditing: Bool = false
-    
-    //Refreshes the view when isExpanded is changed from the ViewModel
+
     private var isExpandedBinding: Binding<Bool> {
         Binding(
-            get: { category.isExpanded },
+            get: { isExpanded },
             set: { newValue in
                 withAnimation {
+                    isExpanded = newValue
                     category.isExpanded = newValue
                     save(viewContext)
                 }
             }
         )
     }
-        
-    //MARK: - CATEGORY BODY
+
     var body: some View {
-        DisclosureGroup(isExpanded: isExpandedBinding) {
-            if !category.sortedItems.isEmpty {
-                LazyVStack(spacing: 0) {
-                    ForEach(category.sortedItems) { item in
-                            EditableItemView<Item>(
-                                item: item,
-                                isList: false,
-                                togglePacked: { viewModel.togglePacked(for: item) },
-                                deleteItem: { viewModel.deleteItem(item) }
-                            )
-                    }//:FOREACH
-                    AddNewItemView(viewModel: viewModel, category: category)
-                }//:LAZY VSTACK
-                
-            } else {
-                AddNewItemView(viewModel: viewModel, category: category)
-            }//:ELSE
-            //MARK: - MENU
-        } label: {
-            // Editable text field for category name
-            if isEditing {
-                HStack {
-                    TextField("Category Name", text: $category.name)
-                        .textFieldStyle(.roundedBorder)
-                        .font(.headline)
-                        .offset(x: 10)
-                        .multilineTextAlignment(.leading)
-                        .onSubmit {
-                            isEditing = false // Disable editing after submit
+        VStack(alignment: .leading, spacing: 0) {
+
+            // MARK: - HEADER TOGGLE ROW
+            Button {
+                isExpandedBinding.wrappedValue.toggle()
+            } label: {
+                HStack(spacing: Constants.horizontalPadding) {
+                    Image(systemName: isExpanded ? "chevron.down" : "chevron.right")
+                        .foregroundColor(.customNeonLight)
+                        .font(.caption.lowercaseSmallCaps())
+                    if isEditing {
+                        TextField("Category Name", text: $category.name)
+                            .focused($focusField, equals: .categoryTitle)
+                            .font(.headline)
+                            .multilineTextAlignment(.leading)
+                            .onSubmit {
+                                isEditing = false
+                                focusField = nil
+                                save(viewContext)
+                            }
+
+                        Button("Done") {
+                            isEditing = false
+                            focusField = nil
                             save(viewContext)
                         }
-                    Button {
-                        isEditing = false // Disable editing after submit
-                        save(viewContext)
-                    } label: {
-                        Text("Done")
-                    }
-                    .padding(.leading, 20)
-                }//:HSTACK
-                .padding(.vertical)
-            } else {
-                VStack {
-                    HStack {
+                        .padding(.vertical, 8)
+                    } else {
                         Text(category.name)
                             .font(.headline)
                             .foregroundStyle(Color.primary)
                             .multilineTextAlignment(.leading)
-                            .offset(x: 7)
+                        
                         Spacer()
                         Menu {
                             Button {
-                                isEditing = true // Enable editing
+                                isEditing = true
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                    focusField = .categoryTitle
+                                }
                             } label: {
                                 Label("Edit Name", systemImage: "pencil")
                             }
-                            Button(action: {
+                            Button {
                                 isRearranging = true
-                            }) {
+                            } label: {
                                 Label("Rearrange", systemImage: "arrow.up.arrow.down")
                             }
                             Button(role: .destructive) {
@@ -100,62 +92,40 @@ struct CategorySectionView: View {
                                 Label("Delete", systemImage: "trash")
                             }
                         } label: {
-                            Label("Edit", systemImage: "ellipsis")
-                                .padding(.leading, 10)
-                                .padding(.vertical, 10)
-                                .padding(.trailing, 0)
-                                .foregroundStyle(Color.primary)
-                        } //:MENU
+                            Image(systemName: "ellipsis")
+                                .padding(.horizontal, 8)
+                                .padding(.vertical)
+                        }
                         .labelStyle(.iconOnly)
-                    }//:HSTACK
-                    .padding(.top)
-                    .padding(.leading, 10)
-                    
-                    if category.isExpanded {
-                        Divider()
                     }
-                    
-                }//:VSTACK
-            }//:ELSE
-            
-        }//:DISCLOSURE GROUP
-        .disclosureGroupStyle(LeftDisclosureStyle())
-        
-    }//:BODY
-    
-}
-
-
-//MARK: - DISCLOSURE GROUP STYLE
-
-struct LeftDisclosureStyle: DisclosureGroupStyle {
-    func makeBody(configuration: Configuration) -> some View {
-        VStack {
-            Button {
-                withAnimation {
-                    configuration.isExpanded.toggle()
                 }
-            } label: {
-                HStack {
-                    Image(systemName: "chevron.forward")
-                        .foregroundColor(.customNeonLight)
-                        .font(.caption.lowercaseSmallCaps())
-                        .offset(y: configuration.isExpanded ? -7 : 7)
-                        .offset(x: configuration.isExpanded ? 0 : 7)
-                        .rotationEffect(configuration.isExpanded ? .degrees(90.0) : .zero)
-                    configuration.label
-                    Spacer()
-                }
+                .padding(.horizontal)
+                .padding(.vertical, Constants.verticalSpacing)
                 .contentShape(Rectangle())
             }
-            .padding(.horizontal)
-            configuration
-                .content
-                .frame(height: configuration.isExpanded ? nil : .zero, alignment: .top)
-                .clipped()
+
+            // MARK: - EXPANDED CONTENT
+            if isExpanded {
+                if !category.sortedItems.isEmpty {
+                    ForEach(category.sortedItems, id: \.id) { item in
+                        EditableItemView<Item>(
+                            item: item,
+                            isList: false,
+                            togglePacked: { viewModel.togglePacked(for: item) },
+                            deleteItem: { viewModel.deleteItem(item) }
+                        )
+                    }
+                }
+                AddNewItemView(viewModel: viewModel, category: category)
+                    .padding(.bottom, 10)
+            }
+        }
+        .onAppear {
+            isExpanded = category.isExpanded
         }
     }
 }
+
 
 //MARK: - PREVIEW
 
@@ -169,14 +139,16 @@ struct LeftDisclosureStyle: DisclosureGroupStyle {
     let categories = Category.sampleCategories(context: context)
     
     // Return the preview
-    NavigationStack {
-        CategorySectionView(
-            viewModel: ListViewModel(viewContext: context, packingList: samplePackingList),
-            category: categories.first!,
-            isRearranging: $isRearranging,
-            deleteCategory: { print("Mock delete category") }
-        )
-    }
+   
+            NavigationStack {
+            CategorySectionView(
+                viewModel: ListViewModel(viewContext: context, packingList: samplePackingList),
+                category: categories.first!,
+                isRearranging: $isRearranging,
+                deleteCategory: { print("Mock delete category") }
+            )
+            .background(.red)
+        }
 }
 
 
