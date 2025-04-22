@@ -127,7 +127,7 @@ struct SettingsView: View {
 
                                 HStack {
                                     VStack(alignment: .leading) {
-                                        Text("Customize bonfire")
+                                        Text("Customize Celebration")
                                             .foregroundStyle(!storeKitManager.isUnlimitedListsUnlocked ? .primary : .secondary)
                                         Text("Tap to change your celebration emoji")
                                             .font(.caption)

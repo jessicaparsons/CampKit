@@ -31,6 +31,7 @@ struct PersistenceController {
     }
 }
 
+#if DEBUG
 extension PersistenceController {
     @MainActor static var preview: PersistenceController = {
         let controller = PersistenceController(inMemory: true)
@@ -48,3 +49,4 @@ extension PersistenceController {
         return controller
     }()
 }
+#endif
