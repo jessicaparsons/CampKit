@@ -119,6 +119,9 @@ Hit the \"+\" to get started!
                     .sheet(isPresented: $isUpgradeToProPresented) {
                         UpgradeToProView()
                     }
+                    .refreshable {
+                        await refresh(context: viewContext)
+                    }
                 }//:ELSE
             }//:VSTACK
         }//:ZSTACK
@@ -167,6 +170,8 @@ Hit the \"+\" to get started!
         }//:TOOLBAR
         
     }//:BODY
+    
+    
     
     
 }//:STRUCT
