@@ -9,6 +9,7 @@ import Foundation
 import CoreData
 
 extension Item: EditablePackableItem {
+    
     convenience init(
         context: NSManagedObjectContext,
         id: UUID = UUID(),

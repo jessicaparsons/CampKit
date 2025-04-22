@@ -13,6 +13,7 @@ import CloudKit
 
 struct ListView: View {
     
+    @AppStorage("successEmoji") private var successEmoji: String = "🔥"
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.dismiss) private var dismiss
     @Environment(StoreKitManager.self) private var storeKitManager
@@ -53,6 +54,9 @@ struct ListView: View {
     @State private var isCloudShareSheetPresented = false
     @State private var participants: [CKShare.Participant] = []
     @State private var showParticipantsMenu = false
+    
+    //PRO
+    @State private var isUpgradeToProPresented: Bool = false
     
     let packingListsCount: Int
     
@@ -120,8 +124,8 @@ struct ListView: View {
                 
                 if viewModel.isConfettiVisible {
                     ZStack {
-                        Text("🔥")
-                            .font(.system(size: 50))
+                        Text(successEmoji)
+                            .font(.system(size: 100))
                             .scaleEffect(fireScale)
                             .shadow(color: .black.opacity(0.3), radius: 10, x: 0, y: 2)
                         
@@ -135,8 +139,8 @@ struct ListView: View {
                             .confettiCannon(
                                 trigger: $trigger,
                                 num:1,
-                                confettis: [.text("🔥")],
-                                confettiSize: 8,
+                                confettis: [.text(successEmoji)],
+                                confettiSize: 18,
                                 rainHeight: 0,
                                 radius: 150,
                                 repetitions: 10,
@@ -314,7 +318,7 @@ struct ListView: View {
                     if storeKitManager.isUnlimitedListsUnlocked || packingListsCount < Constants.proVersionListCount {
                         isDuplicationConfirmationPresented = true
                     } else {
-                        storeKitManager.isUpgradeToProPresented = true
+                        isUpgradeToProPresented.toggle()
                     }
                     
                 } label: {
