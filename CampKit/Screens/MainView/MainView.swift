@@ -96,7 +96,11 @@ struct MainView: View {
                 
                 //MARK: - CENTER ADD NEW LIST BUTTON
                 Button {
-                    isNewListQuizPresented = true
+                    if storeKitManager.isUnlimitedListsUnlocked || packingLists.count < Constants.proVersionListCount {
+                        isNewListQuizPresented = true
+                    } else {
+                        isUpgradeToProPresented.toggle()
+                    }
                 } label: {
                     Image(systemName: "plus.circle.fill")
                         .symbolRenderingMode(.palette)
@@ -127,10 +131,7 @@ struct MainView: View {
                     .environment(weatherViewModel)
                 }
             }
-            .sheet(isPresented: Binding(
-                get: { storeKitManager.isUpgradeToProPresented },
-                set: { storeKitManager.isUpgradeToProPresented = $0 })
-            ) {
+            .sheet(isPresented: $isUpgradeToProPresented) {
                 UpgradeToProView()
             }
             

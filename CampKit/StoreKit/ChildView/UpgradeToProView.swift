@@ -10,16 +10,44 @@ import SwiftUI
 struct UpgradeToProView: View {
     
     @Environment(StoreKitManager.self) private var storeKitManager
+    @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.dismiss) private var dismiss
     
     var body: some View {
         
         NavigationStack {
-            VStack(spacing: Constants.cardSpacing) {
-                
+            ZStack(alignment: .center) {
+                if colorScheme == .dark {
+                    
+                    LinearGradient(
+                        colors: [.customSky, .customLilac],
+                        startPoint: .bottomLeading,
+                        endPoint: .topTrailing
+                    )
+                    .ignoresSafeArea()
+                    
+                    Color.black
+                        .opacity(0.5)
+                        .blendMode(.overlay)
+                        .ignoresSafeArea()
+                    
+                } else {
+                    //LIGHT MODE
+                    
+                    LinearGradient(
+                        colors: [.customGold, .customSage, .customSky, .customSky],
+                        startPoint: .bottomLeading,
+                        endPoint: .topTrailing
+                    )
+                    .ignoresSafeArea()
+                }
+                    
+                VStack(spacing: Constants.cardSpacing) {
+                Spacer()
                 //MARK: - TITLE
-                Image("tentIcon")
-                    .resizable()
-                    .frame(width: 120, height: 120)
+//                Image("tentIcon")
+//                    .resizable()
+//                    .frame(width: 120, height: 120)
                 VStack(alignment: .center) {
                     Text("Upgrade to Pro")
                         .font(.title)
@@ -30,37 +58,45 @@ struct UpgradeToProView: View {
                 //MARK: - WHAT'S INCLUDED
                 GroupBox {
                     VStack(alignment: .leading, spacing: Constants.cardSpacing) {
-                        ProFeaturesListItemView(title: "Unlimited Packing Lists", description: "More descriptive text will go here about it")
-                        ProFeaturesListItemView(title: "Dark Mode", description: "More descriptive text will go here about it")
+                        ProFeaturesListItemView(title: "Unlimited Packing Lists", description: "Create and manage as many lists as you need for every trip.")
+                        ProFeaturesListItemView(title: "Success Customization", description: "Swap the default bonfire with your own emoji to celebrate completed lists 🔥")
                     }//:VSTACK
                     .padding(.vertical, Constants.verticalSpacing)
+                    .padding(.horizontal, Constants.verticalSpacing)
+                    
+                    VStack() {
+                        Divider()
+                            .padding(.bottom)
+                        Text("One time purchase")
+                        Button {
+                            Task {
+                                await                         storeKitManager.purchaseUnlimitedLists()
+                                
+                            }
+                        } label: {
+                            Text("Upgrade to Pro")
+                                .font(.title3)
+                                .fontWeight(.bold)
+                        }
+                        .buttonStyle(BigButton())
+                        
+                    }//:VSTACK
+                    .padding(.vertical)
+                    .padding(.horizontal, Constants.horizontalPadding)
                 }//:GROUPBOX
                 .padding(.horizontal, Constants.horizontalPadding)
-                .backgroundStyle(Color.colorTan)
+                .backgroundStyle(Color.colorWhite)
                 .clipShape(RoundedRectangle(cornerRadius: Constants.cornerRadius))
                 
                 //MARK: - BUTTON
-                Spacer()
-                VStack(spacing: Constants.verticalSpacing) {
-                    Divider()
-                    Text("One time purchase")
-                    Button {
-                        Task {
-                            await                         storeKitManager.purchaseUnlimitedLists()
-
-                        }
-                    } label: {
-                        Text("Upgrade to Pro")
-                    }
-                    .buttonStyle(BigButton())
-                    
-                }//:VSTACK
                 
+                Spacer()
             }//:VSTACK
+        }//:ZSTACK
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button {
-                        storeKitManager.isUpgradeToProPresented = false
+                        dismiss()
                     } label: {
                         Image(systemName: "xmark")
                             .font(.footnote)
@@ -70,6 +106,7 @@ struct UpgradeToProView: View {
                 }
             }
         }//:NAVIGATION STACK
+        
     }
 }
 

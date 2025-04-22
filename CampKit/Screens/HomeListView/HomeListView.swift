@@ -21,6 +21,7 @@ struct HomeListView: View {
     @State private var location: String = ""
     @State private var editMode: EditMode = .inactive
     @Binding var isNewListQuizPresented: Bool
+    @State private var isUpgradeToProPresented: Bool = false
     
     init(context: NSManagedObjectContext, isNewListQuizPresented: Binding<Bool>) {
         _isNewListQuizPresented = isNewListQuizPresented
@@ -115,10 +116,7 @@ Hit the \"+\" to get started!
 
                         }
                     }//:LIST
-                    .sheet(isPresented: Binding(
-                        get: { storeKitManager.isUpgradeToProPresented },
-                        set: { storeKitManager.isUpgradeToProPresented = $0 })
-                    ) {
+                    .sheet(isPresented: $isUpgradeToProPresented) {
                         UpgradeToProView()
                     }
                 }//:ELSE
@@ -140,7 +138,7 @@ Hit the \"+\" to get started!
                             if storeKitManager.isUnlimitedListsUnlocked || packingLists.count < Constants.proVersionListCount {
                                 isNewListQuizPresented = true
                             } else {
-                                storeKitManager.isUpgradeToProPresented = true
+                                isUpgradeToProPresented.toggle()
                             }
                         } label: {
                             Image(systemName: "plus.circle.fill")
@@ -176,7 +174,6 @@ Hit the \"+\" to get started!
 #Preview() {
     
     @Previewable @State var isNewListQuizPresented: Bool = false
-    @Previewable @State var isUpgradeToProPresented: Bool = false
     @Previewable @Bindable var storeKitManager = StoreKitManager()
     
     let context = PersistenceController.preview.container.viewContext
