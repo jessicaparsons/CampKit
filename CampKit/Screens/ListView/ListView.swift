@@ -238,11 +238,6 @@ struct ListView: View {
                         participants = viewModel.loadParticipants(from: existingShare)
                     }
                 }
-                .sheet(isPresented: $isCloudShareSheetPresented) {
-                    if let share = share, let container = container {
-                        CloudSharingSheet(share: share, container: container)
-                    }
-                }
             }
             
             //MARK: - ADD NEW CATEGORY
@@ -319,9 +314,11 @@ struct ListView: View {
                     Task {
                         do {
                             let shareResult = try await shareList(for: viewModel.packingList.objectID)
+                            print("share result: \(shareResult)")
                                 self.share = shareResult
                                 self.container = CKContainer.default()
                                 self.isCloudShareSheetPresented.toggle()
+                            print("isCloudShare toggled: \(isCloudShareSheetPresented)")
                         } catch {
                             print("Failed to create share: \(error.localizedDescription)")
                         }
@@ -384,27 +381,7 @@ struct ListView: View {
                 
                 Button("Cancel", role: .cancel) { }
             }
-            .alert("Add New Category", isPresented: $isAddNewCategoryPresented) {
-                TextField("New category", text: $newCategoryTitle)
-                Button("Done", action: {
-                    if isFormValid {
-                        viewModel.addNewCategory(title: newCategoryTitle)
-                        newCategoryTitle = ""
-                    }
-                    isAddNewCategoryPresented = false
-                }).disabled(!isFormValid)
-                Button("Cancel", role: .cancel) { }
-            }
-            .sheet(isPresented: $isSharingSheetPresented) {
-                if share != nil {
-                    let text = viewModel.exportAsPlainText(packingList: viewModel.packingList)
-                    let pdf = viewModel.generatePDF(from: text)
-                    SharingOptionsSheet(items: [text, pdf])
-                } else {
-                    Text("Unable to share this list.")
-                        .foregroundColor(.secondary)
-                }
-            }
+            
         }//:HSTACK
         .sheet(isPresented: $isEditingTitle) {
             EditListDetailsModal(viewModel: viewModel)
@@ -415,6 +392,34 @@ struct ListView: View {
             RearrangeCategoriesView(viewModel: viewModel)
                 .environmentObject(viewModel)
                 .presentationDetents([.medium, .large])
+        }
+        .alert("Add New Category", isPresented: $isAddNewCategoryPresented) {
+            TextField("New category", text: $newCategoryTitle)
+            Button("Done", action: {
+                if isFormValid {
+                    viewModel.addNewCategory(title: newCategoryTitle)
+                    newCategoryTitle = ""
+                }
+                isAddNewCategoryPresented = false
+            }).disabled(!isFormValid)
+            Button("Cancel", role: .cancel) { }
+        }
+        .sheet(isPresented: $isSharingSheetPresented) {
+            if share != nil {
+                let text = viewModel.exportAsPlainText(packingList: viewModel.packingList)
+                let pdf = viewModel.generatePDF(from: text)
+                SharingOptionsSheet(items: [text, pdf])
+            } else {
+                Text("Unable to share this list.")
+                    .foregroundColor(.secondary)
+            }
+        }
+        .sheet(isPresented: $isCloudShareSheetPresented) {
+            if let share = share, let container = container {
+                CloudSharingSheet(share: share, container: container)
+            } else {
+                EmptyView()
+            }
         }
         .confirmationDialog(
             "Are you sure you want to duplicate the list?",
