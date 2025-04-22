@@ -15,7 +15,15 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         op.perShareResultBlock = { (metadata: CKShare.Metadata, result: Result<CKShare, Error>) in
             switch result {
             case .success(let share):
-                print("✅ Share accepted: \(share.recordID.recordName)")
+                print("Share accepted: \(share.recordID.recordName)")
+                
+                // Force CoreData to refresh
+                DispatchQueue.main.async {
+                    let context = PersistenceController.shared.container.viewContext
+                    context.refreshAllObjects()
+                }
+                
+                
                 NotificationCenter.default.post(name: .didAcceptShare, object: nil)
             case .failure(let error):
                 print("Share acceptance failed: \(error)")
