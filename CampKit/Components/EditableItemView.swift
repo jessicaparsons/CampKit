@@ -16,7 +16,7 @@ struct EditableItemView<T: EditablePackableItem>: View {
     
     @ObservedObject var item: T
     @State private var disableSwipe = false
-    @FocusState var isFocused : Bool
+    @FocusState var isFocused: Bool
     var isList: Bool
     let togglePacked: () -> Void
     let deleteItem: () -> Void

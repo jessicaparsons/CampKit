@@ -9,9 +9,11 @@ import SwiftUI
 import CoreData
 import CloudKit
 
+
 final class ListViewModel: ObservableObject {
     
     let viewContext: NSManagedObjectContext
+    private let packingListID: NSManagedObjectID
     
     @Published var packingList: PackingList
     
@@ -21,6 +23,19 @@ final class ListViewModel: ObservableObject {
     @Published var draggedCategory: Category?
     @Published var isConfettiVisible: Bool = false
     @Published var isSuccessfulDuplicationPresented: Bool = false
+        
+    init(viewContext: NSManagedObjectContext, packingList: PackingList) {
+        self.viewContext = viewContext
+        self.packingList = packingList
+        self.packingListID = packingList.objectID
+        
+        // Force fetch the latest version to sync cloud changes, fallback to passed-in instance
+        if let refreshed = try? viewContext.existingObject(with: packingList.objectID) as? PackingList {
+            self.packingList = refreshed
+        } else {
+            self.packingList = packingList
+        }
+    }
     
     var allItems: [Item] {
         packingList.sortedCategories.flatMap { $0.sortedItems }
@@ -34,9 +49,12 @@ final class ListViewModel: ObservableObject {
         allItems.isEmpty ? 0 : Double(packedCount) / Double(allItems.count)
     }
     
-    init(viewContext: NSManagedObjectContext, packingList: PackingList) {
-        self.viewContext = viewContext
-        self.packingList = packingList
+    //MARK: - REFRESH VIEW
+    
+    func refresh() {
+        if let updated = try? viewContext.existingObject(with: packingListID) as? PackingList {
+            self.packingList = updated
+        }
     }
     
     //MARK: - MODIFY ITEMS
@@ -90,7 +108,7 @@ final class ListViewModel: ObservableObject {
                 context: viewContext,
                 isExpanded: true,
                 name: title,
-                position: Int(maxPosition + 1)
+                position: maxPosition + 1
             )
 
             newCategory.packingList = packingList
@@ -164,7 +182,7 @@ final class ListViewModel: ObservableObject {
                 context: viewContext,
                 id: UUID(),
                 name: category.name,
-                position: Int(category.position)
+                position: category.position
             )
             
             for item in category.sortedItems {
@@ -205,6 +223,7 @@ final class ListViewModel: ObservableObject {
             packingList.sortedCategories.forEach { $0.isExpanded = true }
         }
         save(viewContext)
+        objectWillChange.send()
     }
 
     func collapseAll() {
@@ -212,6 +231,7 @@ final class ListViewModel: ObservableObject {
             packingList.sortedCategories.forEach { $0.isExpanded = false }
         }
         save(viewContext)
+        objectWillChange.send()
     }
     
     
@@ -304,6 +324,22 @@ final class ListViewModel: ObservableObject {
         return share.participants
     }
 
+    @MainActor
+    func fetchLatestShare(for recordID: CKRecord.ID) async throws -> CKShare? {
+        let container = CKContainer.default()
+        let database = container.privateCloudDatabase
+        return try await withCheckedThrowingContinuation { continuation in
+            database.fetch(withRecordID: recordID) { record, error in
+                if let share = record as? CKShare {
+                    continuation.resume(returning: share)
+                } else if let error = error {
+                    continuation.resume(throwing: error)
+                } else {
+                    continuation.resume(returning: nil)
+                }
+            }
+        }
+    }
 
 
 

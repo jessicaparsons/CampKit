@@ -14,24 +14,23 @@ enum FocusField: Hashable {
 
 struct CategorySectionView: View {
     @Environment(\.managedObjectContext) private var viewContext
-    @FocusState private var focusField: FocusField?
+    @FocusState var isFocused: Bool
     @ObservedObject var viewModel: ListViewModel
     @ObservedObject var category: Category
     @Binding var isRearranging: Bool
 
     let deleteCategory: () -> Void
 
-    @State private var isExpanded: Bool = false
     @State private var isEditing: Bool = false
 
     private var isExpandedBinding: Binding<Bool> {
         Binding(
-            get: { isExpanded },
+            get: { category.isExpanded },
             set: { newValue in
                 withAnimation {
-                    isExpanded = newValue
                     category.isExpanded = newValue
                     save(viewContext)
+                    viewModel.objectWillChange.send()
                 }
             }
         )
@@ -45,23 +44,21 @@ struct CategorySectionView: View {
                 isExpandedBinding.wrappedValue.toggle()
             } label: {
                 HStack(spacing: Constants.horizontalPadding) {
-                    Image(systemName: isExpanded ? "chevron.down" : "chevron.right")
+                    Image(systemName: category.isExpanded ? "chevron.down" : "chevron.right")
                         .foregroundColor(.customNeonLight)
                         .font(.caption.lowercaseSmallCaps())
                     if isEditing {
                         TextField("Category Name", text: $category.name)
-                            .focused($focusField, equals: .categoryTitle)
+                            .focused($isFocused)
                             .font(.headline)
                             .multilineTextAlignment(.leading)
                             .onSubmit {
                                 isEditing = false
-                                focusField = nil
-                                save(viewContext)
+                                        save(viewContext)
                             }
 
                         Button("Done") {
                             isEditing = false
-                            focusField = nil
                             save(viewContext)
                         }
                         .padding(.vertical, 8)
@@ -75,9 +72,6 @@ struct CategorySectionView: View {
                         Menu {
                             Button {
                                 isEditing = true
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                                    focusField = .categoryTitle
-                                }
                             } label: {
                                 Label("Edit Name", systemImage: "pencil")
                             }
@@ -103,9 +97,12 @@ struct CategorySectionView: View {
                 .padding(.vertical, Constants.verticalSpacing)
                 .contentShape(Rectangle())
             }
+            .onChange(of: isEditing) {
+                isFocused = isEditing
+            }
 
             // MARK: - EXPANDED CONTENT
-            if isExpanded {
+            if category.isExpanded {
                 if !category.sortedItems.isEmpty {
                     ForEach(category.sortedItems, id: \.id) { item in
                         EditableItemView<Item>(
@@ -119,9 +116,6 @@ struct CategorySectionView: View {
                 AddNewItemView(viewModel: viewModel, category: category)
                     .padding(.bottom, 10)
             }
-        }
-        .onAppear {
-            isExpanded = category.isExpanded
         }
     }
 }
