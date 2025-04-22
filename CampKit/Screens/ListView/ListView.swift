@@ -52,6 +52,7 @@ struct ListView: View {
     @State private var container: CKContainer?
     @State private var share: CKShare?
     @State private var isCloudShareSheetPresented = false
+    @State private var sharingController: UICloudSharingController?
     @State private var participants: [CKShare.Participant] = []
     @State private var showParticipantsMenu = false
     
@@ -315,13 +316,13 @@ struct ListView: View {
                 Button {
                     Task {
                         do {
-                            let shareResult = try await shareList(for: viewModel.packingList.objectID)
-                                self.share = shareResult
-                                self.container = CKContainer.default()
-                                self.isCloudShareSheetPresented.toggle()
-                            debugLog("isCloudShareSheet trigger fired")
+                            let controller = try await sharePackingList(viewModel.packingList.objectID)
+                            await MainActor.run {
+                                self.sharingController = controller
+                                self.isCloudShareSheetPresented = true
+                            }
                         } catch {
-                            print("Failed to create share: \(error.localizedDescription)")
+                            print("Failed to share: \(error)")
                         }
                     }
                 } label: {
@@ -331,16 +332,7 @@ struct ListView: View {
                 // SHARE LIST
                 
                 Button {
-                    Task {
-                        do {
-                            let shareResult = try await shareList(for: viewModel.packingList.objectID)
-                                self.share = shareResult
-                            isSharingSheetPresented.toggle()
-                            debugLog("isSharingSheet trigger fired")
-                        } catch {
-                            print("Failed to create share: \(error.localizedDescription)")
-                        }
-                    }
+                    isSharingSheetPresented.toggle()
                 } label: {
                     Label("Share", systemImage: "square.and.arrow.up")
                 }
@@ -407,20 +399,13 @@ struct ListView: View {
             Button("Cancel", role: .cancel) { }
         }
         .sheet(isPresented: $isSharingSheetPresented) {
-            if share != nil {
-                let text = viewModel.exportAsPlainText(packingList: viewModel.packingList)
-                let pdf = viewModel.generatePDF(from: text)
-                SharingOptionsSheet(items: [text, pdf])
-            } else {
-                Text("Unable to share this list.")
-                    .foregroundColor(.secondary)
-            }
+            let text = viewModel.exportAsPlainText(packingList: viewModel.packingList)
+            let pdf = viewModel.generatePDF(from: text)
+            SharingOptionsSheet(items: [text, pdf])
         }
         .sheet(isPresented: $isCloudShareSheetPresented) {
-            if let share = share, let container = container {
-                CloudSharingSheet(share: share, container: container)
-            } else {
-                EmptyView()
+            if let sharingController = sharingController {
+                CloudSharingSheet(controller: sharingController)
             }
         }
         .confirmationDialog(
@@ -482,38 +467,24 @@ struct ListView: View {
         }
     }
     
-    func shareList(for objectID: NSManagedObjectID) async throws -> CKShare {
-        return try await withCheckedThrowingContinuation { continuation in
-            viewContext.perform {
-                do {
-                    guard let packingList = try viewContext.existingObject(with: objectID) as? PackingList else {
-                        throw NSError(domain: "ShareError", code: 404, userInfo: [NSLocalizedDescriptionKey: "Packing list not found"])
-                    }
+    @MainActor
+    func sharePackingList(_ packingListID: NSManagedObjectID) async throws -> UICloudSharingController {
+        let context = PersistenceController.shared.container.viewContext
+        let packingList = context.object(with: packingListID) as! PackingList
 
-                    Task {
-                        do {
-                            let (_, share, _) = try await PersistenceController.shared.container.share([packingList], to: nil)
-                            share.publicPermission = .readWrite
-                            share[CKShare.SystemFieldKey.title] = packingList.title ?? "Packing List"
-                            await MainActor.run {
-                                save(viewContext)
-                            }
-                            continuation.resume(returning: share)
-                        } catch {
-                            continuation.resume(throwing: error)
-                        }
-                    }
+        let (objectIDs, share, container) = try await PersistenceController.shared.container.share([packingList], to: nil)
+        
+        print("✅ Shared PackingList with objectIDs: \(objectIDs)")
+        print("✅ Share created with ID: \(share.recordID.recordName)")
+        print("✅ Share URL: \(String(describing: share.url))")
 
-                } catch {
-                    continuation.resume(throwing: error)
-                }
-            }
-        }
+        share[CKShare.SystemFieldKey.title] = packingList.title as? CKRecordValue
+
+        let controller = UICloudSharingController(share: share, container: container)
+        controller.availablePermissions = [.allowReadWrite, .allowReadOnly, .allowPrivate]
+
+        return controller
     }
-
-
-
-
     
 
 }
