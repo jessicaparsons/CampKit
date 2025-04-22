@@ -10,6 +10,7 @@ import PhotosUI
 import ConfettiSwiftUI
 import CoreData
 import CloudKit
+import os
 
 struct ListView: View {
     
@@ -207,7 +208,7 @@ struct ListView: View {
     private var optionsMenu: some View {
         HStack {
             //MARK: - LIST IS SHARED OPTIONS
-            if !participants.isEmpty {
+            if share != nil {
                 Menu {
                     Section {
                         ForEach(participants, id: \.self) { participant in
@@ -449,16 +450,14 @@ struct ListView: View {
     
     private func prepareCloudSharingSheet() async {
         guard let existingShare = share else { return }
-        
+
         do {
-            self.container = CKContainer.default()
-            
-            if let refreshedShare = try await viewModel.fetchLatestShare(for: existingShare.recordID) {
-                
-                self.participants = refreshedShare.participants
+            let refreshedShare = try await viewModel.fetchLatestShare(for: existingShare.recordID)
+
+            if let share = refreshedShare {
+                self.participants = share.participants
+                self.sharingController = UICloudSharingController(share: share, container: CKContainer.default())
                 self.isCloudShareSheetPresented = true
-                debugLog("isCloudShareSheet trigger fired")
-                
             } else {
                 print("Could not find updated share")
             }
@@ -466,28 +465,39 @@ struct ListView: View {
             print("Error fetching updated share: \(error)")
         }
     }
+
     
     @MainActor
     func sharePackingList(_ packingListID: NSManagedObjectID) async throws -> UICloudSharingController {
-        let context = PersistenceController.shared.container.viewContext
-        let packingList = context.object(with: packingListID) as! PackingList
+        let controller = UICloudSharingController { sharingController, preparationHandler in
+            Task {
+                do {
+                    let context = PersistenceController.shared.container.viewContext
+                    let packingList = context.object(with: packingListID) as! PackingList
 
-        let (objectIDs, share, container) = try await PersistenceController.shared.container.share([packingList], to: nil)
-        
-        print("✅ Shared PackingList with objectIDs: \(objectIDs)")
-        print("✅ Share created with ID: \(share.recordID.recordName)")
-        print("✅ Share URL: \(String(describing: share.url))")
+                    // ✅ Generate share
+                    let (objectIDs, share, container) = try await PersistenceController.shared.container.share([packingList], to: nil)
 
-        share[CKShare.SystemFieldKey.title] = packingList.title as? CKRecordValue
-        
-        try context.save()
+                    log.info("✅ Shared PackingList with objectIDs: \(objectIDs)")
+                    log.info("✅ Share created with ID: \(share.recordID.recordName)")
+                    log.info("✅ Share URL: \(String(describing: share.url))")
 
-        let controller = UICloudSharingController(share: share, container: container)
+                    share[CKShare.SystemFieldKey.title] = packingList.title as? CKRecordValue
+                    try context.save()
+
+                    // Call the handler to complete setup
+                    preparationHandler(share, container, nil)
+
+                } catch {
+                    log.info("❌ Share preparation failed: \(error)")
+                    preparationHandler(nil, nil, error)
+                }
+            }
+        }
+
         controller.availablePermissions = [.allowReadWrite, .allowReadOnly, .allowPrivate]
-
         return controller
     }
-    
 
 }
 

@@ -6,6 +6,9 @@
 //
 
 import SwiftUI
+import os
+
+let log = Logger(subsystem: "co.junipercreative.CampKit", category: "Sharing")
 
 struct MainView: View {
     
@@ -140,11 +143,11 @@ struct MainView: View {
                 do {
                     try viewContext.setQueryGenerationFrom(.current)
                 } catch {
-                    print("Failed to refresh query generation: \(error)")
+                    log.info("Failed to refresh query generation: \(error)")
                 }
             }
             .onReceive(NotificationCenter.default.publisher(for: .NSPersistentStoreRemoteChange)) { _ in
-                print("🔄 CloudKit sync received — try refreshing UI")
+                log.info("CloudKit sync received — try refreshing UI")
             }
             
     }
