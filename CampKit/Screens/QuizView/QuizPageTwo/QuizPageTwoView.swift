@@ -52,6 +52,7 @@ struct QuizPageTwoView: View {
                 }//:HSTACK
                 
                 ChipSectionView(selectedFilters: $viewModel.selectedFilters, preferenceCategory: ChoiceOptions.weatherConditions)
+                    .padding(.bottom, Constants.quizPadding)
                 Spacer()
             }//:VSTACK
             

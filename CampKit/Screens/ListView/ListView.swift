@@ -314,11 +314,10 @@ struct ListView: View {
                     Task {
                         do {
                             let shareResult = try await shareList(for: viewModel.packingList.objectID)
-                            print("share result: \(shareResult)")
                                 self.share = shareResult
                                 self.container = CKContainer.default()
                                 self.isCloudShareSheetPresented.toggle()
-                            print("isCloudShare toggled: \(isCloudShareSheetPresented)")
+                            debugLog("isCloudShareSheet trigger fired")
                         } catch {
                             print("Failed to create share: \(error.localizedDescription)")
                         }
@@ -335,6 +334,7 @@ struct ListView: View {
                             let shareResult = try await shareList(for: viewModel.packingList.objectID)
                                 self.share = shareResult
                             isSharingSheetPresented.toggle()
+                            debugLog("isSharingSheet trigger fired")
                         } catch {
                             print("Failed to create share: \(error.localizedDescription)")
                         }
@@ -470,6 +470,7 @@ struct ListView: View {
                 
                 self.participants = refreshedShare.participants
                 self.isCloudShareSheetPresented = true
+                debugLog("isCloudShareSheet trigger fired")
                 
             } else {
                 print("Could not find updated share")

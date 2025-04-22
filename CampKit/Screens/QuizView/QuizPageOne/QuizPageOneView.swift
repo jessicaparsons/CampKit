@@ -82,7 +82,7 @@ struct QuizPageOneView: View {
                         selectedFilters: $viewModel.selectedFilters,
                         preferenceCategory: ChoiceOptions.activities
                     )
-                    .padding(.bottom, 150)
+                    .padding(.bottom, Constants.quizPadding)
                     
                 }//:VSTACK
                 
