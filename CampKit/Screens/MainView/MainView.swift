@@ -9,6 +9,7 @@ import SwiftUI
 
 struct MainView: View {
     
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     @FetchRequest(
         entity: PackingList.entity(),
         sortDescriptors: [])
@@ -134,10 +135,28 @@ struct MainView: View {
             .sheet(isPresented: $isUpgradeToProPresented) {
                 UpgradeToProView()
             }
+        //MARK: - CLOUD NOTIFICATIONS
+            .onReceive(NotificationCenter.default.publisher(for: .didAcceptShare)) { _ in
+                do {
+                    try viewContext.setQueryGenerationFrom(.current)
+                } catch {
+                    print("Failed to refresh query generation: \(error)")
+                }
+            }
+            .onReceive(NotificationCenter.default.publisher(for: .NSPersistentStoreRemoteChange)) { _ in
+                print("🔄 CloudKit sync received — try refreshing UI")
+            }
             
     }
     
 }
+
+
+extension Notification.Name {
+    static let didAcceptShare = Notification.Name("didAcceptShare")
+}
+
+
 #if DEBUG
 #Preview {
 

@@ -117,7 +117,9 @@ struct ListView: View {
                 }//:SCROLLVIEW
                 .background(Color.colorTan)
                 .ignoresSafeArea(edges: .top)
-                
+                .refreshable {
+                    await refresh(context: viewContext)
+                }
                 
                 
                 //MARK: - CONFETTI ANIMATION
