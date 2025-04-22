@@ -55,7 +55,7 @@ Hit the \"+\" to get started!
                             .frame(height: 1)//For top spacing
                         ) {
                             ForEach(packingLists) { packingList in
-                                
+
                                 NavigationLink(
                                     destination: ListView(
                                         context: viewContext,
