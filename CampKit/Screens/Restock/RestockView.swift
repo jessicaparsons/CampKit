@@ -32,10 +32,7 @@ struct RestockView: View {
             //MARK: - EMPTY VIEW
             if viewModel.restockItems.isEmpty {
                 ScrollView {
-                        ContentUnavailableView("Empty List", systemImage: "arrow.clockwise.circle", description: Text("""
-You haven't created any restock items yet. 
-Hit the \"+\" to get started!
-"""))
+                        ContentUnavailableView("Empty List", systemImage: "arrow.clockwise.circle", description: Text("You haven't created any restock items yet. Hit the \"+\" to get started!"))
                         .padding(.top, Constants.emptyContentSpacing)
                     
                 }//:SCROLLVIEW

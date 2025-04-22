@@ -109,15 +109,15 @@ struct QuizPageOneView: View {
             LazyVGrid(columns: columns, alignment: .center) {
                 CardButtonView(
                     emoji: "👨‍🦰",
-                    title: ChoiceOptions.adults,
+                    title: "Adults",
                     isSelected: viewModel.selectedFilters.contains(ChoiceOptions.adults),
                     onTap: { viewModel.toggleSelection(ChoiceOptions.adults) })
                 CardButtonView(emoji: "🧸",
-                               title: ChoiceOptions.kids,
+                               title: "Kids",
                                isSelected: viewModel.selectedFilters.contains(ChoiceOptions.kids),
                                onTap: { viewModel.toggleSelection(ChoiceOptions.kids) })
                 CardButtonView(emoji: "🐶",
-                               title: ChoiceOptions.dogs,
+                               title: "Dogs",
                                isSelected: viewModel.selectedFilters.contains(ChoiceOptions.dogs),
                                onTap: { viewModel.toggleSelection(ChoiceOptions.dogs) })
             }

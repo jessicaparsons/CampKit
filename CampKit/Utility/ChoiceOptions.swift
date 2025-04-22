@@ -23,7 +23,7 @@ struct ChoiceOptions {
     
     // MARK: - Participants
     static let adults = "👨‍🦰 Adults"
-    static let kids = "👶 Kids"
+    static let kids = "🧸 Kids"
     static let dogs = "🐶 Dogs"
     
     // MARK: - Activities

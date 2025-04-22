@@ -211,7 +211,7 @@ struct SettingsView: View {
                         SettingsRowView(name: "Compatibility", content: "iOS 18.2+")
                         SettingsRowView(name: "Website", linkLabel: "Juniper Creative Co.", linkDestination: "junipercreative.co")
                         SettingsRowView(name: "Portfolio", linkLabel: "GitHub", linkDestination: "github.com/jessicaparsons")
-                        SettingsRowView(name: "Version", content: "1.1.0")
+                        SettingsRowView(name: "Version", content: "1.0")
                     }
                 }//:GROUP
                     .backgroundStyle(Color.colorWhite)
