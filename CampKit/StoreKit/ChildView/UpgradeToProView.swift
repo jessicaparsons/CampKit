@@ -74,6 +74,8 @@ struct UpgradeToProView: View {
 }
 
 #Preview {
+    @Previewable @Bindable var storeKitManager = StoreKitManager()
     
     UpgradeToProView()
+        .environment(storeKitManager)
 }

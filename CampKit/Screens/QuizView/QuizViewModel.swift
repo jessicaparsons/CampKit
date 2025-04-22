@@ -59,7 +59,7 @@ final class QuizViewModel {
             )
             
             //Generate recommended categories and items
-            let categories = generateCategories(from: newPackingList, using: viewContext)
+            let categories = generateCategories(for: newPackingList, using: viewContext)
             categories.forEach { newPackingList.addToCategories($0)
             }
             
@@ -110,27 +110,37 @@ final class QuizViewModel {
     //Generate Packing Categories
     
     @MainActor
-    private func generateCategories(from packingList: PackingList, using context: NSManagedObjectContext) -> [Category] {
+    private func generateCategories(for packingList: PackingList, using context: NSManagedObjectContext) -> [Category] {
         
         var selectedCategories: [Category] = []
         
-        let defaultCategories = ["Clothing", "Camping Gear", "First Aid"]
+        let defaultCategories = [
+            ChoiceOptions.sleep,
+            ChoiceOptions.kitchen,
+            ChoiceOptions.foodStaples,
+            ChoiceOptions.tools,
+            ChoiceOptions.clothing,
+            ChoiceOptions.toiletries,
+            ChoiceOptions.emergency,
+            ChoiceOptions.lounge
+        ]
         
-        // Grab category templates with real Core Data items
+        // Grab category templates with Core Data items
         let templates = generateCategoryTemplates(using: context)
         
         let filters = defaultCategories + Array(selectedFilters)
         
-        for (index, filter) in filters.enumerated() {
+        for filter in filters {
             guard let items = templates[filter] else { continue }
             
+            let position = setCategoryOrder()[filter] ?? Int64(Int.max)
             
             // Essential Categories
             let category = Category(
                 context: context,
                 isExpanded: false,
                 name: filter,
-                position: index,
+                position: position,
                 packingList: packingList
             )
             

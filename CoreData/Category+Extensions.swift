@@ -15,7 +15,7 @@ extension Category {
         id: UUID = UUID(),
         isExpanded: Bool = false,
         name: String,
-        position: Int,
+        position: Int64,
         items: NSSet? = nil,
         packingList: PackingList? = nil
     ) {
@@ -23,7 +23,7 @@ extension Category {
         self.id = id
         self.isExpanded = isExpanded
         self.name = name
-        self.position = Int64(position)
+        self.position = position
         self.items = items
         self.packingList = packingList
         

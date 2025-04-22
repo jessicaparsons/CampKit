@@ -22,12 +22,12 @@ struct ListView: View {
     @State private var bannerImageItem: PhotosPickerItem?
     @State private var bannerImage: UIImage?
     @State private var isPhotoPickerPresented: Bool = false
-
+    
     //EDITING STATES
     @State private var isEditing: Bool = false
     @State private var isEditingTitle: Bool = false
     @State private var isRearranging: Bool = false
-
+    
     //CONFIRMATIONS
     @State private var isDeleteConfirmationPresented: Bool = false
     @State private var isToggleAllItemsConfirmationPresented: Bool = false
@@ -41,7 +41,7 @@ struct ListView: View {
     @State private var trigger: Int = 0
     @State private var isConfettiVisible: Bool = false
     @State private var fireScale: CGFloat = 0.1
-
+    
     //NAVIGATION
     @State private var scrollOffset: CGFloat = 0
     private let scrollThreshold: CGFloat = 1
@@ -76,78 +76,76 @@ struct ListView: View {
             EmptyView()
         }
         else {
-            Group {
-                ZStack(alignment: .center) {
-                    ScrollView {
+            ZStack(alignment: .center) {
+                ScrollView {
+                    VStack {
+                        
+                        //MARK: - BANNER IMAGE
+                        BannerImageView(viewModel: viewModel, bannerImage: $bannerImage)
+                            .frame(maxWidth: .infinity) // Ensure full width
+                            .listRowInsets(EdgeInsets()) // Remove extra padding
+                        
+                        //MARK: - LIST DETAILS HEADER
                         VStack {
+                            ListDetailCardView(viewModel: viewModel)
+                                .offset(y: -40)
                             
-                            //MARK: - BANNER IMAGE
-                            BannerImageView(viewModel: viewModel, bannerImage: $bannerImage)
-                                .frame(maxWidth: .infinity) // Ensure full width
-                                .listRowInsets(EdgeInsets()) // Remove extra padding
                             
-                            //MARK: - LIST DETAILS HEADER
-                            VStack {
-                                ListDetailCardView(viewModel: viewModel)
-                                    .offset(y: -40)
-                                
-                                
-                                //MARK: - LIST CATEGORIES
-                                
-                                CategoriesListView(
-                                    viewModel: viewModel,
-                                    isRearranging: $isRearranging
-                                )
-                                
-                            }//:VSTACK
-                            .padding(.horizontal)
+                            //MARK: - LIST CATEGORIES
+                            
+                            CategoriesListView(
+                                viewModel: viewModel,
+                                isRearranging: $isRearranging
+                            )
+                            
                         }//:VSTACK
-                        .background(
-                            GeometryReader { geo in
-                                Color.clear
-                                    .frame(height: 0)
-                                    .onChange(of: geo.frame(in: .global).minY) {
-                                        scrollOffset = geo.frame(in: .global).minY
-                                    }
+                        .padding(.horizontal)
+                    }//:VSTACK
+                    .background(
+                        GeometryReader { geo in
+                            Color.clear
+                                .frame(height: 0)
+                                .onChange(of: geo.frame(in: .global).minY) {
+                                    scrollOffset = geo.frame(in: .global).minY
+                                }
+                        }
+                    )//NAV BAR UI CHANGES ON SCROLL
+                }//:SCROLLVIEW
+                .background(Color.colorTan)
+                .ignoresSafeArea(edges: .top)
+                
+                
+                
+                //MARK: - CONFETTI ANIMATION
+                
+                if viewModel.isConfettiVisible {
+                    ZStack {
+                        Text("🔥")
+                            .font(.system(size: 50))
+                            .scaleEffect(fireScale)
+                            .shadow(color: .black.opacity(0.3), radius: 10, x: 0, y: 2)
+                        
+                            .onAppear {
+                                fireScale = 0.1
+                                withAnimation(.interpolatingSpring(stiffness: 200, damping: 8)) {
+                                    fireScale = 1.0
+                                }
+                                trigger += 1
                             }
-                        )//NAV BAR UI CHANGES ON SCROLL
-                    }//:SCROLLVIEW
-                    .background(Color.colorTan)
-                    .ignoresSafeArea(edges: .top)
-                    
-                    
-                    
-                    //MARK: - CONFETTI ANIMATION
-                    
-                        if viewModel.isConfettiVisible {
-                            ZStack {
-                                Text("🔥")
-                                    .font(.system(size: 50))
-                                    .scaleEffect(fireScale)
-                                    .shadow(color: .black.opacity(0.3), radius: 10, x: 0, y: 2)
-                                
-                                    .onAppear {
-                                        fireScale = 0.1
-                                        withAnimation(.interpolatingSpring(stiffness: 200, damping: 8)) {
-                                            fireScale = 1.0
-                                        }
-                                        trigger += 1
-                                    }
-                                    .confettiCannon(
-                                        trigger: $trigger,
-                                        num:1,
-                                        confettis: [.text("🔥")],
-                                        confettiSize: 8,
-                                        rainHeight: 0,
-                                        radius: 150,
-                                        repetitions: 10,
-                                        repetitionInterval: 0.1,
-                                        hapticFeedback: true)
-                            }//:ZSTACK
-                            .animation(.easeOut(duration: 0.5), value: isConfettiVisible)
-                        }//:CONDITION
-                }//:ZSTACK
-            }//:GROUP
+                            .confettiCannon(
+                                trigger: $trigger,
+                                num:1,
+                                confettis: [.text("🔥")],
+                                confettiSize: 8,
+                                rainHeight: 0,
+                                radius: 150,
+                                repetitions: 10,
+                                repetitionInterval: 0.1,
+                                hapticFeedback: true)
+                    }//:ZSTACK
+                    .animation(.easeOut(duration: 0.5), value: isConfettiVisible)
+                }//:CONDITION
+            }//:ZSTACK
             .background(Color.colorTan)
             .navigationTitle(viewModel.packingList.title ?? Constants.newPackingListTitle)
             .navigationBarTitleDisplayMode(.inline)
@@ -190,8 +188,8 @@ struct ListView: View {
                     }
                 }
             }
-            .onTapGesture {
-                hideKeyboard()
+            .onReceive(NotificationCenter.default.publisher(for: .NSPersistentStoreRemoteChange)) { _ in
+                viewModel.refresh()
             }
         }//:CONDITION
     }//:BODY
@@ -210,25 +208,27 @@ struct ListView: View {
                         ForEach(participants, id: \.self) { participant in
                             let name = participant.userIdentity.nameComponents?.formatted() ?? "Unknown"
                             let permission = participant.permission == .readOnly ? "View Only" : "Can Edit"
-                            Label("\(name) • \(permission)", systemImage: "person")
+                            Label("\(name) • \(permission)", systemImage: "person.circle")
                         }
                     }
                 } header: {
                     Text("Current Participants")
                 }
-
+                
                 //if !participants.isEmpty {
-                    Group {
-                        Divider()
-                        
-                        Button {
-                            prepareCloudSharingSheet()
-                        } label: {
-                            Label("Manage Shared List", systemImage: "person.crop.circle.badge.questionmark")
+                Group {
+                    Divider()
+                    
+                    Button {
+                        Task {
+                            await prepareCloudSharingSheet()
                         }
-                    }//:GROUP
+                    } label: {
+                        Label("Manage Shared List", systemImage: "person.crop.circle.badge.questionmark")
+                    }
+                }//:GROUP
                 //}
-
+                
             } label: {
                 Label("Shared", systemImage: "person.crop.circle.badge.checkmark")
                     .dynamicForegroundStyle(trigger: scrollOffset)
@@ -303,6 +303,7 @@ struct ListView: View {
                 Button(action: {
                     withAnimation {
                         viewModel.collapseAll()
+                        
                     }
                 }) {
                     Label("Collapse All", systemImage: "rectangle.compress.vertical")
@@ -435,24 +436,36 @@ struct ListView: View {
         }
     }
     
-    private func prepareCloudSharingSheet() {
-        if let existingShare = share {
+    private func prepareCloudSharingSheet() async {
+        guard let existingShare = share else { return }
+        
+        do {
             self.container = CKContainer.default()
-            self.participants = viewModel.loadParticipants(from: existingShare)
-            self.isCloudShareSheetPresented = true
+            
+            if let refreshedShare = try await viewModel.fetchLatestShare(for: existingShare.recordID) {
+                
+                self.participants = refreshedShare.participants
+                self.isCloudShareSheetPresented = true
+                
+            } else {
+                print("Could not find updated share")
+            }
+        } catch {
+            print("Error fetching updated share: \(error)")
         }
     }
+
 }
 
 //MARK: - PREVIEWS
 
 #Preview("Sample Data") {
-   
-        let storeKitManager = StoreKitManager()
-        let context = PersistenceController.preview.container.viewContext
-        
-        let samplePackingList = PackingList.samplePackingList(context: context)
-        
+    
+    let storeKitManager = StoreKitManager()
+    let context = PersistenceController.preview.container.viewContext
+    
+    let samplePackingList = PackingList.samplePackingList(context: context)
+    
     NavigationStack {
         ListView(
             context: context,
