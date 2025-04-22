@@ -42,7 +42,7 @@ struct WeatherRowView: View {
             }
         }
 }
-
+#if DEBUG
 #Preview("WeatherView") {
     
     @Previewable @State var location: String = "Paris"
@@ -56,3 +56,4 @@ struct WeatherRowView: View {
 #Preview {
     WeatherRowView(symbol: "sun.max.fill", day: "Monday", highTemp: "72", lowTemp: "27")
 }
+#endif

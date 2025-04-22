@@ -47,9 +47,10 @@ struct GradientTanBackgroundView: View {
         }
     }//:ZSTACK
 }
-
+#if DEBUG
 #Preview {
     NavigationStack {
         GradientTanBackgroundView()
     }
 }
+#endif

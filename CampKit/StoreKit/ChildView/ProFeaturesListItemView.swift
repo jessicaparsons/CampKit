@@ -27,7 +27,8 @@ struct ProFeaturesListItemView: View {
         }//:HSTACK
     }
 }
-
+#if DEBUG
 #Preview {
     ProFeaturesListItemView(title: "Unlimited Packing Lists", description: "More descriptive text will go here about it")
 }
+#endif

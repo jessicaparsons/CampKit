@@ -170,7 +170,7 @@ Hit the \"+\" to get started!
     
     
 }//:STRUCT
-
+#if DEBUG
 #Preview() {
     
     @Previewable @State var isNewListQuizPresented: Bool = false
@@ -184,3 +184,4 @@ Hit the \"+\" to get started!
             .environment(storeKitManager)
     }
 }
+#endif

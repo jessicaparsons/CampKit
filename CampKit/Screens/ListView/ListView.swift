@@ -462,7 +462,7 @@ struct ListView: View {
 }
 
 //MARK: - PREVIEWS
-
+#if DEBUG
 #Preview("Sample Data") {
     
     let storeKitManager = StoreKitManager()
@@ -480,7 +480,6 @@ struct ListView: View {
         .environment(\.managedObjectContext, context)
     }
 }
-
 #Preview("Basic Preview") {
     let storeKitManager = StoreKitManager()
     let context = PersistenceController.preview.container.viewContext
@@ -498,3 +497,4 @@ struct ListView: View {
         
     }
 }
+#endif

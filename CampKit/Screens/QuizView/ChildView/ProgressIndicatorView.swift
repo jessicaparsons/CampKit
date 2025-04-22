@@ -33,7 +33,7 @@ struct ProgressIndicatorView: View {
         }
     }
 }
-
+#if DEBUG
 #Preview {
     
     @Previewable @State var isNewListQuizPresented: Bool = true
@@ -50,3 +50,4 @@ struct ProgressIndicatorView: View {
             .environment(WeatherViewModel(weatherFetcher: WeatherAPIClient(), geoCoder: Geocoder()))
     }
 }
+#endif

@@ -169,7 +169,7 @@ struct QuizView: View {
     }
 }
 
-
+#if DEBUG
 #Preview {
     
     @Previewable @State var isNewListQuizPresented: Bool = true
@@ -186,3 +186,4 @@ struct QuizView: View {
             .environment(WeatherViewModel(weatherFetcher: WeatherAPIClient(), geoCoder: Geocoder()))
     }
 }
+#endif

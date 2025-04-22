@@ -51,7 +51,7 @@ struct RearrangeCategoriesView: View {
         }
     }
 }
-
+#if DEBUG
 #Preview {
     
     let context = PersistenceController.preview.container.viewContext
@@ -66,3 +66,4 @@ struct RearrangeCategoriesView: View {
     }
     
 }
+#endif

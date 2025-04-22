@@ -28,7 +28,7 @@ struct ElevationBarView: View {
 }
     }
         
-  
+#if DEBUG
 #Preview("QuizView") {
     
     @Previewable @State var isNewListQuizPresented: Bool = true
@@ -48,3 +48,4 @@ struct ElevationBarView: View {
 #Preview {
     ElevationBarView(height: 30)
 }
+#endif

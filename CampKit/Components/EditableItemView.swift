@@ -69,7 +69,7 @@ struct EditableItemView<T: EditablePackableItem>: View {
     
 }
 
-
+#if DEBUG
 #Preview {
     let context = PersistenceController.preview.container.viewContext
     let item = RestockItem(context: context, title: "Sleeping Bag", position: 0)
@@ -82,3 +82,4 @@ struct EditableItemView<T: EditablePackableItem>: View {
     )
     .environment(\.managedObjectContext, context)
 }
+#endif

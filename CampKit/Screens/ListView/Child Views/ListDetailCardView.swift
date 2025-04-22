@@ -126,7 +126,7 @@ struct ListDetailCardView: View {
 }//:STRUCT
 
 
-
+#if DEBUG
 #Preview {
 
     let context = PersistenceController.preview.container.viewContext
@@ -141,3 +141,4 @@ struct ListDetailCardView: View {
         
     }
 }
+#endif

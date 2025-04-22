@@ -215,7 +215,7 @@ struct QuizPageOneView: View {
     }//:ELEVATIONCHANGER
     
 }
-
+#if DEBUG
 #Preview {
     @Previewable @State var isStepOne: Bool = true
     @Previewable @State var isLocationSearchOpen: Bool = false
@@ -231,3 +231,4 @@ struct QuizPageOneView: View {
         }
     }
 }
+#endif

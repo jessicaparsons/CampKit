@@ -233,10 +233,11 @@ struct SettingsView: View {
         return (fahrenheit - 32) * 5 / 9
     }
 }
-
+#if DEBUG
 #Preview {
     NavigationStack {
         SettingsView()
             .environment(StoreKitManager())
     }
 }
+#endif

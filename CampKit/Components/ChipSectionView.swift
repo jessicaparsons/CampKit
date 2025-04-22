@@ -93,7 +93,7 @@ struct FlowLayout: Layout {
         }
     }
 }
-
+#if DEBUG
 #Preview {
     
     @Previewable @Bindable var viewModel = QuizViewModel(
@@ -106,3 +106,4 @@ struct FlowLayout: Layout {
     )
     .environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
 }
+#endif
