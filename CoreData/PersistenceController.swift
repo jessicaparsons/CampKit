@@ -15,13 +15,20 @@ struct PersistenceController {
 
     init(inMemory: Bool = false) {
         container = NSPersistentCloudKitContainer(name: "CampKitModel")
-        
 
-        if inMemory {
-            container.persistentStoreDescriptions.first?.url = URL(fileURLWithPath: "/dev/null")
+        guard let description = container.persistentStoreDescriptions.first else {
+            fatalError("Missing persistent store description")
         }
 
-        container.loadPersistentStores { (storeDescription, error) in
+        if inMemory {
+            description.url = URL(fileURLWithPath: "/dev/null")
+        }
+
+        description.setOption(true as NSNumber, forKey: NSPersistentHistoryTrackingKey)
+        description.setOption(true as NSNumber, forKey: NSPersistentStoreRemoteChangeNotificationPostOptionKey)
+        description.cloudKitContainerOptions?.databaseScope = .private // Optional, default is private
+
+        container.loadPersistentStores { storeDescription, error in
             if let error = error as NSError? {
                 fatalError("Core Data store failed: \(error), \(error.userInfo)")
             }
@@ -29,6 +36,7 @@ struct PersistenceController {
 
         container.viewContext.automaticallyMergesChangesFromParent = true
     }
+
 }
 
 #if DEBUG
