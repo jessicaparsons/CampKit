@@ -20,8 +20,9 @@ struct SettingsLabelView: View {
         }
     }
 }
-
+#if DEBUG
 #Preview {
     SettingsLabelView(labelText: "CampKit", labelImage: "info.circle")
 }
 
+#endif

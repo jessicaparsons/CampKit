@@ -127,7 +127,7 @@ struct EditListDetailsModal: View {
     }
 }
 
-
+#if DEBUG
 #Preview {
     let context = PersistenceController.preview.container.viewContext
     
@@ -139,3 +139,4 @@ struct EditListDetailsModal: View {
             .environment(\.managedObjectContext, context)
     }
 }
+#endif

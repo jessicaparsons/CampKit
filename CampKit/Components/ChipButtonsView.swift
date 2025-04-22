@@ -33,9 +33,11 @@ struct ChipButtonsView: View {
     }
 }
 
+#if DEBUG
 #Preview {
     
     @Previewable @State var isSelected: Bool = true
     
     ChipButtonsView(label: "label", isSelected: isSelected, onTap: { print("Button tapped") })
 }
+#endif

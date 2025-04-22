@@ -45,7 +45,7 @@ struct AddNewItemView: View {
         .padding(.vertical, 12)
     }
 }
-
+#if DEBUG
 #Preview {
     
     let context = PersistenceController.preview.container.viewContext
@@ -58,3 +58,4 @@ struct AddNewItemView: View {
         .background(Color.customTan)
     
 }
+#endif

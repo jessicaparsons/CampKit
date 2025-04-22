@@ -49,7 +49,7 @@ struct BannerImageView: View {
 
 }
 
-
+#if DEBUG
 #Preview {
     
     @Previewable @State var bannerImage = UIImage(named: "TopographyDesign")
@@ -62,3 +62,4 @@ struct BannerImageView: View {
     return BannerImageView(viewModel: ListViewModel(viewContext: context, packingList: samplePackingList), bannerImage: $bannerImage)
     
 }
+#endif

@@ -57,10 +57,11 @@ struct GradientHeaderView: View {
          .frame(height: Constants.gradientBannerHeight)
     }
 }
-
+#if DEBUG
 #Preview {
     
     @Previewable @State var editMode: EditMode = .inactive
     
     GradientHeaderView(label: "Howdy, Camper!", editMode: $editMode, onAdd: { print("Added something") })
 }
+#endif

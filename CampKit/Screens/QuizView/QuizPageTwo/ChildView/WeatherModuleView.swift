@@ -88,7 +88,7 @@ struct WeatherModuleView: View {
             endPoint: .bottomTrailing))
     }
 }
-
+#if DEBUG
 #Preview("Quiz Page Two") {
     @Previewable @State var isStepOne: Bool = false
     @Previewable @State var locationName: String = "Paris"
@@ -113,3 +113,4 @@ struct WeatherModuleView: View {
         .environment(WeatherViewModel(weatherFetcher: WeatherAPIClient(), geoCoder: Geocoder()))
         .padding()
 }
+#endif

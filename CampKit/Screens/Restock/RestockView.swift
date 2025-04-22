@@ -121,7 +121,7 @@ Hit the \"+\" to get started!
         }//:TOOLBAR
     }
 }
-
+#if DEBUG
 #Preview("Sample Data") {
     do {
         let context = PersistenceController.preview.container.viewContext
@@ -146,3 +146,4 @@ Hit the \"+\" to get started!
     }
 }
 
+#endif

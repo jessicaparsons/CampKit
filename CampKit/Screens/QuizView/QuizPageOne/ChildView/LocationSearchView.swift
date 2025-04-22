@@ -52,7 +52,7 @@ struct LocationSearchView: View {
         
     }
 }
-
+#if DEBUG
 #Preview {
     
     @Previewable @State var isLocationSearchOpen: Bool = true
@@ -61,3 +61,4 @@ struct LocationSearchView: View {
 
     LocationSearchView(isLocationSearchOpen: $isLocationSearchOpen, locationName: $locationNamePlaceholder, locationAddress: $locationAddressPlaceholder)
 }
+#endif

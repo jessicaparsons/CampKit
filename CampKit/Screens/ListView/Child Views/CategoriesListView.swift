@@ -46,7 +46,7 @@ struct CategoriesListView: View {
             }//:LAZY VSTACK
             .offset(y: -30)    }
 }
-
+#if DEBUG
 #Preview() {
     
     @Previewable @State var isRearranging: Bool = false
@@ -63,3 +63,4 @@ struct CategoriesListView: View {
     }
 }
 
+#endif

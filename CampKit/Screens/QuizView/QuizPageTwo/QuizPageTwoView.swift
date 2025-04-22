@@ -83,6 +83,7 @@ struct QuizPageTwoView: View {
     }
 }
 
+#if DEBUG
 #Preview {
     @Previewable @State var isStepOne: Bool = false
     @Previewable @State var isElevationAdded: Bool = false
@@ -97,3 +98,4 @@ struct QuizPageTwoView: View {
         .environment(WeatherViewModel(weatherFetcher: WeatherAPIClient(), geoCoder: Geocoder()))
         .environment(\.managedObjectContext, context)
 }
+#endif

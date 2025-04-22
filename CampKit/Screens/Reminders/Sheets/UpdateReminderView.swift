@@ -157,6 +157,7 @@ struct UpdateReminderView: View {
     }
 }
 
+#if DEBUG
 #Preview {
     
     @Previewable @State var dataRefresh: Bool = false
@@ -177,3 +178,4 @@ struct UpdateReminderView: View {
     }
     
 }
+#endif

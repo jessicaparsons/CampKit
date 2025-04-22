@@ -138,10 +138,11 @@ struct MainView: View {
     }
     
 }
-
+#if DEBUG
 #Preview {
 
     MainView()
         .environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
         .environment(StoreKitManager())
 }
+#endif

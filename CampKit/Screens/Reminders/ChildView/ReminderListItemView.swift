@@ -111,7 +111,7 @@ struct ReminderListItemView: View {
     }
 }
 
-
+#if DEBUG
 #Preview {
     
     do {
@@ -123,3 +123,4 @@ struct ReminderListItemView: View {
         return ReminderListItemView(reminder: reminder, isSelected: true, onEvent: { _ in })
     }
 }
+#endif

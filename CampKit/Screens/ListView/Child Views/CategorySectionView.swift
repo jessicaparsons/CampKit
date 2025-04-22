@@ -122,7 +122,7 @@ struct CategorySectionView: View {
 
 
 //MARK: - PREVIEW
-
+#if DEBUG
 #Preview {
     @Previewable @State var isRearranging: Bool = false
     
@@ -144,5 +144,5 @@ struct CategorySectionView: View {
             .background(.red)
         }
 }
-
+#endif
 

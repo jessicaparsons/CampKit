@@ -69,12 +69,3 @@ struct CardButtonView: View {
 }
 
 
-
-//#Preview {
-//    
-//    let container = try! ModelContainer(
-//        for: PackingList.self, Category.self, Item.self,
-//        configurations: ModelConfiguration(isStoredInMemoryOnly: true)
-//    )
-//    CardButtonView(viewModel: QuizViewModel(viewContext: container.mainContext), emoji: "🧍‍♂️", title: "Adults")
-//}

@@ -34,10 +34,11 @@ struct SettingsRowView: View {
     }
 }
 
+#if DEBUG
 #Preview() {
     Group {
         SettingsRowView(name: "Developer", content: "Jessica Parsons")
         SettingsRowView(name: "Website", linkLabel: "My website", linkDestination: "jessicaparsons.dev")
     }
 }
-
+#endif
