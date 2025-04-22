@@ -15,8 +15,8 @@
   ],
   "products" : [
     {
-      "displayPrice" : "0.99",
-      "familyShareable" : false,
+      "displayPrice" : "2.99",
+      "familyShareable" : true,
       "internalID" : "6855A253",
       "localizations" : [
         {
@@ -26,7 +26,6 @@
         }
       ],
       "productID" : "com.campkit.unlimitedlists",
-      "promotionalImageID" : "44A22EBD",
       "referenceName" : "Unlimited Packing Lists",
       "type" : "NonConsumable"
     }

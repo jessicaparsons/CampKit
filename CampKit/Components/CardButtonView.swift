@@ -46,7 +46,7 @@ struct CardButtonView: View {
     
 }
 
-
+#if DEBUG
 #Preview("Quiz View") {
     
     @Previewable @State var isNewListQuizPresented: Bool = true
@@ -67,5 +67,5 @@ struct CardButtonView: View {
     )
     .environment(\.managedObjectContext, previewContext)
 }
-
+#endif
 

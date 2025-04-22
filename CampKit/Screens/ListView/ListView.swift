@@ -204,47 +204,44 @@ struct ListView: View {
     private var optionsMenu: some View {
         HStack {
             //MARK: - LIST IS SHARED OPTIONS
-            Menu {
-                Section {
-                    if participants.isEmpty {
-                        Label("No participants", systemImage: "person.crop.circle.badge.xmark")
-                    } else {
+            if !participants.isEmpty {
+                Menu {
+                    Section {
                         ForEach(participants, id: \.self) { participant in
                             let name = participant.userIdentity.nameComponents?.formatted() ?? "Unknown"
                             let permission = participant.permission == .readOnly ? "View Only" : "Can Edit"
-                            Label("\(name) • \(permission)", systemImage: "person.circle")
+                            Label(name.isEmpty ? "Unknown" : "\(name) • \(permission)", systemImage: "person.circle")
                         }
+                    } header: {
+                        Text("Current Participants")
                     }
-                } header: {
-                    Text("Current Participants")
-                }
-                
-                //if !participants.isEmpty {
-                Group {
-                    Divider()
                     
-                    Button {
-                        Task {
-                            await prepareCloudSharingSheet()
+                    
+                    Group {
+                        Divider()
+                        
+                        Button {
+                            Task {
+                                await prepareCloudSharingSheet()
+                            }
+                        } label: {
+                            Label("Manage Shared List", systemImage: "person.crop.circle.badge.questionmark")
                         }
-                    } label: {
-                        Label("Manage Shared List", systemImage: "person.crop.circle.badge.questionmark")
+                    }//:GROUP
+                } label: {
+                    Label("Shared", systemImage: "person.crop.circle.badge.checkmark")
+                        .dynamicForegroundStyle(trigger: scrollOffset)
+                    
+                }
+                .onTapGesture {
+                    if let existingShare = share {
+                        participants = viewModel.loadParticipants(from: existingShare)
                     }
-                }//:GROUP
-                //}
-                
-            } label: {
-                Label("Shared", systemImage: "person.crop.circle.badge.checkmark")
-                    .dynamicForegroundStyle(trigger: scrollOffset)
-                    .onTapGesture {
-                        if let existingShare = share {
-                            participants = viewModel.loadParticipants(from: existingShare)
-                        }
+                }
+                .sheet(isPresented: $isCloudShareSheetPresented) {
+                    if let share = share, let container = container {
+                        CloudSharingSheet(share: share, container: container)
                     }
-            }
-            .sheet(isPresented: $isCloudShareSheetPresented) {
-                if let share = share, let container = container {
-                    CloudSharingSheet(share: share, container: container)
                 }
             }
             
@@ -268,7 +265,7 @@ struct ListView: View {
                         systemImage: viewModel.areAllItemsChecked ? "circle" : "checkmark.circle"
                     )
                 }
-                
+                Divider()
                 
                 // EDIT TITLE
                 Button(action: {
@@ -285,7 +282,7 @@ struct ListView: View {
                     Label("Edit Photo", systemImage: "camera")
                 }
                 
-                
+                Divider()
                 // REARRANGE
                 Button(action: {
                     isRearranging = true
@@ -313,6 +310,42 @@ struct ListView: View {
                     Label("Collapse All", systemImage: "rectangle.compress.vertical")
                 }
                 
+                Divider()
+                
+                
+                // INVITE CAMPER
+                
+                Button {
+                    Task {
+                        do {
+                            let shareResult = try await shareList(for: viewModel.packingList.objectID)
+                                self.share = shareResult
+                                self.container = CKContainer.default()
+                                self.isCloudShareSheetPresented.toggle()
+                        } catch {
+                            print("Failed to create share: \(error.localizedDescription)")
+                        }
+                    }
+                } label: {
+                    Label("Invite Collaborator", systemImage: "person.crop.circle.badge.plus")
+                }
+                
+                // SHARE LIST
+                
+                Button {
+                    Task {
+                        do {
+                            let shareResult = try await shareList(for: viewModel.packingList.objectID)
+                                self.share = shareResult
+                            isSharingSheetPresented.toggle()
+                        } catch {
+                            print("Failed to create share: \(error.localizedDescription)")
+                        }
+                    }
+                } label: {
+                    Label("Share", systemImage: "square.and.arrow.up")
+                }
+                
                 // DUPLICATE LIST
                 Button {
                     if storeKitManager.isUnlimitedListsUnlocked || packingListsCount < Constants.proVersionListCount {
@@ -325,25 +358,8 @@ struct ListView: View {
                     Label("Duplicate", systemImage: "doc.on.doc")
                 }
                 
-                // SHARE LIST
                 
-                Button {
-                    Task {
-                        do {
-                            let shareResult = try await viewModel.shareList(for: viewModel.packingList.objectID)
-                            self.share = shareResult
-                            isSharingSheetPresented = true
-                            
-                        } catch {
-                            print("Error generating share")
-                        }
-                    }
-                    
-                } label: {
-                    Label("Share", systemImage: "square.and.arrow.up")
-                }
-                
-                
+                Divider()
                 // DELETE LIST
                 Button(role: .destructive) {
                     isDeleteConfirmationPresented = true
@@ -380,11 +396,10 @@ struct ListView: View {
                 Button("Cancel", role: .cancel) { }
             }
             .sheet(isPresented: $isSharingSheetPresented) {
-                if let share = share,
-                   let url = share.url {
+                if share != nil {
                     let text = viewModel.exportAsPlainText(packingList: viewModel.packingList)
                     let pdf = viewModel.generatePDF(from: text)
-                    SharingOptionsSheet(items: [url, text, pdf])
+                    SharingOptionsSheet(items: [text, pdf])
                 } else {
                     Text("Unable to share this list.")
                         .foregroundColor(.secondary)
@@ -458,6 +473,40 @@ struct ListView: View {
             print("Error fetching updated share: \(error)")
         }
     }
+    
+    func shareList(for objectID: NSManagedObjectID) async throws -> CKShare {
+        return try await withCheckedThrowingContinuation { continuation in
+            viewContext.perform {
+                do {
+                    guard let packingList = try viewContext.existingObject(with: objectID) as? PackingList else {
+                        throw NSError(domain: "ShareError", code: 404, userInfo: [NSLocalizedDescriptionKey: "Packing list not found"])
+                    }
+
+                    Task {
+                        do {
+                            let (_, share, _) = try await PersistenceController.shared.container.share([packingList], to: nil)
+                            share.publicPermission = .readWrite
+                            share[CKShare.SystemFieldKey.title] = packingList.title ?? "Packing List"
+                            await MainActor.run {
+                                save(viewContext)
+                            }
+                            continuation.resume(returning: share)
+                        } catch {
+                            continuation.resume(throwing: error)
+                        }
+                    }
+
+                } catch {
+                    continuation.resume(throwing: error)
+                }
+            }
+        }
+    }
+
+
+
+
+    
 
 }
 

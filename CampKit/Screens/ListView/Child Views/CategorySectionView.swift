@@ -103,6 +103,9 @@ struct CategorySectionView: View {
 
             // MARK: - EXPANDED CONTENT
             if category.isExpanded {
+                Divider()
+                    .padding(.horizontal)
+                    .padding(.bottom, Constants.verticalSpacing)
                 if !category.sortedItems.isEmpty {
                     ForEach(category.sortedItems, id: \.id) { item in
                         EditableItemView<Item>(
