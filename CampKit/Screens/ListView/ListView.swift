@@ -479,6 +479,8 @@ struct ListView: View {
         print("✅ Share URL: \(String(describing: share.url))")
 
         share[CKShare.SystemFieldKey.title] = packingList.title as? CKRecordValue
+        
+        try context.save()
 
         let controller = UICloudSharingController(share: share, container: container)
         controller.availablePermissions = [.allowReadWrite, .allowReadOnly, .allowPrivate]
