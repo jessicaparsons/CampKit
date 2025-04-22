@@ -25,6 +25,7 @@ struct Constants {
     static let bodyPadding: CGFloat = 70
     static let gradientBannerHeight: CGFloat = 120
     static let navSpacing: CGFloat = 20
+    static let quizPadding: CGFloat = 150
     
     //STRINGS
     static let newPackingListTitle: String = "New Packing List"
