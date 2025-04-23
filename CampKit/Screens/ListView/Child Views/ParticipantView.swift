@@ -26,25 +26,26 @@ struct ParticipantView: View {
                 
                 VStack(alignment: .leading, spacing: Constants.verticalSpacing) {
                     
-                        if let share = share {
-                            ForEach(share.participants, id: \.self) { p in
-                                participantCard(
-                                    name: p.userIdentity.nameComponents?.formatted(.name(style: .long)) ?? "Unknown",
-                                    status: string(for: p.acceptanceStatus),
-                                    role: string(for: p.role),
-                                    permission: string(for: p.permission)
-                                )
-                            }
-                        } else if let mockParticipants {
-                            ForEach(mockParticipants, id: \.self) { p in
-                                participantCard(
-                                    name: p.name,
-                                    status: p.status,
-                                    role: p.role,
-                                    permission: p.permission
-                                )
-                            }
+                    if let share = share {
+                        ForEach(share.participants, id: \.self) { p in
+                            participantCard(
+                                name: p.userIdentity.nameComponents?.formatted(.name(style: .long)) ?? "Unknown",
+                                status: string(for: p.acceptanceStatus),
+                                role: string(for: p.role),
+                                permission: string(for: p.permission)
+                            )
                         }
+                    }
+//                        } else if let mockParticipants {
+//                            ForEach(mockParticipants, id: \.self) { p in
+//                                participantCard(
+//                                    name: p.name,
+//                                    status: p.status,
+//                                    role: p.role,
+//                                    permission: p.permission
+//                                )
+//                            }
+//                        }
                     
                     
                 }
@@ -120,16 +121,16 @@ extension ParticipantView {
   }
 }
 
-
-#Preview("Styled ParticipantView with Mock Data") {
-   
-    NavigationStack {
-        ParticipantView(
-            share: nil,
-            mockParticipants: [
-                MockParticipant(name: "Jess Parsons", status: "Accepted", role: "Private User", permission: "Read-Write"),
-                MockParticipant(name: "Taylor Swift", status: "Invited", role: "Owner", permission: "Read-Only")
-            ]
-        )
-    }
-}
+//
+//#Preview("Styled ParticipantView with Mock Data") {
+//   
+//    NavigationStack {
+//        ParticipantView(
+//            share: nil,
+//            mockParticipants: [
+//                MockParticipant(name: "Jess Parsons", status: "Accepted", role: "Private User", permission: "Read-Write"),
+//                MockParticipant(name: "Taylor Swift", status: "Invited", role: "Owner", permission: "Read-Only")
+//            ]
+//        )
+//    }
+//}
