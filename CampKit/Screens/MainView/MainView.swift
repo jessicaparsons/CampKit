@@ -12,7 +12,7 @@ let log = Logger(subsystem: "co.junipercreative.CampKit", category: "Sharing")
 
 struct MainView: View {
     
-    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+    
     @FetchRequest(
         entity: PackingList.entity(),
         sortDescriptors: [])
@@ -138,16 +138,15 @@ struct MainView: View {
             .sheet(isPresented: $isUpgradeToProPresented) {
                 UpgradeToProView()
             }
-        //MARK: - CLOUD NOTIFICATIONS
+       // MARK: - CLOUD NOTIFICATIONS
             .onReceive(NotificationCenter.default.publisher(for: .didAcceptShare)) { _ in
-                do {
-                    try viewContext.setQueryGenerationFrom(.current)
-                } catch {
-                    log.info("Failed to refresh query generation: \(error)")
+                Task { @MainActor in
+                    do {
+                        try viewContext.setQueryGenerationFrom(.current)
+                    } catch {
+                        log.info("Failed to refresh query generation: \(error)")
+                    }
                 }
-            }
-            .onReceive(NotificationCenter.default.publisher(for: .NSPersistentStoreRemoteChange)) { _ in
-                log.info("CloudKit sync received — try refreshing UI")
             }
             
     }
@@ -164,7 +163,7 @@ extension Notification.Name {
 #Preview {
 
     MainView()
-        .environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
+        .environment(\.managedObjectContext, PersistenceController.preview.persistentContainer.viewContext)
         .environment(StoreKitManager())
 }
 #endif

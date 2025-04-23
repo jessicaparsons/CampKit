@@ -54,7 +54,7 @@ struct BannerImageView: View {
     
     @Previewable @State var bannerImage = UIImage(named: "TopographyDesign")
     
-    let context = PersistenceController.preview.container.viewContext
+    let context = PersistenceController.preview.persistentContainer.viewContext
     
     let samplePackingList = PackingList.samplePackingList(context: context)
         

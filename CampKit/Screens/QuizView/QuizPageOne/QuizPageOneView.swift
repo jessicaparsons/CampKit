@@ -221,7 +221,7 @@ struct QuizPageOneView: View {
     @Previewable @State var isLocationSearchOpen: Bool = false
     @Previewable @State var isElevationAdded: Bool = true
     
-    let context = PersistenceController.preview.container.viewContext
+    let context = PersistenceController.preview.persistentContainer.viewContext
     
     NavigationView {
         ScrollView {

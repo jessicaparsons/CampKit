@@ -51,7 +51,7 @@ struct CategoriesListView: View {
     
     @Previewable @State var isRearranging: Bool = false
     
-    let context = PersistenceController.preview.container.viewContext
+    let context = PersistenceController.preview.persistentContainer.viewContext
     
     let samplePackingList = PackingList.samplePackingList(context: context)
         

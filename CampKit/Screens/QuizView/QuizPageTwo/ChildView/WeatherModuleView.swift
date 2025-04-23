@@ -97,7 +97,7 @@ struct WeatherModuleView: View {
     @Previewable @State var isElevationAdded: Bool = true
     
     
-    let context = PersistenceController.preview.container.viewContext
+    let context = PersistenceController.preview.persistentContainer.viewContext
     
     QuizPageTwoView(viewModel: QuizViewModel(context: context), isStepOne: $isStepOne, isElevationAdded: $isElevationAdded)
         .environment(WeatherViewModel(weatherFetcher: WeatherAPIClient(), geoCoder: Geocoder()))

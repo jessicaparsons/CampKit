@@ -208,7 +208,7 @@ Hit the \"+\" to get started!
 #if DEBUG
 #Preview() {
     do {
-        let context = PersistenceController.preview.container.viewContext
+        let context = PersistenceController.preview.persistentContainer.viewContext
         
         // Reset the AppStorage value BEFORE view init
         UserDefaults.standard.set(false, forKey: "isShowingCompletedReminders")

@@ -129,7 +129,7 @@ struct ListDetailCardView: View {
 #if DEBUG
 #Preview {
 
-    let context = PersistenceController.preview.container.viewContext
+    let context = PersistenceController.preview.persistentContainer.viewContext
     
     let samplePackingList = PackingList.samplePackingList(context: context)
         

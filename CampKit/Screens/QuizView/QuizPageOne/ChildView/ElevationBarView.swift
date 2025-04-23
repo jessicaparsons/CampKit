@@ -37,7 +37,7 @@ struct ElevationBarView: View {
     @Previewable @State var currentPackingList: PackingList?
     
     
-    let context = PersistenceController.preview.container.viewContext
+    let context = PersistenceController.preview.persistentContainer.viewContext
     
     QuizView(viewModel: QuizViewModel(context: context), isNewListQuizPresented: $isNewListQuizPresented, isStepOne: $isStepOne,    navigateToListView: $navigateToListView, currentPackingList: $currentPackingList, packingListCount: 3)
         .environment(\.managedObjectContext, context)
