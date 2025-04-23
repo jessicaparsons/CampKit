@@ -307,7 +307,7 @@ struct ListView: View {
                     }
                     isCloudShareSheetPresented = true
                 } label: {
-                    Label("Invite Collaborator", systemImage: "person.crop.circle.badge.plus")
+                    Label("Invite Participants", systemImage: "person.crop.circle.badge.plus")
                 }
                 
                 // SHARE LIST
