@@ -93,17 +93,17 @@ struct FlowLayout: Layout {
         }
     }
 }
-#if DEBUG
-#Preview {
-    
-    @Previewable @Bindable var viewModel = QuizViewModel(
-        context: PersistenceController.preview.container.viewContext
-    )
-    
-    ChipSectionView(
-        selectedFilters: $viewModel.selectedFilters,
-        preferenceCategory: ChoiceOptions.activities
-    )
-    .environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
-}
-#endif
+//#if DEBUG
+//#Preview {
+//    
+//    @Previewable @Bindable var viewModel = QuizViewModel(
+//        context: PersistenceController.preview.persistentContainer.viewContext
+//    )
+//    
+//    ChipSectionView(
+//        selectedFilters: $viewModel.selectedFilters,
+//        preferenceCategory: ChoiceOptions.activities
+//    )
+//    .environment(\.managedObjectContext, PersistenceController.preview.persistentContainer.viewContext)
+//}
+//#endif

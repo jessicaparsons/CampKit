@@ -215,20 +215,20 @@ struct QuizPageOneView: View {
     }//:ELEVATIONCHANGER
     
 }
-#if DEBUG
-#Preview {
-    @Previewable @State var isStepOne: Bool = true
-    @Previewable @State var isLocationSearchOpen: Bool = false
-    @Previewable @State var isElevationAdded: Bool = true
-    
-    let context = PersistenceController.preview.container.viewContext
-    
-    NavigationView {
-        ScrollView {
-            QuizPageOneView(viewModel: QuizViewModel(context: context), isElevationAdded: $isElevationAdded, isLocationSearchOpen: $isLocationSearchOpen, isStepOne: $isStepOne)
-                .environment(\.managedObjectContext, context)
-                .environment(WeatherViewModel(weatherFetcher: WeatherAPIClient(), geoCoder: Geocoder()))
-        }
-    }
-}
-#endif
+//#if DEBUG
+//#Preview {
+//    @Previewable @State var isStepOne: Bool = true
+//    @Previewable @State var isLocationSearchOpen: Bool = false
+//    @Previewable @State var isElevationAdded: Bool = true
+//    
+//    let context = PersistenceController.preview.persistentContainer.viewContext
+//    
+//    NavigationView {
+//        ScrollView {
+//            QuizPageOneView(viewModel: QuizViewModel(context: context), isElevationAdded: $isElevationAdded, isLocationSearchOpen: $isLocationSearchOpen, isStepOne: $isStepOne)
+//                .environment(\.managedObjectContext, context)
+//                .environment(WeatherViewModel(weatherFetcher: WeatherAPIClient(), geoCoder: Geocoder()))
+//        }
+//    }
+//}
+//#endif

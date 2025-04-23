@@ -8,20 +8,25 @@
 import CloudKit
 import UIKit
 
-class AppDelegate: NSObject, UIApplicationDelegate {
-    func application(_ application: UIApplication, userDidAcceptCloudKitShareWith metadata: CKShare.Metadata) {
-        let op = CKAcceptSharesOperation(shareMetadatas: [metadata])
-        op.qualityOfService = .userInitiated
-        op.perShareResultBlock = { (metadata: CKShare.Metadata, result: Result<CKShare, Error>) in
-            switch result {
-            case .success(let share):
-                print("Share accepted: \(share)")
-                NotificationCenter.default.post(name: .didAcceptShare, object: nil)
-            case .failure(let error):
-                print("Share acceptance failed: \(error)")
-            }
-        }
+import CloudKit
+import SwiftUI
 
-        CKContainer(identifier: metadata.containerIdentifier).add(op)
+final class AppDelegate: NSObject, UIApplicationDelegate {
+  func application(_ application: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession, options: UIScene.ConnectionOptions) -> UISceneConfiguration {
+    let sceneConfig = UISceneConfiguration(name: nil, sessionRole: connectingSceneSession.role)
+    sceneConfig.delegateClass = SceneDelegate.self
+    return sceneConfig
+  }
+}
+
+final class SceneDelegate: NSObject, UIWindowSceneDelegate {
+  func windowScene(_ windowScene: UIWindowScene, userDidAcceptCloudKitShareWith cloudKitShareMetadata: CKShare.Metadata) {
+    let shareStore = CoreDataStack.shared.sharedPersistentStore
+    let persistentContainer = CoreDataStack.shared.persistentContainer
+    persistentContainer.acceptShareInvitations(from: [cloudKitShareMetadata], into: shareStore) { _, error in
+      if let error = error {
+        print("acceptShareInvitation error :\(error)")
+      }
     }
+  }
 }

@@ -10,6 +10,7 @@ import PhotosUI
 import ConfettiSwiftUI
 import CoreData
 import CloudKit
+import os
 
 struct ListView: View {
     
@@ -49,11 +50,12 @@ struct ListView: View {
     
     //SHARING OPTIONS
     @State private var isSharingSheetPresented: Bool = false
-    @State private var container: CKContainer?
-    @State private var share: CKShare?
+    
     @State private var isCloudShareSheetPresented = false
-    @State private var participants: [CKShare.Participant] = []
-    @State private var showParticipantsMenu = false
+    @State private var share: CKShare?
+    //@State private var showEditSheet = false
+    private let stack = CoreDataStack.shared
+    @State private var isParticipantsPresented: Bool = false
     
     //PRO
     @State private var isUpgradeToProPresented: Bool = false
@@ -181,7 +183,7 @@ struct ListView: View {
                 }
             }
             .onChange(of: bannerImageItem) {
-                Task {
+                Task { @MainActor in
                     if let data = try? await bannerImageItem?.loadTransferable(type: Data.self),
                        let loadedImage = UIImage(data: data)
                     {
@@ -194,9 +196,11 @@ struct ListView: View {
                     }
                 }
             }
-            .onReceive(NotificationCenter.default.publisher(for: .NSPersistentStoreRemoteChange)) { _ in
-                viewModel.refresh()
+            .onReceive(NotificationCenter.default.publisher(for: .NSPersistentStoreRemoteChange)
+                .receive(on: DispatchQueue.main)) { _ in
+                    viewModel.refresh()
             }
+
         }//:CONDITION
     }//:BODY
     
@@ -206,41 +210,22 @@ struct ListView: View {
     private var optionsMenu: some View {
         HStack {
             //MARK: - LIST IS SHARED OPTIONS
-            if !participants.isEmpty {
-                Menu {
-                    Section {
-                        ForEach(participants, id: \.self) { participant in
-                            let name = participant.userIdentity.nameComponents?.formatted() ?? "Unknown"
-                            let permission = participant.permission == .readOnly ? "View Only" : "Can Edit"
-                            Label(name.isEmpty ? "Unknown" : "\(name) • \(permission)", systemImage: "person.circle")
-                        }
-                    } header: {
-                        Text("Current Participants")
-                    }
-                    
-                    
-                    Group {
-                        Divider()
-                        
-                        Button {
-                            Task {
-                                await prepareCloudSharingSheet()
-                            }
-                        } label: {
-                            Label("Manage Shared List", systemImage: "person.crop.circle.badge.questionmark")
-                        }
-                    }//:GROUP
+            Menu {
+                Button {
+                    isParticipantsPresented.toggle()
                 } label: {
-                    Label("Shared", systemImage: "person.crop.circle.badge.checkmark")
+                    Label("Participants", systemImage: "person.crop.circle.badge.checkmark")
                         .dynamicForegroundStyle(trigger: scrollOffset)
-                    
                 }
-                .onTapGesture {
-                    if let existingShare = share {
-                        participants = viewModel.loadParticipants(from: existingShare)
-                    }
-                }
+            } label: {
+                Label("Participants", systemImage: "person.crop.circle.badge.checkmark")
+                    .dynamicForegroundStyle(trigger: scrollOffset)
             }
+            .sheet(isPresented: $isParticipantsPresented) {
+                ParticipantView(share: share)
+                    .presentationDetents([.medium, .large])
+            }
+                
             
             //MARK: - ADD NEW CATEGORY
             Button {
@@ -313,17 +298,12 @@ struct ListView: View {
                 // INVITE CAMPER
                 
                 Button {
-                    Task {
-                        do {
-                            let shareResult = try await shareList(for: viewModel.packingList.objectID)
-                                self.share = shareResult
-                                self.container = CKContainer.default()
-                                self.isCloudShareSheetPresented.toggle()
-                            debugLog("isCloudShareSheet trigger fired")
-                        } catch {
-                            print("Failed to create share: \(error.localizedDescription)")
-                        }
+                    if !stack.isShared(object: viewModel.packingList) {
+                      Task {
+                          await createShare(viewModel.packingList)
+                      }
                     }
+                    isCloudShareSheetPresented = true
                 } label: {
                     Label("Invite Collaborator", systemImage: "person.crop.circle.badge.plus")
                 }
@@ -331,16 +311,7 @@ struct ListView: View {
                 // SHARE LIST
                 
                 Button {
-                    Task {
-                        do {
-                            let shareResult = try await shareList(for: viewModel.packingList.objectID)
-                                self.share = shareResult
-                            isSharingSheetPresented.toggle()
-                            debugLog("isSharingSheet trigger fired")
-                        } catch {
-                            print("Failed to create share: \(error.localizedDescription)")
-                        }
-                    }
+                    isSharingSheetPresented.toggle()
                 } label: {
                     Label("Share", systemImage: "square.and.arrow.up")
                 }
@@ -406,23 +377,23 @@ struct ListView: View {
             }).disabled(!isFormValid)
             Button("Cancel", role: .cancel) { }
         }
+        //MARK: - SHARE SHEET
         .sheet(isPresented: $isSharingSheetPresented) {
-            if share != nil {
-                let text = viewModel.exportAsPlainText(packingList: viewModel.packingList)
-                let pdf = viewModel.generatePDF(from: text)
-                SharingOptionsSheet(items: [text, pdf])
-            } else {
-                Text("Unable to share this list.")
-                    .foregroundColor(.secondary)
-            }
+            let text = viewModel.exportAsPlainText(packingList: viewModel.packingList)
+            let pdf = viewModel.generatePDF(from: text)
+            SharingOptionsSheet(items: [text, pdf])
         }
-        .sheet(isPresented: $isCloudShareSheetPresented) {
-            if let share = share, let container = container {
-                CloudSharingSheet(share: share, container: container)
-            } else {
-                EmptyView()
-            }
-        }
+        //MARK: - CLOUD SHARE SHEET
+        .sheet(isPresented: $isCloudShareSheetPresented, content: {
+          if let share = share {
+            CloudSharingView(
+              share: share,
+              container: stack.ckContainer,
+              list: viewModel.packingList
+            )
+          }
+        })
+        
         .confirmationDialog(
             "Are you sure you want to duplicate the list?",
             isPresented: $isDuplicationConfirmationPresented,
@@ -460,98 +431,58 @@ struct ListView: View {
             }
             Button("Cancel", role: .cancel) { }
         }
-    }
+    }//:OPTIONS MENU
     
-    private func prepareCloudSharingSheet() async {
-        guard let existingShare = share else { return }
-        
-        do {
-            self.container = CKContainer.default()
-            
-            if let refreshedShare = try await viewModel.fetchLatestShare(for: existingShare.recordID) {
-                
-                self.participants = refreshedShare.participants
-                self.isCloudShareSheetPresented = true
-                debugLog("isCloudShareSheet trigger fired")
-                
-            } else {
-                print("Could not find updated share")
-            }
-        } catch {
-            print("Error fetching updated share: \(error)")
-        }
-    }
-    
-    func shareList(for objectID: NSManagedObjectID) async throws -> CKShare {
-        return try await withCheckedThrowingContinuation { continuation in
-            viewContext.perform {
-                do {
-                    guard let packingList = try viewContext.existingObject(with: objectID) as? PackingList else {
-                        throw NSError(domain: "ShareError", code: 404, userInfo: [NSLocalizedDescriptionKey: "Packing list not found"])
-                    }
-
-                    Task {
-                        do {
-                            let (_, share, _) = try await PersistenceController.shared.container.share([packingList], to: nil)
-                            share.publicPermission = .readWrite
-                            share[CKShare.SystemFieldKey.title] = packingList.title ?? "Packing List"
-                            await MainActor.run {
-                                save(viewContext)
-                            }
-                            continuation.resume(returning: share)
-                        } catch {
-                            continuation.resume(throwing: error)
-                        }
-                    }
-
-                } catch {
-                    continuation.resume(throwing: error)
-                }
-            }
-        }
-    }
-
-
-
-
-    
-
 }
 
-//MARK: - PREVIEWS
-#if DEBUG
-#Preview("Sample Data") {
+extension ListView {
     
-    let storeKitManager = StoreKitManager()
-    let context = PersistenceController.preview.container.viewContext
-    
-    let samplePackingList = PackingList.samplePackingList(context: context)
-    
-    NavigationStack {
-        ListView(
-            context: context,
-            packingList: samplePackingList,
-            packingListsCount: 3
-        )
-        .environment(storeKitManager)
-        .environment(\.managedObjectContext, context)
+    private func createShare(_ list: PackingList) async {
+      do {
+        let (_, share, _) =
+        try await stack.persistentContainer.share([list], to: nil)
+          share[CKShare.SystemFieldKey.title] = list.title
+        self.share = share
+      } catch {
+        print("Failed to create share")
+      }
     }
 }
-#Preview("Basic Preview") {
-    let storeKitManager = StoreKitManager()
-    let context = PersistenceController.preview.container.viewContext
-    
-    let emptySamplePackingList = PackingList(context: context, title: "Empty List", position: 0)
-    
-    NavigationStack {
-        ListView(
-            context: context,
-            packingList: emptySamplePackingList,
-            packingListsCount: 3
-        )
-        .environment(storeKitManager)
-        .environment(\.managedObjectContext, context)
-        
-    }
-}
-#endif
+
+////MARK: - PREVIEWS
+//#if DEBUG
+//#Preview("Sample Data") {
+//    
+//    let storeKitManager = StoreKitManager()
+//    let context = PersistenceController.preview.persistentContainer.viewContext
+//    
+//    let samplePackingList = PackingList.samplePackingList(context: context)
+//    
+//    NavigationStack {
+//        ListView(
+//            context: context,
+//            packingList: samplePackingList,
+//            packingListsCount: 3
+//        )
+//        .environment(storeKitManager)
+//        .environment(\.managedObjectContext, context)
+//    }
+//}
+//#Preview("Basic Preview") {
+//    let storeKitManager = StoreKitManager()
+//    let context = PersistenceController.preview.persistentContainer.viewContext
+//    
+//    let emptySamplePackingList = PackingList(context: context, title: "Empty List", position: 0)
+//    
+//    NavigationStack {
+//        ListView(
+//            context: context,
+//            packingList: emptySamplePackingList,
+//            packingListsCount: 3
+//        )
+//        .environment(storeKitManager)
+//        .environment(\.managedObjectContext, context)
+//        
+//    }
+//}
+//#endif

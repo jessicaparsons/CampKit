@@ -126,17 +126,17 @@ struct EditListDetailsModal: View {
         }
     }
 }
-
-#if DEBUG
-#Preview {
-    let context = PersistenceController.preview.container.viewContext
-    
-    let samplePackingList = PackingList.samplePackingList(context: context)
-    
-    
-    NavigationStack {
-        EditListDetailsModal(viewModel: ListViewModel(viewContext: context, packingList: samplePackingList))
-            .environment(\.managedObjectContext, context)
-    }
-}
-#endif
+//
+//#if DEBUG
+//#Preview {
+//    let context = PersistenceController.preview.persistentContainer.viewContext
+//    
+//    let samplePackingList = PackingList.samplePackingList(context: context)
+//    
+//    
+//    NavigationStack {
+//        EditListDetailsModal(viewModel: ListViewModel(viewContext: context, packingList: samplePackingList))
+//            .environment(\.managedObjectContext, context)
+//    }
+//}
+//#endif

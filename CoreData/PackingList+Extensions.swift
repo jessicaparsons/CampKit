@@ -7,8 +7,12 @@
 
 import Foundation
 import CoreData
+import SwiftData
+import CloudKit
+import UniformTypeIdentifiers
+import CoreTransferable
 
-extension PackingList {
+extension PackingList: @unchecked Sendable {
     convenience init(
         context: NSManagedObjectContext,
         title: String? = nil,

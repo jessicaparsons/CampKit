@@ -84,19 +84,19 @@ struct QuizPageTwoView: View {
     }
 }
 
-#if DEBUG
-#Preview {
-    @Previewable @State var isStepOne: Bool = false
-    @Previewable @State var isElevationAdded: Bool = false
-    
-    let context = PersistenceController.preview.container.viewContext
-    
-    QuizPageTwoView(
-        viewModel: QuizViewModel(context: context),
-        isStepOne: $isStepOne,
-        isElevationAdded: $isElevationAdded
-    )
-        .environment(WeatherViewModel(weatherFetcher: WeatherAPIClient(), geoCoder: Geocoder()))
-        .environment(\.managedObjectContext, context)
-}
-#endif
+//#if DEBUG
+//#Preview {
+//    @Previewable @State var isStepOne: Bool = false
+//    @Previewable @State var isElevationAdded: Bool = false
+//    
+//    let context = PersistenceController.preview.persistentContainer.viewContext
+//    
+//    QuizPageTwoView(
+//        viewModel: QuizViewModel(context: context),
+//        isStepOne: $isStepOne,
+//        isElevationAdded: $isElevationAdded
+//    )
+//        .environment(WeatherViewModel(weatherFetcher: WeatherAPIClient(), geoCoder: Geocoder()))
+//        .environment(\.managedObjectContext, context)
+//}
+//#endif

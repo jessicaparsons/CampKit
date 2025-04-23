@@ -10,9 +10,9 @@ import UserNotifications
 
 @main
 struct CampKitApp: App {
-        
+    
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
     //CORE DATA
-    let persistenceController = PersistenceController.shared
     //WEATHER API
     var weatherViewModel = WeatherViewModel(weatherFetcher: WeatherAPIClient(), geoCoder: Geocoder())
     //STORE KIT
@@ -22,24 +22,11 @@ struct CampKitApp: App {
     var body: some Scene {
         WindowGroup {
             MainView()
-                .environment(\.managedObjectContext, persistenceController.container.viewContext)
+                .environment(\.managedObjectContext, CoreDataStack.shared.context)
                 .environment(weatherViewModel)
                 .environment(storeKitManager)
-                .task {
-                    await requestNotificationPermission()
-                }
         }
         
     }
     
-    @MainActor
-    func requestNotificationPermission() async {
-        do {
-            let granted = try await UNUserNotificationCenter.current()
-                .requestAuthorization(options: [.alert, .badge, .sound])
-            print("Notifications granted: \(granted)")
-        } catch {
-            print("Failed to get notification permission: \(error)")
-        }
-    }
 }

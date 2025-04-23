@@ -11,9 +11,9 @@ import CoreData
 struct HomeListView: View {
     //Live Data
     @FetchRequest(
-        entity: CampKit.PackingList.entity(),
-        sortDescriptors: [NSSortDescriptor(keyPath: \PackingList.position, ascending: true)]) private var packingLists: FetchedResults<PackingList>
-    
+        sortDescriptors: [NSSortDescriptor(keyPath: \PackingList.position, ascending: true)]
+    ) var packingLists: FetchedResults<PackingList>
+
     
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(StoreKitManager.self) private var storeKitManager
@@ -22,6 +22,7 @@ struct HomeListView: View {
     @State private var editMode: EditMode = .inactive
     @Binding var isNewListQuizPresented: Bool
     @State private var isUpgradeToProPresented: Bool = false
+    private let stack = CoreDataStack.shared
     
     init(context: NSManagedObjectContext, isNewListQuizPresented: Binding<Bool>) {
         _isNewListQuizPresented = isNewListQuizPresented
@@ -55,7 +56,7 @@ Hit the \"+\" to get started!
                             .frame(height: 1)//For top spacing
                         ) {
                             ForEach(packingLists) { packingList in
-                                
+
                                 NavigationLink(
                                     destination: ListView(
                                         context: viewContext,
@@ -175,18 +176,18 @@ Hit the \"+\" to get started!
     
     
 }//:STRUCT
-#if DEBUG
-#Preview() {
-    
-    @Previewable @State var isNewListQuizPresented: Bool = false
-    @Previewable @Bindable var storeKitManager = StoreKitManager()
-    
-    let context = PersistenceController.preview.container.viewContext
-
-    NavigationStack {
-        HomeListView(context: context, isNewListQuizPresented: $isNewListQuizPresented)
-            .environment(\.managedObjectContext, context)
-            .environment(storeKitManager)
-    }
-}
-#endif
+//#if DEBUG
+//#Preview() {
+//    
+//    @Previewable @State var isNewListQuizPresented: Bool = false
+//    @Previewable @Bindable var storeKitManager = StoreKitManager()
+//    
+//    let context = PersistenceController.preview.persistentContainer.viewContext
+//
+//    NavigationStack {
+//        HomeListView(context: context, isNewListQuizPresented: $isNewListQuizPresented)
+//            .environment(\.managedObjectContext, context)
+//            .environment(storeKitManager)
+//    }
+//}
+//#endif
