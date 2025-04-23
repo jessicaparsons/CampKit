@@ -9,7 +9,7 @@
 import Foundation
 import CoreData
 
-
+@objc(PackingList)
 public class PackingList: NSManagedObject {
 
 }

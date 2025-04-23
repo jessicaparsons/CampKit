@@ -169,21 +169,21 @@ struct QuizView: View {
     }
 }
 
-#if DEBUG
-#Preview {
-    
-    @Previewable @State var isNewListQuizPresented: Bool = true
-    @Previewable @State var isStepOne: Bool = true
-    
-    @Previewable @State var navigateToListView: Bool = false
-    @Previewable @State var currentPackingList: PackingList?
-    
-    let context = PersistenceController.preview.persistentContainer.viewContext
-    
-    
-    NavigationStack {
-        QuizView(viewModel: QuizViewModel(context: context), isNewListQuizPresented: $isNewListQuizPresented, isStepOne: $isStepOne, navigateToListView: $navigateToListView, currentPackingList: $currentPackingList, packingListCount: 3)
-            .environment(WeatherViewModel(weatherFetcher: WeatherAPIClient(), geoCoder: Geocoder()))
-    }
-}
-#endif
+//#if DEBUG
+//#Preview {
+//    
+//    @Previewable @State var isNewListQuizPresented: Bool = true
+//    @Previewable @State var isStepOne: Bool = true
+//    
+//    @Previewable @State var navigateToListView: Bool = false
+//    @Previewable @State var currentPackingList: PackingList?
+//    
+//    let context = PersistenceController.preview.persistentContainer.viewContext
+//    
+//    
+//    NavigationStack {
+//        QuizView(viewModel: QuizViewModel(context: context), isNewListQuizPresented: $isNewListQuizPresented, isStepOne: $isStepOne, navigateToListView: $navigateToListView, currentPackingList: $currentPackingList, packingListCount: 3)
+//            .environment(WeatherViewModel(weatherFetcher: WeatherAPIClient(), geoCoder: Geocoder()))
+//    }
+//}
+//#endif

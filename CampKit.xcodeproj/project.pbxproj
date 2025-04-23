@@ -55,18 +55,15 @@
 				"Category+CoreDataClass.swift",
 				"Category+CoreDataProperties.swift",
 				"Category+Extensions.swift",
-				CloudKitHelper.swift,
-				CoreDataHelper.swift,
+				CloudSharingController.swift,
+				CoreDataStack.swift,
 				"Item+CoreDataClass.swift",
 				"Item+CoreDataProperties.swift",
 				"Item+Extensions.swift",
-				"NotificationCenter+Extension.swift",
 				"PackingList+CoreDataClass.swift",
 				"PackingList+CoreDataProperties.swift",
 				"PackingList+Extensions.swift",
 				PersistenceController.swift,
-				"PersistenceController+History.swift",
-				"PersistenceController+Sharing.swift",
 				"Reminder+CoreDataClass.swift",
 				"Reminder+CoreDataProperties.swift",
 				"Reminder+Extensions.swift",
@@ -450,7 +447,7 @@
 				CODE_SIGN_ENTITLEMENTS = CampKit/CampKit.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 10;
+				CURRENT_PROJECT_VERSION = 12;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"CampKit/Preview Content\"";
 				DEVELOPMENT_TEAM = 4Q55A6KPP6;
@@ -488,7 +485,7 @@
 				CODE_SIGN_ENTITLEMENTS = CampKit/CampKit.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 10;
+				CURRENT_PROJECT_VERSION = 12;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"CampKit/Preview Content\"";
 				DEVELOPMENT_TEAM = 4Q55A6KPP6;

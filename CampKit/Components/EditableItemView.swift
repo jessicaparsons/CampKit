@@ -68,18 +68,18 @@ struct EditableItemView<T: EditablePackableItem>: View {
     }//:BODY
     
 }
-
-#if DEBUG
-#Preview {
-    let context = PersistenceController.preview.persistentContainer.viewContext
-    let item = RestockItem(context: context, title: "Sleeping Bag", position: 0)
-    
-    EditableItemView(
-        item: item,
-        isList: false,
-        togglePacked: { },
-        deleteItem: { }
-    )
-    .environment(\.managedObjectContext, context)
-}
-#endif
+//
+//#if DEBUG
+//#Preview {
+//    let context = PersistenceController.preview.persistentContainer.viewContext
+//    let item = RestockItem(context: context, title: "Sleeping Bag", position: 0)
+//    
+//    EditableItemView(
+//        item: item,
+//        isList: false,
+//        togglePacked: { },
+//        deleteItem: { }
+//    )
+//    .environment(\.managedObjectContext, context)
+//}
+//#endif

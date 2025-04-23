@@ -11,14 +11,9 @@ import CoreData
 struct HomeListView: View {
     //Live Data
     @FetchRequest(
-        entity: CampKit.PackingList.entity(),
-        sortDescriptors: [NSSortDescriptor(keyPath: \PackingList.position, ascending: true)]) private var packingLists: FetchedResults<PackingList>
-    {
-        didSet {
-            print("HomeList updated on thread: \(Thread.isMainThread ? "MAIN" : "BACKGROUND")")
-        }
-    }
-    
+        sortDescriptors: [NSSortDescriptor(keyPath: \PackingList.position, ascending: true)]
+    ) var packingLists: FetchedResults<PackingList>
+
     
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(StoreKitManager.self) private var storeKitManager
@@ -27,7 +22,7 @@ struct HomeListView: View {
     @State private var editMode: EditMode = .inactive
     @Binding var isNewListQuizPresented: Bool
     @State private var isUpgradeToProPresented: Bool = false
-    private let persistenceController = PersistenceController.shared
+    private let stack = CoreDataStack.shared
     
     init(context: NSManagedObjectContext, isNewListQuizPresented: Binding<Bool>) {
         _isNewListQuizPresented = isNewListQuizPresented
@@ -135,9 +130,6 @@ Hit the \"+\" to get started!
         .navigationBarTitleDisplayMode(.large)
         .scrollContentBackground(.hidden)
         .environment(\.editMode, $editMode)
-        .onReceive(NotificationCenter.default.storeDidChangePublisher) { notification in
-            processStoreChangeNotification(notification)
-        }
         
         //MARK: - MENU
         .toolbar {
@@ -180,30 +172,22 @@ Hit the \"+\" to get started!
         
     }//:BODY
     
-    /**
-     Merge the transactions, if any.
-     */
-    private func processStoreChangeNotification(_ notification: Notification) {
-        let transactions = persistenceController.listTransactions(from: notification)
-        if !transactions.isEmpty {
-            persistenceController.mergeTransactions(transactions, to: viewContext)
-        }
-    }
+    
     
     
 }//:STRUCT
-#if DEBUG
-#Preview() {
-    
-    @Previewable @State var isNewListQuizPresented: Bool = false
-    @Previewable @Bindable var storeKitManager = StoreKitManager()
-    
-    let context = PersistenceController.preview.persistentContainer.viewContext
-
-    NavigationStack {
-        HomeListView(context: context, isNewListQuizPresented: $isNewListQuizPresented)
-            .environment(\.managedObjectContext, context)
-            .environment(storeKitManager)
-    }
-}
-#endif
+//#if DEBUG
+//#Preview() {
+//    
+//    @Previewable @State var isNewListQuizPresented: Bool = false
+//    @Previewable @Bindable var storeKitManager = StoreKitManager()
+//    
+//    let context = PersistenceController.preview.persistentContainer.viewContext
+//
+//    NavigationStack {
+//        HomeListView(context: context, isNewListQuizPresented: $isNewListQuizPresented)
+//            .environment(\.managedObjectContext, context)
+//            .environment(storeKitManager)
+//    }
+//}
+//#endif

@@ -125,27 +125,27 @@ struct CategorySectionView: View {
 
 
 //MARK: - PREVIEW
-#if DEBUG
-#Preview {
-    @Previewable @State var isRearranging: Bool = false
-    
-    let context = PersistenceController.preview.persistentContainer.viewContext
-    
-    let samplePackingList = PackingList.samplePackingList(context: context)
-    
-    let categories = Category.sampleCategories(context: context)
-    
-    // Return the preview
-   
-            NavigationStack {
-            CategorySectionView(
-                viewModel: ListViewModel(viewContext: context, packingList: samplePackingList),
-                category: categories.first!,
-                isRearranging: $isRearranging,
-                deleteCategory: { print("Mock delete category") }
-            )
-            .background(.red)
-        }
-}
-#endif
+//#if DEBUG
+//#Preview {
+//    @Previewable @State var isRearranging: Bool = false
+//    
+//    let context = PersistenceController.preview.persistentContainer.viewContext
+//    
+//    let samplePackingList = PackingList.samplePackingList(context: context)
+//    
+//    let categories = Category.sampleCategories(context: context)
+//    
+//    // Return the preview
+//   
+//            NavigationStack {
+//            CategorySectionView(
+//                viewModel: ListViewModel(viewContext: context, packingList: samplePackingList),
+//                category: categories.first!,
+//                isRearranging: $isRearranging,
+//                deleteCategory: { print("Mock delete category") }
+//            )
+//            .background(.red)
+//        }
+//}
+//#endif
 

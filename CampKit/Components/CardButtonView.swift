@@ -45,27 +45,27 @@ struct CardButtonView: View {
     }//:BODY
     
 }
-
-#if DEBUG
-#Preview("Quiz View") {
-    
-    @Previewable @State var isNewListQuizPresented: Bool = true
-    @Previewable @State var isStepOne: Bool = true
-    @Previewable @State var location: String = "Paris"
-    @Previewable @State var navigateToListView: Bool = false
-    @Previewable @State var currentPackingList: PackingList?
-    
-    let previewContext = PersistenceController.preview.persistentContainer.viewContext
-
-    QuizView(
-        viewModel: QuizViewModel(context: previewContext),
-        isNewListQuizPresented: $isNewListQuizPresented,
-        isStepOne: $isStepOne,
-        navigateToListView: $navigateToListView,
-        currentPackingList: $currentPackingList,
-        packingListCount: 3
-    )
-    .environment(\.managedObjectContext, previewContext)
-}
-#endif
-
+//
+//#if DEBUG
+//#Preview("Quiz View") {
+//    
+//    @Previewable @State var isNewListQuizPresented: Bool = true
+//    @Previewable @State var isStepOne: Bool = true
+//    @Previewable @State var location: String = "Paris"
+//    @Previewable @State var navigateToListView: Bool = false
+//    @Previewable @State var currentPackingList: PackingList?
+//    
+//    let previewContext = PersistenceController.preview.persistentContainer.viewContext
+//
+//    QuizView(
+//        viewModel: QuizViewModel(context: previewContext),
+//        isNewListQuizPresented: $isNewListQuizPresented,
+//        isStepOne: $isStepOne,
+//        navigateToListView: $navigateToListView,
+//        currentPackingList: $currentPackingList,
+//        packingListCount: 3
+//    )
+//    .environment(\.managedObjectContext, previewContext)
+//}
+//#endif
+//
