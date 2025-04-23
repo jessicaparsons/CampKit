@@ -447,7 +447,7 @@
 				CODE_SIGN_ENTITLEMENTS = CampKit/CampKit.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 11;
+				CURRENT_PROJECT_VERSION = 12;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"CampKit/Preview Content\"";
 				DEVELOPMENT_TEAM = 4Q55A6KPP6;
@@ -485,7 +485,7 @@
 				CODE_SIGN_ENTITLEMENTS = CampKit/CampKit.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 11;
+				CURRENT_PROJECT_VERSION = 12;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"CampKit/Preview Content\"";
 				DEVELOPMENT_TEAM = 4Q55A6KPP6;
