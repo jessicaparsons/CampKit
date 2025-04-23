@@ -141,6 +141,44 @@ extension CoreDataStack {
         isShared(objectID: object.objectID)
     }
     
+    func canEdit(object: NSManagedObject) -> Bool {
+      return persistentContainer.canUpdateRecord(
+        forManagedObjectWith: object.objectID
+      )
+    }
+    func canDelete(object: NSManagedObject) -> Bool {
+      return persistentContainer.canDeleteRecord(
+        forManagedObjectWith: object.objectID
+      )
+    }
+    
+    func isOwner(object: NSManagedObject) -> Bool {
+      guard isShared(object: object) else { return false }
+      guard let share = try? persistentContainer.fetchShares(matching: [object.objectID])[object.objectID] else {
+        print("Get ckshare error")
+        return false
+      }
+      if let currentUser = share.currentUserParticipant, currentUser == share.owner {
+        return true
+      }
+      return false
+    }
+
+
+    
+    //get information about the people participating in the share.
+    func getShare(_ list: PackingList) -> CKShare? {
+      guard isShared(object: list) else { return nil }
+      guard let shareDictionary = try? persistentContainer.fetchShares(matching: [list.objectID]),
+        let share = shareDictionary[list.objectID] else {
+        print("Unable to get CKShare")
+        return nil
+      }
+        share[CKShare.SystemFieldKey.title] = list.title
+      return share
+    }
+
+    //determine if an object isShared
     
     private func isShared(objectID: NSManagedObjectID) -> Bool {
         var isShared = false

@@ -51,5 +51,9 @@ final class CloudSharingCoordinator: NSObject, UICloudSharingControllerDelegate 
   }
 
   func cloudSharingControllerDidStopSharing(_ csc: UICloudSharingController) {
+      if !stack.isOwner(object: list) {
+        stack.delete(list)
+      }
+
   }
 }

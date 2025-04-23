@@ -16,30 +16,60 @@ struct ParticipantView: View {
     
     let share: CKShare?
     
+    var mockParticipants: [MockParticipant]? = nil
+    
+    
     var body: some View {
-        
-        Section {
-          if let share = share {
-            ForEach(share.participants, id: \.self) { participant in
-              VStack(alignment: .leading) {
-                Text(participant.userIdentity.nameComponents?.formatted(.name(style: .long)) ?? "")
-                  .font(.headline)
-                Text("Acceptance Status: \(string(for: participant.acceptanceStatus))")
-                  .font(.subheadline)
-                Text("Role: \(string(for: participant.role))")
-                  .font(.subheadline)
-                Text("Permissions: \(string(for: participant.permission))")
-                  .font(.subheadline)
-              }
-              .padding(.bottom, 8)
+        NavigationStack {
+            ZStack(alignment: .top) {
+                Color.colorTan.ignoresSafeArea()
+                
+                VStack(alignment: .leading, spacing: Constants.verticalSpacing) {
+                    
+                        if let share = share {
+                            ForEach(share.participants, id: \.self) { p in
+                                participantCard(
+                                    name: p.userIdentity.nameComponents?.formatted(.name(style: .long)) ?? "Unknown",
+                                    status: string(for: p.acceptanceStatus),
+                                    role: string(for: p.role),
+                                    permission: string(for: p.permission)
+                                )
+                            }
+                        } else if let mockParticipants {
+                            ForEach(mockParticipants, id: \.self) { p in
+                                participantCard(
+                                    name: p.name,
+                                    status: p.status,
+                                    role: p.role,
+                                    permission: p.permission
+                                )
+                            }
+                        }
+                    
+                    
+                }
+                .padding(.horizontal)
+                .padding(.top, Constants.emptyContentSpacing)
             }
-          }
-        } header: {
-          Text("Participants")
+        }//:ZSTACK
+        .navigationTitle("Participants")
+        .navigationBarTitleDisplayMode(.inline)
+    }//:NAVIGATIONSTACK
+
+        @ViewBuilder
+        private func participantCard(name: String, status: String, role: String, permission: String) -> some View {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(name).font(.headline)
+                Text("Acceptance Status: \(status)").font(.subheadline)
+                Text("Role: \(role)").font(.subheadline)
+                Text("Permissions: \(permission)").font(.subheadline)
+            }
+            .padding()
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(Color.white)
+            .cornerRadius(Constants.cornerRadius)
+            .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 2)
         }
-        
-    }//:BODY
-        
 }
 
 // MARK: Returns CKShare participant permission
@@ -91,6 +121,15 @@ extension ParticipantView {
 }
 
 
-//#Preview {
-//    ParticipantView()
-//}
+#Preview("Styled ParticipantView with Mock Data") {
+   
+    NavigationStack {
+        ParticipantView(
+            share: nil,
+            mockParticipants: [
+                MockParticipant(name: "Jess Parsons", status: "Accepted", role: "Private User", permission: "Read-Write"),
+                MockParticipant(name: "Taylor Swift", status: "Invited", role: "Owner", permission: "Read-Only")
+            ]
+        )
+    }
+}

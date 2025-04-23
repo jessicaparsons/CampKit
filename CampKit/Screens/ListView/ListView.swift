@@ -107,6 +107,7 @@ struct ListView: View {
                         }//:VSTACK
                         .padding(.horizontal)
                     }//:VSTACK
+                    .disabled(!stack.canEdit(object: viewModel.packingList))
                     .background(
                         GeometryReader { geo in
                             Color.clear
@@ -196,10 +197,10 @@ struct ListView: View {
                     }
                 }
             }
-            .onReceive(NotificationCenter.default.publisher(for: .NSPersistentStoreRemoteChange)
-                .receive(on: DispatchQueue.main)) { _ in
-                    viewModel.refresh()
-            }
+            .onAppear(perform: {
+                self.share = stack.getShare(viewModel.packingList)
+            })
+
 
         }//:CONDITION
     }//:BODY
@@ -210,22 +211,23 @@ struct ListView: View {
     private var optionsMenu: some View {
         HStack {
             //MARK: - LIST IS SHARED OPTIONS
-            Menu {
-                Button {
-                    isParticipantsPresented.toggle()
+            if stack.isShared(object: viewModel.packingList) {
+                Menu {
+                    Button {
+                        isParticipantsPresented.toggle()
+                    } label: {
+                        Label("Participants", systemImage: "person.crop.circle.badge.checkmark")
+                            .dynamicForegroundStyle(trigger: scrollOffset)
+                    }
                 } label: {
                     Label("Participants", systemImage: "person.crop.circle.badge.checkmark")
                         .dynamicForegroundStyle(trigger: scrollOffset)
                 }
-            } label: {
-                Label("Participants", systemImage: "person.crop.circle.badge.checkmark")
-                    .dynamicForegroundStyle(trigger: scrollOffset)
+                .sheet(isPresented: $isParticipantsPresented) {
+                    ParticipantView(share: share)
+                        .presentationDetents([.medium, .large])
+                }
             }
-            .sheet(isPresented: $isParticipantsPresented) {
-                ParticipantView(share: share)
-                    .presentationDetents([.medium, .large])
-            }
-                
             
             //MARK: - ADD NEW CATEGORY
             Button {
