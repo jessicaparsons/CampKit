@@ -50,12 +50,12 @@ struct ListView: View {
     
     //SHARING OPTIONS
     @State private var isSharingSheetPresented: Bool = false
-    @State private var participants: [CKShare.Participant] = []
-    @State private var showParticipantsMenu = false
-    @State private var isListShared: Bool = true
-    @State private var hasAnyShare: Bool = false
+    
     @State private var isCloudShareSheetPresented = false
-    @State private var sharingController: UICloudSharingController?
+    @State private var share: CKShare?
+    //@State private var showEditSheet = false
+    private let stack = CoreDataStack.shared
+    @State private var isParticipantsPresented: Bool = false
     
     //PRO
     @State private var isUpgradeToProPresented: Bool = false
@@ -183,7 +183,7 @@ struct ListView: View {
                 }
             }
             .onChange(of: bannerImageItem) {
-                Task {
+                Task { @MainActor in
                     if let data = try? await bannerImageItem?.loadTransferable(type: Data.self),
                        let loadedImage = UIImage(data: data)
                     {
@@ -210,16 +210,21 @@ struct ListView: View {
     private var optionsMenu: some View {
         HStack {
             //MARK: - LIST IS SHARED OPTIONS
+            Menu {
                 Button {
-                    isCloudShareSheetPresented.toggle()
+                    isParticipantsPresented.toggle()
                 } label: {
                     Label("Participants", systemImage: "person.crop.circle.badge.checkmark")
                         .dynamicForegroundStyle(trigger: scrollOffset)
                 }
-                .onAppear {
-                    isListShared = (PersistenceController.shared.existingShare(packingList: viewModel.packingList) != nil)
-                    hasAnyShare = PersistenceController.shared.shareTitles().isEmpty ? false : true
-                }
+            } label: {
+                Label("Participants", systemImage: "person.crop.circle.badge.checkmark")
+                    .dynamicForegroundStyle(trigger: scrollOffset)
+            }
+            .sheet(isPresented: $isParticipantsPresented) {
+                ParticipantView(share: share)
+                    .presentationDetents([.medium, .large])
+            }
                 
             
             //MARK: - ADD NEW CATEGORY
@@ -292,7 +297,14 @@ struct ListView: View {
                 
                 // INVITE CAMPER
                 
-                ShareLink(item: viewModel.packingList, preview: SharePreview("Join my packing list!")) {
+                Button {
+                    if !stack.isShared(object: viewModel.packingList) {
+                      Task {
+                          await createShare(viewModel.packingList)
+                      }
+                    }
+                    isCloudShareSheetPresented = true
+                } label: {
                     Label("Invite Collaborator", systemImage: "person.crop.circle.badge.plus")
                 }
                 
@@ -365,18 +377,23 @@ struct ListView: View {
             }).disabled(!isFormValid)
             Button("Cancel", role: .cancel) { }
         }
+        //MARK: - SHARE SHEET
         .sheet(isPresented: $isSharingSheetPresented) {
             let text = viewModel.exportAsPlainText(packingList: viewModel.packingList)
             let pdf = viewModel.generatePDF(from: text)
             SharingOptionsSheet(items: [text, pdf])
         }
-        .sheet(isPresented: $isCloudShareSheetPresented) {
-            if let controller = sharingController {
-                CloudSharingSheet(controller: controller)
-            } else {
-                Text("List hasn't been shared yet")
-            }
-        }
+        //MARK: - CLOUD SHARE SHEET
+        .sheet(isPresented: $isCloudShareSheetPresented, content: {
+          if let share = share {
+            CloudSharingView(
+              share: share,
+              container: stack.ckContainer,
+              list: viewModel.packingList
+            )
+          }
+        })
+        
         .confirmationDialog(
             "Are you sure you want to duplicate the list?",
             isPresented: $isDuplicationConfirmationPresented,
@@ -416,56 +433,56 @@ struct ListView: View {
         }
     }//:OPTIONS MENU
     
-    @MainActor
-    private func manageParticipation(packingList: PackingList) {
-        if let share = PersistenceController.shared.existingShare(packingList: packingList) {
-            let controller = UICloudSharingController(share: share, container: PersistenceController.shared.cloudKitContainer)
-            controller.delegate = nil // Add a delegate if needed
-            controller.availablePermissions = [.allowReadWrite, .allowReadOnly]
-            self.sharingController = controller
-            self.isCloudShareSheetPresented = true
-        } else {
-            print("No existing share found for packing list.")
-        }
-    }
-
-    
 }
 
-//MARK: - PREVIEWS
-#if DEBUG
-#Preview("Sample Data") {
+extension ListView {
     
-    let storeKitManager = StoreKitManager()
-    let context = PersistenceController.preview.persistentContainer.viewContext
-    
-    let samplePackingList = PackingList.samplePackingList(context: context)
-    
-    NavigationStack {
-        ListView(
-            context: context,
-            packingList: samplePackingList,
-            packingListsCount: 3
-        )
-        .environment(storeKitManager)
-        .environment(\.managedObjectContext, context)
+    private func createShare(_ list: PackingList) async {
+      do {
+        let (_, share, _) =
+        try await stack.persistentContainer.share([list], to: nil)
+          share[CKShare.SystemFieldKey.title] = list.title
+        self.share = share
+      } catch {
+        print("Failed to create share")
+      }
     }
 }
-#Preview("Basic Preview") {
-    let storeKitManager = StoreKitManager()
-    let context = PersistenceController.preview.persistentContainer.viewContext
-    
-    let emptySamplePackingList = PackingList(context: context, title: "Empty List", position: 0)
-    
-    NavigationStack {
-        ListView(
-            context: context,
-            packingList: emptySamplePackingList,
-            packingListsCount: 3
-        )
-        .environment(storeKitManager)
-        .environment(\.managedObjectContext, context)
-        
-    }
-}
-#endif
+
+////MARK: - PREVIEWS
+//#if DEBUG
+//#Preview("Sample Data") {
+//    
+//    let storeKitManager = StoreKitManager()
+//    let context = PersistenceController.preview.persistentContainer.viewContext
+//    
+//    let samplePackingList = PackingList.samplePackingList(context: context)
+//    
+//    NavigationStack {
+//        ListView(
+//            context: context,
+//            packingList: samplePackingList,
+//            packingListsCount: 3
+//        )
+//        .environment(storeKitManager)
+//        .environment(\.managedObjectContext, context)
+//    }
+//}
+//#Preview("Basic Preview") {
+//    let storeKitManager = StoreKitManager()
+//    let context = PersistenceController.preview.persistentContainer.viewContext
+//    
+//    let emptySamplePackingList = PackingList(context: context, title: "Empty List", position: 0)
+//    
+//    NavigationStack {
+//        ListView(
+//            context: context,
+//            packingList: emptySamplePackingList,
+//            packingListsCount: 3
+//        )
+//        .environment(storeKitManager)
+//        .environment(\.managedObjectContext, context)
+//        
+//    }
+//}
+//#endif

@@ -14,9 +14,9 @@ struct MainView: View {
     
     
     @FetchRequest(
-        entity: PackingList.entity(),
-        sortDescriptors: [])
-    var packingLists: FetchedResults<PackingList>
+        sortDescriptors: [NSSortDescriptor(keyPath: \PackingList.position, ascending: true)]
+    ) var packingLists: FetchedResults<PackingList>
+
     
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(StoreKitManager.self) private var storeKitManager
@@ -158,12 +158,12 @@ extension Notification.Name {
     static let didAcceptShare = Notification.Name("didAcceptShare")
 }
 
-
-#if DEBUG
-#Preview {
-
-    MainView()
-        .environment(\.managedObjectContext, PersistenceController.preview.persistentContainer.viewContext)
-        .environment(StoreKitManager())
-}
-#endif
+//
+//#if DEBUG
+//#Preview {
+//
+//    MainView()
+//        .environment(\.managedObjectContext, PersistenceController.preview.persistentContainer.viewContext)
+//        .environment(StoreKitManager())
+//}
+//#endif

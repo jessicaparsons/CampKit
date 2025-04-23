@@ -126,19 +126,19 @@ struct ListDetailCardView: View {
 }//:STRUCT
 
 
-#if DEBUG
-#Preview {
-
-    let context = PersistenceController.preview.persistentContainer.viewContext
-    
-    let samplePackingList = PackingList.samplePackingList(context: context)
-        
-    ZStack {
-        
-        Color(.black)
-            .ignoresSafeArea()
-        ListDetailCardView(viewModel: ListViewModel(viewContext: context, packingList: samplePackingList))
-        
-    }
-}
-#endif
+//#if DEBUG
+//#Preview {
+//
+//    let context = PersistenceController.preview.persistentContainer.viewContext
+//    
+//    let samplePackingList = PackingList.samplePackingList(context: context)
+//        
+//    ZStack {
+//        
+//        Color(.black)
+//            .ignoresSafeArea()
+//        ListDetailCardView(viewModel: ListViewModel(viewContext: context, packingList: samplePackingList))
+//        
+//    }
+//}
+//#endif

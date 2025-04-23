@@ -205,25 +205,25 @@ Hit the \"+\" to get started!
         }//:TOOLBAR
     }
 }
-#if DEBUG
-#Preview() {
-    do {
-        let context = PersistenceController.preview.persistentContainer.viewContext
-        
-        // Reset the AppStorage value BEFORE view init
-        UserDefaults.standard.set(false, forKey: "isShowingCompletedReminders")
-        
-        Reminder.generateSampleReminders(context: context)
-        try? context.save()
-        
-        return NavigationStack {
-            RemindersView(context: context)
-                .environment(\.managedObjectContext, context)
-        }
-    }
-    
-    
-}
-#endif
-
-
+//#if DEBUG
+//#Preview() {
+//    do {
+//        let context = PersistenceController.preview.persistentContainer.viewContext
+//        
+//        // Reset the AppStorage value BEFORE view init
+//        UserDefaults.standard.set(false, forKey: "isShowingCompletedReminders")
+//        
+//        Reminder.generateSampleReminders(context: context)
+//        try? context.save()
+//        
+//        return NavigationStack {
+//            RemindersView(context: context)
+//                .environment(\.managedObjectContext, context)
+//        }
+//    }
+//    
+//    
+//}
+//#endif
+//
+//

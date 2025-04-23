@@ -45,17 +45,17 @@ struct AddNewItemView: View {
         .padding(.vertical, 12)
     }
 }
-#if DEBUG
-#Preview {
-    
-    let context = PersistenceController.preview.persistentContainer.viewContext
-    
-    let samplePackingList = PackingList.samplePackingList(context: context)
-    
-    let categories = Category.sampleCategories(context: context)
-    
-    return AddNewItemView(viewModel: ListViewModel(viewContext: context, packingList: samplePackingList), category: categories.first!)
-        .background(Color.customTan)
-    
-}
-#endif
+//#if DEBUG
+//#Preview {
+//    
+//    let context = PersistenceController.preview.persistentContainer.viewContext
+//    
+//    let samplePackingList = PackingList.samplePackingList(context: context)
+//    
+//    let categories = Category.sampleCategories(context: context)
+//    
+//    return AddNewItemView(viewModel: ListViewModel(viewContext: context, packingList: samplePackingList), category: categories.first!)
+//        .background(Color.customTan)
+//    
+//}
+//#endif

@@ -118,29 +118,30 @@ struct RestockView: View {
         }//:TOOLBAR
     }
 }
-#if DEBUG
-#Preview("Sample Data") {
-    do {
-        let context = PersistenceController.preview.persistentContainer.viewContext
-        RestockItem.generateSampleItems(context: context)
-        try? context.save()
-        
-        return NavigationStack {
-            RestockView(context: context)
-                .environment(\.managedObjectContext, context)
-        }
-    }
-}
 
-
-#Preview("Empty") {
-    let context = PersistenceController.preview.persistentContainer.viewContext
-
-    NavigationStack {
-        RestockView(context: context)
-            .environment(\.managedObjectContext, context)
-
-    }
-}
-
-#endif
+//#if DEBUG
+//#Preview("Sample Data") {
+//    do {
+//        let context = PersistenceController.preview.persistentContainer.viewContext
+//        RestockItem.generateSampleItems(context: context)
+//        try? context.save()
+//        
+//        return NavigationStack {
+//            RestockView(context: context)
+//                .environment(\.managedObjectContext, context)
+//        }
+//    }
+//}
+//
+//
+//#Preview("Empty") {
+//    let context = PersistenceController.preview.persistentContainer.viewContext
+//
+//    NavigationStack {
+//        RestockView(context: context)
+//            .environment(\.managedObjectContext, context)
+//
+//    }
+//}
+//
+//#endif
