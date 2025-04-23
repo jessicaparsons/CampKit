@@ -42,32 +42,3 @@ extension PackingList: @unchecked Sendable {
     }
 
 }
-
-extension PackingList: Transferable {
-    public static var transferRepresentation: some TransferRepresentation {
-        // 🛠 Capture actor-isolated properties safely
-        let ckContainer = CKContainer(identifier: gCloudKitContainerIdentifier)
-
-        return CKShareTransferRepresentation<PackingList>(exporter: { listToExport in
-            let listURI = listToExport.objectID.uriRepresentation()
-
-            return .prepareShare(container: ckContainer) {
-                // ⛓ Hop to the main actor to access shared container
-                let (persistentContainer) = await MainActor.run {
-                    PersistenceController.shared.persistentContainer
-                }
-
-                let object = await persistentContainer.viewContext.perform {
-                    let coordinator = persistentContainer.viewContext.persistentStoreCoordinator
-                    guard let objectID = coordinator?.managedObjectID(forURIRepresentation: listURI) else {
-                        fatalError("Could not resolve objectID for URI: \(listURI)")
-                    }
-                    return persistentContainer.viewContext.object(with: objectID)
-                }
-
-                let (_, ckShare, _) = try await persistentContainer.share([object], to: nil)
-                return ckShare
-            }
-        })
-    }
-}
