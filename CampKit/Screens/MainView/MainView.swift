@@ -6,14 +6,17 @@
 //
 
 import SwiftUI
+import os
+
+let log = Logger(subsystem: "co.junipercreative.CampKit", category: "Sharing")
 
 struct MainView: View {
     
-    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+    
     @FetchRequest(
-        entity: PackingList.entity(),
-        sortDescriptors: [])
-    var packingLists: FetchedResults<PackingList>
+        sortDescriptors: [NSSortDescriptor(keyPath: \PackingList.position, ascending: true)]
+    ) var packingLists: FetchedResults<PackingList>
+
     
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(StoreKitManager.self) private var storeKitManager
@@ -135,16 +138,15 @@ struct MainView: View {
             .sheet(isPresented: $isUpgradeToProPresented) {
                 UpgradeToProView()
             }
-        //MARK: - CLOUD NOTIFICATIONS
+       // MARK: - CLOUD NOTIFICATIONS
             .onReceive(NotificationCenter.default.publisher(for: .didAcceptShare)) { _ in
-                do {
-                    try viewContext.setQueryGenerationFrom(.current)
-                } catch {
-                    print("Failed to refresh query generation: \(error)")
+                Task { @MainActor in
+                    do {
+                        try viewContext.setQueryGenerationFrom(.current)
+                    } catch {
+                        log.info("Failed to refresh query generation: \(error)")
+                    }
                 }
-            }
-            .onReceive(NotificationCenter.default.publisher(for: .NSPersistentStoreRemoteChange)) { _ in
-                print("🔄 CloudKit sync received — try refreshing UI")
             }
             
     }
@@ -156,12 +158,12 @@ extension Notification.Name {
     static let didAcceptShare = Notification.Name("didAcceptShare")
 }
 
-
-#if DEBUG
-#Preview {
-
-    MainView()
-        .environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
-        .environment(StoreKitManager())
-}
-#endif
+//
+//#if DEBUG
+//#Preview {
+//
+//    MainView()
+//        .environment(\.managedObjectContext, PersistenceController.preview.persistentContainer.viewContext)
+//        .environment(StoreKitManager())
+//}
+//#endif

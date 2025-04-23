@@ -15,7 +15,7 @@ final class ListViewModel: ObservableObject {
     let viewContext: NSManagedObjectContext
     private let packingListID: NSManagedObjectID
     
-    @Published var packingList: PackingList
+    @Published var packingList: PackingList 
     
     @Published var item: String = ""
     @Published var globalIsExpanded: Bool = false
@@ -49,8 +49,10 @@ final class ListViewModel: ObservableObject {
         allItems.isEmpty ? 0 : Double(packedCount) / Double(allItems.count)
     }
     
+    
     //MARK: - REFRESH VIEW
     
+    @MainActor
     func refresh() {
         if let updated = try? viewContext.existingObject(with: packingListID) as? PackingList {
             self.packingList = updated

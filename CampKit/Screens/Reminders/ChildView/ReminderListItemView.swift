@@ -110,17 +110,17 @@ struct ReminderListItemView: View {
         }
     }
 }
-
-#if DEBUG
-#Preview {
-    
-    do {
-        let context = PersistenceController.preview.container.viewContext
-        
-        let reminder = Reminder(context: context, title: "Recharge batteries", notes: "Get Ollie's Collar", reminderDate: Date(), reminderTime: Date())
-        try? context.save()
-        
-        return ReminderListItemView(reminder: reminder, isSelected: true, onEvent: { _ in })
-    }
-}
-#endif
+//
+//#if DEBUG
+//#Preview {
+//    
+//    do {
+//        let context = PersistenceController.preview.persistentContainer.viewContext
+//        
+//        let reminder = Reminder(context: context, title: "Recharge batteries", notes: "Get Ollie's Collar", reminderDate: Date(), reminderTime: Date())
+//        try? context.save()
+//        
+//        return ReminderListItemView(reminder: reminder, isSelected: true, onEvent: { _ in })
+//    }
+//}
+//#endif

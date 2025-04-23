@@ -156,26 +156,26 @@ struct UpdateReminderView: View {
         }
     }
 }
-
-#if DEBUG
-#Preview {
-    
-    @Previewable @State var dataRefresh: Bool = false
-    
-    do {
-        let context = PersistenceController.preview.container.viewContext
-        
-        Reminder.generateSampleReminders(context: context)
-        try? context.save()
-        
-        return NavigationStack {
-            UpdateReminderView(
-                reminder: Reminder(context: context, title: "Charge batteries"),
-                dataRefreshTrigger: $dataRefresh
-            )
-            .environment(\.managedObjectContext, context)
-        }
-    }
-    
-}
-#endif
+//
+//#if DEBUG
+//#Preview {
+//    
+//    @Previewable @State var dataRefresh: Bool = false
+//    
+//    do {
+//        let context = PersistenceController.preview.persistentContainer.viewContext
+//        
+//        Reminder.generateSampleReminders(context: context)
+//        try? context.save()
+//        
+//        return NavigationStack {
+//            UpdateReminderView(
+//                reminder: Reminder(context: context, title: "Charge batteries"),
+//                dataRefreshTrigger: $dataRefresh
+//            )
+//            .environment(\.managedObjectContext, context)
+//        }
+//    }
+//    
+//}
+//#endif
