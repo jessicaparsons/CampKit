@@ -16,7 +16,7 @@ struct ParticipantView: View {
     
     let share: CKShare?
     
-    var mockParticipants: [MockParticipant]? = nil
+    //var mockParticipants: [MockParticipant]? = nil
     
     
     var body: some View {
