@@ -15,6 +15,7 @@ extension PersistenceController {
     func existingShare(packingList: PackingList) -> CKShare? {
         if let shareSet = try? persistentContainer.fetchShares(matching: [packingList.objectID]),
            let (_, share) = shareSet.first {
+            print("Share is: \(share)")
             return share
         }
         return nil
@@ -40,7 +41,7 @@ extension PersistenceController {
     }
     
     func configure(share: CKShare, with packingList: PackingList? = nil) {
-        share[CKShare.SystemFieldKey.title] = "A cool photo"
+        share[CKShare.SystemFieldKey.title] = "My Packing List"
     }
     
 }

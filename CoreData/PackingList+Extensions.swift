@@ -45,15 +45,13 @@ extension PackingList {
 
 extension PackingList: Transferable {
     public static var transferRepresentation: some TransferRepresentation {
-        // 🛠 Capture actor-isolated properties safely
         let ckContainer = CKContainer(identifier: gCloudKitContainerIdentifier)
 
         return CKShareTransferRepresentation<PackingList>(exporter: { listToExport in
             let listURI = listToExport.objectID.uriRepresentation()
 
             return .prepareShare(container: ckContainer) {
-                // ⛓ Hop to the main actor to access shared container
-                let (persistentContainer) = await MainActor.run {
+                let persistentContainer = await MainActor.run {
                     PersistenceController.shared.persistentContainer
                 }
 
@@ -66,6 +64,13 @@ extension PackingList: Transferable {
                 }
 
                 let (_, ckShare, _) = try await persistentContainer.share([object], to: nil)
+
+                if let packingList = object as? PackingList {
+                    ckShare[CKShare.SystemFieldKey.title] = (packingList.title ?? "Packing List") as CKRecordValue
+                }
+
+                try persistentContainer.viewContext.save()
+
                 return ckShare
             }
         })

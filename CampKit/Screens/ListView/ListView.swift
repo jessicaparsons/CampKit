@@ -421,7 +421,7 @@ struct ListView: View {
         if let share = PersistenceController.shared.existingShare(packingList: packingList) {
             let controller = UICloudSharingController(share: share, container: PersistenceController.shared.cloudKitContainer)
             controller.delegate = nil // Add a delegate if needed
-            controller.availablePermissions = [.allowReadWrite, .allowReadOnly]
+            controller.availablePermissions = [.allowReadWrite, .allowReadOnly, .allowPrivate]
             self.sharingController = controller
             self.isCloudShareSheetPresented = true
         } else {
