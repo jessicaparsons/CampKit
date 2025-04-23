@@ -89,7 +89,7 @@ struct QuizPageTwoView: View {
     @Previewable @State var isStepOne: Bool = false
     @Previewable @State var isElevationAdded: Bool = false
     
-    let context = PersistenceController.preview.container.viewContext
+    let context = PersistenceController.preview.persistentContainer.viewContext
     
     QuizPageTwoView(
         viewModel: QuizViewModel(context: context),

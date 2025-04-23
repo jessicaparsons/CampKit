@@ -55,7 +55,7 @@ struct CardButtonView: View {
     @Previewable @State var navigateToListView: Bool = false
     @Previewable @State var currentPackingList: PackingList?
     
-    let previewContext = PersistenceController.preview.container.viewContext
+    let previewContext = PersistenceController.preview.persistentContainer.viewContext
 
     QuizView(
         viewModel: QuizViewModel(context: previewContext),

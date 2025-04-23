@@ -178,7 +178,7 @@ struct QuizView: View {
     @Previewable @State var navigateToListView: Bool = false
     @Previewable @State var currentPackingList: PackingList?
     
-    let context = PersistenceController.preview.container.viewContext
+    let context = PersistenceController.preview.persistentContainer.viewContext
     
     
     NavigationStack {

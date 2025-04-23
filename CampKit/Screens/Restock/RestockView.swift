@@ -121,7 +121,7 @@ struct RestockView: View {
 #if DEBUG
 #Preview("Sample Data") {
     do {
-        let context = PersistenceController.preview.container.viewContext
+        let context = PersistenceController.preview.persistentContainer.viewContext
         RestockItem.generateSampleItems(context: context)
         try? context.save()
         
@@ -134,7 +134,7 @@ struct RestockView: View {
 
 
 #Preview("Empty") {
-    let context = PersistenceController.preview.container.viewContext
+    let context = PersistenceController.preview.persistentContainer.viewContext
 
     NavigationStack {
         RestockView(context: context)

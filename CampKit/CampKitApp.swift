@@ -10,9 +10,12 @@ import UserNotifications
 
 @main
 struct CampKitApp: App {
-        
+    
+    
     //CORE DATA
-    let persistenceController = PersistenceController.shared
+    //let persistenceController = PersistenceController.shared
+    private let persistentContainer = PersistenceController.shared.persistentContainer
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     //WEATHER API
     var weatherViewModel = WeatherViewModel(weatherFetcher: WeatherAPIClient(), geoCoder: Geocoder())
     //STORE KIT
@@ -22,7 +25,7 @@ struct CampKitApp: App {
     var body: some Scene {
         WindowGroup {
             MainView()
-                .environment(\.managedObjectContext, persistenceController.container.viewContext)
+                .environment(\.managedObjectContext, persistentContainer.viewContext)
                 .environment(weatherViewModel)
                 .environment(storeKitManager)
                 .task {

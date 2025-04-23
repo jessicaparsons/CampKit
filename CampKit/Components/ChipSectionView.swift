@@ -97,13 +97,13 @@ struct FlowLayout: Layout {
 #Preview {
     
     @Previewable @Bindable var viewModel = QuizViewModel(
-        context: PersistenceController.preview.container.viewContext
+        context: PersistenceController.preview.persistentContainer.viewContext
     )
     
     ChipSectionView(
         selectedFilters: $viewModel.selectedFilters,
         preferenceCategory: ChoiceOptions.activities
     )
-    .environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
+    .environment(\.managedObjectContext, PersistenceController.preview.persistentContainer.viewContext)
 }
 #endif

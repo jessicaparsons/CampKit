@@ -115,7 +115,7 @@ struct ReminderListItemView: View {
 #Preview {
     
     do {
-        let context = PersistenceController.preview.container.viewContext
+        let context = PersistenceController.preview.persistentContainer.viewContext
         
         let reminder = Reminder(context: context, title: "Recharge batteries", notes: "Get Ollie's Collar", reminderDate: Date(), reminderTime: Date())
         try? context.save()

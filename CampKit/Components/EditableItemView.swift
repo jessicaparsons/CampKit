@@ -71,7 +71,7 @@ struct EditableItemView<T: EditablePackableItem>: View {
 
 #if DEBUG
 #Preview {
-    let context = PersistenceController.preview.container.viewContext
+    let context = PersistenceController.preview.persistentContainer.viewContext
     let item = RestockItem(context: context, title: "Sleeping Bag", position: 0)
     
     EditableItemView(

@@ -163,7 +163,7 @@ struct UpdateReminderView: View {
     @Previewable @State var dataRefresh: Bool = false
     
     do {
-        let context = PersistenceController.preview.container.viewContext
+        let context = PersistenceController.preview.persistentContainer.viewContext
         
         Reminder.generateSampleReminders(context: context)
         try? context.save()

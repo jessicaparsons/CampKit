@@ -9,6 +9,7 @@ import CloudKit
 import UIKit
 
 class AppDelegate: NSObject, UIApplicationDelegate {
+    
     func application(_ application: UIApplication, userDidAcceptCloudKitShareWith metadata: CKShare.Metadata) {
         let op = CKAcceptSharesOperation(shareMetadatas: [metadata])
         op.qualityOfService = .userInitiated
@@ -19,7 +20,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
                 
                 // Force CoreData to refresh
                 DispatchQueue.main.async {
-                    let context = PersistenceController.shared.container.viewContext
+                    let context = PersistenceController.shared.persistentContainer.viewContext
                     context.refreshAllObjects()
                 }
                 
