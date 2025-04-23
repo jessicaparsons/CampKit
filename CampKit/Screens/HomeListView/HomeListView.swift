@@ -110,7 +110,10 @@ Hit the \"+\" to get started!
 
                             .onDelete { offsets in
                                 for index in offsets {
-                                    viewContext.delete(packingLists[index])
+                                    let list = packingLists[index]
+                                    if stack.canDelete(object: list) {
+                                        viewContext.delete(list)
+                                    }
                                 }
                                 save(viewContext)
                             }
