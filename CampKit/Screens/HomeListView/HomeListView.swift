@@ -120,6 +120,7 @@ Hit the \"+\" to get started!
 
                         }
                     }//:LIST
+                    .scrollContentBackground(.hidden)
                     .sheet(isPresented: $isUpgradeToProPresented) {
                         UpgradeToProView()
                     }
@@ -131,7 +132,6 @@ Hit the \"+\" to get started!
         }//:ZSTACK
         .navigationTitle("Howdy, Camper")
         .navigationBarTitleDisplayMode(.large)
-        .scrollContentBackground(.hidden)
         .environment(\.editMode, $editMode)
         
         //MARK: - MENU
@@ -179,18 +179,20 @@ Hit the \"+\" to get started!
     
     
 }//:STRUCT
-//#if DEBUG
-//#Preview() {
-//    
-//    @Previewable @State var isNewListQuizPresented: Bool = false
-//    @Previewable @Bindable var storeKitManager = StoreKitManager()
-//    
-//    let context = PersistenceController.preview.persistentContainer.viewContext
-//
-//    NavigationStack {
-//        HomeListView(context: context, isNewListQuizPresented: $isNewListQuizPresented)
-//            .environment(\.managedObjectContext, context)
-//            .environment(storeKitManager)
-//    }
-//}
-//#endif
+#if DEBUG
+#Preview() {
+    
+    @Previewable @State var isNewListQuizPresented: Bool = false
+    @Previewable @Bindable var storeKitManager = StoreKitManager()
+    
+    let context = CoreDataStack.shared.context
+    
+    let list = PackingList.samplePackingList(context: context)
+    
+    NavigationStack {
+        HomeListView(context: context, isNewListQuizPresented: $isNewListQuizPresented)
+            .environment(\.managedObjectContext, context)
+            .environment(storeKitManager)
+    }
+}
+#endif

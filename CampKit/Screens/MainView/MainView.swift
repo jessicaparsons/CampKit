@@ -40,10 +40,10 @@ struct MainView: View {
                 TabView(selection: $selection) {
                         NavigationStack {
                             //MARK: - HOME
-                            HomeListView(
-                                context: viewContext,
-                                isNewListQuizPresented: $isNewListQuizPresented
-                            )
+                                HomeListView(
+                                    context: viewContext,
+                                    isNewListQuizPresented: $isNewListQuizPresented
+                                )
                                 .navigationDestination(isPresented: $navigateToListView) {
                                     if let packingList = currentPackingList {
                                         ListView(
@@ -158,12 +158,16 @@ extension Notification.Name {
     static let didAcceptShare = Notification.Name("didAcceptShare")
 }
 
-//
-//#if DEBUG
-//#Preview {
-//
-//    MainView()
-//        .environment(\.managedObjectContext, PersistenceController.preview.persistentContainer.viewContext)
-//        .environment(StoreKitManager())
-//}
-//#endif
+
+#if DEBUG
+#Preview {
+    
+    let context = CoreDataStack.shared.context
+    
+    let list = PackingList.samplePackingList(context: context)
+
+    MainView()
+        .environment(\.managedObjectContext, context)
+        .environment(StoreKitManager())
+}
+#endif
