@@ -14,7 +14,9 @@ struct GradientTanBackgroundView: View {
     var body: some View {
         
         ZStack(alignment: .top) {
-            Group {
+            
+            
+            ZStack {
                 if colorScheme == .dark {
                     
                     LinearGradient(
@@ -35,9 +37,10 @@ struct GradientTanBackgroundView: View {
                         endPoint: .topTrailing
                     )
                 }
-            }
+                
+            }//:ZSTACK
             .frame(height: 200) // This height should cover nav bar + status bar
-            .ignoresSafeArea(edges: .top)
+            .ignoresSafeArea(edges: .all)
             
             RoundedRectangle(cornerRadius: Constants.cornerRadius)
                 .fill(Color.customTan)
