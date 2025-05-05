@@ -33,7 +33,14 @@ struct ListDetailCardView: View {
             listLocation
             
         //MARK: - PROGRESS BAR
-            progressBar
+            ProgressBarView(
+                viewModel: viewModel,
+                packedRatio: viewModel.packedRatio,
+                packedCount: viewModel.packedCount,
+                allItems: viewModel.allItems,
+                barWidth: 0.75,
+                numbersWidth: 0.25
+            )
             
         }//:VSTACK
         .padding(.vertical, Constants.cardSpacing)
@@ -78,30 +85,7 @@ struct ListDetailCardView: View {
         }
     }
     
-    private var progressBar: some View {
-        GeometryReader { geo in
-            HStack {
-                Spacer()
-                HStack {
-                    ProgressView(value: viewModel.packedRatio)
-                        .progressViewStyle(LinearProgressViewStyle(tint: .colorNeon))
-                        .animation(.easeInOut, value: viewModel.packedRatio)
-                }//:HSTACK
-                .frame(width: geo.size.width * 0.75)
-                
-                HStack {
-                    Text("\(viewModel.packedCount)/\(viewModel.allItems.count)")
-                        .font(.subheadline)
-                    Spacer()
-                }//:HSTACK
-                .frame(width: geo.size.width * 0.25)
-                Spacer()
-                                    
-            }//:HSTACK
-        }//:GEOMETRY READER
-        .padding(.horizontal, Constants.horizontalPadding)
-        .frame(height: 20)
-    }
+    
     
     
     //MARK: - FUNCTIONS
@@ -126,19 +110,19 @@ struct ListDetailCardView: View {
 }//:STRUCT
 
 
-//#if DEBUG
-//#Preview {
-//
-//    let context = PersistenceController.preview.persistentContainer.viewContext
-//    
-//    let samplePackingList = PackingList.samplePackingList(context: context)
-//        
-//    ZStack {
-//        
-//        Color(.black)
-//            .ignoresSafeArea()
-//        ListDetailCardView(viewModel: ListViewModel(viewContext: context, packingList: samplePackingList))
-//        
-//    }
-//}
-//#endif
+#if DEBUG
+#Preview {
+
+    let context = CoreDataStack.shared.context
+    
+    let list = PackingList.samplePackingList(context: context)
+        
+    ZStack {
+        
+        Color(.black)
+            .ignoresSafeArea()
+        ListDetailCardView(viewModel: ListViewModel(viewContext: context, packingList: list))
+        
+    }
+}
+#endif

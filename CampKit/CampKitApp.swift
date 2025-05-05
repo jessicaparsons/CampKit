@@ -12,12 +12,16 @@ import UserNotifications
 struct CampKitApp: App {
     
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
-    //CORE DATA
     //WEATHER API
     var weatherViewModel = WeatherViewModel(weatherFetcher: WeatherAPIClient(), geoCoder: Geocoder())
     //STORE KIT
     let storeKitManager = StoreKitManager()
-
+    
+    @AppStorage("isDarkMode") private var isDarkMode = false
+    
+    init() {
+        UITabBar.appearance().unselectedItemTintColor = UIColor(Color("ColorSecondaryMenu"))
+    }
     
     var body: some Scene {
         WindowGroup {
@@ -25,6 +29,7 @@ struct CampKitApp: App {
                 .environment(\.managedObjectContext, CoreDataStack.shared.context)
                 .environment(weatherViewModel)
                 .environment(storeKitManager)
+                .preferredColorScheme(isDarkMode ? .dark : .light)
         }
         
     }

@@ -112,7 +112,30 @@ final class CoreDataStack: ObservableObject {
     
     private var _privatePersistentStore: NSPersistentStore?
     private var _sharedPersistentStore: NSPersistentStore?
-    private init() {}
+    
+    
+    //private init() {}
+    
+    
+    private init(inMemory: Bool = false) {
+        if inMemory {
+            let container = NSPersistentCloudKitContainer(name: "CampKitModel")
+            let description = NSPersistentStoreDescription()
+            description.url = URL(fileURLWithPath: "/dev/null") // in-memory
+            container.persistentStoreDescriptions = [description]
+            
+            container.loadPersistentStores { _, error in
+                if let error = error {
+                    fatalError("Failed to load in-memory store: \(error)")
+                }
+            }
+            
+            container.viewContext.mergePolicy = NSMergePolicy.mergeByPropertyObjectTrump
+            container.viewContext.automaticallyMergesChangesFromParent = true
+            self.persistentContainer = container
+        }
+    }
+    
 }
 
 // MARK: Save or delete from Core Data
@@ -202,22 +225,20 @@ extension CoreDataStack {
 }
 
 
-//#if DEBUG
-//extension CoreDataStack {
-//    @MainActor static var preview: CoreDataStack = {
-//        let stack = CoreDataStack(inMemory: true)
-//        let viewContext = stack.context
-//
-//        // Example: Create sample data
-//        _ = PackingList.samplePackingList(context: viewContext)
-//
-//        do {
-//            try viewContext.save()
-//        } catch {
-//            fatalError("Failed to save preview context: \(error)")
-//        }
-//
-//        return stack
-//    }()
-//}
-//#endif
+#if DEBUG
+extension CoreDataStack {
+    @MainActor static var preview: CoreDataStack = {
+        let stack = CoreDataStack(inMemory: true)
+        let context = stack.context
+
+
+        do {
+            try context.save()
+        } catch {
+            fatalError("❌ Failed to save preview context: \(error)")
+        }
+
+        return stack
+    }()
+}
+#endif

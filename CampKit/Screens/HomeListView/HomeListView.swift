@@ -14,185 +14,293 @@ struct HomeListView: View {
         sortDescriptors: [NSSortDescriptor(keyPath: \PackingList.position, ascending: true)]
     ) var packingLists: FetchedResults<PackingList>
 
+    let weatherViewModel = WeatherViewModel(weatherFetcher: WeatherAPIClient(), geoCoder: Geocoder())
     
     @Environment(\.managedObjectContext) private var viewContext
-    @Environment(StoreKitManager.self) private var storeKitManager
+    @State private var quizViewModel: QuizViewModel
     
     @State private var location: String = ""
     @State private var editMode: EditMode = .inactive
-    @Binding var isNewListQuizPresented: Bool
+    @State private var isNewListQuizPresented: Bool = false
     @State private var isUpgradeToProPresented: Bool = false
+    @State private var isStepOne: Bool = true
+    @Binding var navigateToListView: Bool
+    @Binding var currentPackingList: PackingList?
+    @Binding var packingListsCount: Int
+    @Binding var selection: Int
+    @Binding var isSettingsPresented: Bool
+    
+    @State private var scrollOffset: CGFloat = 0
+    
     private let stack = CoreDataStack.shared
     
-    init(context: NSManagedObjectContext, isNewListQuizPresented: Binding<Bool>) {
-        _isNewListQuizPresented = isNewListQuizPresented
+    private let gridItem: [GridItem] = Array(repeating: .init(.flexible(), spacing: Constants.horizontalPadding), count: 2)
+    
+    
+    init(
+        context: NSManagedObjectContext,
+        packingListsCount: Binding<Int>,
+        selection: Binding<Int>,
+        navigateToListView: Binding<Bool>,
+        currentPackingList: Binding<PackingList?>,
+        isSettingsPresented: Binding<Bool>
+    ) {
+        _packingListsCount = packingListsCount
+        _selection = selection
+        _quizViewModel = State(wrappedValue: QuizViewModel(context: context))
+        _navigateToListView = navigateToListView
+        _currentPackingList = currentPackingList
+        _isSettingsPresented = isSettingsPresented
     }
     
     var body: some View {
         //MARK: - HEADER
         ZStack(alignment: .top) {
             
-            
             //MARK: - BACKGROUND STYLES
-            GradientTanBackgroundView()
-            
-            
-            VStack {
-                //MARK: - PACKING LISTS
+            Color.colorWhiteSands
+                .ignoresSafeArea()
                 
-                if packingLists.isEmpty {
-                    ScrollView {
-                        ContentUnavailableView("Let's Get Packing", systemImage: "tent", description: Text("""
-You haven't created any lists yet. 
-Hit the \"+\" to get started!
-"""))
-                        .padding(.top, Constants.emptyContentSpacing)
-                    }
-                } else {
-                    
-                    List {
-                        Section(header:
-                                    Color.clear
-                            .frame(height: 1)//For top spacing
-                        ) {
-                            ForEach(packingLists) { packingList in
-
-                                NavigationLink(
-                                    destination: ListView(
-                                        context: viewContext,
-                                        packingList: packingList,
-                                        packingListsCount: packingLists.count
-                                    ),
-                                    label: {
-                                        HStack {
-                                            // Optional photo thumbnail
-                                            if let photoData = packingList.photo, let image = UIImage(data: photoData) {
-                                                Image(uiImage: image)
-                                                    .resizable()
-                                                    .scaledToFill()
-                                                    .frame(width: 50, height: 50)
-                                                    .cornerRadius(Constants.cornerRadius)
-                                                    .padding(.trailing, 8)
-                                            } else {
-                                                Image("TopographyDesign")
-                                                    .resizable()
-                                                    .scaledToFill()
-                                                    .frame(width: 50, height: 50)
-                                                    .cornerRadius(Constants.cornerRadius)
-                                                    .padding(.trailing, 8)
-                                            }
-                                            
-                                            VStack(alignment: .leading) {
-                                                Text(packingList.title ?? Constants.newPackingListTitle)
-                                                    .font(.headline)
-                                                    .lineLimit(1)
-                                                    .truncationMode(.tail)
-                                                Text(packingList.dateCreated, style: .date)
-                                                    .font(.subheadline)
-                                                    .foregroundColor(.secondary)
-                                            }//:VSTACK
-                                        }//:HSTACK
+                ScrollView {
+                    VStack {
+                        
+                        //MARK: - WHERE TO NEXT?
+                        
+                        HStack {
+                            Text("Let's get packing")
+                                .font(.headline)
+                                .fontWeight(.bold)
+                                .multilineTextAlignment(.leading)
+                                .padding(.bottom)
+                            Spacer()
+                        }//:HSTACK
+                        .padding(.top, Constants.headerSpacing)
+                        
+                        Button {
+                            isNewListQuizPresented = true
+                        } label: {
+                            ZStack {
+                                RoundedRectangle(cornerRadius: 50)
+                                    .fill(Color.colorWhite)
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 50)
+                                            .stroke(Color(UIColor.systemGray4), lineWidth: 1)
+                                    )
+                                    .frame(height: 50)
+                                
+                                HStack {
+                                    Image(systemName: "magnifyingglass")
+                                        .foregroundColor(Color.colorNeon)
+                                        .frame(width: 35, height: 35)
+                                        .background(Color.colorSecondaryIcon)
+                                        .clipShape(Circle())
+                                        .padding(.leading, 10)
+                                    Text("Where to next?")
+                                        .foregroundStyle(Color.secondary)
+                                    Spacer()
+                                    
+                                }//:HSTACK
+                                
+                            }//:ZSTACK
+                        }//:BUTTON
+                        
+                        
+                        //MARK: - PACKING LISTS
+                        
+                        
+                        HStack {
+                            Text("Your lists")
+                                .font(.headline)
+                                .fontWeight(.bold)
+                                .multilineTextAlignment(.leading)
+                                .padding(.top, Constants.largePadding)
+                                .padding(.bottom)
+                            Spacer()
+                        }//:HSTACK
+                        
+                        if packingLists.isEmpty {
+                            
+                            EmptyContentView(
+                                icon: "tent.fill",
+                                description: "It looks like you don’t have any lists yet")
+                            
+                            .padding(.top, Constants.largePadding)
+                            
+                        } else {
+                            
+                            LazyVGrid(columns: gridItem, alignment: .center) {
+                                ForEach(packingLists) { packingList in
+                                    
+                                    NavigationLink(
+                                        destination: ListView(
+                                            context: viewContext,
+                                            packingList: packingList,
+                                            packingListsCount: packingLists.count
+                                        ),
+                                        label: {
+                                            HomeListCardView(packingList: packingList)
+                                        }
+                                    )//:NAVIGATION LINK
+                                } //:FOR EACH
+                                .onMove { indices, newOffset in
+                                    var reorderedLists = packingLists.map { $0 }
+                                    
+                                    reorderedLists.move(fromOffsets: indices, toOffset: newOffset)
+                                    
+                                    for (index, item) in reorderedLists.enumerated() {
+                                        item.position = Int64(index)
                                     }
-                                )//:NAVIGATION LINK
-                            } //:FOR EACH
-                            .onMove { indices, newOffset in
-                                var reorderedLists = packingLists.map { $0 }
-
-                                reorderedLists.move(fromOffsets: indices, toOffset: newOffset)
-
-                                for (index, item) in reorderedLists.enumerated() {
-                                    item.position = Int64(index)
+                                    
+                                    save(viewContext)
                                 }
-
-                                save(viewContext)
-                            }
-
-
-                            .onDelete { offsets in
-                                for index in offsets {
-                                    let list = packingLists[index]
-                                    if stack.canDelete(object: list) {
-                                        viewContext.delete(list)
+                                
+                                
+                                .onDelete { offsets in
+                                    for index in offsets {
+                                        let list = packingLists[index]
+                                        if stack.canDelete(object: list) {
+                                            viewContext.delete(list)
+                                        }
                                     }
+                                    save(viewContext)
                                 }
-                                save(viewContext)
+                            }//:LAZYVGRID
+                            .scrollContentBackground(.hidden)
+                            .refreshable {
+                                await refresh(context: viewContext)
                             }
-
+                        }//:ELSE
+                    }//:VSTACK
+                    .background(
+                        GeometryReader { geo in
+                            Color.clear
+                                .frame(height: 0)
+                                .onChange(of: geo.frame(in: .global).minY) {
+                                    scrollOffset = geo.frame(in: .global).minY
+                                }
                         }
-                    }//:LIST
-                    .scrollContentBackground(.hidden)
-                    .sheet(isPresented: $isUpgradeToProPresented) {
-                        UpgradeToProView()
-                    }
-                    .refreshable {
-                        await refresh(context: viewContext)
-                    }
-                }//:ELSE
-            }//:VSTACK
+                    )//NAV BAR UI CHANGES ON SCROLL
+                }//:SCROLLVIEW
+                .scrollIndicators(.hidden)
+                .padding(.horizontal, Constants.wideMargin)
+                
+            
+            
+            //MARK: - HEADER
+            
+            HeaderView(
+                title: "Howdy, Camper!",
+                scrollOffset: $scrollOffset,
+                scrollThreshold: -70
+            )
+            
+            //MARK: - FLOATING MENU
+            
+            FloatingMenuView(
+                viewModel: quizViewModel,
+                tabSelection: $selection,
+                packingListsCount: packingLists.count,
+                navigateToListView: $navigateToListView,
+                isUpgradeToProPresented: $isUpgradeToProPresented,
+                isNewListQuizPresented: $isNewListQuizPresented,
+                currentPackingList: $currentPackingList
+            )
+            
         }//:ZSTACK
-        .navigationTitle("Howdy, Camper")
-        .navigationBarTitleDisplayMode(.large)
+        .onAppear {
+            packingListsCount = packingLists.count
+        }
+        .onChange(of: packingLists.count) {
+            packingListsCount = packingLists.count
+        }
         .environment(\.editMode, $editMode)
-        
-        //MARK: - MENU
+        //MARK: - SHOW PACKING LIST QUIZ
+        .sheet(isPresented: $isNewListQuizPresented) {
+            NavigationStack {
+                QuizView(
+                    viewModel: quizViewModel,
+                    isNewListQuizPresented: $isNewListQuizPresented,
+                    isStepOne: $isStepOne,
+                    navigateToListView: $navigateToListView,
+                    currentPackingList: $currentPackingList,
+                    packingListCount: packingLists.count
+                )
+                .environment(weatherViewModel)
+            }
+        }
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                HStack {
-                    if editMode == .inactive {
-                        
-                        // ADD BUTTON
-                        Button {
-                            if storeKitManager.isUnlimitedListsUnlocked || packingLists.count < Constants.proVersionListCount {
-                                isNewListQuizPresented = true
-                            } else {
-                                isUpgradeToProPresented.toggle()
-                            }
-                        } label: {
-                            Image(systemName: "plus.circle.fill")
-                        }
-                        Menu {
-                            // REARRANGE BUTTON
-                            Button {
-                                editMode = (editMode == .active) ? .inactive : .active
-                            } label: {
-                                Label("Rearrange", systemImage: "arrow.up.arrow.down")
-                                    .font(.body)
-                            }
-                        } label: {
-                            Image(systemName: "ellipsis.circle")
-                        }
-                    } else {
-                        Button {
-                            editMode = (editMode == .active) ? .inactive : .active
-                        } label: {
-                            Text("Done")
-                        }
-                    }
-                }//:HSTACK
-                .foregroundStyle(Color.primary)
+                Button {
+                    isSettingsPresented.toggle()
+                } label: {
+                    Image(systemName: "gearshape.fill")
+                        .foregroundStyle(Color.colorForestSecondary)
+                }
             }//:TOOL BAR ITEM
-        }//:TOOLBAR
-        
+        }
+        .toolbarBackground(.hidden, for: .navigationBar)
     }//:BODY
     
     
     
-    
 }//:STRUCT
+
+
 #if DEBUG
 #Preview() {
     
-    @Previewable @State var isNewListQuizPresented: Bool = false
+    @Previewable @State var selection = 0
+    @Previewable @State var packingListsCount = 1
     @Previewable @Bindable var storeKitManager = StoreKitManager()
+    @Previewable @State var navigateToListView = false
+    @Previewable @State var currentPackingList: PackingList?
+    @Previewable @State var isSettingsPresented: Bool = false
     
-    let context = CoreDataStack.shared.context
+    let previewStack = CoreDataStack.preview
     
-    let list = PackingList.samplePackingList(context: context)
+    let list = PackingList.samplePackingList(context: previewStack.context)
+    let list2 = PackingList.samplePackingList(context: previewStack.context)
     
     NavigationStack {
-        HomeListView(context: context, isNewListQuizPresented: $isNewListQuizPresented)
-            .environment(\.managedObjectContext, context)
-            .environment(storeKitManager)
+        HomeListView(
+            context: previewStack.context,
+            packingListsCount: $packingListsCount,
+            selection: $selection,
+            navigateToListView: $navigateToListView,
+            currentPackingList: $currentPackingList,
+            isSettingsPresented: $isSettingsPresented
+        )
+        .environment(\.managedObjectContext, previewStack.context)
+        .environment(StoreKitManager())
+            
     }
 }
+
+#Preview("Blank") {
+    
+    @Previewable @State var selection = 0
+    @Previewable @State var packingListsCount = 1
+    @Previewable @Bindable var storeKitManager = StoreKitManager()
+    @Previewable @State var navigateToListView = false
+    @Previewable @State var currentPackingList: PackingList?
+    @Previewable @State var isSettingsPresented: Bool = false
+    
+    let previewStack = CoreDataStack.preview
+    
+    NavigationStack {
+        HomeListView(
+            context: previewStack.context,
+            packingListsCount: $packingListsCount,
+            selection: $selection,
+            navigateToListView: $navigateToListView,
+            currentPackingList: $currentPackingList,
+            isSettingsPresented: $isSettingsPresented
+        )
+        .environment(\.managedObjectContext, previewStack.context)
+        .environment(StoreKitManager())
+            
+    }
+}
+
+
 #endif

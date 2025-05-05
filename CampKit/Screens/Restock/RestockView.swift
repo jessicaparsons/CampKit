@@ -12,136 +12,172 @@ struct RestockView: View {
     
     @State var viewModel: RestockViewModel
     @State private var isAddNewItemPresented: Bool = false
-    @State private var newItemTitle: String = ""
-    @State private var editMode: EditMode = .inactive
     
-    private var isFormValid: Bool {
-        !newItemTitle.isEmptyOrWhiteSpace
-    }
+    @State private var scrollOffset: CGFloat = 0
     
-    init(context: NSManagedObjectContext) {
+    @Binding var isSettingsPresented: Bool
+
+    
+    init(context: NSManagedObjectContext, isSettingsPresented: Binding<Bool>) {
         _viewModel = State(wrappedValue: RestockViewModel(context: context))
+        _isSettingsPresented = isSettingsPresented
     }
     
     var body: some View {
         ZStack(alignment: .top) {
             
             //MARK: - BACKGROUND STYLES
-            GradientTanBackgroundView()
+            Color.colorWhiteSands
+                .ignoresSafeArea()
             
-            //MARK: - EMPTY VIEW
-            if viewModel.restockItems.isEmpty {
-                ScrollView {
-                        ContentUnavailableView("Empty List", systemImage: "arrow.clockwise.circle", description: Text("You haven't created any restock items yet. Hit the \"+\" to get started!"))
-                        .padding(.top, Constants.emptyContentSpacing)
+            ScrollView {
+                VStack(alignment: .leading) {
                     
-                }//:SCROLLVIEW
-            } else {
-                //MARK: - RESTOCK LIST
-                List {
+                    Text("Use this list to keep track of items that need replenishing")
+                        .multilineTextAlignment(.leading)
+                        .padding(.top, Constants.headerSpacing)
+                        .padding(.bottom)
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                        .padding(.horizontal, Constants.wideMargin)
                     
-                    Section(header:
-                                Color.clear
-                        .frame(height: 1) //Top Spacing
-                    ) {
-                        ForEach(viewModel.sortedItems) { item in
+                        //MARK: - RESTOCK LIST
+                        LazyVStack(spacing: 0) {
                             
-                                EditableItemView<RestockItem>(
-                                    item: item,
-                                    isList: true,
-                                    togglePacked: { viewModel.togglePacked(for: item)
-                                        HapticsManager.shared.triggerLightImpact()
-                                    },
-                                    deleteItem: { }
-                                )
-                                .listRowInsets(EdgeInsets(top: Constants.lineSpacing, leading: 0, bottom: Constants.lineSpacing, trailing: 0))
+                            if !viewModel.restockItems.isEmpty {
+                                
+                                ForEach(Array(viewModel.sortedItems.enumerated()), id: \.element.id) { index, item in
+                                    
+                                    let isFirst = index == 0
+                                    
+                                    HStack(spacing: 0) {
+                                        Spacer()
+                                            .frame(width: 30)
+                                        Rectangle()
+                                            .frame(width: 1)
+                                            .foregroundColor(Color.colorSecondaryGrey)
+                                        EditableItemView<RestockItem>(
+                                            item: item,
+                                            isList: true,
+                                            togglePacked: { viewModel.togglePacked(for: item)
+                                                HapticsManager.shared.triggerLightImpact()
+                                            },
+                                            deleteItem: { }
+                                        )
+                                        .padding(.top, isFirst ? -8 : 4)
+                                        .padding(.bottom, 4)
+                                    }//:HSTACK
+                                    .overlay(
+                                        Rectangle()
+                                            .frame(height: 1)
+                                            .foregroundColor(Color.colorSecondaryGrey),
+                                        alignment: .bottom
+                                    )
+                                }//:FOREACH
+                                .onMove(perform: viewModel.onMove)
+                                .onDelete(perform: viewModel.deleteItem)
+                            }//:IF NOT EMPTY
                             
-                        }//:FOREACH
-                        .onMove(perform: viewModel.onMove)
-                        .onDelete(perform: viewModel.deleteItem)
+                            
+                            //MARK: - ADD NEW ITEM
+                            HStack(spacing: 0) {
+                                Spacer()
+                                    .frame(width: 30)
+                                Rectangle()
+                                    .frame(width: 1)
+                                    .foregroundColor(Color.colorSecondaryGrey)
+                                AddNewRestockItemView(
+                                    viewModel: viewModel)
+                                .offset(y: viewModel.restockItems.isEmpty ? -5 : 0)
+                            }//:HSTACK
+                            
+                        }//:LAZYVSTACK
+                        .padding()
+                        .background(
+                            RoundedRectangle(cornerRadius: Constants.cornerRadius)
+                                .fill(Color.colorWhite)
+                                .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
+                        )
+                        .padding(.horizontal)
+                        .animation(.easeInOut, value: viewModel.restockItems.count)
+                    
+                }//:VSTACK
+                .background(
+                    GeometryReader { geo in
+                        Color.clear
+                            .frame(height: 0)
+                            .onChange(of: geo.frame(in: .global).minY) {
+                                scrollOffset = geo.frame(in: .global).minY
+                            }
                     }
-                }//:LIST
-                .animation(.easeInOut, value: viewModel.restockItems.count)
-                
-                
-            }
+                )//NAV BAR UI CHANGES ON SCROLL
+            }//:SCROLLVIEW
+            .scrollIndicators(.hidden)
+            
+            
+            
+            //MARK: - HEADER
+            
+            HeaderView(
+                title: "Restock",
+                scrollOffset: $scrollOffset,
+                scrollThreshold: -70
+            )
+            
+            
+            
         }//:ZSTACK
-        .navigationTitle("Restock")
-        .navigationBarTitleDisplayMode(.large)
-        .scrollContentBackground(.hidden)
-        .environment(\.editMode, $editMode)
         .task {
             await viewModel.loadItems()
         }
-        //MARK: - ADD NEW ITEM POP UP
-        .alert("Add New Item", isPresented: $isAddNewItemPresented) {
-            TextField("New restock item", text: $newItemTitle)
-            Button("Done", action: {
-                if isFormValid {
-                    viewModel.addNewItem(title: newItemTitle)
-                    newItemTitle = ""
-                }
-                isAddNewItemPresented = false
-            }).disabled(!isFormValid)
-            Button("Cancel", role: .cancel) { }
-        }
-        
         //MARK: - MENU
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                HStack {
-                    if editMode == .inactive {
-                        // ADD BUTTON
-                        Button {
-                            isAddNewItemPresented = true
-                            
-                        } label: {
-                            Image(systemName: "plus.circle.fill")
-                        }
-                        // REARRANGE BUTTON
-                        Button {
-                            editMode = (editMode == .active) ? .inactive : .active
-                        } label: {
-                            Image(systemName: "ellipsis.circle")
-                        }
-                        
-                    } else {
-                        Button {
-                            editMode = (editMode == .active) ? .inactive : .active
-                        } label: {
-                            Text("Done")
-                        }
-                    }
-                }//:HSTACK
-                .foregroundStyle(Color.primary)
+                Button {
+                    isSettingsPresented.toggle()
+                } label: {
+                    Image(systemName: "gearshape.fill")
+                        .foregroundStyle(Color.colorForestSecondary)
+                }
             }//:TOOL BAR ITEM
         }//:TOOLBAR
+        .toolbarBackground(.hidden, for: .navigationBar)
     }
 }
 
-//#if DEBUG
-//#Preview("Sample Data") {
-//    do {
-//        let context = PersistenceController.preview.persistentContainer.viewContext
-//        RestockItem.generateSampleItems(context: context)
-//        try? context.save()
-//        
-//        return NavigationStack {
-//            RestockView(context: context)
-//                .environment(\.managedObjectContext, context)
-//        }
-//    }
-//}
-//
-//
-//#Preview("Empty") {
-//    let context = PersistenceController.preview.persistentContainer.viewContext
-//
-//    NavigationStack {
-//        RestockView(context: context)
-//            .environment(\.managedObjectContext, context)
-//
-//    }
-//}
-//
-//#endif
+#if DEBUG
+#Preview("Sample Data") {
+    
+    @Previewable @State var isSettingsPresented: Bool = false
+
+    
+    do {
+        let previewStack = CoreDataStack.preview
+        
+        RestockItem.generateSampleItems(context: previewStack.context)
+        
+        try? previewStack.context.save()
+        
+        return NavigationStack {
+            RestockView(context: previewStack.context, isSettingsPresented: $isSettingsPresented)
+                .environment(\.managedObjectContext, previewStack.context)
+            
+        }
+    }
+}
+
+
+#Preview("Empty") {
+    
+    @Previewable @State var isSettingsPresented: Bool = false
+    let previewStack = CoreDataStack.preview
+    
+    NavigationStack {
+        RestockView(context: previewStack.context, isSettingsPresented: $isSettingsPresented)
+            .environment(\.managedObjectContext, previewStack.context)
+        
+    }
+}
+
+#endif
+

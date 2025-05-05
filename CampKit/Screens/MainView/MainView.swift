@@ -7,138 +7,119 @@
 
 import SwiftUI
 import os
+import CoreData
 
 let log = Logger(subsystem: "co.junipercreative.CampKit", category: "Sharing")
 
 struct MainView: View {
     
     
-    @FetchRequest(
-        sortDescriptors: [NSSortDescriptor(keyPath: \PackingList.position, ascending: true)]
-    ) var packingLists: FetchedResults<PackingList>
-
-    
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(StoreKitManager.self) private var storeKitManager
-    let weatherViewModel = WeatherViewModel(weatherFetcher: WeatherAPIClient(), geoCoder: Geocoder())
+    @Environment(\.colorScheme) var colorScheme
     
     @State private var selection = 0
+    
     @State private var isSettingsPresented: Bool = false
-    @State private var isNewListQuizPresented: Bool = false
-    @State private var isStepOne: Bool = true
-    @State private var navigateToListView = false
-    @State private var currentPackingList: PackingList?
     @State private var isUpgradeToProPresented: Bool = false
     
-    var packingListsCount: Int {
-        packingLists.count
-    }
+    @State private var packingListsCount: Int = 0
+    
+    @State private var navigateToListView = false
+    @State private var currentPackingList: PackingList?
     
     var body: some View {
-        
-            ZStack(alignment: .bottom) {
+            ZStack {
+                
                 TabView(selection: $selection) {
-                        NavigationStack {
-                            //MARK: - HOME
+                    NavigationStack {
+                        //MARK: - HOME
+                        HomeListView(
+                            context: viewContext,
+                            packingListsCount: $packingListsCount,
+                            selection: $selection,
+                            navigateToListView: $navigateToListView,
+                            currentPackingList: $currentPackingList,
+                            isSettingsPresented: $isSettingsPresented
+                        )
+                        .navigationDestination(isPresented: $navigateToListView) {
+                            if let packingList = currentPackingList {
+                                ListView(
+                                    context: viewContext,
+                                    packingList: packingList,
+                                    packingListsCount: packingListsCount
+                                )
+                            } else {
                                 HomeListView(
                                     context: viewContext,
-                                    isNewListQuizPresented: $isNewListQuizPresented
+                                    packingListsCount: $packingListsCount,
+                                    selection: $selection,
+                                    navigateToListView: $navigateToListView,
+                                    currentPackingList: $currentPackingList,
+                                    isSettingsPresented: $isSettingsPresented
                                 )
-                                .navigationDestination(isPresented: $navigateToListView) {
-                                    if let packingList = currentPackingList {
-                                        ListView(
-                                            context: viewContext,
-                                            packingList: packingList,
-                                            packingListsCount: packingListsCount
-                                        )
-                                    } else {
-                                        HomeListView(context: viewContext, isNewListQuizPresented: $isNewListQuizPresented)
-                                    }
-                                }
-                        }
-                        .tabItem {
-                            Image(systemName: "list.bullet")
-                        }
-                        .tag(0)
-                        
-                        //MARK: - REMINDERS
-                        NavigationStack {
-                            RemindersView(context: viewContext)
-                        }
-                        .tabItem {
-                            Image(systemName: "alarm")
-                        }
-                        .tag(1)
-                        
-                        //MARK: - CENTER BUTTON
-                        Spacer()
-                            .tabItem {
-                                EmptyView()
                             }
-                            .tag(2)
-                        
-                        //MARK: - RESTOCK
-                        NavigationStack {
-                            RestockView(context: viewContext)
                         }
-                        .tabItem {
-                            Image(systemName: "arrow.clockwise.square")
+                    }
+                    .tabItem {
+                        VStack {
+                            Image(systemName: selection == 0 ? "tent.fill" : "tent")
+                                .environment(\.symbolVariants, .none)
+                            Text("Home")
                         }
-                        .tag(3)
-                        
-                        //MARK: - SETTINGS
-                        NavigationStack {
-                            SettingsView()
+                    }
+                    .tag(0)
+                    
+                    //MARK: - REMINDERS
+                    NavigationStack {
+                        RemindersView(
+                            context: viewContext,
+                            isSettingsPresented: $isSettingsPresented)
+                    }
+                    .tabItem {
+                        VStack {
+                            Image(systemName: selection != 1  && colorScheme == .dark ? "alarm" : "alarm.fill")
+                                .environment(\.symbolVariants, .none)
+                            Text("Reminders")
                         }
-                        .tabItem {
-                            Image(systemName: "gearshape")
+                    }
+                    .tag(1)
+                    
+                    
+                    //MARK: - RESTOCK
+                    
+                        RestockView(
+                            context: viewContext,
+                            isSettingsPresented: $isSettingsPresented)
+                    
+                    .tabItem {
+                        VStack {
+                            Image(systemName: selection != 2 && colorScheme == .dark ?  "arrow.clockwise.circle" : "arrow.clockwise.circle.fill")
+                                .environment(\.symbolVariants, .none)
+               
+                            Text("Restock")
                         }
-                        .tag(4)
+                    }
+                    .tag(2)
                     
                 }//:TABVIEW
                 .toolbarBackground(Color(UIColor.tertiarySystemBackground), for: .tabBar)
+                .tint(colorScheme == .light ? Color.colorForest : Color.colorSage)
                 
-                //MARK: - CENTER ADD NEW LIST BUTTON
-                Button {
-                    if storeKitManager.isUnlimitedListsUnlocked || packingLists.count < Constants.proVersionListCount {
-                        isNewListQuizPresented = true
-                    } else {
-                        isUpgradeToProPresented.toggle()
-                    }
-                } label: {
-                    Image(systemName: "plus.circle.fill")
-                        .symbolRenderingMode(.palette)
-                        .font(.system(size: 38))
-                        .foregroundStyle(.black, Color(Color.colorNeon))
-                        .offset(y: -10)
-                }
+                
                 
             }//:ZSTACK
             .ignoresSafeArea(.keyboard) // So the button doesn't move on keyboard appearance
-            .onChange(of: selection) { oldValue, newValue in
-                if newValue == 2 {
-                    selection = oldValue // Revert to the previous tab
-                }
-            }
             
-            //MARK: - SHOW PACKING LIST QUIZ
-            .sheet(isPresented: $isNewListQuizPresented) {
-                NavigationStack {
-                    QuizView(
-                        viewModel: QuizViewModel(context: viewContext),
-                        isNewListQuizPresented: $isNewListQuizPresented,
-                        isStepOne: $isStepOne,
-                        navigateToListView: $navigateToListView,
-                        currentPackingList: $currentPackingList,
-                        packingListCount: packingListsCount
-                    )
-                    .environment(weatherViewModel)
-                }
-            }
+            
             .sheet(isPresented: $isUpgradeToProPresented) {
                 UpgradeToProView()
             }
-       // MARK: - CLOUD NOTIFICATIONS
+            .sheet(isPresented: $isSettingsPresented) {
+                SettingsView()
+                    .presentationDragIndicator(.visible)
+            }
+            // MARK: - CLOUD NOTIFICATIONS
             .onReceive(NotificationCenter.default.publisher(for: .didAcceptShare)) { _ in
                 Task { @MainActor in
                     do {
@@ -148,7 +129,6 @@ struct MainView: View {
                     }
                 }
             }
-            
     }
     
 }
@@ -161,13 +141,26 @@ extension Notification.Name {
 
 #if DEBUG
 #Preview {
+    @Previewable @State var isDarkMode = false
     
-    let context = CoreDataStack.shared.context
+    let previewStack = CoreDataStack.preview
     
-    let list = PackingList.samplePackingList(context: context)
+    let list = PackingList.samplePackingList(context: CoreDataStack.preview.context)
 
     MainView()
-        .environment(\.managedObjectContext, context)
+        .environment(\.managedObjectContext, previewStack.context)
+        .environment(StoreKitManager())
+}
+#endif
+
+#if DEBUG
+#Preview("Blank") {
+    @Previewable @State var isDarkMode = false
+    
+    let previewStack = CoreDataStack.preview
+
+    MainView()
+        .environment(\.managedObjectContext, previewStack.context)
         .environment(StoreKitManager())
 }
 #endif

@@ -14,7 +14,7 @@ struct CampGradientBackground: View {
         Group {
             if colorScheme == .dark {
                 LinearGradient(
-                    colors: [.customSky, .customLilac],
+                    colors: [Color.colorSky, Color.colorLilac],
                     startPoint: .bottomLeading,
                     endPoint: .topTrailing
                 )
@@ -24,7 +24,7 @@ struct CampGradientBackground: View {
                 )
             } else {
                 LinearGradient(
-                    colors: [.customGold, .customSage, .customSky, .customSky],
+                    colors: [Color.colorGold, Color.colorSage, Color.colorSky, Color.colorSky],
                     startPoint: .bottomLeading,
                     endPoint: .topTrailing
                 )

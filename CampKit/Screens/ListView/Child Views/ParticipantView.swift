@@ -50,7 +50,7 @@ struct ParticipantView: View {
                     
                 }
                 .padding(.horizontal)
-                .padding(.top, Constants.emptyContentSpacing)
+                .padding(.top, Constants.largePadding)
             }
         }//:ZSTACK
         .navigationTitle("Participants")

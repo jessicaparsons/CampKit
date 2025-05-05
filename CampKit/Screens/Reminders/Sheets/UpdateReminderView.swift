@@ -43,6 +43,7 @@ struct UpdateReminderView: View {
                     TextField("Reminder Name", text: $title)
                     TextField("Notes", text: $notes)
                 }//:SECTION
+                .listRowBackground(Color.colorWhite)
                 
                 Section {
                     HStack {
@@ -89,13 +90,13 @@ struct UpdateReminderView: View {
                     }
                     
                 }//:SECTION
-                
+                .listRowBackground(Color.colorWhite)
                 
             }//:FORM
-            .navigationTitle("Update Reminder")
+            .navigationTitle(reminder == nil ? "New Reminder" : "Update Reminder")
             .navigationBarTitleDisplayMode(.inline)
             .scrollContentBackground(.hidden)
-            .background(Color.colorTan)
+            .background(Color.colorWhiteSands)
             .onAppear {
                 title = reminder?.title ?? "New Reminder"
                 notes = reminder?.notes ?? ""
@@ -156,26 +157,47 @@ struct UpdateReminderView: View {
         }
     }
 }
-//
-//#if DEBUG
-//#Preview {
-//    
-//    @Previewable @State var dataRefresh: Bool = false
-//    
-//    do {
-//        let context = PersistenceController.preview.persistentContainer.viewContext
-//        
-//        Reminder.generateSampleReminders(context: context)
-//        try? context.save()
-//        
-//        return NavigationStack {
-//            UpdateReminderView(
-//                reminder: Reminder(context: context, title: "Charge batteries"),
-//                dataRefreshTrigger: $dataRefresh
-//            )
-//            .environment(\.managedObjectContext, context)
-//        }
-//    }
-//    
-//}
-//#endif
+
+#if DEBUG
+#Preview {
+    
+    @Previewable @State var dataRefresh: Bool = false
+    
+    do {
+        let previewStack = CoreDataStack.preview
+                
+        Reminder.generateSampleReminders(context: previewStack.context)
+        try? previewStack.context.save()
+        
+        return NavigationStack {
+            UpdateReminderView(
+                reminder: Reminder(context: previewStack.context, title: "Charge batteries"),
+                dataRefreshTrigger: $dataRefresh
+            )
+            .environment(\.managedObjectContext, previewStack.context)
+        }
+    }
+    
+}
+#endif
+
+#if DEBUG
+#Preview("Blank") {
+    
+    @Previewable @State var dataRefresh: Bool = false
+    
+    do {
+        let previewStack = CoreDataStack.preview
+                
+        
+        return NavigationStack {
+            UpdateReminderView(
+                reminder: nil,
+                dataRefreshTrigger: $dataRefresh
+            )
+            .environment(\.managedObjectContext, previewStack.context)
+        }
+    }
+    
+}
+#endif

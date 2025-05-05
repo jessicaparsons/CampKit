@@ -85,16 +85,21 @@ struct ReminderListItemView: View {
             
             //MARK: - INFO ICON
             Spacer()
-            Image(systemName: "info.circle.fill")
-                .foregroundStyle(.colorSage)
+            Image(systemName: "pencil.circle.fill")
+                .foregroundStyle(.colorForest)
                 .opacity(isSelected ? 1 : 0)
                 .onTapGesture {
                     onEvent(.onInfoSelected(reminder))
                 }
             
         }//:HSTACK
-        .padding(.vertical, isTitleOnly ? 6 : 0)
-        .contentShape(Rectangle())//makes entire row clickable
+        .padding()
+        .background(
+            RoundedRectangle(cornerRadius: Constants.cornerRadius)
+                .fill(Color.colorWhite)
+                .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
+        )
+        .padding(.horizontal)
         .onTapGesture {
             onEvent(.onSelect(reminder))
         }
@@ -110,17 +115,43 @@ struct ReminderListItemView: View {
         }
     }
 }
-//
-//#if DEBUG
-//#Preview {
-//    
-//    do {
-//        let context = PersistenceController.preview.persistentContainer.viewContext
-//        
-//        let reminder = Reminder(context: context, title: "Recharge batteries", notes: "Get Ollie's Collar", reminderDate: Date(), reminderTime: Date())
-//        try? context.save()
-//        
-//        return ReminderListItemView(reminder: reminder, isSelected: true, onEvent: { _ in })
-//    }
-//}
-//#endif
+
+#if DEBUG
+#Preview {
+    
+    do {
+        let previewStack = CoreDataStack.preview
+        
+        let reminder = Reminder(context: previewStack.context, title: "Recharge batteries", notes: "Get Ollie's Collar", reminderDate: Date(), reminderTime: Date())
+        try? previewStack.context.save()
+        
+        return
+        
+            ZStack {
+                Color.colorWhiteSands
+                ReminderListItemView(reminder: reminder, isSelected: true, onEvent: { _ in })
+            
+            }
+    }
+}
+#endif
+
+#if DEBUG
+#Preview("Title only") {
+    
+    do {
+        let previewStack = CoreDataStack.preview
+        
+        let reminder = Reminder(context: previewStack.context, title: "Recharge batteries")
+        try? previewStack.context.save()
+        
+        return
+        
+            ZStack {
+                Color.colorWhiteSands
+                ReminderListItemView(reminder: reminder, isSelected: true, onEvent: { _ in })
+            
+            }
+    }
+}
+#endif

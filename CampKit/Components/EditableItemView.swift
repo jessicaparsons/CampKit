@@ -40,6 +40,7 @@ struct EditableItemView<T: EditablePackableItem>: View {
                     get: { item.title ?? "" },
                     set: { item.title = $0 }))
                 .focused($isFocused)
+                .fontWeight(.light)
                 .foregroundStyle(item.isPacked ? Color.secondary : .primary)
                 .strikethrough(item.isPacked)
                 .italic(item.isPacked)
@@ -68,18 +69,18 @@ struct EditableItemView<T: EditablePackableItem>: View {
     }//:BODY
     
 }
-//
-//#if DEBUG
-//#Preview {
-//    let context = PersistenceController.preview.persistentContainer.viewContext
-//    let item = RestockItem(context: context, title: "Sleeping Bag", position: 0)
-//    
-//    EditableItemView(
-//        item: item,
-//        isList: false,
-//        togglePacked: { },
-//        deleteItem: { }
-//    )
-//    .environment(\.managedObjectContext, context)
-//}
-//#endif
+
+#if DEBUG
+#Preview {
+    let previewStack = CoreDataStack.preview
+    let item = RestockItem(context: previewStack.context, title: "Sleeping Bag", position: 0)
+    
+    EditableItemView(
+        item: item,
+        isList: false,
+        togglePacked: { },
+        deleteItem: { }
+    )
+    .environment(\.managedObjectContext, previewStack.context)
+}
+#endif

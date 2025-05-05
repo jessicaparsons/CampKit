@@ -22,6 +22,7 @@ struct SettingsView: View {
     //Placeholder
     @AppStorage("temperatureUnit") private var temperatureUnit = TemperatureUnit.fahrenheit.rawValue
     @AppStorage("successEmoji") private var successEmoji: String = "🔥"
+    @AppStorage("isDarkMode") private var isDarkMode = false
     
     @State var isProUnlocked: Bool = false
     @State private var isPickerPresented = false
@@ -29,7 +30,9 @@ struct SettingsView: View {
     
     @State private var showRestoreAlert = false
     @State private var restoreMessage = ""
-        
+    
+    
+    
     private let options = TemperatureUnit.allCases
     
     let allEmojis: [String] = [
@@ -51,24 +54,29 @@ struct SettingsView: View {
     var body: some View {
 
             ScrollView(.vertical, showsIndicators: false){
-                VStack(spacing: Constants.verticalSpacing){
-                    //MARK: - SECTION 1
+                VStack(alignment: .leading, spacing: Constants.verticalSpacing){
+                    
+                    Text("Settings")
+                        .font(.title)
+                        .fontWeight(.bold)
+                        .padding(.top, Constants.largePadding)
+                        .padding(.bottom)
+                
                     Group {
-                    GroupBox(
-                        label:
-                            SettingsLabelView(labelText: "CampKit", labelImage: "info.circle")
-                    )   {
-                        Divider().padding(.vertical, 4)
-                        HStack(alignment: .center, spacing: 10) {
-                            Image("logo")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 80, height: 80)
-                                .cornerRadius(9)
-                            Text("CampKit is a passion project that helps you build smart packing lists for your trips with weather-based suggestions. Happy camping! 🌲🏕️")
-                                .font(.footnote)
-                        }//:HSTACK
+                    
                         
+                    //MARK: - DARK/LIGHT MODE
+                        
+                    GroupBox(
+                        label: SettingsLabelView(labelText: "Dark/Light Mode", labelImage: isDarkMode ? "moon.stars" : "sun.max")
+                    ) {
+                        Divider().padding(.vertical, 4)
+                        Toggle(isDarkMode ? "Dark Mode On" :
+                                "Dark Mode Off", isOn: $isDarkMode)
+                        .tint(Color.colorSage)
+                        .onChange(of: isDarkMode) {
+                            HapticsManager.shared.triggerLightImpact()
+                        }
                     }
                     
                     //MARK: - TEMPERATURE
@@ -83,7 +91,7 @@ struct SettingsView: View {
                                     Spacer()
                                     if option.rawValue == temperatureUnit {
                                         Image(systemName: "checkmark")
-                                            .foregroundColor(Color.customSage)
+                                            .foregroundColor(Color.colorSage)
                                     }
                                 }
                                 .contentShape(Rectangle())
@@ -147,7 +155,7 @@ struct SettingsView: View {
                                             .font(.title)
                                             .padding()
                                             .opacity(!storeKitManager.isUnlimitedListsUnlocked ? 1 : 0.5)
-                                        .background(.colorTan)
+                                        .background(.colorWhiteSands)
                                         .clipShape(RoundedRectangle(cornerRadius: Constants.cornerRadius))
                                     }
                                     
@@ -159,7 +167,7 @@ struct SettingsView: View {
                                                 .font(.system(size: 32))
                                                 .padding(6)
                                                 .frame(width: 44, height: 44)
-                                                .background(emoji == successEmoji ? Color.colorTan : Color.clear)
+                                                .background(emoji == successEmoji ? Color.colorWhiteSands : Color.clear)
                                                 .clipShape(RoundedRectangle(cornerRadius: Constants.cornerRadius))
                                                 .onTapGesture {
                                                     successEmoji = emoji
@@ -200,6 +208,50 @@ struct SettingsView: View {
                                 
                             }//:VSTACK
                         }
+                        
+                    //MARK: - INFORMATION
+                        
+                        GroupBox(
+                            label: SettingsLabelView(labelText: "Feedback", labelImage: "envelope")
+                        ) {
+                            Divider()
+                                .padding(.vertical, 4)
+                        
+                            VStack(alignment: .leading) {
+                                HStack {
+                                    Image(systemName: "star.square.fill")
+                                        .foregroundStyle(Color.colorSage)
+                                    HStack {
+                                        Link("Rate CampKit", destination: URL(string: "https://apps.apple.com/app/idYOUR_APP_ID")!)
+                                            .font(.body)
+                                            .foregroundStyle(Color.colorSage)
+                                        Image(systemName: "arrow.up.right.square").foregroundColor(Color.colorSage)
+                                    }//:HSTACK
+                                    
+                                }//:HSTACK
+                                .padding(.top, Constants.lineSpacing)
+                                
+                                Divider()
+                                    .padding(.vertical, 4)
+                                
+                                HStack(alignment: .top) {
+                                    Image(systemName: "questionmark.app.fill")
+                                        .foregroundStyle(Color.colorSage)
+                                    VStack(alignment: .leading) {
+                                        HStack {
+                                            Link("Email the Developer", destination: URL(string: "mailto:jess@junipercreative.co?subject=CampKit Feedback")!)
+                                                .foregroundStyle(Color.colorSage)
+                                            Image(systemName: "arrow.up.right.square").foregroundColor(Color.colorSage)
+                                        }//:HSTACK
+                                        
+                                        Text("Have a feature idea or ran into an issue? I’d love to hear from you.")
+                                            .font(.footnote)
+                                            .foregroundColor(.secondary)
+                                    }//:VSTACK
+                                }//:HSTACK
+                                .padding(.top, Constants.lineSpacing)
+                            }
+                        }
                     
                     //MARK: - APPLICATION
                     GroupBox(
@@ -214,7 +266,7 @@ struct SettingsView: View {
                         SettingsRowView(name: "Version", content: "1.0")
                     }
                 }//:GROUP
-                    .backgroundStyle(Color.colorWhite)
+                .backgroundStyle(Color.colorWhite)
 
                 }//:VSTACK
                 .padding(.horizontal)
@@ -223,11 +275,12 @@ struct SettingsView: View {
                 }
                 
             }//:SCROLLVIEW
-            .background(Color.colorTan)
-            .navigationTitle("Settings")
-            .navigationBarTitleDisplayMode(.large)
+            .background(Color.colorWhiteSands)
+            .preferredColorScheme(isDarkMode ? .dark : .light)
+            
         
     }//:BODY
+    
     
     private func fahrenheitToCelsius(_ fahrenheit: Double) -> Double {
         return (fahrenheit - 32) * 5 / 9
@@ -235,9 +288,8 @@ struct SettingsView: View {
 }
 #if DEBUG
 #Preview {
-    NavigationStack {
         SettingsView()
             .environment(StoreKitManager())
-    }
+    
 }
 #endif

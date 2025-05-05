@@ -118,7 +118,7 @@ struct ListView: View {
                         }
                     )//NAV BAR UI CHANGES ON SCROLL
                 }//:SCROLLVIEW
-                .background(Color.colorTan)
+                .background(Color.colorWhiteSands)
                 .ignoresSafeArea(edges: .top)
                 .refreshable {
                     await refresh(context: viewContext)
@@ -451,40 +451,40 @@ extension ListView {
     }
 }
 
-////MARK: - PREVIEWS
-//#if DEBUG
-//#Preview("Sample Data") {
-//    
-//    let storeKitManager = StoreKitManager()
-//    let context = PersistenceController.preview.persistentContainer.viewContext
-//    
-//    let samplePackingList = PackingList.samplePackingList(context: context)
-//    
-//    NavigationStack {
-//        ListView(
-//            context: context,
-//            packingList: samplePackingList,
-//            packingListsCount: 3
-//        )
-//        .environment(storeKitManager)
-//        .environment(\.managedObjectContext, context)
-//    }
-//}
-//#Preview("Basic Preview") {
-//    let storeKitManager = StoreKitManager()
-//    let context = PersistenceController.preview.persistentContainer.viewContext
-//    
-//    let emptySamplePackingList = PackingList(context: context, title: "Empty List", position: 0)
-//    
-//    NavigationStack {
-//        ListView(
-//            context: context,
-//            packingList: emptySamplePackingList,
-//            packingListsCount: 3
-//        )
-//        .environment(storeKitManager)
-//        .environment(\.managedObjectContext, context)
-//        
-//    }
-//}
-//#endif
+//MARK: - PREVIEWS
+#if DEBUG
+#Preview("Sample Data") {
+    
+    let storeKitManager = StoreKitManager()
+    let previewStack = CoreDataStack.preview
+    
+    let list = PackingList.samplePackingList(context: previewStack.context)
+    
+    NavigationStack {
+        ListView(
+            context: previewStack.context,
+            packingList: list,
+            packingListsCount: 3
+        )
+        .environment(storeKitManager)
+        .environment(\.managedObjectContext, previewStack.context)
+    }
+}
+#Preview("Basic Preview") {
+    let storeKitManager = StoreKitManager()
+    let previewStack = CoreDataStack.preview
+    
+    let list = PackingList.samplePackingList(context: previewStack.context)
+    
+    NavigationStack {
+        ListView(
+            context: previewStack.context,
+            packingList: list,
+            packingListsCount: 3
+        )
+        .environment(storeKitManager)
+        .environment(\.managedObjectContext, previewStack.context)
+        
+    }
+}
+#endif

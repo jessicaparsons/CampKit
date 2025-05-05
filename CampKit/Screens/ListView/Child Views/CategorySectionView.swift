@@ -35,6 +35,18 @@ struct CategorySectionView: View {
             }
         )
     }
+    
+    private var allItems: [Item] {
+        category.sortedItems
+    }
+    
+    private var packedCount: Int {
+        allItems.filter { $0.isPacked }.count
+    }
+    
+    private var packedRatio: Double {
+        allItems.isEmpty ? 0 : Double(packedCount) / Double(allItems.count)
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -43,9 +55,9 @@ struct CategorySectionView: View {
             Button {
                 isExpandedBinding.wrappedValue.toggle()
             } label: {
-                HStack(spacing: Constants.horizontalPadding) {
+                HStack(spacing: 8) {
                     Image(systemName: category.isExpanded ? "chevron.down" : "chevron.right")
-                        .foregroundColor(.customNeonLight)
+                        .foregroundColor(Color.colorNeonLight)
                         .font(.caption.lowercaseSmallCaps())
                     if isEditing {
                         TextField("Category Name", text: $category.name)
@@ -56,41 +68,54 @@ struct CategorySectionView: View {
                                 isEditing = false
                                         save(viewContext)
                             }
+                            .padding(.leading, Constants.horizontalPadding)
 
                         Button("Done") {
                             isEditing = false
                             save(viewContext)
                         }
                         .padding(.vertical, 8)
+                        
+                        //MARK: - CATEGORY NAME
                     } else {
                         Text(category.name)
                             .font(.headline)
                             .foregroundStyle(Color.primary)
                             .multilineTextAlignment(.leading)
+                            .padding(.leading, 8)
+                            .layoutPriority(1)
                         
                         Spacer()
-                        Menu {
-                            Button {
-                                isEditing = true
+                        
+                        
+                            //MARK: - PROGRESS BAR
+                            Text("\(packedCount)/\(allItems.count)")
+                                .font(.subheadline)
+                                .foregroundStyle(packedCount == allItems.count ? Color.green : Color.secondary)
+                            
+                            //MARK: - MENU
+                            Menu {
+                                Button {
+                                    isEditing = true
+                                } label: {
+                                    Label("Edit Name", systemImage: "pencil")
+                                }
+                                Button {
+                                    isRearranging = true
+                                } label: {
+                                    Label("Rearrange", systemImage: "arrow.up.arrow.down")
+                                }
+                                Button(role: .destructive) {
+                                    deleteCategory()
+                                } label: {
+                                    Label("Delete", systemImage: "trash")
+                                }
                             } label: {
-                                Label("Edit Name", systemImage: "pencil")
-                            }
-                            Button {
-                                isRearranging = true
-                            } label: {
-                                Label("Rearrange", systemImage: "arrow.up.arrow.down")
-                            }
-                            Button(role: .destructive) {
-                                deleteCategory()
-                            } label: {
-                                Label("Delete", systemImage: "trash")
-                            }
-                        } label: {
-                            Image(systemName: "ellipsis")
-                                .padding(.horizontal, 8)
-                                .padding(.vertical)
-                        }
-                        .labelStyle(.iconOnly)
+                                Image(systemName: "ellipsis")
+                                    .padding(.horizontal, 8)
+                                    .padding(.vertical)
+                            }//:MENU
+                            .labelStyle(.iconOnly)
                     }
                 }
                 .padding(.horizontal)
@@ -125,27 +150,26 @@ struct CategorySectionView: View {
 
 
 //MARK: - PREVIEW
-//#if DEBUG
-//#Preview {
-//    @Previewable @State var isRearranging: Bool = false
-//    
-//    let context = PersistenceController.preview.persistentContainer.viewContext
-//    
-//    let samplePackingList = PackingList.samplePackingList(context: context)
-//    
-//    let categories = Category.sampleCategories(context: context)
-//    
-//    // Return the preview
-//   
-//            NavigationStack {
-//            CategorySectionView(
-//                viewModel: ListViewModel(viewContext: context, packingList: samplePackingList),
-//                category: categories.first!,
-//                isRearranging: $isRearranging,
-//                deleteCategory: { print("Mock delete category") }
-//            )
-//            .background(.red)
-//        }
-//}
-//#endif
+#if DEBUG
+#Preview {
+    @Previewable @State var isRearranging: Bool = false
+    
+    let context = CoreDataStack.shared.context
+    
+    let list = PackingList.samplePackingList(context: context)
+    
+    let categories = Category.sampleCategories(context: context)
+    
+    // Return the preview
+   
+            NavigationStack {
+            CategorySectionView(
+                viewModel: ListViewModel(viewContext: context, packingList: list),
+                category: categories.first!,
+                isRearranging: $isRearranging,
+                deleteCategory: { print("Mock delete category") }
+            )
+        }
+}
+#endif
 

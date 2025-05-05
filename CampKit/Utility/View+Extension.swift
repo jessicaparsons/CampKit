@@ -15,6 +15,10 @@ extension View {
     func dynamicForegroundStyle(trigger: CGFloat, threshold: CGFloat = 1) -> some View {
         self.foregroundStyle(trigger < -threshold ? Color.primary : Color.white)
     }
+    
+    func dynamicMaterialOpacity(trigger: CGFloat, threshold: CGFloat = 1) -> some View {
+        self.opacity(trigger < -threshold ? 0 : 1)
+    }
 }
 
     

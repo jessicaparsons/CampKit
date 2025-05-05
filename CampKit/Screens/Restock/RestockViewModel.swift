@@ -16,7 +16,7 @@ final class RestockViewModel {
     var restockItems: [RestockItem] = []
     
     var sortedItems: [RestockItem] {
-        restockItems.sorted(by: { $0.position > $1.position })
+        restockItems.sorted(by: { $0.position < $1.position })
     }
     
     init(context: NSManagedObjectContext) {
@@ -32,6 +32,9 @@ final class RestockViewModel {
     }
     
     func addNewItem(title: String) {
+        
+        guard !title.isEmptyOrWhiteSpace else { return }
+        
         withAnimation {
             let newPosition = (restockItems.map(\.positionInt).max() ?? -1) + 1
             let newItem = RestockItem(context: viewContext, title: title, position: newPosition, isPacked: false)

@@ -15,7 +15,7 @@ struct GradientHeaderView: View {
     
     var body: some View {
         ZStack(alignment: .center) {
-             LinearGradient(colors: [.customGold, .customSage, .customSky, .customLilac], startPoint: .bottomLeading, endPoint: .topTrailing)
+            LinearGradient(colors: [Color.colorGold, Color.colorSage, Color.colorSky, Color.colorLilac], startPoint: .bottomLeading, endPoint: .topTrailing)
                  
              HStack{
                  Text(label)

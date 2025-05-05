@@ -20,7 +20,7 @@ struct GradientTanBackgroundView: View {
                 if colorScheme == .dark {
                     
                     LinearGradient(
-                        colors: [.customSky, .customLilac],
+                        colors: [Color.colorSky, Color.colorLilac],
                         startPoint: .bottomLeading,
                         endPoint: .topTrailing
                     )
@@ -32,7 +32,7 @@ struct GradientTanBackgroundView: View {
                     //LIGHT MODE
                     
                     LinearGradient(
-                        colors: [.customGold, .customSage, .customSky, .customSky],
+                        colors: [Color.colorGold, Color.colorSage, Color.colorSky, Color.colorSky],
                         startPoint: .bottomLeading,
                         endPoint: .topTrailing
                     )
@@ -43,7 +43,7 @@ struct GradientTanBackgroundView: View {
             .ignoresSafeArea(edges: .all)
             
             RoundedRectangle(cornerRadius: Constants.cornerRadius)
-                .fill(Color.customTan)
+                .fill(Color.colorTan)
                 .ignoresSafeArea(.container, edges: [.bottom])
                 .shadow(color: .gray.opacity(0.2), radius: 4, x: 0, y: -2)
             

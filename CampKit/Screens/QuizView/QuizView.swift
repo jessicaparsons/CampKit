@@ -44,6 +44,7 @@ struct QuizView: View {
                                 .transition(.move(edge: .trailing))
                         }
                     }
+                    .scrollIndicators(.hidden)
                 }//:ZSTACK
                 
                 
@@ -169,21 +170,20 @@ struct QuizView: View {
     }
 }
 
-//#if DEBUG
-//#Preview {
-//    
-//    @Previewable @State var isNewListQuizPresented: Bool = true
-//    @Previewable @State var isStepOne: Bool = true
-//    
-//    @Previewable @State var navigateToListView: Bool = false
-//    @Previewable @State var currentPackingList: PackingList?
-//    
-//    let context = PersistenceController.preview.persistentContainer.viewContext
-//    
-//    
-//    NavigationStack {
-//        QuizView(viewModel: QuizViewModel(context: context), isNewListQuizPresented: $isNewListQuizPresented, isStepOne: $isStepOne, navigateToListView: $navigateToListView, currentPackingList: $currentPackingList, packingListCount: 3)
-//            .environment(WeatherViewModel(weatherFetcher: WeatherAPIClient(), geoCoder: Geocoder()))
-//    }
-//}
-//#endif
+#if DEBUG
+#Preview {
+    
+    @Previewable @State var isNewListQuizPresented: Bool = true
+    @Previewable @State var isStepOne: Bool = true
+    
+    @Previewable @State var navigateToListView: Bool = false
+    @Previewable @State var currentPackingList: PackingList?
+    
+    let context = CoreDataStack.shared.context
+    
+    NavigationStack {
+        QuizView(viewModel: QuizViewModel(context: context), isNewListQuizPresented: $isNewListQuizPresented, isStepOne: $isStepOne, navigateToListView: $navigateToListView, currentPackingList: $currentPackingList, packingListCount: 3)
+            .environment(WeatherViewModel(weatherFetcher: WeatherAPIClient(), geoCoder: Geocoder()))
+    }
+}
+#endif

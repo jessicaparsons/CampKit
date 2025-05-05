@@ -48,18 +48,18 @@ struct BannerImageView: View {
     }
 
 }
-//
-//#if DEBUG
-//#Preview {
-//    
-//    @Previewable @State var bannerImage = UIImage(named: "TopographyDesign")
-//    
-//    let context = PersistenceController.preview.persistentContainer.viewContext
-//    
-//    let samplePackingList = PackingList.samplePackingList(context: context)
-//        
-//    // Return the ListView with the in-memory container
-//    return BannerImageView(viewModel: ListViewModel(viewContext: context, packingList: samplePackingList), bannerImage: $bannerImage)
-//    
-//}
-//#endif
+
+#if DEBUG
+#Preview {
+    
+    @Previewable @State var bannerImage = UIImage(named: "TopographyDesign")
+    
+    let context = CoreDataStack.shared.context
+    
+    let list = PackingList.samplePackingList(context: context)
+        
+    // Return the ListView with the in-memory container
+    return BannerImageView(viewModel: ListViewModel(viewContext: context, packingList: list), bannerImage: $bannerImage)
+    
+}
+#endif

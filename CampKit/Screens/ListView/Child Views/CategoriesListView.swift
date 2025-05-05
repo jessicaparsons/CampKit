@@ -25,13 +25,13 @@ struct CategoriesListView: View {
                         systemImage: "tent",
                         description: Text("Hit the \"+\" to add a new category and get started")
                     )
-                    .padding(.top, Constants.emptyContentSpacing)
+                    .padding(.top, Constants.largePadding)
                 } else {
                     ForEach(viewModel.packingList.sortedCategories, id: \.objectID) { category in
                         
                         ZStack {
                             RoundedRectangle(cornerRadius: Constants.cornerRadius)
-                                .fill(Color.customWhite)
+                                .fill(Color.colorWhite)
                                 .shadow(color: .gray.opacity(0.2), radius: 4, x: 0, y: 2)
                             CategorySectionView(
                                 viewModel: viewModel,
@@ -46,21 +46,21 @@ struct CategoriesListView: View {
             }//:LAZY VSTACK
             .offset(y: -30)    }
 }
-//#if DEBUG
-//#Preview() {
-//    
-//    @Previewable @State var isRearranging: Bool = false
-//    
-//    let context = PersistenceController.preview.persistentContainer.viewContext
-//    
-//    let samplePackingList = PackingList.samplePackingList(context: context)
-//        
-//    // Return the preview
-//    ScrollView {
-//        LazyVStack {
-//            CategoriesListView(viewModel: ListViewModel(viewContext: context, packingList: samplePackingList), isRearranging: $isRearranging)
-//        }
-//    }
-//}
-//
-//#endif
+#if DEBUG
+#Preview() {
+    
+    @Previewable @State var isRearranging: Bool = false
+    
+    let context = CoreDataStack.shared.context
+    
+    let list = PackingList.samplePackingList(context: context)
+        
+    // Return the preview
+    ScrollView {
+        LazyVStack {
+            CategoriesListView(viewModel: ListViewModel(viewContext: context, packingList: list), isRearranging: $isRearranging)
+        }
+    }
+}
+
+#endif
