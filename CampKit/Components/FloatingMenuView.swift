@@ -10,19 +10,15 @@ import CoreData
 
 struct FloatingMenuView: View {
     
-    @Environment(\.managedObjectContext) private var viewContext
-    @Environment(StoreKitManager.self) private var storeKitManager
-
-    @Bindable var viewModel: QuizViewModel
+    @Binding var isMenuOpen: Bool
     
-    @Binding var tabSelection: Int
-    var packingListsCount: Int
-
-    @State private var isMenuOpen = false
-    @Binding var navigateToListView: Bool
-    @Binding var isUpgradeToProPresented: Bool
-    @Binding var isNewListQuizPresented: Bool
-    @Binding var currentPackingList: PackingList?
+    let buttonOneImage: String
+    let buttonOneLabel: String
+    let buttonOneAction: () -> Void
+    
+    let buttonTwoImage: String
+    let buttonTwoLabel: String
+    let buttonTwoAction: () -> Void
     
     
     var body: some View {
@@ -52,43 +48,15 @@ struct FloatingMenuView: View {
                         Group {
                             
                             
-//                            Button {
-//                                tabSelection = 2 // Restock tab
-//                                isMenuOpen = false
-//                            } label: {
-//                                MenuItem(icon: "arrow.clockwise.circle.fill", label: "Restock")
-//                            }
-//                            
-//                            Button {
-//                                tabSelection = 1 // Reminders tab
-//                                isMenuOpen = false
-//                            } label: {
-//                                MenuItem(icon: "alarm.fill", label: "Reminder")
-//                            }
-                            
                             //MARK: - BLANK PACKING LIST
-                            Button {
-                                viewModel.createBlankPackingList()
-                                
-                                if let packingList = viewModel.currentPackingList {
-                                    currentPackingList = packingList
-                                    navigateToListView = true
-                                }
-                                isMenuOpen = false
-                            } label: {
-                                MenuItem(icon: "clipboard", label: "Blank List")
-                            }
+                            MenuItem(icon: buttonOneImage, label: buttonOneLabel)
+                                .onTapGesture(perform: buttonOneAction)
                             
                             //MARK: - TEMPLATE PACKING LIST
-                            MenuItem(icon: "list.clipboard", label: "Customized List")
-                                .onTapGesture {
-                                    if storeKitManager.isUnlimitedListsUnlocked || packingListsCount < Constants.proVersionListCount {
-                                        isNewListQuizPresented = true
-                                    } else {
-                                        isUpgradeToProPresented.toggle()
-                                    }
-                                    isMenuOpen = false
-                                }
+                            MenuItem(icon: buttonTwoImage, label: buttonTwoLabel)
+                                .onTapGesture(perform: buttonTwoAction)
+                            
+                            
                         }//:GROUP
                         .transition(.move(edge: .bottom).combined(with: .opacity))
                         .padding(.trailing, 5)
@@ -117,10 +85,6 @@ struct FloatingMenuView: View {
                 .padding(.bottom, Constants.largePadding)
             }//:HSTACK
         }//:ZSTACK
-        .sheet(isPresented: $isUpgradeToProPresented) {
-            UpgradeToProView()
-        }
-        
     }
 }
 
@@ -154,20 +118,19 @@ struct MenuItem: View {
     @Previewable @State var isNewListQuizPresented: Bool = false
     @Previewable @State var currentPackingList: PackingList?
     @Previewable @State var tabSelection: Int = 1
-
+    @Previewable @State var isMenuOpen: Bool = false
 
     let context = CoreDataStack.shared.context
     let storeKitManager = StoreKitManager()
     
     
     FloatingMenuView(
-        viewModel: QuizViewModel(context: context),
-        tabSelection: $tabSelection,
-        packingListsCount: 1,
-        navigateToListView: $navigateToListView,
-        isUpgradeToProPresented: $isUpgradeToProPresented,
-        isNewListQuizPresented: $isNewListQuizPresented,
-        currentPackingList: $currentPackingList
+        isMenuOpen: $isMenuOpen,
+        buttonOneImage: "clipboard",
+        buttonOneLabel: "Blank List",
+        buttonOneAction: {},
+        buttonTwoImage: "list.clipboard",
+        buttonTwoLabel: "Customized List",
+        buttonTwoAction: {}
     )
-    .environment(storeKitManager)
 }

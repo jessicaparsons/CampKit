@@ -89,9 +89,13 @@ struct CategorySectionView: View {
                         
                         
                             //MARK: - PROGRESS BAR
-                            Text("\(packedCount)/\(allItems.count)")
-                                .font(.subheadline)
-                                .foregroundStyle(packedCount == allItems.count ? Color.green : Color.secondary)
+                        let isSuccess = packedCount == allItems.count && allItems.count != 0
+
+                        let countText: Text = isSuccess
+                            ? Text("\(packedCount)/\(allItems.count)").bold().foregroundColor(Color.colorSuccess)
+                            : Text("\(packedCount)/\(allItems.count)").foregroundColor(.secondary)
+                        countText
+                            .font(.subheadline)
                             
                             //MARK: - MENU
                             Menu {

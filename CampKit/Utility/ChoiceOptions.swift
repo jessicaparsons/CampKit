@@ -8,9 +8,15 @@
 struct ChoiceOptions {
     
     //MARK: - Categories
+    static let defaults = "Defaults"
     static let activities = "Activities"
+    
     static let participants = "Participants"
+    static let addParticipants = "Essential Participants"
+
     static let weatherConditions = "Weather Conditions"
+    static let addWeatherConditions = "Essential Weather Conditions"
+    
     
     static let sleep = "⛺ Sleep"
     static let kitchen = "🍳 Kitchen"
@@ -24,7 +30,7 @@ struct ChoiceOptions {
     // MARK: - Participants
     static let adults = "👨‍🦰 Adults"
     static let kids = "🧸 Kids"
-    static let dogs = "🐶 Dogs"
+    static let pets = "🐶 Pets"
     
     // MARK: - Activities
     static let hiking = "🥾 Hiking"

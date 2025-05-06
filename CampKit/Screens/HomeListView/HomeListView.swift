@@ -18,6 +18,9 @@ struct HomeListView: View {
     
     @Environment(\.managedObjectContext) private var viewContext
     @State private var quizViewModel: QuizViewModel
+    @Environment(StoreKitManager.self) private var storeKitManager
+    
+    @State private var isMenuOpen = false
     
     @State private var location: String = ""
     @State private var editMode: EditMode = .inactive
@@ -197,13 +200,28 @@ struct HomeListView: View {
             //MARK: - FLOATING MENU
             
             FloatingMenuView(
-                viewModel: quizViewModel,
-                tabSelection: $selection,
-                packingListsCount: packingLists.count,
-                navigateToListView: $navigateToListView,
-                isUpgradeToProPresented: $isUpgradeToProPresented,
-                isNewListQuizPresented: $isNewListQuizPresented,
-                currentPackingList: $currentPackingList
+                isMenuOpen: $isMenuOpen,
+                buttonOneImage: "clipboard",
+                buttonOneLabel: "Blank List",
+                buttonOneAction: {
+                    quizViewModel.createBlankPackingList()
+                    
+                    if let packingList = quizViewModel.currentPackingList {
+                        currentPackingList = packingList
+                        navigateToListView = true
+                    }
+                    isMenuOpen = false
+                },
+                buttonTwoImage: "list.clipboard",
+                buttonTwoLabel: "Customized List",
+                buttonTwoAction: {
+                    if storeKitManager.isUnlimitedListsUnlocked || packingListsCount < Constants.proVersionListCount {
+                        isNewListQuizPresented = true
+                    } else {
+                        isUpgradeToProPresented.toggle()
+                    }
+                    isMenuOpen = false
+                }
             )
             
         }//:ZSTACK
@@ -227,6 +245,9 @@ struct HomeListView: View {
                 )
                 .environment(weatherViewModel)
             }
+        }
+        .sheet(isPresented: $isUpgradeToProPresented) {
+            UpgradeToProView()
         }
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {

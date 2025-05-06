@@ -93,17 +93,31 @@ struct FlowLayout: Layout {
         }
     }
 }
-//#if DEBUG
-//#Preview {
-//    
-//    @Previewable @Bindable var viewModel = QuizViewModel(
-//        context: PersistenceController.preview.persistentContainer.viewContext
-//    )
-//    
-//    ChipSectionView(
-//        selectedFilters: $viewModel.selectedFilters,
-//        preferenceCategory: ChoiceOptions.activities
-//    )
-//    .environment(\.managedObjectContext, PersistenceController.preview.persistentContainer.viewContext)
-//}
-//#endif
+#if DEBUG
+#Preview("ListViewModel") {
+    
+    @Previewable @ObservedObject var viewModel = ListViewModel(viewContext: CoreDataStack.preview.context, packingList: PackingList.samplePackingList(context: CoreDataStack.preview.context))
+    
+    
+    
+    ChipSectionView(
+        selectedFilters: $viewModel.selectedFilters,
+        preferenceCategory: ChoiceOptions.activities
+    )
+    .environment(\.managedObjectContext, CoreDataStack.preview.context)
+}
+
+#Preview("QuizViewModel") {
+    
+    @Previewable @Bindable var viewModel = QuizViewModel(
+        context: CoreDataStack.preview.context
+    )
+    
+    ChipSectionView(
+        selectedFilters: $viewModel.selectedFilters,
+        preferenceCategory: ChoiceOptions.activities
+    )
+    .environment(\.managedObjectContext, CoreDataStack.preview.context)
+}
+
+#endif

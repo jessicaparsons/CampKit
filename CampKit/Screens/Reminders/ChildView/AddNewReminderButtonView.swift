@@ -16,7 +16,7 @@ struct AddNewReminderButtonView: View {
                 .foregroundColor(.secondary)
                 .font(.system(size: 22))
             Text("Add new reminder")
-                .foregroundColor(.secondary)
+                .foregroundColor(Color.secondary)
             Spacer()
             
         }//:HSTACK

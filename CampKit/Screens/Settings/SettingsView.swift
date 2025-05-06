@@ -30,8 +30,8 @@ struct SettingsView: View {
     
     @State private var showRestoreAlert = false
     @State private var restoreMessage = ""
-    
-    
+    @State private var isExpanded: Bool = true
+
     
     private let options = TemperatureUnit.allCases
     
@@ -73,7 +73,14 @@ struct SettingsView: View {
                         Divider().padding(.vertical, 4)
                         Toggle(isDarkMode ? "Dark Mode On" :
                                 "Dark Mode Off", isOn: $isDarkMode)
-                        .tint(Color.colorSage)
+                        .toggleStyle(
+                                ColoredToggleStyle(
+                                    label: isDarkMode ? "Dark Mode On" : "Dark Mode Off",
+                                    onColor: Color.colorToggleOn,
+                                    offColor: Color.colorToggleOff,
+                                    thumbColor: Color.colorToggleThumb
+                                    )
+                        )
                         .onChange(of: isDarkMode) {
                             HapticsManager.shared.triggerLightImpact()
                         }
@@ -254,17 +261,25 @@ struct SettingsView: View {
                         }
                     
                     //MARK: - APPLICATION
-                    GroupBox(
-                        label:
-                            SettingsLabelView(labelText: "Application", labelImage: "apps.iphone")
-                    ) {
-                        
-                        SettingsRowView(name: "Development & Design", content: "Jessica Parsons")
-                        SettingsRowView(name: "Compatibility", content: "iOS 18.2+")
-                        SettingsRowView(name: "Website", linkLabel: "Juniper Creative Co.", linkDestination: "junipercreative.co")
-                        SettingsRowView(name: "Portfolio", linkLabel: "GitHub", linkDestination: "github.com/jessicaparsons")
-                        SettingsRowView(name: "Version", content: "1.0")
-                    }
+                        DisclosureGroup(
+                            isExpanded: $isExpanded,
+                            content: {
+                                VStack(alignment: .leading, spacing: 10) {
+                                    SettingsRowView(name: "Development & Design", content: "Jessica Parsons")
+                                    SettingsRowView(name: "Compatibility", content: "iOS 18.2+")
+                                    SettingsRowView(name: "Website", linkLabel: "Juniper Creative Co.", linkDestination: "junipercreative.co")
+                                    SettingsRowView(name: "Portfolio", linkLabel: "GitHub", linkDestination: "github.com/jessicaparsons")
+                                    SettingsRowView(name: "Version", content: "1.0")
+                                }
+                                .padding(.top, 8)
+                            },
+                            label: {
+                                SettingsLabelView(labelText: "App Info", labelImage: "apps.iphone")
+                            }
+                        )
+                        .padding()
+                        .background(Color.colorWhite)
+                        .clipShape(RoundedRectangle(cornerRadius: 10))
                 }//:GROUP
                 .backgroundStyle(Color.colorWhite)
 
@@ -286,6 +301,38 @@ struct SettingsView: View {
         return (fahrenheit - 32) * 5 / 9
     }
 }
+
+
+struct ColoredToggleStyle: ToggleStyle {
+    var label: String
+    var onColor: Color
+    var offColor: Color
+    var thumbColor: Color
+    
+    func makeBody(configuration: Self.Configuration) -> some View {
+        HStack {
+            Text(label)
+            Spacer()
+            Button(action: { configuration.isOn.toggle() } )
+            {
+                RoundedRectangle(cornerRadius: 16, style: .circular)
+                    .fill(configuration.isOn ? onColor : offColor)
+                    .frame(width: 50, height: 29)
+                    .overlay(
+                        Circle()
+                            .fill(thumbColor)
+                            .shadow(radius: 1, x: 0, y: 1)
+                            .padding(1.5)
+                            .offset(x: configuration.isOn ? 10 : -10))
+            }//:BUTTON
+            .animation(Animation.easeInOut(duration: 0.1), value: configuration.isOn)
+        }
+    }
+}
+
+
+
+
 #if DEBUG
 #Preview {
         SettingsView()

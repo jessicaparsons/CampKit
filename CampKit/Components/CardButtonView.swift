@@ -26,7 +26,7 @@ struct CardButtonView: View {
             .frame(maxWidth: .infinity)
             .background(
                 RoundedRectangle(cornerRadius: Constants.cornerRadius)
-                    .fill(isSelected ? Color.colorTan : Color.clear)
+                    .fill(Color.clear)
                     .stroke(isSelected ? Color.colorSage : Color.colorSteel, lineWidth: 1)
                 
             )

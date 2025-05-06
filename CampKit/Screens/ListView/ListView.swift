@@ -7,7 +7,7 @@
 
 import SwiftUI
 import PhotosUI
-import ConfettiSwiftUI
+internal import ConfettiSwiftUI
 import CoreData
 import CloudKit
 import os
@@ -37,6 +37,7 @@ struct ListView: View {
     
     //ADD NEW CATEGORY
     @State private var isAddNewCategoryPresented: Bool = false
+    @State private var isAddNewPresetCategoryPresented: Bool = false
     @State private var newCategoryTitle: String = ""
     
     //FIRE ANIMATION
@@ -47,6 +48,7 @@ struct ListView: View {
     //NAVIGATION
     @State private var scrollOffset: CGFloat = 0
     private let scrollThreshold: CGFloat = 1
+    @State private var isMenuOpen = false
     
     //SHARING OPTIONS
     @State private var isSharingSheetPresented: Bool = false
@@ -66,7 +68,6 @@ struct ListView: View {
         !newCategoryTitle.isEmptyOrWhiteSpace
     }
     
-    //Initialize ListView with its corresponding ViewModel
     init(
         context: NSManagedObjectContext,
         packingList: PackingList,
@@ -124,6 +125,24 @@ struct ListView: View {
                     await refresh(context: viewContext)
                 }
                 
+                
+                //MARK: - FLOATING MENU
+                
+                FloatingMenuView(
+                    isMenuOpen: $isMenuOpen,
+                    buttonOneImage: "square.and.pencil",
+                    buttonOneLabel: "Blank Category",
+                    buttonOneAction: {
+                        isAddNewCategoryPresented = true
+                        isMenuOpen = false
+                    },
+                    buttonTwoImage: "sparkles.square.filled.on.square",
+                    buttonTwoLabel: "Preset Category",
+                    buttonTwoAction: {
+                        isAddNewPresetCategoryPresented = true
+                        isMenuOpen = false
+                    }
+                )
                 
                 //MARK: - CONFETTI ANIMATION
                 
@@ -229,13 +248,6 @@ struct ListView: View {
                 }
             }
             
-            //MARK: - ADD NEW CATEGORY
-            Button {
-                isAddNewCategoryPresented = true
-            } label: {
-                Image(systemName: "plus.circle.fill")
-                    .dynamicForegroundStyle(trigger: scrollOffset)
-            }
             
             //MARK: - MENU BUTTON
             Menu {
@@ -359,7 +371,7 @@ struct ListView: View {
             
         }//:HSTACK
         .sheet(isPresented: $isEditingTitle) {
-            EditListDetailsModal(viewModel: viewModel)
+            EditListDetailsSheet(viewModel: viewModel)
                 .presentationDetents([.medium, .large])
         }
         .photosPicker(isPresented: $isPhotoPickerPresented, selection: $bannerImageItem, matching: .images)
@@ -395,7 +407,10 @@ struct ListView: View {
             )
           }
         })
-        
+        //MARK: - ADD NEW PRESET CATEGORY
+        .sheet(isPresented: $isAddNewPresetCategoryPresented) {
+            AddNewCategoriesView(viewModel: viewModel)
+        }
         .confirmationDialog(
             "Are you sure you want to duplicate the list?",
             isPresented: $isDuplicationConfirmationPresented,

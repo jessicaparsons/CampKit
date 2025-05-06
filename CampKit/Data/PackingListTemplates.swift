@@ -25,7 +25,7 @@ import CoreData
         ChoiceOptions.lounge,
         ChoiceOptions.adults,
         ChoiceOptions.kids,
-        ChoiceOptions.dogs,
+        ChoiceOptions.pets,
         ChoiceOptions.hiking,
         ChoiceOptions.waterSports,
         ChoiceOptions.bouldering,
@@ -50,13 +50,21 @@ import CoreData
 
 
 
-
-
-
 let packingPreferenceCategories: [String: [String]] = [
-    ChoiceOptions.participants: [ChoiceOptions.adults, ChoiceOptions.kids, ChoiceOptions.dogs],
+    ChoiceOptions.defaults: [ChoiceOptions.sleep, ChoiceOptions.kitchen, ChoiceOptions.foodStaples, ChoiceOptions.tools, ChoiceOptions.clothing, ChoiceOptions.toiletries, ChoiceOptions.emergency, ChoiceOptions.lounge],
+    
+    
+    ChoiceOptions.participants: [ChoiceOptions.adults, ChoiceOptions.kids, ChoiceOptions.pets],
+    ChoiceOptions.addParticipants: [ChoiceOptions.kids, ChoiceOptions.pets],
+
+    
     ChoiceOptions.activities: [ChoiceOptions.hiking, ChoiceOptions.waterSports, ChoiceOptions.bouldering, ChoiceOptions.biking, ChoiceOptions.backpacking, ChoiceOptions.fishing, ChoiceOptions.hunting],
-    ChoiceOptions.weatherConditions: [ChoiceOptions.mild, ChoiceOptions.hot, ChoiceOptions.cold, ChoiceOptions.snowy, ChoiceOptions.rainy]
+    
+    
+    ChoiceOptions.weatherConditions: [ChoiceOptions.mild, ChoiceOptions.hot, ChoiceOptions.cold, ChoiceOptions.snowy, ChoiceOptions.rainy],
+    ChoiceOptions.addWeatherConditions: [ChoiceOptions.hot, ChoiceOptions.cold, ChoiceOptions.snowy, ChoiceOptions.rainy]
+    
+    
     ]
 
 
@@ -186,7 +194,7 @@ func generateCategoryTemplates(using viewContext: NSManagedObjectContext) -> [St
             Item(context: viewContext, title: "Travel fan")
         ],
         
-        ChoiceOptions.dogs: [
+        ChoiceOptions.pets: [
             Item(context: viewContext, title: "Pet food"),
             Item(context: viewContext, title: "Food and water bowls"),
             Item(context: viewContext, title: "Stake/tie-out"),

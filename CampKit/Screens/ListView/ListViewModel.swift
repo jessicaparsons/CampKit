@@ -23,6 +23,7 @@ final class ListViewModel: ObservableObject {
     @Published var draggedCategory: Category?
     @Published var isConfettiVisible: Bool = false
     @Published var isSuccessfulDuplicationPresented: Bool = false
+    @Published var selectedFilters: Set<String> = []
         
     init(viewContext: NSManagedObjectContext, packingList: PackingList) {
         self.viewContext = viewContext
@@ -48,6 +49,8 @@ final class ListViewModel: ObservableObject {
     var packedRatio: Double {
         allItems.isEmpty ? 0 : Double(packedCount) / Double(allItems.count)
     }
+    
+    
     
     
     //MARK: - REFRESH VIEW
@@ -153,6 +156,80 @@ final class ListViewModel: ObservableObject {
         save(viewContext)
         objectWillChange.send()
     }
+    
+    
+    //MARK: - ADD NEW PRESET CATEGORIES
+    
+    func toggleSelection(_ filter: String) {
+        if selectedFilters.contains(filter) {
+            selectedFilters.remove(filter)
+        } else {
+            selectedFilters.insert(filter)
+        }
+    }
+    
+    func resetSelections() {
+        selectedFilters.removeAll()
+    }
+    
+    
+    func addPresetCategories() {
+        withAnimation {
+
+            let categories = createPresetCategories(for: packingList, using: viewContext)
+            categories.forEach { packingList.addToCategories($0)
+                
+            }
+            save(viewContext)
+        }
+    }
+    
+    
+    func createPresetCategories(for packingList: PackingList, using context: NSManagedObjectContext) -> [Category] {
+        
+        var selectedCategories: [Category] = []
+        
+        // Grab category templates with Core Data items
+        let templates = generateCategoryTemplates(using: context)
+        
+        let filters = Array(selectedFilters)
+        
+        for filter in filters {
+            guard let items = templates[filter] else { continue }
+            
+            let maxPosition = packingList.sortedCategories.map(\.position).max() ?? -1
+            
+            
+            let category = Category(
+                context: context,
+                isExpanded: false,
+                name: filter,
+                position: maxPosition + 1,
+                packingList: packingList
+            )
+            
+            items.enumerated().forEach { index, itemTemplate in
+               let newItem = Item(
+                context: context,
+                title: itemTemplate.title ?? "Packing item",
+                isPacked: false
+               )
+                
+                newItem.position = Int64(index)
+                newItem.category = category
+                
+                category.addToItems(newItem)
+            }
+                
+            selectedCategories.append(category)
+        }
+        
+        return selectedCategories
+    }
+
+    
+    
+    
     
     //MARK: - MODIFY LIST
     

@@ -117,9 +117,9 @@ struct QuizPageOneView: View {
                                isSelected: viewModel.selectedFilters.contains(ChoiceOptions.kids),
                                onTap: { viewModel.toggleSelection(ChoiceOptions.kids) })
                 CardButtonView(emoji: "🐶",
-                               title: "Dogs",
-                               isSelected: viewModel.selectedFilters.contains(ChoiceOptions.dogs),
-                               onTap: { viewModel.toggleSelection(ChoiceOptions.dogs) })
+                               title: "Pets",
+                               isSelected: viewModel.selectedFilters.contains(ChoiceOptions.pets),
+                               onTap: { viewModel.toggleSelection(ChoiceOptions.pets) })
             }
             
         }
@@ -215,20 +215,20 @@ struct QuizPageOneView: View {
     }//:ELEVATIONCHANGER
     
 }
-//#if DEBUG
-//#Preview {
-//    @Previewable @State var isStepOne: Bool = true
-//    @Previewable @State var isLocationSearchOpen: Bool = false
-//    @Previewable @State var isElevationAdded: Bool = true
-//    
-//    let context = PersistenceController.preview.persistentContainer.viewContext
-//    
-//    NavigationView {
-//        ScrollView {
-//            QuizPageOneView(viewModel: QuizViewModel(context: context), isElevationAdded: $isElevationAdded, isLocationSearchOpen: $isLocationSearchOpen, isStepOne: $isStepOne)
-//                .environment(\.managedObjectContext, context)
-//                .environment(WeatherViewModel(weatherFetcher: WeatherAPIClient(), geoCoder: Geocoder()))
-//        }
-//    }
-//}
-//#endif
+#if DEBUG
+#Preview {
+    @Previewable @State var isStepOne: Bool = true
+    @Previewable @State var isLocationSearchOpen: Bool = false
+    @Previewable @State var isElevationAdded: Bool = true
+    
+    let previewStack = CoreDataStack.preview
+    
+    NavigationView {
+        ScrollView {
+            QuizPageOneView(viewModel: QuizViewModel(context: previewStack.context), isElevationAdded: $isElevationAdded, isLocationSearchOpen: $isLocationSearchOpen, isStepOne: $isStepOne)
+                .environment(\.managedObjectContext, previewStack.context)
+                .environment(WeatherViewModel(weatherFetcher: WeatherAPIClient(), geoCoder: Geocoder()))
+        }
+    }
+}
+#endif

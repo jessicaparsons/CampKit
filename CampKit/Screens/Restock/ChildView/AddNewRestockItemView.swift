@@ -23,7 +23,7 @@ struct AddNewRestockItemView: View {
                 .onTapGesture {
                     isFocused = true
                 }
-            TextField("Add new item", text: $newItemTitle)
+            TextField("", text: $newItemTitle, prompt: Text("Add new item").foregroundStyle(Color.secondary))
                 .focused($isFocused)
                 .textFieldStyle(.plain)
                 .fontWeight(.light)

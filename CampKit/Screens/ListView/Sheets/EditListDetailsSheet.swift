@@ -6,7 +6,7 @@
 //
 import SwiftUI
 
-struct EditListDetailsModal: View {
+struct EditListDetailsSheet: View {
     
     @ObservedObject var viewModel: ListViewModel
     @Environment(\.managedObjectContext) private var viewContext
@@ -19,7 +19,7 @@ struct EditListDetailsModal: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                Color.colorTan
+                Color.colorWhiteSands
                     .ignoresSafeArea()
                 
                 VStack(alignment: .leading, spacing: Constants.verticalSpacing) {
@@ -126,17 +126,17 @@ struct EditListDetailsModal: View {
         }
     }
 }
-//
-//#if DEBUG
-//#Preview {
-//    let context = PersistenceController.preview.persistentContainer.viewContext
-//    
-//    let samplePackingList = PackingList.samplePackingList(context: context)
-//    
-//    
-//    NavigationStack {
-//        EditListDetailsModal(viewModel: ListViewModel(viewContext: context, packingList: samplePackingList))
-//            .environment(\.managedObjectContext, context)
-//    }
-//}
-//#endif
+
+#if DEBUG
+#Preview {
+    let previewStack = CoreDataStack.preview
+    
+    let samplePackingList = PackingList.samplePackingList(context: previewStack.context)
+    
+    
+    NavigationStack {
+        EditListDetailsSheet(viewModel: ListViewModel(viewContext: previewStack.context, packingList: samplePackingList))
+            .environment(\.managedObjectContext, previewStack.context)
+    }
+}
+#endif
