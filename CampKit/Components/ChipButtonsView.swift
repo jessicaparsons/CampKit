@@ -24,7 +24,7 @@ struct ChipButtonsView: View {
             .background(
                 RoundedRectangle(cornerRadius: Constants.cornerRadius)
                     .fill(Color.clear)
-                    .stroke(isSelected ? Color.colorSage : Color.colorSteel, lineWidth: 1)
+                    .stroke(isSelected ? Color.colorSage : Color.colorToggleOff, lineWidth: 1)
             )
             .onTapGesture {
                 onTap()

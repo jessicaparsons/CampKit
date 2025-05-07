@@ -16,7 +16,7 @@ struct RestockView: View {
     @State private var scrollOffset: CGFloat = 0
     
     @Binding var isSettingsPresented: Bool
-
+    @State private var isPickerFocused: Bool = false
     
     init(context: NSManagedObjectContext, isSettingsPresented: Binding<Bool>) {
         _viewModel = State(wrappedValue: RestockViewModel(context: context))
@@ -62,7 +62,8 @@ struct RestockView: View {
                                             togglePacked: { viewModel.togglePacked(for: item)
                                                 HapticsManager.shared.triggerLightImpact()
                                             },
-                                            deleteItem: { }
+                                            deleteItem: { },
+                                            isPickerFocused: $isPickerFocused
                                         )
                                         .padding(.top, isFirst ? -8 : 4)
                                         .padding(.bottom, 4)

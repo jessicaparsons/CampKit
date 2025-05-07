@@ -20,6 +20,9 @@ struct EditableItemView<T: EditablePackableItem>: View {
     var isList: Bool
     let togglePacked: () -> Void
     let deleteItem: () -> Void
+    @Binding var isPickerFocused: Bool
+    
+    @State private var quantity: Int = 0
 
     
     var body: some View {
@@ -28,6 +31,7 @@ struct EditableItemView<T: EditablePackableItem>: View {
                 Button(action: {
                     togglePacked()
                     HapticsManager.shared.triggerLightImpact()
+                    isPickerFocused = false
                         
                 }) {
                     Image(systemName: item.isPacked ? "checkmark.circle.fill" : "circle")
@@ -47,6 +51,11 @@ struct EditableItemView<T: EditablePackableItem>: View {
                 .onSubmit {
                     isFocused = false
                 }
+                .simultaneousGesture(
+                    TapGesture().onEnded {
+                        isPickerFocused = false
+                    }
+                )
                 
                 if isFocused {
                     Button {
@@ -55,6 +64,13 @@ struct EditableItemView<T: EditablePackableItem>: View {
                         Text("Done")
                     }
                 }
+                
+                
+                CollapsableStepperView(
+                    value: $quantity,
+                    range: 0...999,
+                    isPickerFocused: $isPickerFocused)
+            
                 
             }//:HSTACK
         }//:ZSTACK
@@ -72,15 +88,29 @@ struct EditableItemView<T: EditablePackableItem>: View {
 
 #if DEBUG
 #Preview {
+    @Previewable @State var isPickerFocused = false
+    
     let previewStack = CoreDataStack.preview
     let item = RestockItem(context: previewStack.context, title: "Sleeping Bag", position: 0)
+    let item2 = RestockItem(context: previewStack.context, title: "Tent", position: 0)
     
-    EditableItemView(
-        item: item,
-        isList: false,
-        togglePacked: { },
-        deleteItem: { }
-    )
+    VStack {
+        EditableItemView(
+            item: item,
+            isList: false,
+            togglePacked: { },
+            deleteItem: { },
+            isPickerFocused: $isPickerFocused,
+        )
+        EditableItemView(
+            item: item2,
+            isList: false,
+            togglePacked: { },
+            deleteItem: { },
+            isPickerFocused: $isPickerFocused,
+        )
+    }
+    .frame(height: 100)
     .environment(\.managedObjectContext, previewStack.context)
 }
 #endif

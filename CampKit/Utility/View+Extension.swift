@@ -22,4 +22,10 @@ extension View {
 }
 
     
+//if light mode
 
+//white then black
+
+//if dark mode
+
+//white

@@ -10,12 +10,16 @@ import SwiftUI
 struct QuizPageOneView: View {
     
     @Environment(WeatherViewModel.self) private var weatherViewModel
+    @Environment(\.dismiss) private var dismiss
     @Bindable var viewModel: QuizViewModel
     @State private var isElevationPopoverPresented: Bool = true
     @FocusState var isFocused: Bool
     @Binding var isElevationAdded: Bool
     @Binding var isLocationSearchOpen: Bool
     @Binding var isStepOne: Bool
+    @State private var showStepper: Bool = false
+    @State private var isCalendarPresented: Bool = false
+    
     
     let columns: [GridItem] = Array(repeating: .init(.flexible(), spacing: 10), count: 3)
     
@@ -23,12 +27,14 @@ struct QuizPageOneView: View {
         Int(viewModel.elevation / 500)
     } // Number of bars (each 550ft adds 1 bar)
     
-    
+    var participantsSelected: Bool {
+        !viewModel.selectedFilters.isDisjoint(with: [ChoiceOptions.adults, ChoiceOptions.kids, ChoiceOptions.pets])
+    }
     
     var body: some View {
         
         ZStack {
-            VStack(alignment: .center, spacing: Constants.cardSpacing) {
+            VStack(spacing: Constants.cardSpacing) {
                 
                 //MARK: - TITLE
                 VStack(alignment: .center) {
@@ -36,9 +42,10 @@ struct QuizPageOneView: View {
                         .font(.title)
                         .fontWeight(.bold)
                 }//:VSTACK
+                .padding(.top, Constants.largePadding)
                 
                 //MARK: - NAME THE LIST
-                VStack(alignment: .leading) {
+                VStack(alignment: .leading, spacing: Constants.cardSpacing) {
                     Text("Name your list")
                         .font(.footnote)
                         .fontWeight(.bold)
@@ -57,12 +64,18 @@ struct QuizPageOneView: View {
                     }//:HSTACK
                     .overlay {
                         RoundedRectangle(cornerRadius: Constants.cornerRadius)
-                            .stroke(Color.colorSteel, lineWidth: 1)
+                            .stroke(Color.colorToggleOff, lineWidth: 1)
                     }
                     .focused($isFocused)
-                }//:VSTACK
                 
+                
+               
+                    
                 participantChoices
+                
+                datePicker
+                
+                }//:VSTACK
                 
                 locationSearch
                 
@@ -92,8 +105,49 @@ struct QuizPageOneView: View {
                 hideKeyboard()
             }
         }//:ZSTACK
+        .background(Color.colorWhiteBackground)
         
     }//:BODY
+    
+    
+    //MARK: - WHEN ARE YOU GOING
+    
+    private var datePicker: some View {
+        VStack(alignment: .leading, spacing: Constants.cardSpacing) {
+            Text("When are you going? (optional)")
+                .font(.footnote)
+                .fontWeight(.bold)
+            
+            Button(action: {
+                isCalendarPresented = true
+            }) {
+                HStack(spacing: 8) {
+                    Image(systemName: "calendar")
+                        .font(.subheadline)
+                        
+                    Text(viewModel.formattedDateRange)
+                        .font(.footnote)
+                        .fontWeight(.medium)
+                }//:HSTACK
+                .foregroundColor(Color.primary)
+                .padding(.vertical, Constants.verticalSpacing)
+                .padding(.horizontal)
+                .background(
+                    RoundedRectangle(cornerRadius: Constants.cornerRadius, style: .continuous)
+                        .fill(Color.clear)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: Constants.cornerRadius, style: .continuous)
+                                .stroke(Color.colorToggleOff, lineWidth: 1)
+                        )
+                )
+            }
+            .sheet(isPresented: $isCalendarPresented) {
+                DatePickerView {
+                    
+                }
+            }
+        }//:VSTACK
+    }
     
     //MARK: - WHO'S GOING
     private var participantChoices: some View {
@@ -105,24 +159,33 @@ struct QuizPageOneView: View {
                     .fontWeight(.bold)
                 Spacer()
             }
+            VStack {
+                LazyVGrid(columns: columns, alignment: .center) {
+                    CardButtonView(
+                        emoji: "👨‍🦰",
+                        title: "Adults",
+                        isSelected: viewModel.selectedFilters.contains(ChoiceOptions.adults),
+                        onTap: {
+                            viewModel.toggleSelection(ChoiceOptions.adults)
+                        })
+                    CardButtonView(emoji: "🧸",
+                                   title: "Kids",
+                                   isSelected: viewModel.selectedFilters.contains(ChoiceOptions.kids),
+                                   onTap: {
+                        viewModel.toggleSelection(ChoiceOptions.kids)
+                    })
+                    CardButtonView(emoji: "🐶",
+                                   title: "Pets",
+                                   isSelected: viewModel.selectedFilters.contains(ChoiceOptions.pets),
+                                   onTap: {
+                        viewModel.toggleSelection(ChoiceOptions.pets)
+                    })
+                }//:LAZYGRID
+                    
+            }//:VSTACK
             
-            LazyVGrid(columns: columns, alignment: .center) {
-                CardButtonView(
-                    emoji: "👨‍🦰",
-                    title: "Adults",
-                    isSelected: viewModel.selectedFilters.contains(ChoiceOptions.adults),
-                    onTap: { viewModel.toggleSelection(ChoiceOptions.adults) })
-                CardButtonView(emoji: "🧸",
-                               title: "Kids",
-                               isSelected: viewModel.selectedFilters.contains(ChoiceOptions.kids),
-                               onTap: { viewModel.toggleSelection(ChoiceOptions.kids) })
-                CardButtonView(emoji: "🐶",
-                               title: "Pets",
-                               isSelected: viewModel.selectedFilters.contains(ChoiceOptions.pets),
-                               onTap: { viewModel.toggleSelection(ChoiceOptions.pets) })
-            }
             
-        }
+        }//:VSTACK
     }//:WHOISGOING
     
     //MARK: - LOCATION SEARCH
@@ -153,7 +216,7 @@ struct QuizPageOneView: View {
                 .padding(.horizontal, 15)
                 .overlay {
                     RoundedRectangle(cornerRadius: Constants.cornerRadius)
-                        .stroke(Color.colorSteel, lineWidth: 1)
+                        .stroke(Color.colorToggleOff, lineWidth: 1)
                 }
             }//:ZSTACK
             .onTapGesture {

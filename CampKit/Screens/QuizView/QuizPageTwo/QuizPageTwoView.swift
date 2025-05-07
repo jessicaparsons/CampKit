@@ -26,6 +26,7 @@ struct QuizPageTwoView: View {
                     .fontWeight(.bold)
 
             }//:VSTACK
+            .padding(.top, Constants.largePadding)
             
             //MARK: - WEATHER DISPLAY
             VStack(alignment: .leading, spacing: Constants.cardSpacing) {
@@ -58,6 +59,7 @@ struct QuizPageTwoView: View {
             
         }//:VSTACK
         .padding(.horizontal, Constants.horizontalPadding)
+        .background(Color.colorWhiteBackground)
         .task {
             if let locationName = viewModel.locationName {
                                 
@@ -84,19 +86,19 @@ struct QuizPageTwoView: View {
     }
 }
 
-//#if DEBUG
-//#Preview {
-//    @Previewable @State var isStepOne: Bool = false
-//    @Previewable @State var isElevationAdded: Bool = false
-//    
-//    let context = PersistenceController.preview.persistentContainer.viewContext
-//    
-//    QuizPageTwoView(
-//        viewModel: QuizViewModel(context: context),
-//        isStepOne: $isStepOne,
-//        isElevationAdded: $isElevationAdded
-//    )
-//        .environment(WeatherViewModel(weatherFetcher: WeatherAPIClient(), geoCoder: Geocoder()))
-//        .environment(\.managedObjectContext, context)
-//}
-//#endif
+#if DEBUG
+#Preview {
+    @Previewable @State var isStepOne: Bool = false
+    @Previewable @State var isElevationAdded: Bool = false
+    
+    let previewStack = CoreDataStack.preview
+    
+    QuizPageTwoView(
+        viewModel: QuizViewModel(context: previewStack.context),
+        isStepOne: $isStepOne,
+        isElevationAdded: $isElevationAdded
+    )
+        .environment(WeatherViewModel(weatherFetcher: WeatherAPIClient(), geoCoder: Geocoder()))
+        .environment(\.managedObjectContext, previewStack.context)
+}
+#endif

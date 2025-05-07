@@ -20,7 +20,7 @@ struct UpgradeToProView: View {
                 if colorScheme == .dark {
                     
                     LinearGradient(
-                        colors: [Color.colorSky, Color.colorLilac],
+                        colors: [Color.colorSage, Color.colorForest],
                         startPoint: .bottomLeading,
                         endPoint: .topTrailing
                     )
@@ -35,7 +35,7 @@ struct UpgradeToProView: View {
                     //LIGHT MODE
                     
                     LinearGradient(
-                        colors: [Color.colorGold, Color.colorSage, Color.colorSky, Color.colorSky],
+                        colors: [ Color.colorSage, Color.colorForest],
                         startPoint: .bottomLeading,
                         endPoint: .topTrailing
                     )

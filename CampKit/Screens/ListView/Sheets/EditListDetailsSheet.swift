@@ -38,7 +38,7 @@ struct EditListDetailsSheet: View {
                         )
                         .overlay {
                             RoundedRectangle(cornerRadius: Constants.cornerRadius)
-                                .stroke(Color.colorSteel, lineWidth: 1)
+                                .stroke(Color.colorToggleOff, lineWidth: 1)
                         }
                     
                     //MARK: - EDIT LOCATION
@@ -57,7 +57,7 @@ struct EditListDetailsSheet: View {
                         )
                         .overlay {
                             RoundedRectangle(cornerRadius: Constants.cornerRadius)
-                                .stroke(Color.colorSteel, lineWidth: 1)
+                                .stroke(Color.colorToggleOff, lineWidth: 1)
                         }
                         .onTapGesture {
                             isLocationSearchOpen = true

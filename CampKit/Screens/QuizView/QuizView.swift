@@ -49,6 +49,7 @@ struct QuizView: View {
                 
                 
             }//VSTACK
+            
             //MARK: - BUTTONS
             .overlay(
                 VStack {
@@ -109,6 +110,7 @@ struct QuizView: View {
                     )
                 }
                 .ignoresSafeArea(.keyboard, edges: .bottom)
+                
             )//:OVERLAY
             
             //MARK: - LOCATION SEARCH
@@ -149,12 +151,15 @@ struct QuizView: View {
                     }
                 }
             }
+            .toolbarBackground(Color.colorWhiteBackground, for: .navigationBar)
+            .toolbarBackground(.visible, for: .navigationBar)
             .onDisappear {
                 isStepOne = true
             }
             .ignoresSafeArea(.keyboard)
         }//:ZSTACK
         .ignoresSafeArea(edges: .bottom)
+        
     }//:BODY
     
     private func resetQuiz() {

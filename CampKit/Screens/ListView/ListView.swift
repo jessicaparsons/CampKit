@@ -29,6 +29,7 @@ struct ListView: View {
     @State private var isEditing: Bool = false
     @State private var isEditingTitle: Bool = false
     @State private var isRearranging: Bool = false
+    @State private var isPickerFocused: Bool = false
     
     //CONFIRMATIONS
     @State private var isDeleteConfirmationPresented: Bool = false
@@ -84,6 +85,7 @@ struct ListView: View {
         }
         else {
             ZStack(alignment: .center) {
+                
                 ScrollView {
                     VStack {
                         
@@ -91,18 +93,24 @@ struct ListView: View {
                         BannerImageView(viewModel: viewModel, bannerImage: $bannerImage)
                             .frame(maxWidth: .infinity) // Ensure full width
                             .listRowInsets(EdgeInsets()) // Remove extra padding
+                            .onTapGesture {
+                                isPickerFocused = false
+                            }
                         
                         //MARK: - LIST DETAILS HEADER
                         VStack {
                             ListDetailCardView(viewModel: viewModel)
                                 .offset(y: -40)
-                            
+                                .onTapGesture {
+                                    isPickerFocused = false
+                                }
                             
                             //MARK: - LIST CATEGORIES
                             
                             CategoriesListView(
                                 viewModel: viewModel,
-                                isRearranging: $isRearranging
+                                isRearranging: $isRearranging,
+                                isPickerFocused: $isPickerFocused
                             )
                             
                         }//:VSTACK
@@ -143,6 +151,11 @@ struct ListView: View {
                         isMenuOpen = false
                     }
                 )
+                .simultaneousGesture(
+                    TapGesture().onEnded {
+                        isPickerFocused = false
+                    }
+                )
                 
                 //MARK: - CONFETTI ANIMATION
                 
@@ -171,10 +184,10 @@ struct ListView: View {
                                 repetitionInterval: 0.1,
                                 hapticFeedback: true)
                     }//:ZSTACK
-                    .animation(.easeOut(duration: 0.5), value: isConfettiVisible)
                 }//:CONDITION
+                
             }//:ZSTACK
-            .background(Color.colorTan)
+            .background(Color.colorWhiteSands)
             .navigationTitle(viewModel.packingList.title ?? Constants.newPackingListTitle)
             .navigationBarTitleDisplayMode(.inline)
             .navigationBarBackButtonHidden(true)
@@ -196,6 +209,7 @@ struct ListView: View {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     optionsMenu
                 }
+                
                 // This makes the title invisible until scrolled
                 ToolbarItem(placement: .principal) {
                     Text(viewModel.packingList.title ?? Constants.newPackingListTitle)
@@ -353,7 +367,7 @@ struct ListView: View {
                 
                 
             } label: {
-                Label("Options", systemImage: "ellipsis.circle")
+                Image(systemName: "ellipsis.circle")
                     .dynamicForegroundStyle(trigger: scrollOffset)
             }
             .confirmationDialog(

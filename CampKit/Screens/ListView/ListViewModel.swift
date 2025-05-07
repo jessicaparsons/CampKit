@@ -328,8 +328,7 @@ final class ListViewModel: ObservableObject {
         } else {
             checkAllItems()
             isConfettiVisible = true
-            print("is confetti visible set from toggle all items/check all items: \(isConfettiVisible)")
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.4) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                 withAnimation {
                     self.isConfettiVisible = false
                 }
@@ -372,8 +371,7 @@ final class ListViewModel: ObservableObject {
         if areAllItemsChecked {
             
             isConfettiVisible = true
-            print("are all items checked boolean: \(areAllItemsChecked), then isConfettiVisible: \(isConfettiVisible)")
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.4) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                 withAnimation {
                     self.isConfettiVisible = false
                 }

@@ -18,10 +18,9 @@ struct CategorySectionView: View {
     @ObservedObject var viewModel: ListViewModel
     @ObservedObject var category: Category
     @Binding var isRearranging: Bool
-
     let deleteCategory: () -> Void
-
     @State private var isEditing: Bool = false
+    @Binding var isPickerFocused: Bool
 
     private var isExpandedBinding: Binding<Bool> {
         Binding(
@@ -118,6 +117,7 @@ struct CategorySectionView: View {
                                 Image(systemName: "ellipsis")
                                     .padding(.horizontal, 8)
                                     .padding(.vertical)
+                                
                             }//:MENU
                             .labelStyle(.iconOnly)
                     }
@@ -125,6 +125,11 @@ struct CategorySectionView: View {
                 .padding(.horizontal)
                 .padding(.vertical, Constants.verticalSpacing)
                 .contentShape(Rectangle())
+                .simultaneousGesture(
+                    TapGesture().onEnded {
+                        isPickerFocused = false
+                    }
+                )
             }
             .onChange(of: isEditing) {
                 isFocused = isEditing
@@ -141,12 +146,17 @@ struct CategorySectionView: View {
                             item: item,
                             isList: false,
                             togglePacked: { viewModel.togglePacked(for: item) },
-                            deleteItem: { viewModel.deleteItem(item) }
+                            deleteItem: { viewModel.deleteItem(item) },
+                            isPickerFocused: $isPickerFocused
                         )
                     }
                 }
-                AddNewItemView(viewModel: viewModel, category: category)
+                AddNewItemView(
+                    viewModel: viewModel,
+                    category: category,
+                    isPickerFocused: $isPickerFocused)
                     .padding(.bottom, 10)
+                    
             }
         }
     }
@@ -157,6 +167,7 @@ struct CategorySectionView: View {
 #if DEBUG
 #Preview {
     @Previewable @State var isRearranging: Bool = false
+    @Previewable @State var isPickerFocused: Bool = false
     
     let context = CoreDataStack.shared.context
     
@@ -171,7 +182,8 @@ struct CategorySectionView: View {
                 viewModel: ListViewModel(viewContext: context, packingList: list),
                 category: categories.first!,
                 isRearranging: $isRearranging,
-                deleteCategory: { print("Mock delete category") }
+                deleteCategory: { print("Mock delete category") },
+                isPickerFocused: $isPickerFocused
             )
         }
 }

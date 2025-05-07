@@ -24,6 +24,21 @@ final class QuizViewModel {
     var latitude: Double?
     var longitude: Double?
     var elevation: Double = 0
+    var listDates: Set<DateComponents> = []
+    
+    var formattedDateRange: String {
+        let calendar = Calendar.current
+        let dates = listDates.compactMap { calendar.date(from: $0) }.sorted()
+        
+        guard let first = dates.first, let last = dates.last else {
+            return "Select Dates"
+        }
+
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMM d"
+
+        return "\(formatter.string(from: first)) – \(formatter.string(from: last))"
+    }
     
     //Stores the packing list so the user gets sent to it after creation
     var currentPackingList: PackingList?

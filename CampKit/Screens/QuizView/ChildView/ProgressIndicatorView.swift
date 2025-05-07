@@ -16,7 +16,7 @@ struct ProgressIndicatorView: View {
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 5)
-                .fill(Color.colorSteel)
+                .fill(Color.colorToggleOff)
                 .frame(height: 7)
             HStack {
                 RoundedRectangle(cornerRadius: 5)
@@ -33,21 +33,21 @@ struct ProgressIndicatorView: View {
         }
     }
 }
-//#if DEBUG
-//#Preview {
-//    
-//    @Previewable @State var isNewListQuizPresented: Bool = true
-//    @Previewable @State var isStepOne: Bool = true
-//    
-//    @Previewable @State var navigateToListView: Bool = false
-//    @Previewable @State var currentPackingList: PackingList?
-//    
-//    let context = PersistenceController.preview.persistentContainer.viewContext
-//    
-//    
-//    NavigationStack {
-//        QuizView(viewModel: QuizViewModel(context: context), isNewListQuizPresented: $isNewListQuizPresented, isStepOne: $isStepOne, navigateToListView: $navigateToListView, currentPackingList: $currentPackingList, packingListCount: 3)
-//            .environment(WeatherViewModel(weatherFetcher: WeatherAPIClient(), geoCoder: Geocoder()))
-//    }
-//}
-//#endif
+#if DEBUG
+#Preview {
+    
+    @Previewable @State var isNewListQuizPresented: Bool = true
+    @Previewable @State var isStepOne: Bool = true
+    
+    @Previewable @State var navigateToListView: Bool = false
+    @Previewable @State var currentPackingList: PackingList?
+    
+    let previewStack = CoreDataStack.preview
+    
+    
+    NavigationStack {
+        QuizView(viewModel: QuizViewModel(context: previewStack.context), isNewListQuizPresented: $isNewListQuizPresented, isStepOne: $isStepOne, navigateToListView: $navigateToListView, currentPackingList: $currentPackingList, packingListCount: 3)
+            .environment(WeatherViewModel(weatherFetcher: WeatherAPIClient(), geoCoder: Geocoder()))
+    }
+}
+#endif

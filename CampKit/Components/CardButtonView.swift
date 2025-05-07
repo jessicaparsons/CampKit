@@ -27,7 +27,7 @@ struct CardButtonView: View {
             .background(
                 RoundedRectangle(cornerRadius: Constants.cornerRadius)
                     .fill(Color.clear)
-                    .stroke(isSelected ? Color.colorSage : Color.colorSteel, lineWidth: 1)
+                    .stroke(isSelected ? Color.colorSage : Color.colorToggleOff, lineWidth: 1)
                 
             )
             .onTapGesture {
@@ -45,27 +45,27 @@ struct CardButtonView: View {
     }//:BODY
     
 }
-//
-//#if DEBUG
-//#Preview("Quiz View") {
-//    
-//    @Previewable @State var isNewListQuizPresented: Bool = true
-//    @Previewable @State var isStepOne: Bool = true
-//    @Previewable @State var location: String = "Paris"
-//    @Previewable @State var navigateToListView: Bool = false
-//    @Previewable @State var currentPackingList: PackingList?
-//    
-//    let previewContext = PersistenceController.preview.persistentContainer.viewContext
-//
-//    QuizView(
-//        viewModel: QuizViewModel(context: previewContext),
-//        isNewListQuizPresented: $isNewListQuizPresented,
-//        isStepOne: $isStepOne,
-//        navigateToListView: $navigateToListView,
-//        currentPackingList: $currentPackingList,
-//        packingListCount: 3
-//    )
-//    .environment(\.managedObjectContext, previewContext)
-//}
-//#endif
-//
+
+#if DEBUG
+#Preview("Quiz View") {
+    
+    @Previewable @State var isNewListQuizPresented: Bool = true
+    @Previewable @State var isStepOne: Bool = true
+    @Previewable @State var location: String = "Paris"
+    @Previewable @State var navigateToListView: Bool = false
+    @Previewable @State var currentPackingList: PackingList?
+    
+    let previewStack = CoreDataStack.preview
+
+    QuizView(
+        viewModel: QuizViewModel(context: previewStack.context),
+        isNewListQuizPresented: $isNewListQuizPresented,
+        isStepOne: $isStepOne,
+        navigateToListView: $navigateToListView,
+        currentPackingList: $currentPackingList,
+        packingListCount: 3
+    )
+    .environment(\.managedObjectContext, previewStack.context)
+}
+#endif
+

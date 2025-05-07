@@ -13,6 +13,7 @@ struct AddNewItemView: View {
     @FocusState var isFocused : Bool
     @State private var newItemText: String = ""
     @ObservedObject var category: Category
+    @Binding var isPickerFocused: Bool
     
     var body: some View {
         HStack {
@@ -44,18 +45,23 @@ struct AddNewItemView: View {
         }//:HSTACK
         .padding(.horizontal)
         .padding(.vertical, 12)
+        .simultaneousGesture(
+            TapGesture().onEnded {
+                isPickerFocused = false
+            }
+        )
     }
 }
 #if DEBUG
 #Preview {
-    
+    @Previewable @State var isPickerFocused = false
     let previewStack = CoreDataStack.preview
     
     let list = PackingList.samplePackingList(context: previewStack.context)
     
     let categories = Category.sampleCategories(context: previewStack.context)
     
-    return AddNewItemView(viewModel: ListViewModel(viewContext: previewStack.context, packingList: list), category: categories.first!)
+    return AddNewItemView(viewModel: ListViewModel(viewContext: previewStack.context, packingList: list), category: categories.first!, isPickerFocused: $isPickerFocused)
         .background(Color.colorTan)
     
 }
