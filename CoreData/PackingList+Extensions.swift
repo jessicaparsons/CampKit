@@ -23,18 +23,22 @@ extension PackingList: @unchecked Sendable {
         locationAddress: String? = nil,
         latitude: Double? = nil,
         longitude: Double? = nil,
-        elevation: Double? = nil
+        elevation: Double? = nil,
+        startDate: Date? = nil,
+        endDate: Date? = nil
     ) {
         self.init(context: context)
-        self.title = title
+        self.title = title ?? Constants.newPackingListTitle
         self.position = Int64(position)
         self.photo = photo
         self.dateCreated = dateCreated
         self.locationName = locationName
         self.locationAddress = locationAddress
-        self.latitude = latitude.map(NSNumber.init(value:))
-        self.longitude = longitude.map(NSNumber.init(value:))
-        self.elevation = elevation.map(NSNumber.init(value:))
+        self.latitude = latitude ?? 0.0
+        self.longitude = longitude ?? 0.0
+        self.elevation = elevation ?? 0.0
+        self.startDate = startDate
+        self.endDate = endDate
     }
     
     var sortedCategories: [Category] {
@@ -42,3 +46,7 @@ extension PackingList: @unchecked Sendable {
     }
 
 }
+
+
+extension PackingList: Identifiable {}
+

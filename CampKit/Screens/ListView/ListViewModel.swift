@@ -50,7 +50,15 @@ final class ListViewModel: ObservableObject {
         allItems.isEmpty ? 0 : Double(packedCount) / Double(allItems.count)
     }
     
-    
+    var formattedDateRange: String {
+        guard let start = packingList.startDate, let end = packingList.endDate else {
+            return "Select Dates"
+        }
+
+        let formatter = DateFormatter()
+        formatter.dateFormat = "M/d"
+        return "\(formatter.string(from: start)) – \(formatter.string(from: end))"
+    }
     
     
     //MARK: - REFRESH VIEW
@@ -248,9 +256,9 @@ final class ListViewModel: ObservableObject {
             position: 0,
             locationName: packingList.locationName,
             locationAddress: packingList.locationAddress,
-            latitude: packingList.latitude?.doubleValue,
-            longitude: packingList.longitude?.doubleValue,
-            elevation: packingList.elevation?.doubleValue
+            latitude: packingList.latitude,
+            longitude: packingList.longitude,
+            elevation: packingList.elevation
         )
         
         duplicatedPackingList.photo = packingList.photo

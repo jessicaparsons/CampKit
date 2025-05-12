@@ -9,21 +9,17 @@ import SwiftUI
 import CoreData
 
 struct HomeListView: View {
-    //Live Data
-    @FetchRequest(
-        sortDescriptors: [NSSortDescriptor(keyPath: \PackingList.position, ascending: true)]
-    ) var packingLists: FetchedResults<PackingList>
-
+    
+    
     let weatherViewModel = WeatherViewModel(weatherFetcher: WeatherAPIClient(), geoCoder: Geocoder())
     
     @Environment(\.managedObjectContext) private var viewContext
+    @State private var viewModel: HomeListViewModel
     @State private var quizViewModel: QuizViewModel
     @Environment(StoreKitManager.self) private var storeKitManager
     
     @State private var isMenuOpen = false
-    
     @State private var location: String = ""
-    @State private var editMode: EditMode = .inactive
     @State private var isNewListQuizPresented: Bool = false
     @State private var isUpgradeToProPresented: Bool = false
     @State private var isStepOne: Bool = true
@@ -32,6 +28,7 @@ struct HomeListView: View {
     @Binding var packingListsCount: Int
     @Binding var selection: Int
     @Binding var isSettingsPresented: Bool
+    @State private var isDeleteConfirmationPresented: Bool = false
     
     @State private var scrollOffset: CGFloat = 0
     
@@ -50,6 +47,7 @@ struct HomeListView: View {
     ) {
         _packingListsCount = packingListsCount
         _selection = selection
+        _viewModel = State(wrappedValue: HomeListViewModel(viewContext: context))
         _quizViewModel = State(wrappedValue: QuizViewModel(context: context))
         _navigateToListView = navigateToListView
         _currentPackingList = currentPackingList
@@ -63,130 +61,83 @@ struct HomeListView: View {
             //MARK: - BACKGROUND STYLES
             Color.colorWhiteSands
                 .ignoresSafeArea()
-                
-                ScrollView {
-                    VStack {
-                        
-                        //MARK: - WHERE TO NEXT?
-                        
-                        HStack {
-                            Text("Let's get packing")
-                                .font(.headline)
-                                .fontWeight(.bold)
-                                .multilineTextAlignment(.leading)
-                                .padding(.bottom)
-                            Spacer()
-                        }//:HSTACK
-                        .padding(.top, Constants.headerSpacing)
-                        
-                        Button {
-                            isNewListQuizPresented = true
-                        } label: {
-                            ZStack {
-                                RoundedRectangle(cornerRadius: 50)
-                                    .fill(Color.colorWhite)
-                                    .overlay(
-                                        RoundedRectangle(cornerRadius: 50)
-                                            .stroke(Color(UIColor.systemGray4), lineWidth: 1)
-                                    )
-                                    .frame(height: 50)
-                                
-                                HStack {
-                                    Image(systemName: "magnifyingglass")
-                                        .foregroundColor(Color.colorNeon)
-                                        .frame(width: 35, height: 35)
-                                        .background(Color.colorSecondaryIcon)
-                                        .clipShape(Circle())
-                                        .padding(.leading, 10)
-                                    Text("Where to next?")
-                                        .foregroundStyle(Color.secondary)
-                                    Spacer()
-                                    
-                                }//:HSTACK
-                                
-                            }//:ZSTACK
-                        }//:BUTTON
-                        
-                        
-                        //MARK: - PACKING LISTS
-                        
-                        
-                        HStack {
-                            Text("Your lists")
-                                .font(.headline)
-                                .fontWeight(.bold)
-                                .multilineTextAlignment(.leading)
-                                .padding(.top, Constants.largePadding)
-                                .padding(.bottom)
-                            Spacer()
-                        }//:HSTACK
-                        
-                        if packingLists.isEmpty {
-                            
-                            EmptyContentView(
-                                icon: "tent.fill",
-                                description: "It looks like you don’t have any lists yet")
-                            
+            
+            ScrollView {
+                VStack {
+                    
+                    //MARK: - WHERE TO NEXT?
+                    
+                    HStack {
+                        Text("Let's get packing")
+                            .font(.headline)
+                            .fontWeight(.bold)
+                            .multilineTextAlignment(.leading)
+                            .padding(.bottom)
+                        Spacer()
+                    }//:HSTACK
+                    .padding(.top, Constants.headerSpacing)
+                    
+                    whereToNextButton
+                    
+                    //MARK: - PACKING LISTS
+                    
+                    HStack {
+                        Text("Your lists")
+                            .font(.headline)
+                            .fontWeight(.bold)
+                            .multilineTextAlignment(.leading)
                             .padding(.top, Constants.largePadding)
-                            
-                        } else {
-                            
-                            LazyVGrid(columns: gridItem, alignment: .center) {
-                                ForEach(packingLists) { packingList in
-                                    
-                                    NavigationLink(
-                                        destination: ListView(
-                                            context: viewContext,
-                                            packingList: packingList,
-                                            packingListsCount: packingLists.count
-                                        ),
-                                        label: {
-                                            HomeListCardView(packingList: packingList)
-                                        }
-                                    )//:NAVIGATION LINK
-                                } //:FOR EACH
-                                .onMove { indices, newOffset in
-                                    var reorderedLists = packingLists.map { $0 }
-                                    
-                                    reorderedLists.move(fromOffsets: indices, toOffset: newOffset)
-                                    
-                                    for (index, item) in reorderedLists.enumerated() {
-                                        item.position = Int64(index)
-                                    }
-                                    
-                                    save(viewContext)
-                                }
+                            .padding(.bottom)
+                        Spacer()
+                    }//:HSTACK
+                    
+                    if viewModel.packingLists.isEmpty {
+                        
+                        EmptyContentView(
+                            icon: "tent.fill",
+                            description: "It looks like you don’t have any lists yet")
+                        
+                        .padding(.top, Constants.largePadding)
+                        
+                    } else {
+                        
+                        LazyVGrid(columns: gridItem, alignment: .center) {
+                            ForEach(viewModel.packingLists) { packingList in
                                 
-                                
-                                .onDelete { offsets in
-                                    for index in offsets {
-                                        let list = packingLists[index]
-                                        if stack.canDelete(object: list) {
-                                            viewContext.delete(list)
+                                    HomeListCardView(
+                                        viewModel: viewModel,
+                                        packingList: packingList,
+                                        onDelete: {
+                                            viewModel.delete(packingList)
                                         }
+                                    )
+                                    .onTapGesture {
+                                        currentPackingList = packingList
+                                        navigateToListView = true
                                     }
-                                    save(viewContext)
-                                }
-                            }//:LAZYVGRID
-                            .scrollContentBackground(.hidden)
-                            .refreshable {
-                                await refresh(context: viewContext)
-                            }
-                        }//:ELSE
-                    }//:VSTACK
-                    .background(
-                        GeometryReader { geo in
-                            Color.clear
-                                .frame(height: 0)
-                                .onChange(of: geo.frame(in: .global).minY) {
-                                    scrollOffset = geo.frame(in: .global).minY
-                                }
+                      
+                                
+                            }//:FOREACH
+                        }//:LAZYVGRID
+                        .scrollContentBackground(.hidden)
+                        .refreshable {
+                            await refresh(context: viewContext)
                         }
-                    )//NAV BAR UI CHANGES ON SCROLL
-                }//:SCROLLVIEW
-                .scrollIndicators(.hidden)
+                    }//:ELSE
+                }//:VSTACK
                 .padding(.horizontal, Constants.wideMargin)
-                
+                .background(
+                    GeometryReader { geo in
+                        Color.clear
+                            .frame(height: 0)
+                            .onChange(of: geo.frame(in: .global).minY) {
+                                scrollOffset = geo.frame(in: .global).minY
+                            }
+                    }
+                )//NAV BAR UI CHANGES ON SCROLL
+            }//:SCROLLVIEW
+            .scrollIndicators(.hidden)
+            
             
             
             //MARK: - HEADER
@@ -226,12 +177,12 @@ struct HomeListView: View {
             
         }//:ZSTACK
         .onAppear {
-            packingListsCount = packingLists.count
+            viewModel.fetchPackingLists()
+            packingListsCount = viewModel.packingLists.count
         }
-        .onChange(of: packingLists.count) {
-            packingListsCount = packingLists.count
+        .onChange(of: viewModel.packingLists.count) {
+            packingListsCount = viewModel.packingLists.count
         }
-        .environment(\.editMode, $editMode)
         //MARK: - SHOW PACKING LIST QUIZ
         .sheet(isPresented: $isNewListQuizPresented) {
             NavigationStack {
@@ -241,7 +192,7 @@ struct HomeListView: View {
                     isStepOne: $isStepOne,
                     navigateToListView: $navigateToListView,
                     currentPackingList: $currentPackingList,
-                    packingListCount: packingLists.count
+                    packingListCount: viewModel.packingLists.count
                 )
                 .environment(weatherViewModel)
             }
@@ -251,20 +202,52 @@ struct HomeListView: View {
         }
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
+                
                 Button {
                     isSettingsPresented.toggle()
                 } label: {
                     Image(systemName: "gearshape.fill")
                         .foregroundStyle(Color.colorForestSecondary)
                 }
+                
             }//:TOOL BAR ITEM
         }
         .toolbarBackground(.hidden, for: .navigationBar)
     }//:BODY
     
-    
+    private var whereToNextButton: some View {
+        Button {
+            isNewListQuizPresented = true
+        } label: {
+            ZStack {
+                RoundedRectangle(cornerRadius: 50)
+                    .fill(Color.colorWhite)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 50)
+                            .stroke(Color(UIColor.systemGray4), lineWidth: 1)
+                    )
+                    .frame(height: 50)
+                
+                HStack {
+                    Image(systemName: "magnifyingglass")
+                        .foregroundColor(Color.colorNeon)
+                        .frame(width: 35, height: 35)
+                        .background(Color.colorSecondaryIcon)
+                        .clipShape(Circle())
+                        .padding(.leading, 10)
+                    Text("Where to next?")
+                        .foregroundStyle(Color.secondary)
+                    Spacer()
+                    
+                }//:HSTACK
+                
+            }//:ZSTACK
+        }//:BUTTON
+    }
     
 }//:STRUCT
+
+
 
 
 #if DEBUG
@@ -293,7 +276,7 @@ struct HomeListView: View {
         )
         .environment(\.managedObjectContext, previewStack.context)
         .environment(StoreKitManager())
-            
+        
     }
 }
 
@@ -319,7 +302,7 @@ struct HomeListView: View {
         )
         .environment(\.managedObjectContext, previewStack.context)
         .environment(StoreKitManager())
-            
+        
     }
 }
 

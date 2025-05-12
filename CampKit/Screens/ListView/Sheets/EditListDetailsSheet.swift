@@ -91,7 +91,10 @@ struct EditListDetailsSheet: View {
                 .fullScreenCover(isPresented: $isLocationSearchOpen, content: {
                     
                     VStack(alignment: .leading, spacing: Constants.cardSpacing) {
-                        LocationSearchView(isLocationSearchOpen: $isLocationSearchOpen, locationName: $locationNamePlaceholder, locationAddress: $locationAddressPlaceholder)
+                        LocationSearchView(
+                            locationName: $locationNamePlaceholder,
+                            locationAddress: $locationAddressPlaceholder
+                        )
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                         .background(Color.white)
                         .transition(.move(edge: .trailing))

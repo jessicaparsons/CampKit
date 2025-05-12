@@ -144,7 +144,6 @@ struct CategorySectionView: View {
                     ForEach(category.sortedItems, id: \.id) { item in
                         EditableItemView<Item>(
                             item: item,
-                            isList: false,
                             togglePacked: { viewModel.togglePacked(for: item) },
                             deleteItem: { viewModel.deleteItem(item) },
                             isPickerFocused: $isPickerFocused

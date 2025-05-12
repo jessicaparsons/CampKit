@@ -58,7 +58,6 @@ struct RestockView: View {
                                             .foregroundColor(Color.colorSecondaryGrey)
                                         EditableItemView<RestockItem>(
                                             item: item,
-                                            isList: true,
                                             togglePacked: { viewModel.togglePacked(for: item)
                                                 HapticsManager.shared.triggerLightImpact()
                                             },

@@ -9,6 +9,11 @@ import SwiftUI
 
 struct ListDetailCardView: View {
     @ObservedObject var viewModel: ListViewModel
+    @State private var isLocationPresented: Bool = false
+    @State private var isCalendarPresented: Bool = false
+    
+    @State private var tempStartDate: Date? = nil
+    @State private var tempEndDate: Date? = nil
     
     //Map Options
     @State private var showMapOptions = false
@@ -16,73 +21,149 @@ struct ListDetailCardView: View {
         
     var body: some View {
         //MARK: - LIST NAME
-        VStack(spacing: 6) {
+        VStack(spacing: 15) {
             HStack {
-                HStack {
-                    Spacer()
-                    Text(viewModel.packingList.title ?? Constants.newPackingListTitle)
-                        .multilineTextAlignment(.center)
-                        .font(.title2.weight(.bold))
-                        .lineLimit(3)
-                        .truncationMode(.tail)
-                    Spacer()
-                }//:HSTACK
-        //MARK: - LIST LOCATION
+                TextField("List Title", text: Binding(
+                    get: { viewModel.packingList.title ?? Constants.newPackingListTitle },
+                    set: { viewModel.packingList.title = $0 }
+                ))
+                .multilineTextAlignment(.center)
+                .font(.title2.weight(.bold))
+                .lineLimit(3)
+                .truncationMode(.tail)
+                    
             }//:HSTACK
             
-            listLocation
             
-        //MARK: - PROGRESS BAR
-            ProgressBarView(
-                viewModel: viewModel,
-                packedRatio: viewModel.packedRatio,
-                packedCount: viewModel.packedCount,
-                allItems: viewModel.allItems,
-                barWidth: 0.75,
-                numbersWidth: 0.25
-            )
+            //MARK: - PROGRESS BAR
+                ProgressBarView(
+                    viewModel: viewModel,
+                    packedRatio: viewModel.packedRatio,
+                    packedCount: viewModel.packedCount,
+                    allItems: viewModel.allItems
+                )
+
+            
+            Grid(alignment: .top, horizontalSpacing: 20) {
+                
+                //MARK: - DATE
+                GridRow {
+                    
+                    listDates
+                    
+                    listLocation
+                    
+                }//:GRID ROW
+                .font(.subheadline)
+                .fontWeight(.semibold)
+                .foregroundStyle(Color.secondary)
+                
+            }//:GRID
             
         }//:VSTACK
-        .padding(.vertical, Constants.cardSpacing)
+        .padding(.vertical, 30)
         .padding(.horizontal, Constants.cardSpacing)
         .background(
             RoundedRectangle(cornerRadius: 10)
                 .fill(Color.colorWhite)
                 .shadow(color: .gray.opacity(0.2), radius: 4, x: 0, y: 2)
         )
+        .sheet(isPresented: $isLocationPresented) {
+            LocationSearchView(
+                locationName: $viewModel.packingList.locationName,
+                locationAddress: $viewModel.packingList.locationAddress
+            )
+            .presentationDetents([.medium, .large])
+        }
     }//:BODY
+    
+    private var listDates: some View {
+        HStack(spacing: 5) {
+            Image(systemName: "calendar")
+                .foregroundColor(.colorSage)
+                .font(.footnote)
+            
+            Group {
+                if viewModel.packingList.startDate != nil && viewModel.packingList.endDate != nil {
+                    Text(viewModel.formattedDateRange)
+                        .fixedSize(horizontal: true, vertical: false)
+                } else {
+                    
+                    Text("Anytime")
+                }
+            }
+            
+        }//:HSTACK
+        .onTapGesture {
+            tempStartDate = viewModel.packingList.startDate ?? nil
+            tempEndDate = viewModel.packingList.endDate ?? nil
+            isCalendarPresented = true
+        }
+        .sheet(isPresented: $isCalendarPresented) {
+            DatePickerView(
+                startDate: $tempStartDate,
+                endDate: $tempEndDate,
+            ) {
+                viewModel.packingList.startDate = tempStartDate
+                viewModel.packingList.endDate = tempEndDate
+            }
+            .presentationDetents([.medium, .large])
+        }
+    }
+    
     
     
     private var listLocation: some View {
-        HStack {
-            Text(viewModel.packingList.locationName ?? "No Location Set")
-                .multilineTextAlignment(.center)
+        HStack(alignment: .top, spacing: 5) {
+           
+            Image(systemName: "arrow.up.right.square")
+                    .foregroundColor(.colorSage)
+                    .offset(y: 1)
+         
             
-            if viewModel.packingList.locationName != nil {
-                Image(systemName: "arrow.up.right.square").foregroundColor(.colorSage)
+            if let locationName = viewModel.packingList.locationName {
+               Text(locationName)
+                    .lineLimit(2)
+                    .truncationMode(.tail)
+                    .lineSpacing(-2)
+                    .multilineTextAlignment(.leading)
+            } else {
+                Text("No Location Set")
             }
+            
+            
         }//:HSTACK
         .onTapGesture {
-            if viewModel.packingList.locationName != nil {
-                showMapOptions = true
-            }
+            showMapOptions = true
         }
-        .confirmationDialog("Open location in:", isPresented: $showMapOptions, titleVisibility: .visible) {
+        .confirmationDialog("Location Details", isPresented: $showMapOptions, titleVisibility: .visible) {
             
+            //EDIT LOCATION
+            Button("Edit Location") {
+                isLocationPresented = true
+            }
+            
+            //MAP OPTIONS IF LOCATION IS SET
             if let locationName = viewModel.packingList.locationName,
                let locationAddress = viewModel.packingList.locationAddress
             {
-                Button("Apple Maps") {
+                
+                //CLEAR LOCATION
+                Button("Clear Location") {
+                    viewModel.packingList.locationName = nil
+                }
+                
+                Button("Open in Apple Maps") {
                     openInAppleMaps(query: locationName + ", " + locationAddress)
                 }
                 
-                Button("Google Maps") {
+                Button("Open in Google Maps") {
                     openInGoogleMaps(query: locationName + ", " + locationAddress)
                 }
                 
                 Button("Cancel", role: .cancel) {}
-            }
-        }
+            }//:IF
+        }//:CONFIRMATION DIALOGUE
     }
     
     
@@ -113,6 +194,7 @@ struct ListDetailCardView: View {
 #if DEBUG
 #Preview {
 
+    @Previewable @State var isLocationSearchOpen: Bool = false
     let context = CoreDataStack.shared.context
     
     let list = PackingList.samplePackingList(context: context)

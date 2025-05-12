@@ -10,11 +10,15 @@ import SwiftUI
 struct DatePickerView: View {
     
     @Environment(\.calendar) var calendar
+    @Environment(\.dismiss) var dismiss
+    
+    @Binding var startDate: Date?
+    @Binding var endDate: Date?
+    let onTap: () -> Void
+
     @State private var dates: Set<DateComponents> = []
     let datePickerComponents: Set<Calendar.Component> = [.calendar, .era, .year, .month, .day]
     
-    @Environment(\.dismiss) var dismiss
-    let onTap: () -> Void
     
     var body: some View {
         NavigationStack {
@@ -27,6 +31,17 @@ struct DatePickerView: View {
             .navigationTitle("Trip Dates")
             .navigationBarTitleDisplayMode(.inline)
             .padding()
+            .onAppear {
+                if let start = startDate, let end = endDate {
+                    var filled = Set<DateComponents>()
+                    var current = start
+                    while current <= end {
+                        filled.insert(calendar.dateComponents(datePickerComponents, from: current))
+                        current = calendar.date(byAdding: .day, value: 1, to: current)!
+                    }
+                    dates = filled
+                }
+            }
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") {
@@ -35,6 +50,7 @@ struct DatePickerView: View {
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Done") {
+                        applyDateRange()
                         onTap()
                         dismiss()
                     }
@@ -65,6 +81,12 @@ struct DatePickerView: View {
                 dates = []
             }
         }
+    }
+    
+    private func applyDateRange() {
+        let selected = dates.compactMap { calendar.date(from: $0) }.sorted()
+        startDate = selected.first
+        endDate = selected.last
     }
     
     private func filledRange(selectedDates: Set<DateComponents>) -> Set<DateComponents> {
@@ -99,5 +121,9 @@ struct DatePickerView: View {
         DateComponents(year: 2025, month: 5, day: 10)
     ]
     
-    DatePickerView(onTap: {})
+    @Previewable @State var startDate: Date? = nil
+    @Previewable @State var endDate: Date? = nil
+
+    
+    DatePickerView(startDate: $startDate, endDate: $endDate, onTap: {})
 }

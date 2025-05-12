@@ -11,7 +11,6 @@ struct LocationSearchView: View {
     
     @Environment(\.dismiss) private var dismiss
     @State var locationSearchService = LocationSearchService()
-    @Binding var isLocationSearchOpen: Bool
     @Binding var locationName: String?
     @Binding var locationAddress: String?
     
@@ -26,7 +25,7 @@ struct LocationSearchView: View {
                         Button {
                             locationName = result.title
                             locationAddress = result.subtitle
-                            isLocationSearchOpen = false
+                            dismiss()
                         } label: {
                             VStack(alignment: .leading) {
                                 Text(result.title)
@@ -41,7 +40,7 @@ struct LocationSearchView: View {
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button(action: {
-                        isLocationSearchOpen = false
+                        dismiss()
                     }, label: {
                         Image(systemName: "arrow.backward")
                     })
@@ -55,10 +54,12 @@ struct LocationSearchView: View {
 #if DEBUG
 #Preview {
     
-    @Previewable @State var isLocationSearchOpen: Bool = true
     @Previewable @State var locationNamePlaceholder: String? = "Sequoia National Forest"
     @Previewable @State var locationAddressPlaceholder: String? = "Somwhere in the Forest, CA"
 
-    LocationSearchView(isLocationSearchOpen: $isLocationSearchOpen, locationName: $locationNamePlaceholder, locationAddress: $locationAddressPlaceholder)
+    LocationSearchView(
+        locationName: $locationNamePlaceholder,
+        locationAddress: $locationAddressPlaceholder
+    )
 }
 #endif

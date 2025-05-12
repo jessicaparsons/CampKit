@@ -11,11 +11,10 @@ import SwipeCell
 struct SwipeActionModifier: ViewModifier {
     
     var isFocused: Bool
-    var isList: Bool
     let deleteAction: () -> Void
     
     func body(content: Content) -> some View {
-        if !isFocused && !isList {
+        if !isFocused {
             content.swipeCell(
                 cellPosition: .both,
                 leftSlot: nil,

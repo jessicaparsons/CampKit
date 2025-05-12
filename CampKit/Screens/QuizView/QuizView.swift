@@ -33,7 +33,6 @@ struct QuizView: View {
                             QuizPageOneView(
                                 viewModel: viewModel,
                                 isElevationAdded: $isElevationAdded,
-                                isLocationSearchOpen: $isLocationSearchOpen,
                                 isStepOne: $isStepOne)
                                 .transition(.move(edge: .leading))
                         } else {
@@ -113,20 +112,6 @@ struct QuizView: View {
                 
             )//:OVERLAY
             
-            //MARK: - LOCATION SEARCH
-            .fullScreenCover(isPresented: $isLocationSearchOpen, content: {
-                
-                VStack(alignment: .leading, spacing: Constants.cardSpacing) {
-                    LocationSearchView(
-                        isLocationSearchOpen: $isLocationSearchOpen,
-                        locationName: $viewModel.locationName,
-                        locationAddress: $viewModel.locationAddress)
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .background(Color.white)
-                        .transition(.move(edge: .trailing))
-                        .animation(.easeInOut(duration: 0.3), value: isLocationSearchOpen)
-                }
-            })
             //MARK: - MENU
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
@@ -169,6 +154,8 @@ struct QuizView: View {
         isLocationSearchOpen = false
         viewModel.listTitle = ""
         isElevationAdded = false
+        viewModel.startDate = nil
+        viewModel.endDate = nil
         weatherViewModel.isNoLocationFoundMessagePresented = false
         
         viewModel.resetSelections()

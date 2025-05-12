@@ -60,8 +60,6 @@
 				"Item+CoreDataClass.swift",
 				"Item+CoreDataProperties.swift",
 				"Item+Extensions.swift",
-				"PackingList+CoreDataClass.swift",
-				"PackingList+CoreDataProperties.swift",
 				"PackingList+Extensions.swift",
 				PersistenceController.swift,
 				"Reminder+CoreDataClass.swift",

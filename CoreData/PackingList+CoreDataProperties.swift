@@ -2,7 +2,7 @@
 //  PackingList+CoreDataProperties.swift
 //  CampKit
 //
-//  Created by Jessica Parsons on 4/13/25.
+//  Created by Jessica Parsons on 5/7/25.
 //
 //
 
@@ -16,15 +16,17 @@ extension PackingList {
         return NSFetchRequest<PackingList>(entityName: "PackingList")
     }
 
-    @NSManaged public var dateCreated: Date
-    @NSManaged public var elevation: NSNumber?
-    @NSManaged public var latitude: NSNumber?
+    @NSManaged public var dateCreated: Date?
+    @NSManaged public var elevation: Double
+    @NSManaged public var latitude: Double
     @NSManaged public var locationAddress: String?
     @NSManaged public var locationName: String?
-    @NSManaged public var longitude: NSNumber?
+    @NSManaged public var longitude: Double
     @NSManaged public var photo: Data?
     @NSManaged public var position: Int64
     @NSManaged public var title: String?
+    @NSManaged public var startDate: Date?
+    @NSManaged public var endDate: Date?
     @NSManaged public var categories: NSSet?
 
 }
@@ -46,6 +48,3 @@ extension PackingList {
 
 }
 
-extension PackingList : Identifiable {
-
-}

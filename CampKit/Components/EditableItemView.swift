@@ -17,7 +17,6 @@ struct EditableItemView<T: EditablePackableItem>: View {
     @ObservedObject var item: T
     @State private var disableSwipe = false
     @FocusState var isFocused: Bool
-    var isList: Bool
     let togglePacked: () -> Void
     let deleteItem: () -> Void
     @Binding var isPickerFocused: Bool
@@ -79,7 +78,6 @@ struct EditableItemView<T: EditablePackableItem>: View {
         //MARK: - SWIPE TO DELETE
         .modifier(SwipeActionModifier(
             isFocused: disableSwipe,
-            isList: isList,
             deleteAction: deleteItem))
         
     }//:BODY
@@ -97,14 +95,12 @@ struct EditableItemView<T: EditablePackableItem>: View {
     VStack {
         EditableItemView(
             item: item,
-            isList: false,
             togglePacked: { },
             deleteItem: { },
             isPickerFocused: $isPickerFocused,
         )
         EditableItemView(
             item: item2,
-            isList: false,
             togglePacked: { },
             deleteItem: { },
             isPickerFocused: $isPickerFocused,

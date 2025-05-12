@@ -15,10 +15,14 @@ struct QuizPageOneView: View {
     @State private var isElevationPopoverPresented: Bool = true
     @FocusState var isFocused: Bool
     @Binding var isElevationAdded: Bool
-    @Binding var isLocationSearchOpen: Bool
+    @State private var isLocationSearchPresented: Bool = false
     @Binding var isStepOne: Bool
     @State private var showStepper: Bool = false
     @State private var isCalendarPresented: Bool = false
+    
+    @State private var tempStartDate: Date? = nil
+    @State private var tempEndDate: Date? = nil
+    @State private var formattedDate: String = "Select Dates"
     
     
     let columns: [GridItem] = Array(repeating: .init(.flexible(), spacing: 10), count: 3)
@@ -119,13 +123,15 @@ struct QuizPageOneView: View {
                 .fontWeight(.bold)
             
             Button(action: {
+                tempStartDate = viewModel.startDate
+                tempEndDate = viewModel.endDate
                 isCalendarPresented = true
             }) {
                 HStack(spacing: 8) {
                     Image(systemName: "calendar")
                         .font(.subheadline)
                         
-                    Text(viewModel.formattedDateRange)
+                    Text(formattedDate)
                         .font(.footnote)
                         .fontWeight(.medium)
                 }//:HSTACK
@@ -142,8 +148,13 @@ struct QuizPageOneView: View {
                 )
             }
             .sheet(isPresented: $isCalendarPresented) {
-                DatePickerView {
-                    
+                DatePickerView(
+                    startDate: $tempStartDate,
+                    endDate: $tempEndDate
+                ) {
+                    viewModel.startDate = tempStartDate
+                    viewModel.endDate = tempEndDate
+                    formattedDate = Date.formattedRange(from: viewModel.startDate, to: viewModel.endDate)
                 }
             }
         }//:VSTACK
@@ -221,9 +232,21 @@ struct QuizPageOneView: View {
             }//:ZSTACK
             .onTapGesture {
                 withAnimation {
-                    isLocationSearchOpen.toggle()
+                    isLocationSearchPresented.toggle()
                 }
             }
+            //MARK: - LOCATION SEARCH
+            .fullScreenCover(isPresented: $isLocationSearchPresented, content: {
+                
+                VStack(alignment: .leading, spacing: Constants.cardSpacing) {
+                    LocationSearchView(
+                        locationName: $viewModel.locationName,
+                        locationAddress: $viewModel.locationAddress)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .background(Color.white)
+                        .transition(.move(edge: .trailing))
+                }
+            })
         }//:GROUP
     }//:WHEREYOUHEADED
     
@@ -281,14 +304,17 @@ struct QuizPageOneView: View {
 #if DEBUG
 #Preview {
     @Previewable @State var isStepOne: Bool = true
-    @Previewable @State var isLocationSearchOpen: Bool = false
     @Previewable @State var isElevationAdded: Bool = true
     
     let previewStack = CoreDataStack.preview
     
     NavigationView {
         ScrollView {
-            QuizPageOneView(viewModel: QuizViewModel(context: previewStack.context), isElevationAdded: $isElevationAdded, isLocationSearchOpen: $isLocationSearchOpen, isStepOne: $isStepOne)
+            QuizPageOneView(
+                viewModel: QuizViewModel(context: previewStack.context),
+                isElevationAdded: $isElevationAdded,
+                isStepOne: $isStepOne
+            )
                 .environment(\.managedObjectContext, previewStack.context)
                 .environment(WeatherViewModel(weatherFetcher: WeatherAPIClient(), geoCoder: Geocoder()))
         }

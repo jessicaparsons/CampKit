@@ -27,7 +27,6 @@ struct ListView: View {
     
     //EDITING STATES
     @State private var isEditing: Bool = false
-    @State private var isEditingTitle: Bool = false
     @State private var isRearranging: Bool = false
     @State private var isPickerFocused: Bool = false
     
@@ -277,12 +276,7 @@ struct ListView: View {
                 }
                 Divider()
                 
-                // EDIT TITLE
-                Button(action: {
-                    isEditingTitle = true
-                }) {
-                    Label("Edit List Details", systemImage: "pencil")
-                }
+                
                 
                 
                 // CHANGE BANNER IMAGE
@@ -384,10 +378,6 @@ struct ListView: View {
             }
             
         }//:HSTACK
-        .sheet(isPresented: $isEditingTitle) {
-            EditListDetailsSheet(viewModel: viewModel)
-                .presentationDetents([.medium, .large])
-        }
         .photosPicker(isPresented: $isPhotoPickerPresented, selection: $bannerImageItem, matching: .images)
         .sheet(isPresented: $isRearranging) {
             RearrangeCategoriesView(viewModel: viewModel)

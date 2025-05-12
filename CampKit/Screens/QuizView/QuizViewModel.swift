@@ -25,20 +25,8 @@ final class QuizViewModel {
     var longitude: Double?
     var elevation: Double = 0
     var listDates: Set<DateComponents> = []
-    
-    var formattedDateRange: String {
-        let calendar = Calendar.current
-        let dates = listDates.compactMap { calendar.date(from: $0) }.sorted()
-        
-        guard let first = dates.first, let last = dates.last else {
-            return "Select Dates"
-        }
-
-        let formatter = DateFormatter()
-        formatter.dateFormat = "MMM d"
-
-        return "\(formatter.string(from: first)) – \(formatter.string(from: last))"
-    }
+    var startDate: Date?
+    var endDate: Date?
     
     //Stores the packing list so the user gets sent to it after creation
     var currentPackingList: PackingList?
@@ -70,7 +58,9 @@ final class QuizViewModel {
                 locationAddress: (locationAddress == nil) ? nil : locationAddress,
                 latitude: latitude,
                 longitude: longitude,
-                elevation: elevation
+                elevation: elevation,
+                startDate: startDate,
+                endDate: endDate
             )
             
             //Generate recommended categories and items
@@ -101,7 +91,9 @@ final class QuizViewModel {
                 locationAddress: nil,
                 latitude: latitude,
                 longitude: longitude,
-                elevation: elevation
+                elevation: elevation,
+                startDate: nil,
+                endDate: nil
             )
             
             save(viewContext)
@@ -183,4 +175,24 @@ final class QuizViewModel {
         let request = NSFetchRequest<PackingList>(entityName: "PackingList")
         return (try? viewContext.fetch(request)) ?? []
     }
+    
+    
+    //MARK: - FORMAT DATES
+    
+    func formatDateRange(startDate: Date?, endDate: Date?) -> String {
+        guard let start = startDate, let end = endDate else {
+            return "Select Dates"
+        }
+            
+        let dayFormatter = DateFormatter()
+            dayFormatter.dateFormat = "MMM d"
+
+        let yearFormatter = DateFormatter()
+            yearFormatter.dateFormat = "yyyy"
+        
+        
+        return "\(dayFormatter.string(from: start)) – \(dayFormatter.string(from: end)), \(yearFormatter.string(from: end))"
+    }
+    
+    
 }
