@@ -13,11 +13,9 @@
 		<key>UIColorName</key>
 		<string>launch-color</string>
 		<key>UIImageName</key>
-		<string>launch-icon</string>
+		<string>launch-background</string>
 		<key>UIImageRespectsSafeAreaInsets</key>
-		<true/>
-		<key>UILaunchScreen</key>
-		<dict/>
+		<false/>
 	</dict>
 	<key>UTExportedTypeDeclarations</key>
 	<array>

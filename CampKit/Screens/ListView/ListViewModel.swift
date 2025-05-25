@@ -84,7 +84,9 @@ final class ListViewModel: ObservableObject {
             category.addToItems(newItem)
             reassignItemPositions(for: category)
             save(viewContext)
-            objectWillChange.send()
+            withAnimation(nil) {
+                objectWillChange.send()
+            }
     }
     
     //Keeps items arranged when a new item is added to a category
@@ -127,7 +129,9 @@ final class ListViewModel: ObservableObject {
             newCategory.packingList = packingList
             packingList.addToCategories(newCategory)
             save(viewContext)
-            objectWillChange.send()
+            withAnimation(nil) {
+                objectWillChange.send()
+            }
         }
     }
     
@@ -303,6 +307,17 @@ final class ListViewModel: ObservableObject {
     }
     
     
+    func updateDates(start: Date?, end: Date?) {
+        packingList.startDate = start
+        packingList.endDate = end
+        
+        save(viewContext)
+        withAnimation(nil) {
+            objectWillChange.send()
+        }
+    }
+    
+    
     //MARK: - MODIFY ALL ITEMS
     
     func expandAll() {
@@ -310,7 +325,9 @@ final class ListViewModel: ObservableObject {
             packingList.sortedCategories.forEach { $0.isExpanded = true }
         }
         save(viewContext)
-        objectWillChange.send()
+        withAnimation(nil) {
+            objectWillChange.send()
+        }
     }
 
     func collapseAll() {
@@ -318,11 +335,13 @@ final class ListViewModel: ObservableObject {
             packingList.sortedCategories.forEach { $0.isExpanded = false }
         }
         save(viewContext)
-        objectWillChange.send()
+        withAnimation(nil) {
+            objectWillChange.send()
+        }
     }
     
     
-    var areAllItemsChecked: Bool {
+    var allItemsAreChecked: Bool {
         guard !packingList.isDeleted else { return false }
         return packingList.sortedCategories.allSatisfy { category in
             category.sortedItems.allSatisfy { $0.isPacked }
@@ -331,7 +350,7 @@ final class ListViewModel: ObservableObject {
     
     @MainActor
     func toggleAllItems() {
-        if areAllItemsChecked {
+        if allItemsAreChecked {
             uncheckAllItems()
         } else {
             checkAllItems()
@@ -346,6 +365,7 @@ final class ListViewModel: ObservableObject {
         save(viewContext)
     }
     
+    @MainActor
     func checkAllItems() {
         
         for category in packingList.sortedCategories {
@@ -355,9 +375,12 @@ final class ListViewModel: ObservableObject {
         }
         
         save(viewContext)
-        objectWillChange.send()
+        withAnimation(nil) {
+            objectWillChange.send()
+        }
     }
 
+    @MainActor
     func uncheckAllItems() {
         for category in packingList.sortedCategories {
             for item in category.sortedItems {
@@ -365,7 +388,9 @@ final class ListViewModel: ObservableObject {
             }
         }
         save(viewContext)
-        objectWillChange.send()
+        withAnimation(nil) {
+            objectWillChange.send()
+        }
     }
     
     @MainActor
@@ -373,10 +398,13 @@ final class ListViewModel: ObservableObject {
         withAnimation {
             item.isPacked.toggle()
             save(viewContext)
-            objectWillChange.send()
+            
+            withAnimation(nil) {
+                objectWillChange.send()
+            }
         }
         
-        if areAllItemsChecked {
+        if allItemsAreChecked {
             
             isConfettiVisible = true
             DispatchQueue.main.asyncAfter(deadline: .now() + 2) {

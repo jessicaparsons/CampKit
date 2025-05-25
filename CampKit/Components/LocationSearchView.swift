@@ -19,7 +19,7 @@ struct LocationSearchView: View {
         NavigationView {
             ZStack {
                 if locationSearchService.results.isEmpty {
-                    ContentUnavailableView("No results", systemImage: "mappin.slash", description: Text("Search for a location"))
+                    ContentUnavailableView("No results yet", systemImage: "map", description: Text("Search for a location"))
                 } else {
                     List(locationSearchService.results) { result in
                         Button {

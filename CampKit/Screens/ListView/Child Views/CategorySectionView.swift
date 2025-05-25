@@ -29,7 +29,9 @@ struct CategorySectionView: View {
                 withAnimation {
                     category.isExpanded = newValue
                     save(viewContext)
-                    viewModel.objectWillChange.send()
+                    withAnimation(nil) {
+                        viewModel.objectWillChange.send()
+                    }
                 }
             }
         )
@@ -87,7 +89,7 @@ struct CategorySectionView: View {
                         Spacer()
                         
                         
-                            //MARK: - PROGRESS BAR
+                            //MARK: - PROGRESS COUNTER
                         let isSuccess = packedCount == allItems.count && allItems.count != 0
 
                         let countText: Text = isSuccess
@@ -95,6 +97,7 @@ struct CategorySectionView: View {
                             : Text("\(packedCount)/\(allItems.count)").foregroundColor(.secondary)
                         countText
                             .font(.subheadline)
+                            .fixedSize(horizontal: true, vertical: false)
                             
                             //MARK: - MENU
                             Menu {
@@ -117,6 +120,7 @@ struct CategorySectionView: View {
                                 Image(systemName: "ellipsis")
                                     .padding(.horizontal, 8)
                                     .padding(.vertical)
+                                    .foregroundStyle(Color.primary)
                                 
                             }//:MENU
                             .labelStyle(.iconOnly)

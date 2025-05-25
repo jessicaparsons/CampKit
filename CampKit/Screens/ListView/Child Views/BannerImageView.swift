@@ -12,7 +12,7 @@ struct BannerImageView: View {
     
     @ObservedObject var viewModel: ListViewModel
     @Binding var bannerImage: UIImage?
-    private let placeholderImage: String = "TopographyDesign"
+    private let placeholderImage: String = "forestPlaceholder"
     
     var body: some View {
         
@@ -52,7 +52,7 @@ struct BannerImageView: View {
 #if DEBUG
 #Preview {
     
-    @Previewable @State var bannerImage = UIImage(named: "TopographyDesign")
+    @Previewable @State var bannerImage = UIImage(named: "forestPlaceholder")
     
     let context = CoreDataStack.shared.context
     

@@ -61,7 +61,9 @@ struct RestockView: View {
                                             togglePacked: { viewModel.togglePacked(for: item)
                                                 HapticsManager.shared.triggerLightImpact()
                                             },
-                                            deleteItem: { },
+                                            deleteItem: {
+                                                viewModel.deleteItem(item)
+                                            },
                                             isPickerFocused: $isPickerFocused
                                         )
                                         .padding(.top, isFirst ? -8 : 4)
@@ -74,8 +76,6 @@ struct RestockView: View {
                                         alignment: .bottom
                                     )
                                 }//:FOREACH
-                                .onMove(perform: viewModel.onMove)
-                                .onDelete(perform: viewModel.deleteItem)
                             }//:IF NOT EMPTY
                             
                             

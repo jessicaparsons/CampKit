@@ -261,6 +261,14 @@ struct ListView: View {
                 }
             }
             
+            // CHANGE BANNER IMAGE
+            Button(action: {
+                isPhotoPickerPresented = true
+            }) {
+                Label("Edit Photo", systemImage: "photo")
+            }
+            .dynamicForegroundStyle(trigger: scrollOffset)
+            
             
             //MARK: - MENU BUTTON
             Menu {
@@ -270,20 +278,9 @@ struct ListView: View {
                     isToggleAllItemsConfirmationPresented = true
                 }) {
                     Label(
-                        viewModel.areAllItemsChecked ? "Uncheck All" : "Check All",
-                        systemImage: viewModel.areAllItemsChecked ? "circle" : "checkmark.circle"
+                        viewModel.allItemsAreChecked ? "Uncheck All" : "Check All",
+                        systemImage: viewModel.allItemsAreChecked ? "circle" : "checkmark.circle"
                     )
-                }
-                Divider()
-                
-                
-                
-                
-                // CHANGE BANNER IMAGE
-                Button(action: {
-                    isPhotoPickerPresented = true
-                }) {
-                    Label("Edit Photo", systemImage: "camera")
                 }
                 
                 Divider()
@@ -327,7 +324,7 @@ struct ListView: View {
                     }
                     isCloudShareSheetPresented = true
                 } label: {
-                    Label("Invite Participants", systemImage: "person.crop.circle.badge.plus")
+                    Label("Invite Camper to List", systemImage: "person.crop.circle.badge.plus")
                 }
                 
                 // SHARE LIST
@@ -335,7 +332,7 @@ struct ListView: View {
                 Button {
                     isSharingSheetPresented.toggle()
                 } label: {
-                    Label("Share", systemImage: "square.and.arrow.up")
+                    Label("Export", systemImage: "square.and.arrow.up")
                 }
                 
                 // DUPLICATE LIST
@@ -345,11 +342,9 @@ struct ListView: View {
                     } else {
                         isUpgradeToProPresented.toggle()
                     }
-                    
                 } label: {
                     Label("Duplicate", systemImage: "doc.on.doc")
                 }
-                
                 
                 Divider()
                 // DELETE LIST
@@ -365,11 +360,11 @@ struct ListView: View {
                     .dynamicForegroundStyle(trigger: scrollOffset)
             }
             .confirmationDialog(
-                viewModel.areAllItemsChecked ? "Are you sure you want to uncheck all items?" : "Are you sure you want to check all items?",
+                viewModel.allItemsAreChecked ? "Are you sure you want to uncheck all items?" : "Are you sure you want to check all items?",
                 isPresented: $isToggleAllItemsConfirmationPresented,
                 titleVisibility: .visible
             ) {
-                Button(viewModel.areAllItemsChecked ? "Uncheck All" : "Check All") {
+                Button(viewModel.allItemsAreChecked ? "Uncheck All" : "Check All") {
                     viewModel.toggleAllItems()
                     isToggleAllItemsConfirmationPresented = false
                 }
@@ -451,6 +446,9 @@ struct ListView: View {
                 }
             }
             Button("Cancel", role: .cancel) { }
+        } 
+        .sheet(isPresented: $isUpgradeToProPresented) {
+            UpgradeToProView()
         }
     }//:OPTIONS MENU
     
@@ -493,7 +491,7 @@ extension ListView {
     let storeKitManager = StoreKitManager()
     let previewStack = CoreDataStack.preview
     
-    let list = PackingList.samplePackingList(context: previewStack.context)
+    let list = PackingList(context: previewStack.context, position: 1)
     
     NavigationStack {
         ListView(

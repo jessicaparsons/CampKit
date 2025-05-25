@@ -35,6 +35,6 @@ struct Constants {
     static let newPackingListTitle: String = "New Packing List"
     
     //PRO
-    static let proVersionListCount: Int = 10
+    static let proVersionListCount: Int = 3
     @AppStorage("successEmoji") var successEmoji: String = "🔥"
 }

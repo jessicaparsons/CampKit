@@ -14,7 +14,7 @@ struct HomeListView: View {
     let weatherViewModel = WeatherViewModel(weatherFetcher: WeatherAPIClient(), geoCoder: Geocoder())
     
     @Environment(\.managedObjectContext) private var viewContext
-    @State private var viewModel: HomeListViewModel
+    @StateObject private var viewModel: HomeListViewModel
     @State private var quizViewModel: QuizViewModel
     @Environment(StoreKitManager.self) private var storeKitManager
     
@@ -47,7 +47,7 @@ struct HomeListView: View {
     ) {
         _packingListsCount = packingListsCount
         _selection = selection
-        _viewModel = State(wrappedValue: HomeListViewModel(viewContext: context))
+        _viewModel = StateObject(wrappedValue: HomeListViewModel(viewContext: context))
         _quizViewModel = State(wrappedValue: QuizViewModel(context: context))
         _navigateToListView = navigateToListView
         _currentPackingList = currentPackingList
@@ -182,6 +182,7 @@ struct HomeListView: View {
         }
         .onChange(of: viewModel.packingLists.count) {
             packingListsCount = viewModel.packingLists.count
+            viewModel.reassignAllListPositions()
         }
         //MARK: - SHOW PACKING LIST QUIZ
         .sheet(isPresented: $isNewListQuizPresented) {

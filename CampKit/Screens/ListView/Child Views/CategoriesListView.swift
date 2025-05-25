@@ -21,19 +21,16 @@ struct CategoriesListView: View {
                         dismiss() // Trigger dismissal as a side effect
                     }
             } else if viewModel.packingList.sortedCategories.isEmpty {
-                ContentUnavailableView(
-                    "Fresh Start",
-                    systemImage: "tent",
-                    description: Text("Hit the \"+\" to add a new category and get started")
-                )
-                .padding(.top, Constants.largePadding)
+                EmptyContentView(
+                    icon: "tent",
+                    description: "You haven't created any categories yet")
             } else {
                 ForEach(viewModel.packingList.sortedCategories, id: \.objectID) { category in
                     
                     ZStack {
                         RoundedRectangle(cornerRadius: Constants.cornerRadius)
                             .fill(Color.colorWhite)
-                            .shadow(color: .gray.opacity(0.2), radius: 4, x: 0, y: 2)
+                            .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 2)
                         CategorySectionView(
                             viewModel: viewModel,
                             category: category,

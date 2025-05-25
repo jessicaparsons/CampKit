@@ -10,28 +10,28 @@ import SwiftUI
 struct HomeListCardView: View {
     @Environment(\.colorScheme) var colorScheme
     
-    @Bindable var viewModel: HomeListViewModel
-    let packingList: PackingList
+    @ObservedObject var viewModel: HomeListViewModel
+    @ObservedObject var packingList: PackingList
     let onDelete: () -> Void
     @State private var isTargetedSpot: Bool = false
     
     var body: some View {
         VStack(alignment: .leading) {
-            ZStack {
-                ZStack {
-                    // MARK: - USER IMAGE
+
+            GeometryReader { geometry in
+                ZStack(alignment: .bottomTrailing) {
+                    // MARK: - IMAGE
+                    
+                    //USER IMAGE
                     if let photoData = packingList.photo, let image = UIImage(data: photoData) {
                         Image(uiImage: image)
                             .resizable()
-                            .aspectRatio(1/1, contentMode: .fit)
-                            .modifier(SwipeActionModifier(
-                                isFocused: false,
-                                deleteAction: onDelete))
-                            .cornerRadius(Constants.cornerRadiusRounded)
-                            
-                            
+                            .scaledToFill()
+                            .frame(width: geometry.size.width, height: geometry.size.width)
+                            .clipped()
+                        
                     } else {
-                        //MARK: - DEFAULT IMAGE
+                        //DEFAULT IMAGE
                         ZStack {
                             Color(Color.colorWhite)
                             Image(systemName: "tent")
@@ -39,26 +39,35 @@ struct HomeListCardView: View {
                                 .foregroundColor(Color.colorSecondaryGrey)
                         }//:ZSTACK
                         .ignoresSafeArea()
-                        .modifier(SwipeActionModifier(
-                            isFocused: false,
-                            deleteAction: onDelete))
-                        .cornerRadius(Constants.cornerRadiusRounded)
                     }
+                    
+                    
+                    //MARK: - OVERLAY
+                    if allItemsAreChecked {
+                        Color.black.opacity(0.25)
+                        Image(systemName: "checkmark.circle.fill")
+                            .foregroundStyle(Color.colorNeon)
+                            .font(.system(size: 26))
+                            .padding()
+                    }
+                    
                 }//:ZSTACK
-                .aspectRatio(1/1, contentMode: .fill)
+                .modifier(SwipeActionModifier(
+                    isFocused: false,
+                    deleteAction: onDelete))
+                .clipShape(RoundedRectangle(cornerRadius: Constants.cornerRadiusRounded))
                 .overlay(
                     RoundedRectangle(cornerRadius: Constants.cornerRadiusRounded)
-                        .stroke(isTargetedSpot ? Color.colorNeon : Color(UIColor.systemGray4), lineWidth: isTargetedSpot ? 2 : 1)
+                        .stroke(Color(UIColor.systemGray4), lineWidth: 1)
                         .animation(.easeInOut(duration: 0.2), value: isTargetedSpot)
-
+                    
                 )
                 .scaleEffect(isTargetedSpot ? 1.03 : 1.0)
                 .shadow(color: isTargetedSpot ? Color.black.opacity(0.25) : .clear, radius: 10, x: 0, y: 4)
                 
-            }//:ZSTACK
-           
-            
-            
+            }//:GEO READER
+            .aspectRatio(1, contentMode: .fit)
+
             //MARK: - LIST INFO
             VStack(alignment: .leading) {
                     Text(packingList.title ?? Constants.newPackingListTitle)
@@ -74,8 +83,9 @@ struct HomeListCardView: View {
                             Text("Anytime")
                         }
                     }//:GROUP
-                    .font(.subheadline)
                     .foregroundColor(.secondary)
+                    .lineLimit(1)
+                    .truncationMode(.tail)
                 }//:VSTACK
         } //:VSTACK
         .draggable(PackingListDragItem(id: packingList.objectID.uriRepresentation()))
@@ -94,6 +104,18 @@ struct HomeListCardView: View {
         }
         
     }//:BODY
+    
+    var allItemsAreChecked: Bool {
+        guard !packingList.isDeleted else { return false }
+        
+        guard let categories = packingList.categories as? Set<Category>, !categories.isEmpty else { return false }
+        
+        return categories.allSatisfy { category in
+            guard let items = category.items as? Set<Item> else { return false }
+            return items.allSatisfy { $0.isPacked }
+        }
+    }
+        
 }
 
 

@@ -69,7 +69,9 @@ struct EditListDetailsSheet: View {
                         viewModel.packingList.locationAddress = locationAddressPlaceholder?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
                         try? viewContext.save()
                         HapticsManager.shared.triggerSuccess()
-                        viewModel.objectWillChange.send()
+                        withAnimation(nil) {
+                            viewModel.objectWillChange.send()
+                        }
                         dismiss()
                     }
                     .padding(.top)

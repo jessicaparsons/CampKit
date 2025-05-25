@@ -59,23 +59,18 @@ final class RestockViewModel {
         restockItems = mutable
     }
 
-    func deleteItem(at offsets: IndexSet) {
-        let sorted = sortedItems
-        var mutable = sorted
-
-        for index in offsets {
-            let item = mutable[index]
-            viewContext.delete(item)
+    func deleteItem(_ item: RestockItem) {
+        
+        viewContext.delete(item)
+        
+        //Update positions in the main list
+        restockItems.removeAll { $0.id == item.id }
+        
+        for (index, item) in restockItems.enumerated() {
+            item.position = Int64(index)
         }
-
-        mutable.remove(atOffsets: offsets)
-
-        for (index, item) in mutable.enumerated() {
-            item.positionInt = mutable.count - index
-        }
-
+        
         save(viewContext)
-        restockItems = mutable
     }
     
     func loadItems() async {

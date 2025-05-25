@@ -14,13 +14,15 @@ extension Item: EditablePackableItem {
         context: NSManagedObjectContext,
         id: UUID = UUID(),
         title: String? = nil,
-        isPacked: Bool = false
+        isPacked: Bool = false,
+        quantity: Int64? = nil
     )
     {
         self.init(context: context)
         self.id = id
         self.title = title
         self.isPacked = isPacked
+        self.quantity = quantity ?? 0
     }
 }
 

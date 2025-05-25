@@ -21,6 +21,7 @@ extension RestockItem {
     @NSManaged public var isPacked: Bool
     @NSManaged public var position: Int64
     @NSManaged public var title: String?
+    @NSManaged public var quantity: Int64
 
 }
 

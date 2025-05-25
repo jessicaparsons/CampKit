@@ -44,7 +44,7 @@ struct CollapsableStepperView: View {
                     }
                     .font(.footnote)
                     .foregroundColor(.primary)
-                    .padding(.vertical, 6)
+                    .padding(.vertical, 5)
                     .padding(.horizontal, 12)
                     .background(
                         RoundedRectangle(cornerRadius: 999, style: .continuous)

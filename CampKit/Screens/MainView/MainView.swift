@@ -87,11 +87,11 @@ struct MainView: View {
                     
                     
                     //MARK: - RESTOCK
-                    
+                    NavigationStack {
                         RestockView(
                             context: viewContext,
                             isSettingsPresented: $isSettingsPresented)
-                    
+                    }
                     .tabItem {
                         VStack {
                             Image(systemName: selection != 2 && colorScheme == .dark ?  "arrow.clockwise.circle" : "arrow.clockwise.circle.fill")

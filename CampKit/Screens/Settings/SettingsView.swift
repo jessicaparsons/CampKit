@@ -290,7 +290,7 @@ struct SettingsView: View {
                 }
                 
             }//:SCROLLVIEW
-            .background(Color.colorWhiteSands)
+            .background(Color.colorWhiteSandsSheet)
             .preferredColorScheme(isDarkMode ? .dark : .light)
             
         

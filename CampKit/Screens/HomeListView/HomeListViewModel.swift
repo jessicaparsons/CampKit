@@ -8,13 +8,13 @@
 import SwiftUI
 import CoreData
 
-@Observable
-class HomeListViewModel {
+
+class HomeListViewModel: ObservableObject {
     
     private let viewContext: NSManagedObjectContext
     
-    var packingLists: [PackingList] = []
-    var draggedItem: PackingList?
+    @Published var packingLists: [PackingList] = []
+    @Published var draggedItem: PackingList?
 
     
     init(viewContext: NSManagedObjectContext) {
@@ -33,11 +33,9 @@ class HomeListViewModel {
     }
     
     func reassignAllListPositions() {
-        let sortedLists = packingLists
-            .filter { !$0.isDeleted } // skip deleted objects
-            .sorted(by: { ($0.position) > ($1.position) })
+        let lists = packingLists.filter { !$0.isDeleted } // skip deleted objects
         
-        for (index, list) in sortedLists.enumerated() {
+        for (index, list) in lists.enumerated() {
             list.position = Int64(index)
         }
 
@@ -63,10 +61,13 @@ class HomeListViewModel {
               let toIndex = packingLists.firstIndex(of: to),
               fromIndex != toIndex else { return }
 
-        let movedItem = packingLists.remove(at: fromIndex)
-        packingLists.insert(movedItem, at: toIndex)
-
-        reassignAllListPositions()
+        withAnimation {
+            let movedItem = packingLists.remove(at: fromIndex)
+            packingLists.insert(movedItem, at: toIndex)
+            
+            reassignAllListPositions()
+        }
+        
         save(viewContext)
     }
 

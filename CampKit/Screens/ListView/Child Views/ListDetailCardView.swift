@@ -46,7 +46,7 @@ struct ListDetailCardView: View {
             
             Grid(alignment: .top, horizontalSpacing: 20) {
                 
-                //MARK: - DATE
+                //MARK: - DATE AND LOCATION
                 GridRow {
                     
                     listDates
@@ -66,7 +66,7 @@ struct ListDetailCardView: View {
         .background(
             RoundedRectangle(cornerRadius: 10)
                 .fill(Color.colorWhite)
-                .shadow(color: .gray.opacity(0.2), radius: 4, x: 0, y: 2)
+                .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 2)
         )
         .sheet(isPresented: $isLocationPresented) {
             LocationSearchView(
@@ -104,8 +104,7 @@ struct ListDetailCardView: View {
                 startDate: $tempStartDate,
                 endDate: $tempEndDate,
             ) {
-                viewModel.packingList.startDate = tempStartDate
-                viewModel.packingList.endDate = tempEndDate
+                viewModel.updateDates(start: tempStartDate, end: tempEndDate)
             }
             .presentationDetents([.medium, .large])
         }

@@ -21,12 +21,7 @@ struct AddNewCategoriesView: View {
         NavigationStack {
             ScrollView {
                 
-                VStack(alignment: .leading, spacing: Constants.cardSpacing) {
-                    
-                    //                Text("Select to add more preset categories to your list")
-                    //                    .multilineTextAlignment(.leading)
-                    //                    .font(.subheadline)
-                    
+                VStack(alignment: .leading, spacing: Constants.verticalSpacing) {
                     
                     //MARK: - PARTICIPANTS
                     
@@ -34,13 +29,13 @@ struct AddNewCategoriesView: View {
                         Text("Who's going?")
                             .font(.footnote)
                             .fontWeight(.bold)
-                        Spacer()
                     }
                     
                     ChipSectionView(
                         selectedFilters: $viewModel.selectedFilters,
                         preferenceCategory: ChoiceOptions.addParticipants
                     )
+                    .padding(.bottom)
                     
                     
                     //MARK: - DEFAULTS
@@ -49,14 +44,13 @@ struct AddNewCategoriesView: View {
                         Text("Essentials")
                             .font(.footnote)
                             .fontWeight(.bold)
-                        Spacer()
                     }
                     
                     ChipSectionView(
                         selectedFilters: $viewModel.selectedFilters,
                         preferenceCategory: ChoiceOptions.defaults
                     )
-                    
+                    .padding(.bottom)
                     
                     //MARK: - ACTIVITIES
                     
@@ -72,7 +66,7 @@ struct AddNewCategoriesView: View {
                         selectedFilters: $viewModel.selectedFilters,
                         preferenceCategory: ChoiceOptions.activities
                     )
-                    
+                    .padding(.bottom)
                     
                     //MARK: - WEATHER
                     
@@ -80,21 +74,22 @@ struct AddNewCategoriesView: View {
                         Text("Weather")
                             .font(.footnote)
                             .fontWeight(.bold)
-                        Spacer()
                     }
                     
                     ChipSectionView(
                         selectedFilters: $viewModel.selectedFilters,
                         preferenceCategory: ChoiceOptions.addWeatherConditions
                     )
-                    
+                    .padding(.bottom)
                     
                     //MARK: - ADD BUTTON
                     Button("Add") {
                         
                         viewModel.addPresetCategories()
                         HapticsManager.shared.triggerSuccess()
-                        viewModel.objectWillChange.send()
+                        withAnimation(nil) {
+                            viewModel.objectWillChange.send()
+                        }
                         viewModel.selectedFilters = []
                         dismiss()
                     }

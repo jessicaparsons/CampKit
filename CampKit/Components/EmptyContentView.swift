@@ -23,6 +23,7 @@ struct EmptyContentView: View {
                 
                 Text(description)
                     .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
                 
             }//:VSTACK
             .padding(.top, Constants.largePadding)

@@ -96,7 +96,7 @@ struct UpdateReminderView: View {
             .navigationTitle(reminder == nil ? "New Reminder" : "Update Reminder")
             .navigationBarTitleDisplayMode(.inline)
             .scrollContentBackground(.hidden)
-            .background(Color.colorWhiteSands)
+            .background(Color.colorWhiteSandsSheet)
             .onAppear {
                 title = reminder?.title ?? "New Reminder"
                 notes = reminder?.notes ?? ""

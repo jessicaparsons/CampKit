@@ -6,10 +6,12 @@
 //
 
 import SwiftUI
+import CoreData
 
 protocol EditablePackableItem: ObservableObject {
     var title: String? { get set }
     var isPacked: Bool { get set }
+    var quantity: Int64 { get set }
 }
 
 struct EditableItemView<T: EditablePackableItem>: View {
@@ -20,8 +22,6 @@ struct EditableItemView<T: EditablePackableItem>: View {
     let togglePacked: () -> Void
     let deleteItem: () -> Void
     @Binding var isPickerFocused: Bool
-    
-    @State private var quantity: Int = 0
 
     
     var body: some View {
@@ -31,7 +31,7 @@ struct EditableItemView<T: EditablePackableItem>: View {
                     togglePacked()
                     HapticsManager.shared.triggerLightImpact()
                     isPickerFocused = false
-                        
+                    
                 }) {
                     Image(systemName: item.isPacked ? "checkmark.circle.fill" : "circle")
                         .foregroundStyle(item.isPacked ? Color.colorSage : .secondary)
@@ -41,7 +41,9 @@ struct EditableItemView<T: EditablePackableItem>: View {
                 
                 TextField("Item Name", text: Binding(
                     get: { item.title ?? "" },
-                    set: { item.title = $0 }))
+                    set: { item.title = $0 }),
+                          axis: .vertical
+                )
                 .focused($isFocused)
                 .fontWeight(.light)
                 .foregroundStyle(item.isPacked ? Color.secondary : .primary)
@@ -49,27 +51,35 @@ struct EditableItemView<T: EditablePackableItem>: View {
                 .italic(item.isPacked)
                 .onSubmit {
                     isFocused = false
+                    disableSwipe = false
                 }
                 .simultaneousGesture(
                     TapGesture().onEnded {
                         isPickerFocused = false
+                        disableSwipe = true
                     }
                 )
                 
                 if isFocused {
                     Button {
                         isFocused = false
+                        disableSwipe = false
                     } label: {
                         Text("Done")
                     }
-                }
-                
-                
-                CollapsableStepperView(
-                    value: $quantity,
-                    range: 0...999,
-                    isPickerFocused: $isPickerFocused)
-            
+                } else {
+                    
+                    
+                    CollapsableStepperView(
+                        value: Binding(
+                            get: { Int(item.quantity) },
+                            set: { item.quantity = Int64($0)
+                                saveContext(for: item as! NSManagedObject)
+                            }
+                        ),
+                        range: 0...999,
+                        isPickerFocused: $isPickerFocused)
+                    }
                 
             }//:HSTACK
         }//:ZSTACK
@@ -82,6 +92,14 @@ struct EditableItemView<T: EditablePackableItem>: View {
         
     }//:BODY
     
+    private func saveContext(for item: NSManagedObject) {
+        do {
+            try item.managedObjectContext?.save()
+        } catch {
+            print("Error saving item: \(error.localizedDescription)")
+        }
+    }
+    
 }
 
 #if DEBUG
@@ -90,7 +108,7 @@ struct EditableItemView<T: EditablePackableItem>: View {
     
     let previewStack = CoreDataStack.preview
     let item = RestockItem(context: previewStack.context, title: "Sleeping Bag", position: 0)
-    let item2 = RestockItem(context: previewStack.context, title: "Tent", position: 0)
+    let item2 = RestockItem(context: previewStack.context, title: "Tent really long test name to see if thsi will keep going wow", position: 0)
     
     VStack {
         EditableItemView(

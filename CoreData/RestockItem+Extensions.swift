@@ -15,7 +15,8 @@ extension RestockItem: EditablePackableItem {
         position: Int,
         isPacked: Bool = false,
         dateCreated: Date? = nil,
-        id: UUID = UUID()
+        id: UUID = UUID(),
+        quantity: Int64? = nil
     ) {
         self.init(context: context)
         self.title = title
@@ -23,6 +24,7 @@ extension RestockItem: EditablePackableItem {
         self.isPacked = isPacked
         self.dateCreated = dateCreated ?? Date()
         self.id = id
+        self.quantity = quantity ?? 0
     }
     
     var positionInt: Int {
