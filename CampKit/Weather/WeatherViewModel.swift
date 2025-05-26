@@ -56,8 +56,11 @@ final class WeatherViewModel {
                 
                 self.coordinates = location
                 
-                
-                let urlString = "\(Constants.weatherURL)?lat=\(location.latitude)&lon=\(location.longitude)&units=imperial&appid=\(Constants.apiKey)"
+                //Call the backend server for the API key
+                let urlString = "http://localhost:3000/weather?lat=\(location.latitude)&lon=\(location.longitude)"
+                guard let url = URL(string: urlString) else {
+                    throw NetworkError.invalidURL
+                }
                 
                 let fiveDayForecast = try await weatherFetcher.fetchWeather(with: urlString)
                 

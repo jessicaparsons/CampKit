@@ -28,7 +28,7 @@ struct BigButtonWide: ButtonStyle {
         configuration.label
             .padding(.vertical, 15)
             .padding(.horizontal, Constants.horizontalPadding)
-            .frame(maxWidth: .infinity)
+            //.frame(maxWidth: .infinity)
             .background(
                 RoundedRectangle(cornerRadius: 10)
                     .fill(.colorNeon)

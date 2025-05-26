@@ -51,55 +51,39 @@ struct QuizView: View {
             
             //MARK: - BUTTONS
             .overlay(
+                GeometryReader { geo in
                 VStack {
                     Spacer()
                     VStack {
                         ProgressIndicatorView(isStepOne: $isStepOne)
                             .padding(.bottom, Constants.verticalSpacing)
+                       
+                            HStack {
+                                Spacer()
+                                    .frame(width: geo.size.width * 0.46)
+                                
+                                //MARK: - NEXT / CREATE LIST BUTTON
+                                Button(action: {
+                                    if isStepOne {
+                                        isStepOne = false
+                                    } else {
+                                        
+                                        viewModel.createPackingList()
+                                        
+                                        if let packingList = viewModel.currentPackingList {
+                                            currentPackingList = packingList
+                                            navigateToListView = true
+                                            isNewListQuizPresented = false
+                                        }
+                                    }
+                                }) {
+                                    Text(isStepOne ? "Next" : "Create List")
+                                        .frame(maxWidth: .infinity)
+                                }
+                                .buttonStyle(BigButtonWide())
+                            }//:HSTACK
+                            .padding(.bottom)
                         
-                        HStack {
-                            //MARK: - BLANK LIST / BACK BUTTON
-                            
-                            Button(action: {
-                                if !isStepOne {
-                                    isStepOne = true
-                                } else {
-                                    viewModel.createBlankPackingList()
-                                    
-                                    if let packingList = viewModel.currentPackingList {
-                                        currentPackingList = packingList
-                                        navigateToListView = true
-                                        isNewListQuizPresented = false
-                                    }
-                                }
-                                    
-                            }) {
-                                Text(isStepOne ? "New Blank List" : "Back")
-                                    .frame(maxWidth: .infinity)
-                            }
-                            .buttonStyle(BigButtonWide())
-                            
-                            //MARK: - NEXT / CREATE LIST BUTTON
-                            Button(action: {
-                                if isStepOne {
-                                    isStepOne = false
-                                } else {
-                                    
-                                    viewModel.createPackingList()
-                                    
-                                    if let packingList = viewModel.currentPackingList {
-                                        currentPackingList = packingList
-                                        navigateToListView = true
-                                        isNewListQuizPresented = false
-                                    }
-                                }
-                            }) {
-                                Text(isStepOne ? "Next" : "Create List")
-                                    .frame(maxWidth: .infinity)
-                            }
-                            .buttonStyle(BigButtonWide())
-                        }//:HSTACK
-                        .padding(.bottom)
                     }
                     .padding()
                     .background(
@@ -109,7 +93,7 @@ struct QuizView: View {
                     )
                 }
                 .ignoresSafeArea(.keyboard, edges: .bottom)
-                
+                }//:GEOMETRYREADER
             )//:OVERLAY
             
             //MARK: - MENU

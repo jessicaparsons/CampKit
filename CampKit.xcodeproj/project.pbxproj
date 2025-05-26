@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		C82EBE932D3116E2000B39DF /* SwipeCell in Frameworks */ = {isa = PBXBuildFile; productRef = C82EBE922D3116E2000B39DF /* SwipeCell */; };
+		C8A548CA2DE382EB00EFE195 /* UnsplashPhotoPicker in Frameworks */ = {isa = PBXBuildFile; productRef = C8A548C92DE382EB00EFE195 /* UnsplashPhotoPicker */; };
 		C8BED5542D9CA4710069171E /* ConfettiSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = C8BED5532D9CA4710069171E /* ConfettiSwiftUI */; };
 /* End PBXBuildFile section */
 
@@ -121,6 +122,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C8A548CA2DE382EB00EFE195 /* UnsplashPhotoPicker in Frameworks */,
 				C8BED5542D9CA4710069171E /* ConfettiSwiftUI in Frameworks */,
 				C82EBE932D3116E2000B39DF /* SwipeCell in Frameworks */,
 			);
@@ -224,6 +226,7 @@
 			packageProductDependencies = (
 				C82EBE922D3116E2000B39DF /* SwipeCell */,
 				C8BED5532D9CA4710069171E /* ConfettiSwiftUI */,
+				C8A548C92DE382EB00EFE195 /* UnsplashPhotoPicker */,
 			);
 			productName = CampKit;
 			productReference = C8B614F22D27078500E1DB8D /* CampKit.app */;
@@ -286,6 +289,7 @@
 			packageReferences = (
 				C82EBE912D3116E2000B39DF /* XCRemoteSwiftPackageReference "SwipeCell" */,
 				C8BED5522D9CA4710069171E /* XCRemoteSwiftPackageReference "ConfettiSwiftUI" */,
+				C8A548C82DE382EB00EFE195 /* XCRemoteSwiftPackageReference "unsplash-photopicker-ios" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = C8B614F32D27078500E1DB8D /* Products */;
@@ -720,6 +724,14 @@
 				minimumVersion = 0.9.8;
 			};
 		};
+		C8A548C82DE382EB00EFE195 /* XCRemoteSwiftPackageReference "unsplash-photopicker-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/unsplash/unsplash-photopicker-ios.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.3.0;
+			};
+		};
 		C8BED5522D9CA4710069171E /* XCRemoteSwiftPackageReference "ConfettiSwiftUI" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/simibac/ConfettiSwiftUI.git";
@@ -735,6 +747,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = C82EBE912D3116E2000B39DF /* XCRemoteSwiftPackageReference "SwipeCell" */;
 			productName = SwipeCell;
+		};
+		C8A548C92DE382EB00EFE195 /* UnsplashPhotoPicker */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C8A548C82DE382EB00EFE195 /* XCRemoteSwiftPackageReference "unsplash-photopicker-ios" */;
+			productName = UnsplashPhotoPicker;
 		};
 		C8BED5532D9CA4710069171E /* ConfettiSwiftUI */ = {
 			isa = XCSwiftPackageProductDependency;
