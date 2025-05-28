@@ -27,6 +27,10 @@ final class QuizViewModel {
     var listDates: Set<DateComponents> = []
     var startDate: Date?
     var endDate: Date?
+    var photo: Data?
+    
+    //Stores the photo selection until the Next button is pressed
+    var tempPhoto: UIImage? = nil
     
     //Stores the packing list so the user gets sent to it after creation
     var currentPackingList: PackingList?
@@ -51,9 +55,12 @@ final class QuizViewModel {
                 list.position += 1
             }
             
+            let finalPhotoData = photo ?? tempPhoto?.jpegData(compressionQuality: 1.0)
+            
             let newPackingList = PackingList(
                 context: viewContext,
                 title: listTitle.isEmpty ? "My Packing List" : listTitle, position: 0,
+                photo: finalPhotoData,
                 locationName: (locationName == nil) ? nil : locationName,
                 locationAddress: (locationAddress == nil) ? nil : locationAddress,
                 latitude: latitude,
@@ -61,6 +68,7 @@ final class QuizViewModel {
                 elevation: elevation,
                 startDate: startDate,
                 endDate: endDate
+                
             )
             
             //Generate recommended categories and items
@@ -194,5 +202,18 @@ final class QuizViewModel {
         return "\(dayFormatter.string(from: start)) – \(dayFormatter.string(from: end)), \(yearFormatter.string(from: end))"
     }
     
+    //MARK: - PHOTO SELECTOR
     
+    @MainActor
+    func setTempPhoto(_ image: UIImage) {
+        tempPhoto = image
+    }
+
+    @MainActor
+    func setGalleryPhoto(_ image: UIImage) {
+        self.photo = image.jpegData(compressionQuality: 1.0)
+    }
+
+    
+  
 }

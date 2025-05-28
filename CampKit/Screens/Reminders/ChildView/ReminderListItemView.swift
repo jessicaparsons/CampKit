@@ -20,9 +20,11 @@ struct ReminderListItemView: View {
     
     var reminder: Reminder
     let isSelected: Bool
+    let onDelete: () -> Void
     let onEvent: (ReminderCellEvents) -> Void
     @State private var isChecked: Bool = false
     let delay = Delay()
+    
     
     var isTitleOnly: Bool {
         reminder.notes == nil && reminder.reminderDate == nil && reminder.reminderTime == nil
@@ -94,15 +96,20 @@ struct ReminderListItemView: View {
             
         }//:HSTACK
         .padding()
+        .modifier(SwipeActionModifier(
+            isFocused: false,
+            deleteAction: onDelete))
         .background(
             RoundedRectangle(cornerRadius: Constants.cornerRadius)
                 .fill(Color.colorWhite)
                 .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
         )
+        .clipShape(RoundedRectangle(cornerRadius: Constants.cornerRadius))
         .padding(.horizontal)
         .onTapGesture {
             onEvent(.onSelect(reminder))
         }
+        
     }
     
     private func formatReminderDate(_ date: Date) -> String {
@@ -129,7 +136,12 @@ struct ReminderListItemView: View {
         
             ZStack {
                 Color.colorWhiteSands
-                ReminderListItemView(reminder: reminder, isSelected: true, onEvent: { _ in })
+                ReminderListItemView(
+                    reminder: reminder,
+                    isSelected: true,
+                    onDelete: {},
+                    onEvent: { _ in }
+                     )
             
             }
     }
@@ -149,7 +161,11 @@ struct ReminderListItemView: View {
         
             ZStack {
                 Color.colorWhiteSands
-                ReminderListItemView(reminder: reminder, isSelected: true, onEvent: { _ in })
+                ReminderListItemView(
+                    reminder: reminder,
+                    isSelected: true,
+                    onDelete: {},
+                    onEvent: { _ in } )
             
             }
     }

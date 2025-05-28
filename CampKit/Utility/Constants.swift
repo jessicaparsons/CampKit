@@ -10,12 +10,9 @@ import SwiftUI
 
 struct Constants {
     
-    //API
-    static let apiKey = "REDACTED"
-    static let weatherURL = "https://api.openweathermap.org/data/2.5/forecast"
-    
-    static let photoKey = ""
-    static let photoSecretKey = ""
+    //PHOTOS
+    static let photoK = ""
+    static let photoSK = ""
     
     //UI STYLES
     static let titleFont: CGFloat = 36
@@ -33,6 +30,7 @@ struct Constants {
     static let quizPadding: CGFloat = 150
     static let gridSpacing: CGFloat = 15
     static let headerSpacing: CGFloat = 70
+    static let gallerySpacing: CGFloat = 4
     
     //STRINGS
     static let newPackingListTitle: String = "New Packing List"

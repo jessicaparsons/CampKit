@@ -16,7 +16,6 @@ struct QuizPageOneView: View {
     @FocusState var isFocused: Bool
     @Binding var isElevationAdded: Bool
     @State private var isLocationSearchPresented: Bool = false
-    @Binding var isStepOne: Bool
     @State private var showStepper: Bool = false
     @State private var isCalendarPresented: Bool = false
     
@@ -230,6 +229,7 @@ struct QuizPageOneView: View {
                         .stroke(Color.colorToggleOff, lineWidth: 1)
                 }
             }//:ZSTACK
+            .background(Color.white.opacity(0.001))
             .onTapGesture {
                 withAnimation {
                     isLocationSearchPresented.toggle()
@@ -303,7 +303,6 @@ struct QuizPageOneView: View {
 }
 #if DEBUG
 #Preview {
-    @Previewable @State var isStepOne: Bool = true
     @Previewable @State var isElevationAdded: Bool = true
     
     let previewStack = CoreDataStack.preview
@@ -313,7 +312,6 @@ struct QuizPageOneView: View {
             QuizPageOneView(
                 viewModel: QuizViewModel(context: previewStack.context),
                 isElevationAdded: $isElevationAdded,
-                isStepOne: $isStepOne
             )
                 .environment(\.managedObjectContext, previewStack.context)
                 .environment(WeatherViewModel(weatherFetcher: WeatherAPIClient(), geoCoder: Geocoder()))

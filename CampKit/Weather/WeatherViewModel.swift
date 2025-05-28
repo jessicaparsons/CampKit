@@ -56,11 +56,10 @@ final class WeatherViewModel {
                 
                 self.coordinates = location
                 
-                //Call the backend server for the API key
-                let urlString = "http://localhost:3000/weather?lat=\(location.latitude)&lon=\(location.longitude)"
-                guard let url = URL(string: urlString) else {
-                    throw NetworkError.invalidURL
-                }
+                let lat = location.latitude
+                let lon = location.longitude
+                
+                let urlString = "https://campingkit-weather.onrender.com/weather?lat=\(lat)&lon=\(lon)"
                 
                 let fiveDayForecast = try await weatherFetcher.fetchWeather(with: urlString)
                 

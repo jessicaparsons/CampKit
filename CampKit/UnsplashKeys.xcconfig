@@ -1,0 +1,12 @@
+//
+//  UnsplashKeys.xcconfig
+//  CampKit
+//
+//  Created by Jessica Parsons on 5/27/25.
+//
+
+// Configuration settings file format documentation can be found at:
+// https://developer.apple.com/documentation/xcode/adding-a-build-configuration-file-to-your-project
+
+UNSPLASH_ACCESS_KEY = VOyDtXT-sra92sqCu97kWi-m5O1jP9GYKXqSSoCoBiE
+UNSPLASH_SECRET_KEY = hzbhkGrF46vBt1TaFL6e61rnre4va8LT-UqU1tQ0C3k

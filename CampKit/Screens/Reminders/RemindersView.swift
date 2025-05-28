@@ -102,7 +102,11 @@ struct RemindersView: View {
                             ForEach(reminderItems) { reminder in
                                 ReminderListItemView(
                                     reminder: reminder,
-                                    isSelected: isSelectedReminder(reminder)) { event in
+                                    isSelected: isSelectedReminder(reminder),
+                                    onDelete: {
+                                        viewContext.delete(reminder)
+                                    }
+                                ) { event in
                                         switch event {
                                         case .onChecked(let reminder, let checked): reminder.isCompleted = checked
                                             dataRefreshTrigger.toggle()
@@ -118,12 +122,6 @@ struct RemindersView: View {
                                         }
                                     }
                             }//:FOREACH
-                            .onDelete { indexSet in
-                                for index in indexSet {
-                                    viewContext.delete(reminderItems[index])
-                                }
-                                save(viewContext)
-                            }
                         }//:LAZYVSTACK
                         .animation(.easeInOut, value: reminderItems.count)
                         
@@ -186,8 +184,6 @@ struct RemindersView: View {
     private var reminderToolBar: some ToolbarContent {
         ToolbarItem(placement: .topBarTrailing) {
             HStack {
-                if editMode == .inactive {
-                    
                     Menu {
                         //SORT BY
                         Label("Sort By", systemImage: "arrow.up.arrow.down")
@@ -216,13 +212,6 @@ struct RemindersView: View {
                         }
                         Divider()
                         
-                        // REARRANGE BUTTON
-                        Button {
-                            editMode = (editMode == .active) ? .inactive : .active
-                        } label: {
-                            Label("Delete Multiple", systemImage: "trash")
-                                .font(.body)
-                        }
                         //SHOW / HIDE COMPLETED
                         Button {
                             isShowingCompleted.toggle()
@@ -242,16 +231,7 @@ struct RemindersView: View {
                         Image(systemName: "gearshape.fill")
                                 .foregroundStyle(Color.colorForestSecondary)
                     }
-                        
-                  
-                    
-                } else {
-                    Button {
-                        editMode = (editMode == .active) ? .inactive : .active
-                    } label: {
-                        Text("Done")
-                    }
-                }
+
             }//:HSTACK
             .foregroundStyle(Color.primary)
             

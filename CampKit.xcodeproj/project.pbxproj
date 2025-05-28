@@ -443,6 +443,8 @@
 		};
 		C8B615042D27078700E1DB8D /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = C85DEC2B2D39E6070023A1BD /* CampKit */;
+			baseConfigurationReferenceRelativePath = UnsplashKeys.xcconfig;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -481,6 +483,8 @@
 		};
 		C8B615052D27078700E1DB8D /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = C85DEC2B2D39E6070023A1BD /* CampKit */;
+			baseConfigurationReferenceRelativePath = UnsplashKeys.xcconfig;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;

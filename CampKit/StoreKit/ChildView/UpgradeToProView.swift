@@ -17,43 +17,37 @@ struct UpgradeToProView: View {
         
         NavigationStack {
             ZStack(alignment: .center) {
-                if colorScheme == .dark {
-                    
-                    LinearGradient(
-                        colors: [Color.colorSage, Color.colorForest],
-                        startPoint: .bottomLeading,
-                        endPoint: .topTrailing
-                    )
+                
+                Image("pro-camp")
+                    .resizable()
+                    .scaledToFill()
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .ignoresSafeArea()
-                    
-                    Color.black
-                        .opacity(0.5)
-                        .blendMode(.overlay)
-                        .ignoresSafeArea()
-                    
-                } else {
-                    //LIGHT MODE
-                    
-                    LinearGradient(
-                        colors: [ Color.colorSage, Color.colorForest],
-                        startPoint: .bottomLeading,
-                        endPoint: .topTrailing
-                    )
-                    .ignoresSafeArea()
-                }
-                    
+                
                 VStack(spacing: Constants.cardSpacing) {
                 Spacer()
                 //MARK: - TITLE
-//                Image("tentIcon")
-//                    .resizable()
-//                    .frame(width: 120, height: 120)
-                VStack(alignment: .center) {
-                    Text("Upgrade to Pro")
-                        .font(.title)
-                        .fontWeight(.bold)
-                    Text("Unlock all features for just $2.99")
-                }//:VSTACK
+
+                // Title
+                    VStack(spacing: Constants.verticalSpacing) {
+                        HStack(spacing: 4) {
+                            Text("Upgrade to")
+                                .font(.title)
+                                .fontWeight(.bold)
+                                .foregroundStyle(.white)
+                            
+                            Text("Pro")
+                                .font(.title)
+                                .fontWeight(.bold)
+                                .foregroundColor(.white)
+                                .padding(.horizontal, 6)
+                                .background(Color.colorBloodOrange)
+                                .clipShape(Rectangle())
+                        }
+                        Text("Unlock all features for just $2.99")
+                            .foregroundStyle(.white)
+                            .font(.headline)
+                    }//:VSTACK
                 
                 //MARK: - WHAT'S INCLUDED
                 GroupBox {
@@ -81,11 +75,11 @@ struct UpgradeToProView: View {
                         .buttonStyle(BigButton())
                         
                     }//:VSTACK
-                    .padding(.vertical)
+                    .padding(.vertical, 5)
                     .padding(.horizontal, Constants.horizontalPadding)
                 }//:GROUPBOX
                 .padding(.horizontal, Constants.horizontalPadding)
-                .backgroundStyle(Color.colorWhite)
+                .backgroundStyle(Color.colorWhiteSands)
                 .clipShape(RoundedRectangle(cornerRadius: Constants.cornerRadius))
                 
                 //MARK: - BUTTON
@@ -98,10 +92,11 @@ struct UpgradeToProView: View {
                     Button {
                         dismiss()
                     } label: {
-                        Image(systemName: "xmark")
-                            .font(.footnote)
+                        Image(systemName: "x.circle.fill")
+                            .font(.title3)
                             .fontWeight(.bold)
-                            .tint(Color.accent)
+                            .foregroundStyle(.regularMaterial)
+                            .padding(.top)
                     }
                 }
             }

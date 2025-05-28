@@ -12,18 +12,34 @@ import CoreData
 class HomeListViewModel: ObservableObject {
     
     private let viewContext: NSManagedObjectContext
+    private let sortKey = "selectedHomeSort"
+
     
     @Published var packingLists: [PackingList] = []
     @Published var draggedItem: PackingList?
+    
+    var selectedSort: String {
+        get {
+            UserDefaults.standard.string(forKey: sortKey) ?? "Date"
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: sortKey)
+            fetchPackingLists()
+        }
+    }
 
     
     init(viewContext: NSManagedObjectContext) {
         self.viewContext = viewContext
+        fetchPackingLists()
     }
     
     func fetchPackingLists() {
         let request: NSFetchRequest<PackingList> = PackingList.fetchRequest()
-        request.sortDescriptors = [NSSortDescriptor(keyPath: \PackingList.position, ascending: true)]
+        
+        request.sortDescriptors = selectedSort == "Date"
+        ? [NSSortDescriptor(keyPath: \PackingList.startDate, ascending: true)]
+        : [NSSortDescriptor(keyPath: \PackingList.title, ascending: true)]
 
         do {
             packingLists = try viewContext.fetch(request)

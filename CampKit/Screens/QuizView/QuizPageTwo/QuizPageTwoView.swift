@@ -11,7 +11,6 @@ struct QuizPageTwoView: View {
     
     @Environment(WeatherViewModel.self) private var weatherViewModel
     @Bindable var viewModel: QuizViewModel
-    @Binding var isStepOne: Bool
     @Binding var isElevationAdded: Bool
     @State private var weatherCategories: Set<String> = []
     @State private var isWeatherLoading: Bool = false
@@ -88,14 +87,13 @@ struct QuizPageTwoView: View {
 
 #if DEBUG
 #Preview {
-    @Previewable @State var isStepOne: Bool = false
+    @Previewable @State var currentStep: Int = 1
     @Previewable @State var isElevationAdded: Bool = false
     
     let previewStack = CoreDataStack.preview
     
     QuizPageTwoView(
         viewModel: QuizViewModel(context: previewStack.context),
-        isStepOne: $isStepOne,
         isElevationAdded: $isElevationAdded
     )
         .environment(WeatherViewModel(weatherFetcher: WeatherAPIClient(), geoCoder: Geocoder()))

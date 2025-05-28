@@ -30,7 +30,7 @@ struct SettingsView: View {
     
     @State private var showRestoreAlert = false
     @State private var restoreMessage = ""
-    @State private var isExpanded: Bool = true
+    @State private var isExpanded: Bool = false
 
     
     private let options = TemperatureUnit.allCases

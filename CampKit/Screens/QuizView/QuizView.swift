@@ -10,10 +10,11 @@ import SwiftUI
 struct QuizView: View {
     
     @Environment(\.managedObjectContext) private var viewContext
+    @Environment(\.dismiss) private var dismiss
     @Environment(WeatherViewModel.self) private var weatherViewModel
     @Bindable var viewModel: QuizViewModel
     @Binding var isNewListQuizPresented: Bool
-    @Binding var isStepOne: Bool
+    @Binding var currentStep: Int
     @Binding var navigateToListView: Bool
     @Binding var currentPackingList: PackingList?
     let packingListCount: Int
@@ -29,18 +30,21 @@ struct QuizView: View {
                 //QUIZ PAGES
                 ZStack {
                     ScrollView {
-                        if isStepOne {
+                        if currentStep == 1 {
                             QuizPageOneView(
                                 viewModel: viewModel,
-                                isElevationAdded: $isElevationAdded,
-                                isStepOne: $isStepOne)
-                                .transition(.move(edge: .leading))
-                        } else {
+                                isElevationAdded: $isElevationAdded
+                            )
+                           
+                        } else if currentStep == 2 {
                             QuizPageTwoView(
                                 viewModel: viewModel,
-                                isStepOne: $isStepOne,
-                                isElevationAdded: $isElevationAdded)
-                                .transition(.move(edge: .trailing))
+                                isElevationAdded: $isElevationAdded
+                            )
+                            
+                        } else {
+                            QuizPageThreeView(viewModel: viewModel)
+                                
                         }
                     }
                     .scrollIndicators(.hidden)
@@ -51,39 +55,48 @@ struct QuizView: View {
             
             //MARK: - BUTTONS
             .overlay(
-                GeometryReader { geo in
                 VStack {
                     Spacer()
                     VStack {
-                        ProgressIndicatorView(isStepOne: $isStepOne)
+                        ProgressIndicatorView(currentStep: $currentStep)
                             .padding(.bottom, Constants.verticalSpacing)
-                       
-                            HStack {
-                                Spacer()
-                                    .frame(width: geo.size.width * 0.46)
-                                
-                                //MARK: - NEXT / CREATE LIST BUTTON
-                                Button(action: {
-                                    if isStepOne {
-                                        isStepOne = false
-                                    } else {
-                                        
-                                        viewModel.createPackingList()
-                                        
-                                        if let packingList = viewModel.currentPackingList {
-                                            currentPackingList = packingList
-                                            navigateToListView = true
-                                            isNewListQuizPresented = false
-                                        }
-                                    }
-                                }) {
-                                    Text(isStepOne ? "Next" : "Create List")
-                                        .frame(maxWidth: .infinity)
-                                }
-                                .buttonStyle(BigButtonWide())
-                            }//:HSTACK
-                            .padding(.bottom)
                         
+                        HStack {
+                            //MARK: - BACK BUTTON
+                            
+                            Button(action: {
+                                if currentStep == 1 {
+                                    dismiss()
+                                } else {
+                                    currentStep -= 1
+                                }
+                            }) {
+                                Text("Back")
+                                    .frame(maxWidth: .infinity)
+                            }
+                            .buttonStyle(BigButtonWide())
+                            
+                            //MARK: - NEXT / CREATE LIST BUTTON
+                            Button(action: {
+                                if currentStep < 3 {
+                                    currentStep += 1
+                                } else {
+                                    
+                                    viewModel.createPackingList()
+                                    
+                                    if let packingList = viewModel.currentPackingList {
+                                        currentPackingList = packingList
+                                        navigateToListView = true
+                                        isNewListQuizPresented = false
+                                    }
+                                }
+                            }) {
+                                Text(currentStep < 3 ? "Next" : "Create List")
+                                    .frame(maxWidth: .infinity)
+                            }
+                            .buttonStyle(BigButtonWide())
+                        }//:HSTACK
+                        .padding(.bottom)
                     }
                     .padding()
                     .background(
@@ -93,7 +106,7 @@ struct QuizView: View {
                     )
                 }
                 .ignoresSafeArea(.keyboard, edges: .bottom)
-                }//:GEOMETRYREADER
+                
             )//:OVERLAY
             
             //MARK: - MENU
@@ -101,7 +114,7 @@ struct QuizView: View {
                 ToolbarItem(placement: .topBarLeading) {
                     Button {
                         isNewListQuizPresented = false
-                        isStepOne = true
+                        currentStep = 1
                     } label: {
                         Image(systemName: "xmark")
                             .font(.footnote)
@@ -123,7 +136,7 @@ struct QuizView: View {
             .toolbarBackground(Color.colorWhiteBackground, for: .navigationBar)
             .toolbarBackground(.visible, for: .navigationBar)
             .onDisappear {
-                isStepOne = true
+                currentStep = 1
             }
             .ignoresSafeArea(.keyboard)
         }//:ZSTACK
@@ -150,7 +163,7 @@ struct QuizView: View {
 #Preview {
     
     @Previewable @State var isNewListQuizPresented: Bool = true
-    @Previewable @State var isStepOne: Bool = true
+    @Previewable @State var currentStep: Int = 1
     
     @Previewable @State var navigateToListView: Bool = false
     @Previewable @State var currentPackingList: PackingList?
@@ -158,7 +171,13 @@ struct QuizView: View {
     let context = CoreDataStack.shared.context
     
     NavigationStack {
-        QuizView(viewModel: QuizViewModel(context: context), isNewListQuizPresented: $isNewListQuizPresented, isStepOne: $isStepOne, navigateToListView: $navigateToListView, currentPackingList: $currentPackingList, packingListCount: 3)
+        QuizView(
+            viewModel: QuizViewModel(context: context),
+            isNewListQuizPresented: $isNewListQuizPresented,
+            currentStep: $currentStep,
+            navigateToListView: $navigateToListView,
+            currentPackingList: $currentPackingList,
+            packingListCount: 3)
             .environment(WeatherViewModel(weatherFetcher: WeatherAPIClient(), geoCoder: Geocoder()))
     }
 }

@@ -18,17 +18,21 @@ struct HomeListView: View {
     @State private var quizViewModel: QuizViewModel
     @Environment(StoreKitManager.self) private var storeKitManager
     
+   // @AppStorage("selectedHomeSort") private var selectedSort: String = "Date"
+    
     @State private var isMenuOpen = false
     @State private var location: String = ""
     @State private var isNewListQuizPresented: Bool = false
     @State private var isUpgradeToProPresented: Bool = false
-    @State private var isStepOne: Bool = true
+    @State private var currentStep: Int = 1
     @Binding var navigateToListView: Bool
     @Binding var currentPackingList: PackingList?
     @Binding var packingListsCount: Int
     @Binding var selection: Int
     @Binding var isSettingsPresented: Bool
     @State private var isDeleteConfirmationPresented: Bool = false
+    @State private var isEditing = false
+
     
     @State private var scrollOffset: CGFloat = 0
     
@@ -107,14 +111,14 @@ struct HomeListView: View {
                                     HomeListCardView(
                                         viewModel: viewModel,
                                         packingList: packingList,
-                                        onDelete: {
-                                            viewModel.delete(packingList)
-                                        }
+                                        isEditing: $isEditing,
+                                        isDeleteConfirmationPresented: $isDeleteConfirmationPresented
                                     )
                                     .onTapGesture {
                                         currentPackingList = packingList
                                         navigateToListView = true
                                     }
+                                    
                       
                                 
                             }//:FOREACH
@@ -190,7 +194,7 @@ struct HomeListView: View {
                 QuizView(
                     viewModel: quizViewModel,
                     isNewListQuizPresented: $isNewListQuizPresented,
-                    isStepOne: $isStepOne,
+                    currentStep: $currentStep,
                     navigateToListView: $navigateToListView,
                     currentPackingList: $currentPackingList,
                     packingListCount: viewModel.packingLists.count
@@ -203,12 +207,62 @@ struct HomeListView: View {
         }
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                
-                Button {
-                    isSettingsPresented.toggle()
-                } label: {
-                    Image(systemName: "gearshape.fill")
-                        .foregroundStyle(Color.colorForestSecondary)
+                if !isEditing {
+                    
+                    HStack {
+                        Menu {
+                            //SORT BY
+                            Label("Sort By", systemImage: "arrow.up.arrow.down")
+                            
+                            Button {
+                                withAnimation {
+                                    viewModel.selectedSort = "Date"
+                                }
+                            } label: {
+                                if viewModel.selectedSort == "Date" {
+                                    Label("Date", systemImage: "checkmark")
+                                } else {
+                                    Text("Date")
+                                }
+                            }
+                            Button {
+                                withAnimation {
+                                    viewModel.selectedSort = "Name"
+                                }
+                            } label: {
+                                if viewModel.selectedSort == "Name" {
+                                    Label("Name", systemImage: "checkmark")
+                                } else {
+                                    Text("Name")
+                                }
+                            }
+                            Divider()
+                            
+                            Button(role: .destructive) {
+                                isEditing = true
+                            } label: {
+                                Label("Delete a list", systemImage: "trash")
+                            }
+                            
+                        } label: {
+                            Image(systemName: "ellipsis.circle")
+                                .font(.body)
+                        }//:MENU
+                        
+                        //SETTINGS
+                        Button {
+                            isSettingsPresented.toggle()
+                        } label: {
+                            Image(systemName: "gearshape.fill")
+                                .foregroundStyle(Color.colorForestSecondary)
+                        }
+                    }//:HSTACK
+                } else {
+                    Button {
+                        isEditing = false
+                    } label: {
+                        Text("Done")
+                    }
                 }
                 
             }//:TOOL BAR ITEM
@@ -216,7 +270,7 @@ struct HomeListView: View {
         .toolbarBackground(.hidden, for: .navigationBar)
     }//:BODY
     
-    private var whereToNextButton: some View {
+    var whereToNextButton: some View {
         Button {
             isNewListQuizPresented = true
         } label: {

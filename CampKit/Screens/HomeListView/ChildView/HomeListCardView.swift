@@ -9,11 +9,13 @@ import SwiftUI
 
 struct HomeListCardView: View {
     @Environment(\.colorScheme) var colorScheme
-    
+    @Environment(\.managedObjectContext) private var viewContext
     @ObservedObject var viewModel: HomeListViewModel
     @ObservedObject var packingList: PackingList
-    let onDelete: () -> Void
-    @State private var isTargetedSpot: Bool = false
+    
+    
+    @Binding var isEditing: Bool
+    @Binding var isDeleteConfirmationPresented: Bool
     
     var body: some View {
         VStack(alignment: .leading) {
@@ -52,18 +54,36 @@ struct HomeListCardView: View {
                     }
                     
                 }//:ZSTACK
-                .modifier(SwipeActionModifier(
-                    isFocused: false,
-                    deleteAction: onDelete))
                 .clipShape(RoundedRectangle(cornerRadius: Constants.cornerRadiusRounded))
                 .overlay(
                     RoundedRectangle(cornerRadius: Constants.cornerRadiusRounded)
                         .stroke(Color(UIColor.systemGray4), lineWidth: 1)
-                        .animation(.easeInOut(duration: 0.2), value: isTargetedSpot)
                     
                 )
-                .scaleEffect(isTargetedSpot ? 1.03 : 1.0)
-                .shadow(color: isTargetedSpot ? Color.black.opacity(0.25) : .clear, radius: 10, x: 0, y: 4)
+                .onLongPressGesture {
+                    withAnimation {
+                        isEditing = true
+                    }
+                }
+                .overlay(alignment: .topLeading) {
+                    if isEditing {
+                        Button(action: {
+                            isDeleteConfirmationPresented = true
+                        }) {
+                            ZStack {
+                                Circle()
+                                    .fill(Color.red)
+                                    .frame(width: 24, height: 24)
+                                
+                                Image(systemName: "minus")
+                                    .foregroundColor(.white)
+                                    .font(.system(size: 12, weight: .bold))
+                            }
+                            .padding(6)
+                            .offset(x: -12, y: -12)
+                        }
+                    }
+                }
                 
             }//:GEO READER
             .aspectRatio(1, contentMode: .fit)
@@ -88,19 +108,17 @@ struct HomeListCardView: View {
                     .truncationMode(.tail)
                 }//:VSTACK
         } //:VSTACK
-        .draggable(PackingListDragItem(id: packingList.objectID.uriRepresentation()))
-        .dropDestination(for: PackingListDragItem.self) { items, _ in
-            guard
-                let dragItem = items.first,
-                let from = viewModel.packingList(for: dragItem.id)
-            else { return false }
-            withAnimation {
-                viewModel.moveItem(from: from, to: packingList)
+        .confirmationDialog(
+            "Are you sure you want to delete this list?",
+            isPresented: $isDeleteConfirmationPresented,
+            titleVisibility: .visible
+        ) {
+            Button("Delete", role: .destructive) {
+                viewModel.delete(packingList)
+                HapticsManager.shared.triggerMediumImpact()
+                save(viewContext)
             }
-            HapticsManager.shared.triggerSuccess()
-            return true
-        } isTargeted: { target in
-            isTargetedSpot = target
+            Button("Cancel", role: .cancel) { }
         }
         
     }//:BODY
@@ -121,6 +139,9 @@ struct HomeListCardView: View {
 
 
 #Preview {
+    
+    @Previewable @State var isEditing: Bool = false
+    @Previewable @State var isDeleteConfirmationPresented: Bool = false
     let previewStack = CoreDataStack.preview
     
     let list = PackingList.samplePackingList(context: previewStack.context)
@@ -128,7 +149,7 @@ struct HomeListCardView: View {
     HomeListCardView(
         viewModel: HomeListViewModel(viewContext: previewStack.context),
         packingList: list,
-        onDelete: {}
+        isEditing: $isEditing, isDeleteConfirmationPresented: $isDeleteConfirmationPresented
     )
     .frame(width:200, height:200)
 }

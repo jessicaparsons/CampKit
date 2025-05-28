@@ -9,26 +9,34 @@ import SwiftUI
 
 struct ProgressIndicatorView: View {
     
-    @Binding var isStepOne: Bool
-    @State private var isAnimating: Bool = false
+    @Binding var currentStep: Int
+    
     @State private var leftOrRight: Alignment = .leading
+    @State private var fillWidth: CGFloat = UIScreen.main.bounds.width / 3 - 20
     
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 5)
                 .fill(Color.colorToggleOff)
                 .frame(height: 7)
+
             HStack {
                 RoundedRectangle(cornerRadius: 5)
                     .fill(Color.colorNeon)
-                    .frame(width: (UIScreen.main.bounds.width / 2) - 15, height: 7)
+                    .frame(width: fillWidth, height: 7)
             }
             .frame(maxWidth: .infinity, alignment: leftOrRight)
-            
-        }//:ZSTACK
-        .onChange(of: isStepOne) {
-            withAnimation(.bouncy(duration: 0.4)) {
-                leftOrRight = isStepOne ? .leading : .trailing
+        }
+        .onChange(of: currentStep) { updatePosition() }
+        .onAppear { updatePosition() }
+    }
+
+    private func updatePosition() {
+        withAnimation(.bouncy(duration: 0.4)) {
+            switch currentStep {
+            case 1: leftOrRight = .leading
+            case 2: leftOrRight = .center
+            default: leftOrRight = .trailing
             }
         }
     }
@@ -37,7 +45,7 @@ struct ProgressIndicatorView: View {
 #Preview {
     
     @Previewable @State var isNewListQuizPresented: Bool = true
-    @Previewable @State var isStepOne: Bool = true
+    @Previewable @State var currentStep: Int = 1
     
     @Previewable @State var navigateToListView: Bool = false
     @Previewable @State var currentPackingList: PackingList?
@@ -46,7 +54,13 @@ struct ProgressIndicatorView: View {
     
     
     NavigationStack {
-        QuizView(viewModel: QuizViewModel(context: previewStack.context), isNewListQuizPresented: $isNewListQuizPresented, isStepOne: $isStepOne, navigateToListView: $navigateToListView, currentPackingList: $currentPackingList, packingListCount: 3)
+        QuizView(
+            viewModel: QuizViewModel(context: previewStack.context),
+            isNewListQuizPresented: $isNewListQuizPresented,
+            currentStep: $currentStep,
+            navigateToListView: $navigateToListView,
+            currentPackingList: $currentPackingList,
+            packingListCount: 3)
             .environment(WeatherViewModel(weatherFetcher: WeatherAPIClient(), geoCoder: Geocoder()))
     }
 }

@@ -50,7 +50,7 @@ struct CardButtonView: View {
 #Preview("Quiz View") {
     
     @Previewable @State var isNewListQuizPresented: Bool = true
-    @Previewable @State var isStepOne: Bool = true
+    @Previewable @State var currentStep: Int = 1
     @Previewable @State var location: String = "Paris"
     @Previewable @State var navigateToListView: Bool = false
     @Previewable @State var currentPackingList: PackingList?
@@ -60,7 +60,7 @@ struct CardButtonView: View {
     QuizView(
         viewModel: QuizViewModel(context: previewStack.context),
         isNewListQuizPresented: $isNewListQuizPresented,
-        isStepOne: $isStepOne,
+        currentStep: $currentStep,
         navigateToListView: $navigateToListView,
         currentPackingList: $currentPackingList,
         packingListCount: 3

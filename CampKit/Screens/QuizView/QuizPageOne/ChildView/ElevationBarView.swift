@@ -32,14 +32,20 @@ struct ElevationBarView: View {
 #Preview("QuizView") {
     
     @Previewable @State var isNewListQuizPresented: Bool = true
-    @Previewable @State var isStepOne: Bool = true
+    @Previewable @State var currentStep: Int = 1
     @Previewable @State var navigateToListView: Bool = false
     @Previewable @State var currentPackingList: PackingList?
     
     
     let context = CoreDataStack.shared.context
         
-    QuizView(viewModel: QuizViewModel(context: context), isNewListQuizPresented: $isNewListQuizPresented, isStepOne: $isStepOne,    navigateToListView: $navigateToListView, currentPackingList: $currentPackingList, packingListCount: 3)
+    QuizView(
+        viewModel: QuizViewModel(context: context),
+        isNewListQuizPresented: $isNewListQuizPresented,
+        currentStep: $currentStep,
+        navigateToListView: $navigateToListView,
+        currentPackingList: $currentPackingList,
+        packingListCount: 3)
         .environment(\.managedObjectContext, context)
         .environment(WeatherViewModel(weatherFetcher: WeatherAPIClient(), geoCoder: Geocoder()))
 }

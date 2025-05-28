@@ -445,14 +445,18 @@ final class ListViewModel: ObservableObject {
     func exportAsPlainText(packingList: PackingList) -> String {
         var result = "Packing List: \(packingList.title ?? "Untitled")\n\n"
         for category in packingList.sortedCategories {
-            result += "• \(category.name)\n"
+            let categoryName = category.name
+            result += "• \(categoryName)\n"
+            
             for item in category.sortedItems {
-                result += "  - \(String(describing: item.title))\(item.isPacked ? " ✅" : "")\n"
+                let itemTitle = item.title ?? "Unnamed Item"
+                result += "  - \(itemTitle)\(item.isPacked ? " ✅" : "")\n"
             }
             result += "\n"
         }
         return result
     }
+
  
     func generatePDF(from text: String) -> Data {
         let pdfRenderer = UIGraphicsPDFRenderer(bounds: CGRect(x: 0, y: 0, width: 612, height: 792)) // Letter size

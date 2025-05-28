@@ -15,7 +15,7 @@ struct ProFeaturesListItemView: View {
     var body: some View {
         HStack {
             Image(systemName: "checkmark.circle.fill")
-                .foregroundStyle(.colorSage)
+                .foregroundStyle(.colorForest)
                 .font(.title)
             VStack(alignment: .leading) {
                 Text(title)
@@ -24,6 +24,7 @@ struct ProFeaturesListItemView: View {
                 Text(description)
                     .multilineTextAlignment(.leading)
             }
+            .padding(.leading, 8)
         }//:HSTACK
     }
 }
