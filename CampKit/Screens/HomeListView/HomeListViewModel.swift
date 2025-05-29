@@ -8,7 +8,7 @@
 import SwiftUI
 import CoreData
 
-
+@MainActor
 class HomeListViewModel: ObservableObject {
     
     private let viewContext: NSManagedObjectContext
@@ -31,6 +31,7 @@ class HomeListViewModel: ObservableObject {
     
     init(viewContext: NSManagedObjectContext) {
         self.viewContext = viewContext
+        setupCloudKitObserver()
         fetchPackingLists()
     }
     
@@ -45,6 +46,22 @@ class HomeListViewModel: ObservableObject {
             self.packingLists = try viewContext.fetch(request)
         } catch {
             print("Fetch error: \(error)")
+        }
+    }
+    
+    
+    private func setupCloudKitObserver() {
+        NotificationCenter.default.addObserver(
+            forName: NSPersistentCloudKitContainer.eventChangedNotification,
+            object: nil,
+            queue: .main
+        ) { notification in
+            if let event = notification.userInfo?[NSPersistentCloudKitContainer.eventNotificationUserInfoKey] as? NSPersistentCloudKitContainer.Event {
+                print("CloudKit sync finished: \(event)")
+                Task { @MainActor in
+                    self.fetchPackingLists() 
+                }
+            }
         }
     }
     

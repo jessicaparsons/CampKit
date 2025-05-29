@@ -138,7 +138,7 @@ struct SettingsView: View {
                                     Text("Tap to change your celebration emoji")
                                         .font(.caption)
                                         .foregroundColor(.secondary)
-                                }//:HSTACK
+                                }//:VSTACK
                                 Spacer()
                                 Button {
                                     if !storeKitManager.isUnlimitedListsUnlocked {
@@ -183,11 +183,15 @@ struct SettingsView: View {
                             
                             // MARK: - SECTION: ICONS
                             
-                            Section(header: Text("Custom Icons")) {
+                            VStack(alignment: .leading) {
+                                Text("Custom App Icon")
+                                    .foregroundStyle(!storeKitManager.isUnlimitedListsUnlocked ? .primary : .secondary)
                                 Text("Tap to choose your favorite app icon from the collection below")
-                                    .multilineTextAlignment(.leading)
+                                    .font(.caption)
                                     .foregroundColor(.secondary)
-                                    .font(.footnote)
+                                    .multilineTextAlignment(.leading)
+                            }//:VSTACK
+                            .padding(.top, Constants.lineSpacing)
                                 
                                 ScrollView(.horizontal, showsIndicators: false) {
                                     HStack(spacing: 12) {
@@ -222,12 +226,9 @@ struct SettingsView: View {
                                     .foregroundColor(.colorSage)
                                     .fontWeight(.medium)
                                 }
-                                .padding(.vertical)
+                                .padding(.top, 12)
+                                .padding(.bottom, Constants.lineSpacing)
                                 
-                                
-                            } //: SECTION
-                            .listRowSeparator(.hidden)
-
                             
                             
                             //MARK: - RESTORE PURCHASE
