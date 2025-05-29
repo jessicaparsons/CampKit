@@ -81,36 +81,38 @@ struct WeatherModuleView: View {
             }//:ZSTACK
         }//:GROUPBOX
         .backgroundStyle(LinearGradient(gradient: Gradient(colors: [
-            Color.colorTan,
-            Color.colorTan
+            Color.colorWhiteSands,
+            Color.colorWhiteSands
         ]),
             startPoint: .topLeading,
             endPoint: .bottomTrailing))
     }
 }
-//#if DEBUG
-//#Preview("Quiz Page Two") {
-//    @Previewable @State var isStepOne: Bool = false
-//    @Previewable @State var locationName: String = "Paris"
-//    @Previewable @State var locationAddress: String = "France"
-//    @Previewable @State var elevation: Double = 0.0
-//    @Previewable @State var isElevationAdded: Bool = true
-//    
-//    
-//    let context = PersistenceController.preview.persistentContainer.viewContext
-//    
-//    QuizPageTwoView(viewModel: QuizViewModel(context: context), isStepOne: $isStepOne, isElevationAdded: $isElevationAdded)
-//        .environment(WeatherViewModel(weatherFetcher: WeatherAPIClient(), geoCoder: Geocoder()))
-//}
-//
-//
-//#Preview {
-//    
-//    @Previewable @State var location: String = "Los Angeles"
-//    @Previewable @State var isWeatherLoading: Bool = false
-//    
-//    WeatherModuleView(isWeatherLoading: $isWeatherLoading)
-//        .environment(WeatherViewModel(weatherFetcher: WeatherAPIClient(), geoCoder: Geocoder()))
-//        .padding()
-//}
-//#endif
+#if DEBUG
+#Preview("Quiz Page Two") {
+    @Previewable @State var isStepOne: Bool = false
+    @Previewable @State var locationName: String = "Paris"
+    @Previewable @State var locationAddress: String = "France"
+    @Previewable @State var elevation: Double = 0.0
+    @Previewable @State var isElevationAdded: Bool = true
+    
+    
+    let previewStack = CoreDataStack.preview
+    
+    QuizPageTwoView(
+        viewModel: QuizViewModel(context: previewStack.context),
+        isElevationAdded: $isElevationAdded)
+        .environment(WeatherViewModel(weatherFetcher: WeatherAPIClient(), geoCoder: Geocoder()))
+}
+
+
+#Preview {
+    
+    @Previewable @State var location: String = "Los Angeles"
+    @Previewable @State var isWeatherLoading: Bool = false
+    
+    WeatherModuleView(isWeatherLoading: $isWeatherLoading)
+        .environment(WeatherViewModel(weatherFetcher: WeatherAPIClient(), geoCoder: Geocoder()))
+        .padding()
+}
+#endif

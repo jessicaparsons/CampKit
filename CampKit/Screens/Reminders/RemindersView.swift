@@ -89,7 +89,7 @@ struct RemindersView: View {
                         } label: {
                             AddNewReminderButtonView()
                         }
-                        .padding(.horizontal, Constants.wideMargin)
+                        .padding(.horizontal)
                         
                         EmptyContentView(
                             icon: "alarm",

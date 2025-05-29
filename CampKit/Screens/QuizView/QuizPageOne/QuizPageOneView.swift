@@ -157,6 +157,13 @@ struct QuizPageOneView: View {
                 }
             }
         }//:VSTACK
+        .onChange(of: viewModel.startDate) {
+            if viewModel.startDate == nil {
+                tempStartDate = nil
+                tempEndDate = nil
+                formattedDate = "Select Dates"
+            }
+        }
     }
     
     //MARK: - WHO'S GOING

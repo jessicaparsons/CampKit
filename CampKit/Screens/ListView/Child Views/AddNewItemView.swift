@@ -62,7 +62,7 @@ struct AddNewItemView: View {
     let categories = Category.sampleCategories(context: previewStack.context)
     
     return AddNewItemView(viewModel: ListViewModel(viewContext: previewStack.context, packingList: list), category: categories.first!, isPickerFocused: $isPickerFocused)
-        .background(Color.colorTan)
+        .background(Color.colorSecondaryGrey)
     
 }
 #endif

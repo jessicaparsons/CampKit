@@ -30,7 +30,7 @@ struct HomeListView: View {
     @Binding var isSettingsPresented: Bool
     @State private var isDeleteConfirmationPresented: Bool = false
     @State private var isEditing = false
-
+    @State private var listToDelete: PackingList?
     
     @State private var scrollOffset: CGFloat = 0
     
@@ -109,12 +109,31 @@ struct HomeListView: View {
                                     HomeListCardView(
                                         viewModel: viewModel,
                                         packingList: packingList,
-                                        isEditing: $isEditing,
-                                        isDeleteConfirmationPresented: $isDeleteConfirmationPresented
+                                        isEditing: $isEditing
                                     )
                                     .onTapGesture {
                                         currentPackingList = packingList
                                         navigateToListView = true
+                                    }
+                                    .overlay(alignment: .topLeading) {
+                                        if isEditing {
+                                            Button(action: {
+                                                listToDelete = packingList
+                                                isDeleteConfirmationPresented = true
+                                            }) {
+                                                ZStack {
+                                                    Circle()
+                                                        .fill(Color.red)
+                                                        .frame(width: 24, height: 24)
+                                                    
+                                                    Image(systemName: "minus")
+                                                        .foregroundColor(.white)
+                                                        .font(.system(size: 12, weight: .bold))
+                                                }
+                                                .padding(6)
+                                                .offset(x: -12, y: -12)
+                                            }
+                                        }
                                     }
                                     
                       
@@ -137,6 +156,21 @@ struct HomeListView: View {
                             }
                     }
                 )//NAV BAR UI CHANGES ON SCROLL
+                .confirmationDialog(
+                    "Are you sure you want to delete this list?",
+                    isPresented: $isDeleteConfirmationPresented,
+                    titleVisibility: .visible
+                ) {
+                    Button("Delete", role: .destructive) {
+                        if let list = listToDelete {
+                            viewModel.delete(list)
+                            HapticsManager.shared.triggerSuccess()
+                            save(viewContext)
+                        }
+                      
+                    }
+                    Button("Cancel", role: .cancel) { }
+                }
             }//:SCROLLVIEW
             .scrollIndicators(.hidden)
             

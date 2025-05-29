@@ -9,6 +9,15 @@ import CoreData
 import CloudKit
 
 final class CoreDataStack: ObservableObject {
+
+    #if DEBUG
+    let shouldInitializeCloudKitSchema = true
+    #else
+    let shouldInitializeCloudKitSchema = false
+    #endif
+    
+    
+    
     @MainActor static let shared = CoreDataStack()
     
     var ckContainer: CKContainer {
@@ -82,25 +91,56 @@ final class CoreDataStack: ObservableObject {
         container.loadPersistentStores { loadedStoreDescription, error in
             if let error = error as NSError? {
                 fatalError("Failed to load persistent stores: \(error)")
-            } else if let cloudKitContainerOptions = loadedStoreDescription
-                .cloudKitContainerOptions {
-                guard let loadedStoreDescritionURL = loadedStoreDescription.url else {
-                    return
-                }
+            }
+
+            // Assign the store references
+            if let cloudKitContainerOptions = loadedStoreDescription.cloudKitContainerOptions {
+                guard let loadedStoreDescriptionURL = loadedStoreDescription.url else { return }
+
                 if cloudKitContainerOptions.databaseScope == .private {
-                    let privateStore = container.persistentStoreCoordinator
-                        .persistentStore(for: loadedStoreDescritionURL)
-                    self._privatePersistentStore = privateStore
+                    self._privatePersistentStore = container.persistentStoreCoordinator
+                        .persistentStore(for: loadedStoreDescriptionURL)
                 } else if cloudKitContainerOptions.databaseScope == .shared {
-                    let sharedStore = container.persistentStoreCoordinator
-                        .persistentStore(for: loadedStoreDescritionURL)
-                    self._sharedPersistentStore = sharedStore
+                    self._sharedPersistentStore = container.persistentStoreCoordinator
+                        .persistentStore(for: loadedStoreDescriptionURL)
                 }
             }
+
+//            // SCHEMA INIT (development only)
+//            #if DEBUG
+//            if self.shouldInitializeCloudKitSchema {
+//                do {
+//                    try container.initializeCloudKitSchema(options: [])
+//                    print("CloudKit schema initialized")
+//                } catch {
+//                    print("Failed to initialize CloudKit schema: \(error)")
+//                }
+//            }
+//            #endif
         }
         
+//        container.loadPersistentStores { loadedStoreDescription, error in
+//            if let error = error as NSError? {
+//                fatalError("Failed to load persistent stores: \(error)")
+//            } else if let cloudKitContainerOptions = loadedStoreDescription
+//                .cloudKitContainerOptions {
+//                guard let loadedStoreDescritionURL = loadedStoreDescription.url else {
+//                    return
+//                }
+//                if cloudKitContainerOptions.databaseScope == .private {
+//                    let privateStore = container.persistentStoreCoordinator
+//                        .persistentStore(for: loadedStoreDescritionURL)
+//                    self._privatePersistentStore = privateStore
+//                } else if cloudKitContainerOptions.databaseScope == .shared {
+//                    let sharedStore = container.persistentStoreCoordinator
+//                        .persistentStore(for: loadedStoreDescritionURL)
+//                    self._sharedPersistentStore = sharedStore
+//                }
+//            }
+//        }
+        
         for entity in container.managedObjectModel.entities {
-            print("✅ Entity loaded: \(entity.name ?? "Unnamed")")
+            print("Entity loaded: \(entity.name ?? "Unnamed")")
         }
         
         

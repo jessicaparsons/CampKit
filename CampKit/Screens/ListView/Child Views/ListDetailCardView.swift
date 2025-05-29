@@ -69,11 +69,14 @@ struct ListDetailCardView: View {
                 .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 2)
         )
         .sheet(isPresented: $isLocationPresented) {
-            LocationSearchView(
-                locationName: $viewModel.packingList.locationName,
-                locationAddress: $viewModel.packingList.locationAddress
-            )
-            .presentationDetents([.medium, .large])
+            VStack {
+                LocationSearchView(
+                    locationName: $viewModel.packingList.locationName,
+                    locationAddress: $viewModel.packingList.locationAddress
+                )
+                .presentationDetents([.medium, .large])
+                .padding(.top)
+            }
         }
     }//:BODY
     

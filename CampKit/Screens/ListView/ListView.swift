@@ -456,6 +456,7 @@ struct ListView: View {
         ) {
             Button("Duplicate") {
                 viewModel.duplicateList()
+                HapticsManager.shared.triggerSuccess()
                 isDuplicationConfirmationPresented = false
             }
             

@@ -40,7 +40,7 @@ struct RearrangeCategoriesView: View {
             }//:VSTACK
             .navigationTitle("Rearrange")
             .navigationBarTitleDisplayMode(.inline)
-            .background(Color.colorTan)
+            .background(Color.colorWhiteSands)
         }//:NAVIGATION STACK
         
     }
@@ -51,19 +51,19 @@ struct RearrangeCategoriesView: View {
         }
     }
 }
-//#if DEBUG
-//#Preview {
-//    
-//    let context = PersistenceController.preview.persistentContainer.viewContext
-//    
-//    let samplePackingList = PackingList.samplePackingList(context: context)
-//    
-//
-//    NavigationStack {
-//        RearrangeCategoriesView(viewModel: ListViewModel(viewContext: context, packingList: samplePackingList)
-//        )
-//        .environment(\.managedObjectContext, context)
-//    }
-//    
-//}
-//#endif
+#if DEBUG
+#Preview {
+    
+    let previewStack = CoreDataStack.preview
+    
+    let samplePackingList = PackingList.samplePackingList(context: previewStack.context)
+    
+
+    NavigationStack {
+        RearrangeCategoriesView(viewModel: ListViewModel(viewContext: previewStack.context, packingList: samplePackingList)
+        )
+       
+    }
+    
+}
+#endif

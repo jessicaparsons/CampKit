@@ -53,7 +53,8 @@ struct UpgradeToProView: View {
                 GroupBox {
                     VStack(alignment: .leading, spacing: Constants.cardSpacing) {
                         ProFeaturesListItemView(title: "Unlimited Packing Lists", description: "Create and manage as many lists as you need for every trip.")
-                        ProFeaturesListItemView(title: "Success Customization", description: "Swap the default bonfire with your own emoji to celebrate completed lists 🔥")
+                        ProFeaturesListItemView(title: "Cloud Sharing", description: "Easily collaborate on your packing lists with family and friends across devices.")
+                        ProFeaturesListItemView(title: "Personalize Your App", description: "Choose from cool custom designed app icons and your own emoji for completed lists 🔥")
                     }//:VSTACK
                     .padding(.vertical, Constants.verticalSpacing)
                     .padding(.horizontal, Constants.verticalSpacing)

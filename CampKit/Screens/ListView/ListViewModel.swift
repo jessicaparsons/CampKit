@@ -258,7 +258,9 @@ final class ListViewModel: ObservableObject {
             locationAddress: packingList.locationAddress,
             latitude: packingList.latitude,
             longitude: packingList.longitude,
-            elevation: packingList.elevation
+            elevation: packingList.elevation,
+            startDate: packingList.startDate,
+            endDate: packingList.endDate
         )
         
         duplicatedPackingList.photo = packingList.photo

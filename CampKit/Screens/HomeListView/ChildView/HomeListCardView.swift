@@ -14,8 +14,9 @@ struct HomeListCardView: View {
     @ObservedObject var packingList: PackingList
     
     
+    
     @Binding var isEditing: Bool
-    @Binding var isDeleteConfirmationPresented: Bool
+    
     
     var body: some View {
         VStack(alignment: .leading) {
@@ -66,25 +67,6 @@ struct HomeListCardView: View {
                         HapticsManager.shared.triggerLightImpact()
                     }
                 }
-                .overlay(alignment: .topLeading) {
-                    if isEditing {
-                        Button(action: {
-                            isDeleteConfirmationPresented = true
-                        }) {
-                            ZStack {
-                                Circle()
-                                    .fill(Color.red)
-                                    .frame(width: 24, height: 24)
-                                
-                                Image(systemName: "minus")
-                                    .foregroundColor(.white)
-                                    .font(.system(size: 12, weight: .bold))
-                            }
-                            .padding(6)
-                            .offset(x: -12, y: -12)
-                        }
-                    }
-                }
                 
             }//:GEO READER
             .aspectRatio(1, contentMode: .fit)
@@ -109,18 +91,7 @@ struct HomeListCardView: View {
                     .truncationMode(.tail)
                 }//:VSTACK
         } //:VSTACK
-        .confirmationDialog(
-            "Are you sure you want to delete this list?",
-            isPresented: $isDeleteConfirmationPresented,
-            titleVisibility: .visible
-        ) {
-            Button("Delete", role: .destructive) {
-                viewModel.delete(packingList)
-                HapticsManager.shared.triggerSuccess()
-                save(viewContext)
-            }
-            Button("Cancel", role: .cancel) { }
-        }
+        
         
     }//:BODY
     
@@ -142,7 +113,6 @@ struct HomeListCardView: View {
 #Preview {
     
     @Previewable @State var isEditing: Bool = false
-    @Previewable @State var isDeleteConfirmationPresented: Bool = false
     let previewStack = CoreDataStack.preview
     
     let list = PackingList.samplePackingList(context: previewStack.context)
@@ -150,7 +120,7 @@ struct HomeListCardView: View {
     HomeListCardView(
         viewModel: HomeListViewModel(viewContext: previewStack.context),
         packingList: list,
-        isEditing: $isEditing, isDeleteConfirmationPresented: $isDeleteConfirmationPresented
+        isEditing: $isEditing
     )
     .frame(width:200, height:200)
 }
