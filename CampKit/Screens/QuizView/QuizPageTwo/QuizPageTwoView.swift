@@ -35,7 +35,7 @@ struct QuizPageTwoView: View {
                 //MARK: - WEATHER SUGGESTION
                 
                 if viewModel.locationName != nil && weatherViewModel.isNoLocationFoundMessagePresented == false {
-                    Text("Based on the five day forecast") +
+                    Text("Based on the next five day forecast") +
                     (isElevationAdded ? Text(" and added elevation") : Text("")) +
                     Text(", we suggest packing for ") +
                     weatherViewModel.formatWeatherCategories(weatherCategories) +

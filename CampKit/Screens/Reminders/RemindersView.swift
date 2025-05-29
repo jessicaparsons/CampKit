@@ -105,6 +105,8 @@ struct RemindersView: View {
                                     isSelected: isSelectedReminder(reminder),
                                     onDelete: {
                                         viewContext.delete(reminder)
+                                        save(viewContext)
+                                        dataRefreshTrigger.toggle()
                                     }
                                 ) { event in
                                         switch event {
@@ -167,14 +169,18 @@ struct RemindersView: View {
         //MARK: - ADD NEW ITEM SHEET
         .sheet(isPresented: $isAddNewReminderAlertPresented, content: {
             NavigationStack {
-                UpdateReminderView(dataRefreshTrigger: $dataRefreshTrigger)
+                UpdateReminderView(viewModel: viewModel,
+                                   dataRefreshTrigger: $dataRefreshTrigger)
             }
         })
         //MARK: - EDIT REMINDER SHEET
         .sheet(isPresented: $showReminderEditScreen, content: {
             if let selectedReminder {
                 NavigationStack {
-                    UpdateReminderView(reminder: selectedReminder, dataRefreshTrigger: $dataRefreshTrigger)
+                    UpdateReminderView(
+                        viewModel: viewModel,
+                        reminder: selectedReminder,
+                        dataRefreshTrigger: $dataRefreshTrigger)
                 }
             }
         })

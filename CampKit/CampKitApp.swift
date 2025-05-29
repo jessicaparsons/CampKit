@@ -20,7 +20,21 @@ struct CampKitApp: App {
     @AppStorage("isDarkMode") private var isDarkMode = false
     
     init() {
-        UITabBar.appearance().unselectedItemTintColor = UIColor(Color("ColorSecondaryMenu"))
+        UITabBar.appearance().unselectedItemTintColor = UIColor(named:"ColorSecondaryMenu")
+        
+        Task {
+            let center = UNUserNotificationCenter.current()
+            do {
+                if try await center.requestAuthorization(options: [.alert, .sound, .badge]) == true {
+                    print("success")
+                } else {
+                    print("fail")
+                }
+                
+            } catch {
+                print("Error")
+            }
+        }
     }
     
     var body: some Scene {

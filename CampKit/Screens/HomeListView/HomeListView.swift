@@ -18,8 +18,6 @@ struct HomeListView: View {
     @State private var quizViewModel: QuizViewModel
     @Environment(StoreKitManager.self) private var storeKitManager
     
-   // @AppStorage("selectedHomeSort") private var selectedSort: String = "Date"
-    
     @State private var isMenuOpen = false
     @State private var location: String = ""
     @State private var isNewListQuizPresented: Bool = false
@@ -186,7 +184,6 @@ struct HomeListView: View {
         }
         .onChange(of: viewModel.packingLists.count) {
             packingListsCount = viewModel.packingLists.count
-            viewModel.reassignAllListPositions()
         }
         //MARK: - SHOW PACKING LIST QUIZ
         .sheet(isPresented: $isNewListQuizPresented) {
@@ -240,6 +237,7 @@ struct HomeListView: View {
                             
                             Button(role: .destructive) {
                                 isEditing = true
+                                HapticsManager.shared.triggerLightImpact()
                             } label: {
                                 Label("Delete a list", systemImage: "trash")
                             }
@@ -247,6 +245,7 @@ struct HomeListView: View {
                         } label: {
                             Image(systemName: "ellipsis.circle")
                                 .font(.body)
+                                .foregroundStyle(Color.colorForestSecondary)
                         }//:MENU
                         
                         //SETTINGS
@@ -273,6 +272,7 @@ struct HomeListView: View {
     var whereToNextButton: some View {
         Button {
             isNewListQuizPresented = true
+            HapticsManager.shared.triggerLightImpact()
         } label: {
             ZStack {
                 RoundedRectangle(cornerRadius: 50)

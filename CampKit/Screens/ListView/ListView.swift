@@ -19,11 +19,13 @@ struct ListView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(StoreKitManager.self) private var storeKitManager
     @StateObject var viewModel: ListViewModel
+    @ObservedObject var homeViewModel: HomeListViewModel
     
     //CHANGING PHOTO
     @State private var bannerImageItem: PhotosPickerItem?
     @State private var bannerImage: UIImage?
     @State private var isPhotoPickerPresented: Bool = false
+    @State private var isGalleryPhotoPickerPresented: Bool = false
     
     //EDITING STATES
     @State private var isEditing: Bool = false
@@ -74,6 +76,7 @@ struct ListView: View {
         packingListsCount: Int
     ) {
         _viewModel = StateObject(wrappedValue: ListViewModel(viewContext: context, packingList: packingList))
+        _homeViewModel = .init(wrappedValue: .init(viewContext: context))
         self.packingListsCount = packingListsCount
         
     }
@@ -192,6 +195,7 @@ struct ListView: View {
             .navigationBarBackButtonHidden(true)
             .ignoresSafeArea(.keyboard, edges: .bottom)
             .animation(.easeOut(duration: 0.3), value: viewModel.isSuccessfulDuplicationPresented)
+            .photosPicker(isPresented: $isGalleryPhotoPickerPresented, selection: $bannerImageItem, matching: .images)
             .toolbar {
                 //CUSTOM BACK BUTTON
                 ToolbarItem(placement: .navigationBarLeading) {
@@ -205,7 +209,7 @@ struct ListView: View {
                         .dynamicForegroundStyle(trigger: scrollOffset)
                     }
                 }
-                ToolbarItem(placement: .navigationBarTrailing) {
+                ToolbarItemGroup(placement: .navigationBarTrailing) {
                     optionsMenu
                 }
                 
@@ -221,7 +225,7 @@ struct ListView: View {
                        let loadedImage = UIImage(data: data)
                     {
                         bannerImage = loadedImage
-                        viewModel.packingList.photo = data  // Save to SwiftData PackingList Model
+                        viewModel.packingList.photo = data
                         save(viewContext)
                         
                     } else {
@@ -244,30 +248,60 @@ struct ListView: View {
         HStack {
             //MARK: - LIST IS SHARED OPTIONS
             if stack.isShared(object: viewModel.packingList) {
-                Menu {
-                    Button {
-                        isParticipantsPresented.toggle()
-                    } label: {
-                        Label("Participants", systemImage: "person.crop.circle.badge.checkmark")
-                            .dynamicForegroundStyle(trigger: scrollOffset)
-                    }
+                
+                Button {
+                    loadShare()
                 } label: {
                     Label("Participants", systemImage: "person.crop.circle.badge.checkmark")
                         .dynamicForegroundStyle(trigger: scrollOffset)
                 }
                 .sheet(isPresented: $isParticipantsPresented) {
-                    ParticipantView(share: share)
-                        .presentationDetents([.medium, .large])
+                    if let share = share {
+                        ParticipantView(share: share)
+                            .presentationDetents([.medium, .large])
+                    } else {
+                        ProgressView()
+                    }
                 }
             }
             
-            // CHANGE BANNER IMAGE
+            //MARK: - CHANGE BANNER PHOTO
             Button(action: {
                 isPhotoPickerPresented = true
             }) {
                 Label("Edit Photo", systemImage: "photo")
             }
             .dynamicForegroundStyle(trigger: scrollOffset)
+            .sheet(isPresented: $isPhotoPickerPresented) {
+                NavigationStack {
+                    BackgroundPickerView { image in
+                        bannerImage = image
+                        viewModel.updatePhoto(with: image)
+                        isPhotoPickerPresented.toggle()
+                    }
+                    .toolbar {
+                        ToolbarItem(placement: .topBarLeading) {
+                            Button {
+                                isPhotoPickerPresented.toggle()
+                            } label: {
+                                Image(systemName: "xmark")
+                                    .font(.footnote)
+                                    .fontWeight(.bold)
+                                    .tint(Color.primary)
+                            }
+                        }
+                        ToolbarItemGroup(placement: .topBarTrailing) {
+                            Button {
+                                isGalleryPhotoPickerPresented = true
+                            } label: {
+                                Image(systemName: "plus")
+                                    .foregroundStyle(Color.primary)
+                            }
+                        }
+                    }
+                }
+                
+            }
             
             
             //MARK: - MENU BUTTON
@@ -324,7 +358,13 @@ struct ListView: View {
                     }
                     isCloudShareSheetPresented = true
                 } label: {
-                    Label("Invite Camper to List", systemImage: "person.crop.circle.badge.plus")
+                    
+                    if stack.isShared(object: viewModel.packingList) {
+                        
+                        Label("Edit List Sharing", systemImage: "person.crop.circle.badge.plus")
+                    } else {
+                        Label("Invite Camper to List", systemImage: "person.crop.circle.badge.plus")
+                    }
                 }
                 
                 // SHARE LIST
@@ -373,7 +413,6 @@ struct ListView: View {
             }
             
         }//:HSTACK
-        .photosPicker(isPresented: $isPhotoPickerPresented, selection: $bannerImageItem, matching: .images)
         .sheet(isPresented: $isRearranging) {
             RearrangeCategoriesView(viewModel: viewModel)
                 .environmentObject(viewModel)
@@ -436,14 +475,10 @@ struct ListView: View {
             titleVisibility: .visible
         ) {
             Button("Delete", role: .destructive) {
-                // Step 1: Exit the view
+                homeViewModel.delete(viewModel.packingList)
                 dismiss()
-                // Step 2: After a short delay, safely delete
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
-                    let listToDelete = viewModel.packingList
-                    viewContext.delete(listToDelete)
-                    save(viewContext)
-                }
+                HapticsManager.shared.triggerSuccess()
+                
             }
             Button("Cancel", role: .cancel) { }
         } 
@@ -451,6 +486,15 @@ struct ListView: View {
             UpgradeToProView()
         }
     }//:OPTIONS MENU
+    
+    func loadShare() {
+        if let existingShare = stack.getShare(viewModel.packingList) {
+            self.share = existingShare
+            self.isParticipantsPresented = true
+        } else {
+            print("No share found.")
+        }
+    }
     
 }
 

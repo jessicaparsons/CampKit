@@ -13,7 +13,7 @@ final class RemindersViewModel {
     
     
     private let viewContext: NSManagedObjectContext
-    //var reminderItems: [ReminderItem] = []
+    
     
     init(context: NSManagedObjectContext) {
         self.viewContext = context
@@ -39,6 +39,37 @@ final class RemindersViewModel {
             print("Failed to delete completed remiders: \(error.localizedDescription)")
         }
         
+    }
+    
+    //MARK: - CREATE OR UPDATE THE REMINDER
+    @MainActor
+    func updateReminder(isNew: Bool, currentReminder: Reminder, title: String, notes: String, showCalendar: Bool, showTime: Bool, reminderDate: Date? = nil, reminderTime: Date? = nil) {
+        
+        currentReminder.id = currentReminder.id ?? UUID()
+        currentReminder.title = title
+        currentReminder.notes = notes.isEmpty ? nil : notes
+        currentReminder.reminderDate = showCalendar ? reminderDate : nil
+        currentReminder.reminderTime = showTime ? reminderTime : nil
+        currentReminder.isCompleted = currentReminder.isCompleted
+        
+        //SCHEDULE A LOCAL NOTIFICATION
+        if let existingReminderTime = currentReminder.reminderTime {
+            NotificationManager.scheduleNotification(userData: UserData(
+                title: currentReminder.title,
+                body: currentReminder.notes ?? "",
+                date: currentReminder.reminderDate ?? Date(),
+                time: existingReminderTime
+            ))
+        }
+        
+        do {
+            try viewContext.save()
+        } catch {
+            print("Could not save or update reminder: \(error.localizedDescription)")
+            if isNew {
+                viewContext.delete(currentReminder)
+            }
+        }
     }
     
 }

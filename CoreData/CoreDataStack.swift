@@ -177,14 +177,16 @@ extension CoreDataStack {
     
     func isOwner(object: NSManagedObject) -> Bool {
       guard isShared(object: object) else { return false }
+        
       guard let share = try? persistentContainer.fetchShares(matching: [object.objectID])[object.objectID] else {
         print("Get ckshare error")
         return false
       }
-      if let currentUser = share.currentUserParticipant, currentUser == share.owner {
-        return true
-      }
-      return false
+        
+        guard let currentUser = share.currentUserParticipant else { return false }
+        
+        return currentUser.userIdentity.userRecordID == share.owner.userIdentity.userRecordID
+        
     }
 
 

@@ -8,11 +8,11 @@
 import SwiftUI
 
 struct InlineUnsplashGridView: View {
-    @ObservedObject var loader = UnsplashImageLoader()
+    @ObservedObject var loader: UnsplashImageLoader
     @Binding var selectedImage: UIImage?
 
     @State private var selectedID: String?
-    @State private var searchText: String = "camping"
+    @Binding var searchText: String
     
     let setImage: (UIImage) -> Void
 
@@ -61,6 +61,7 @@ struct InlineUnsplashGridView: View {
                                         .onTapGesture {
                                             loadFullImage(from: photo.urls.regular)
                                             selectedID = photo.id
+                                            HapticsManager.shared.triggerLightImpact()
                                         }
                                     
                                 default:
@@ -82,7 +83,7 @@ struct InlineUnsplashGridView: View {
                             // Attribution text
                             Text("\(photo.user.name)")
                                 .font(.caption2)
-                                .foregroundColor(.colorWhite)
+                                .foregroundColor(.white)
                                 .padding(5)
                                 .onTapGesture {
                                     if let profileURL = URL(string: photo.user.links.html) {
@@ -97,9 +98,6 @@ struct InlineUnsplashGridView: View {
             }//:SCROLLVIEW
         }//:VSTACK
         .ignoresSafeArea(edges: .bottom)
-        .onAppear {
-            loader.fetchImages(for: searchText)
-        }
     }
 
     func loadFullImage(from url: URL) {
@@ -117,8 +115,13 @@ struct InlineUnsplashGridView: View {
 #Preview {
     
     @Previewable @State var selectedImage: UIImage? = nil
+    @Previewable @State var searchText: String = "camping"
     
     let previewStack = CoreDataStack.preview
     
-    InlineUnsplashGridView(selectedImage: $selectedImage, setImage: {_ in })
+    InlineUnsplashGridView(
+        loader: UnsplashImageLoader(),
+        selectedImage: $selectedImage,
+        searchText: $searchText,
+        setImage: {_ in })
 }

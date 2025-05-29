@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import PhotosUI
 
 struct QuizView: View {
     
@@ -21,6 +22,10 @@ struct QuizView: View {
 
     @State private var isLocationSearchOpen: Bool = false
     @State private var isElevationAdded: Bool = false
+    
+    //PHOTO PICKER
+    @State private var isPhotoPickerPresented: Bool = false
+    @State private var selectedPhoto: PhotosPickerItem?
     
     var body: some View {
         
@@ -49,6 +54,25 @@ struct QuizView: View {
                     }
                     .scrollIndicators(.hidden)
                 }//:ZSTACK
+                .photosPicker(isPresented: $isPhotoPickerPresented, selection: $selectedPhoto, matching: .images)
+                .onChange(of: selectedPhoto) {
+                    guard let selectedPhoto else { return }
+
+                    Task {
+                        if let data = try? await selectedPhoto.loadTransferable(type: Data.self),
+                           let image = UIImage(data: data) {
+                            viewModel.setGalleryPhoto(image)
+                            viewModel.createPackingList()
+                            HapticsManager.shared.triggerSuccess()
+                            
+                            if let packingList = viewModel.currentPackingList {
+                                currentPackingList = packingList
+                                navigateToListView = true
+                                isNewListQuizPresented = false
+                            }
+                        }
+                    }
+                }
                 
                 
             }//VSTACK
@@ -71,10 +95,12 @@ struct QuizView: View {
                                     currentStep -= 1
                                 }
                             }) {
-                                Text("Back")
+                                Text(currentStep == 1 ? "" : "Back")
                                     .frame(maxWidth: .infinity)
                             }
                             .buttonStyle(BigButtonWide())
+                            .opacity(currentStep == 1 ? 0 : 1)
+                            .animation(.interactiveSpring, value: currentStep)
                             
                             //MARK: - NEXT / CREATE LIST BUTTON
                             Button(action: {
@@ -83,6 +109,7 @@ struct QuizView: View {
                                 } else {
                                     
                                     viewModel.createPackingList()
+                                    HapticsManager.shared.triggerSuccess()
                                     
                                     if let packingList = viewModel.currentPackingList {
                                         currentPackingList = packingList
@@ -119,17 +146,31 @@ struct QuizView: View {
                         Image(systemName: "xmark")
                             .font(.footnote)
                             .fontWeight(.bold)
-                            .tint(Color.accent)
+                            .tint(Color.primary)
                     }
                 }
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        resetQuiz()
-                    } label: {
-                        Text("Clear All")
-                            .font(.footnote)
-                            .fontWeight(.bold)
-                            .tint(Color.accent)
+                ToolbarItemGroup(placement: .topBarTrailing) {
+                    
+                    if currentStep == 3 {
+                        
+                        Button {
+                            isPhotoPickerPresented.toggle()
+                        } label: {
+                            Image(systemName: "plus")
+                                .foregroundStyle(Color.primary)
+                                
+                        }
+                        
+                    } else {
+                        
+                        Button {
+                            resetQuiz()
+                        } label: {
+                            Text("Clear All")
+                                .font(.footnote)
+                                .fontWeight(.bold)
+                                .tint(Color.primary)
+                        }
                     }
                 }
             }

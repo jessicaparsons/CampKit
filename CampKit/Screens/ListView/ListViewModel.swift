@@ -19,7 +19,6 @@ final class ListViewModel: ObservableObject {
     
     @Published var item: String = ""
     @Published var globalIsExpanded: Bool = false
-    @Published var showPhotoPicker: Bool = false
     @Published var draggedCategory: Category?
     @Published var isConfettiVisible: Bool = false
     @Published var isSuccessfulDuplicationPresented: Bool = false
@@ -238,9 +237,6 @@ final class ListViewModel: ObservableObject {
         
         return selectedCategories
     }
-
-    
-    
     
     
     //MARK: - MODIFY LIST
@@ -311,6 +307,15 @@ final class ListViewModel: ObservableObject {
         packingList.startDate = start
         packingList.endDate = end
         
+        save(viewContext)
+        withAnimation(nil) {
+            objectWillChange.send()
+        }
+    }
+    
+    @MainActor
+    func updatePhoto(with image: UIImage) {
+        packingList.photo = image.jpegData(compressionQuality: 0.9)
         save(viewContext)
         withAnimation(nil) {
             objectWillChange.send()

@@ -63,6 +63,7 @@ struct HomeListCardView: View {
                 .onLongPressGesture {
                     withAnimation {
                         isEditing = true
+                        HapticsManager.shared.triggerLightImpact()
                     }
                 }
                 .overlay(alignment: .topLeading) {
@@ -115,7 +116,7 @@ struct HomeListCardView: View {
         ) {
             Button("Delete", role: .destructive) {
                 viewModel.delete(packingList)
-                HapticsManager.shared.triggerMediumImpact()
+                HapticsManager.shared.triggerSuccess()
                 save(viewContext)
             }
             Button("Cancel", role: .cancel) { }

@@ -12,6 +12,8 @@ struct UpdateReminderView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.dismiss) private var dismiss
     
+    @Bindable var viewModel: RemindersViewModel
+    
     var reminder: Reminder? = nil
     
     @State private var title: String = ""
@@ -108,7 +110,20 @@ struct UpdateReminderView: View {
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Done") {
-                        updateReminder()
+                        
+                        let isNew = reminder == nil
+                        let currentReminder = reminder ?? Reminder(context: viewContext)
+                            
+                        viewModel.updateReminder(
+                            isNew: isNew,
+                            currentReminder: currentReminder,
+                            title: title,
+                            notes: notes,
+                            showCalendar: showCalendar,
+                            showTime: showTime,
+                            reminderDate: reminderDate,
+                            reminderTime: reminderTime)
+                        
                         dismiss()
                     }.disabled(!isFormValid)
                 }
@@ -122,40 +137,7 @@ struct UpdateReminderView: View {
             
         }//:NAVIGATION STACK
     }
-    
-    //MARK: - CREATE OR UPDATE THE REMINDER
-    @MainActor
-    private func updateReminder() {
-        let isNew = reminder == nil
-        let currentReminder = reminder ?? Reminder(context: viewContext)
-        
-        currentReminder.id = currentReminder.id ?? UUID()
-        currentReminder.title = title
-        currentReminder.notes = notes.isEmpty ? nil : notes
-        currentReminder.reminderDate = showCalendar ? reminderDate : nil
-        currentReminder.reminderTime = showTime ? reminderTime : nil
-        currentReminder.isCompleted = currentReminder.isCompleted
-        
-        //SCHEDULE A LOCAL NOTIFICATION
-        if let existingReminderTime = currentReminder.reminderTime {
-            NotificationManager.scheduleNotification(userData: UserData(
-                title: currentReminder.title,
-                body: currentReminder.notes ?? "",
-                date: currentReminder.reminderDate ?? Date(),
-                time: existingReminderTime
-            ))
-        }
-        
-        do {
-            try viewContext.save()
-            dataRefreshTrigger.toggle()
-        } catch {
-            print("Could not save or update reminder: \(error.localizedDescription)")
-            if isNew {
-                viewContext.delete(currentReminder)
-            }
-        }
-    }
+
 }
 
 #if DEBUG
@@ -171,7 +153,7 @@ struct UpdateReminderView: View {
         
         return NavigationStack {
             UpdateReminderView(
-                reminder: Reminder(context: previewStack.context, title: "Charge batteries"),
+                viewModel: RemindersViewModel(context: previewStack.context),
                 dataRefreshTrigger: $dataRefresh
             )
             .environment(\.managedObjectContext, previewStack.context)
@@ -192,7 +174,7 @@ struct UpdateReminderView: View {
         
         return NavigationStack {
             UpdateReminderView(
-                reminder: nil,
+                viewModel: RemindersViewModel(context: previewStack.context),
                 dataRefreshTrigger: $dataRefresh
             )
             .environment(\.managedObjectContext, previewStack.context)

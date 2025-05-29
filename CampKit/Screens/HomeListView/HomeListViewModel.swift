@@ -42,7 +42,7 @@ class HomeListViewModel: ObservableObject {
         : [NSSortDescriptor(keyPath: \PackingList.title, ascending: true)]
 
         do {
-            packingLists = try viewContext.fetch(request)
+            self.packingLists = try viewContext.fetch(request)
         } catch {
             print("Fetch error: \(error)")
         }
@@ -62,29 +62,10 @@ class HomeListViewModel: ObservableObject {
     
     func delete(_ packingList: PackingList) {
         withAnimation {
-            if let index = packingLists.firstIndex(of: packingList) {
-                packingLists.remove(at: index) 
-            }
             viewContext.delete(packingList)
-            reassignAllListPositions()
+            save(viewContext)
+            fetchPackingLists()
         }
-
-        save(viewContext)
-    }
-
-    func moveItem(from: PackingList, to: PackingList) {
-        guard let fromIndex = packingLists.firstIndex(of: from),
-              let toIndex = packingLists.firstIndex(of: to),
-              fromIndex != toIndex else { return }
-
-        withAnimation {
-            let movedItem = packingLists.remove(at: fromIndex)
-            packingLists.insert(movedItem, at: toIndex)
-            
-            reassignAllListPositions()
-        }
-        
-        save(viewContext)
     }
 
     
