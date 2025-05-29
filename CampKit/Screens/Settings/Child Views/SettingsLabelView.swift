@@ -14,10 +14,12 @@ struct SettingsLabelView: View {
     
     var body: some View {
         HStack {
-            Text(labelText.uppercased()).fontWeight(.bold)
+            Text(labelText.uppercased()).fontWeight(.medium)
             Spacer()
             Image(systemName: labelImage)
         }
+        
+        
     }
 }
 #if DEBUG

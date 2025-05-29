@@ -113,7 +113,7 @@ struct AddNewCategoriesView: View {
         
     }
 }
-
+#if DEBUG
 #Preview {
     
     let previewStack = CoreDataStack.preview
@@ -122,3 +122,4 @@ struct AddNewCategoriesView: View {
         AddNewCategoriesView(viewModel: ListViewModel(viewContext: previewStack.context, packingList: PackingList.samplePackingList(context: previewStack.context)))
     }
 }
+#endif

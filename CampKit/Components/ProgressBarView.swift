@@ -32,6 +32,8 @@ struct ProgressBarView: View {
     }
 }
 
+#if DEBUG
+
 #Preview {
     
     let previewStack = CoreDataStack.preview
@@ -45,3 +47,4 @@ struct ProgressBarView: View {
        allItems: allItems
     )
 }
+#endif

@@ -111,7 +111,7 @@ struct InlineUnsplashGridView: View {
         }.resume()
     }
 }
-
+#if DEBUG
 #Preview {
     
     @Previewable @State var selectedImage: UIImage? = nil
@@ -125,3 +125,4 @@ struct InlineUnsplashGridView: View {
         searchText: $searchText,
         setImage: {_ in })
 }
+#endif

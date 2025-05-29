@@ -17,7 +17,7 @@ struct ParticipantView: View {
     let share: CKShare?
     @State private var participants: [CKShare.Participant] = []
     
-    var mockParticipants: [MockParticipant]? = nil
+//    var mockParticipants: [MockParticipant]? = nil
     
     
     var body: some View {
@@ -42,16 +42,17 @@ struct ParticipantView: View {
                             )
                         }
                         
-                    } else if let mockParticipants {
-                            ForEach(mockParticipants, id: \.self) { participant in
-                                ParticipantCard(
-                                    name: participant.name,
-                                    status: participant.status,
-                                    role: participant.role,
-                                    permission: participant.permission
-                                )
-                            }
-                        }
+                    }
+//                    else if let mockParticipants {
+//                            ForEach(mockParticipants, id: \.self) { participant in
+//                                ParticipantCard(
+//                                    name: participant.name,
+//                                    status: participant.status,
+//                                    role: participant.role,
+//                                    permission: participant.permission
+//                                )
+//                            }
+//                        }
                     
                     
                 }
@@ -171,15 +172,15 @@ extension ParticipantView {
 }
 
 
-#Preview("Styled ParticipantView with Mock Data") {
-   
-    NavigationStack {
-        ParticipantView(
-            share: nil,
-            mockParticipants: [
-                MockParticipant(name: "Jess Parsons", status: "Accepted", role: "Private User", permission: "Read-Write"),
-                MockParticipant(name: "Taylor Swift", status: "Invited", role: "Owner", permission: "Read-Only")
-            ]
-        )
-    }
-}
+//#Preview("Styled ParticipantView with Mock Data") {
+//   
+//    NavigationStack {
+//        ParticipantView(
+//            share: nil,
+//            mockParticipants: [
+//                MockParticipant(name: "Jess Parsons", status: "Accepted", role: "Private User", permission: "Read-Write"),
+//                MockParticipant(name: "Taylor Swift", status: "Invited", role: "Owner", permission: "Read-Only")
+//            ]
+//        )
+//    }
+//}

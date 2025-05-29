@@ -138,7 +138,7 @@ struct HomeListCardView: View {
 }
 
 
-
+#if DEBUG
 #Preview {
     
     @Previewable @State var isEditing: Bool = false
@@ -154,3 +154,4 @@ struct HomeListCardView: View {
     )
     .frame(width:200, height:200)
 }
+#endif

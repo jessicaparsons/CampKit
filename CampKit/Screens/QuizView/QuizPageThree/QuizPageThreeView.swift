@@ -19,7 +19,7 @@ struct QuizPageThreeView: View {
     }
 }
 
-
+#if DEBUG
 #Preview {
     
     @Previewable @State var previewStack = CoreDataStack.preview
@@ -31,3 +31,4 @@ struct QuizPageThreeView: View {
         viewModel: QuizViewModel(context: previewStack.context)
     )
 }
+#endif

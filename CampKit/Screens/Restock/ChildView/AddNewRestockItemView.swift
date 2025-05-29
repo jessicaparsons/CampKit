@@ -49,9 +49,10 @@ struct AddNewRestockItemView: View {
         .padding(.top, 12)
     }
 }
-
+#if DEBUG
 #Preview {
     let previewStack = CoreDataStack.preview
     
     AddNewRestockItemView(viewModel: RestockViewModel(context: previewStack.context))
 }
+#endif
