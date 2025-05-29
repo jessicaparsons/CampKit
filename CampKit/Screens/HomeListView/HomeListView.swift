@@ -29,7 +29,7 @@ struct HomeListView: View {
     @Binding var selection: Int
     @Binding var isSettingsPresented: Bool
     @State private var isDeleteConfirmationPresented: Bool = false
-    @State private var isEditing = false
+    @Binding var isEditing: Bool
     @State private var listToDelete: PackingList?
     
     @State private var scrollOffset: CGFloat = 0
@@ -45,7 +45,8 @@ struct HomeListView: View {
         selection: Binding<Int>,
         navigateToListView: Binding<Bool>,
         currentPackingList: Binding<PackingList?>,
-        isSettingsPresented: Binding<Bool>
+        isSettingsPresented: Binding<Bool>,
+        isEditing: Binding<Bool>
     ) {
         _packingListsCount = packingListsCount
         _selection = selection
@@ -54,6 +55,7 @@ struct HomeListView: View {
         _navigateToListView = navigateToListView
         _currentPackingList = currentPackingList
         _isSettingsPresented = isSettingsPresented
+        _isEditing = isEditing
     }
     
     var body: some View {
@@ -112,6 +114,7 @@ struct HomeListView: View {
                                         isEditing: $isEditing
                                     )
                                     .onTapGesture {
+                                        isEditing = false
                                         currentPackingList = packingList
                                         navigateToListView = true
                                     }
@@ -218,6 +221,11 @@ struct HomeListView: View {
         }
         .onChange(of: viewModel.packingLists.count) {
             packingListsCount = viewModel.packingLists.count
+        }
+        .onChange(of: isMenuOpen) {
+            if isMenuOpen {
+                isEditing = false
+            }
         }
         //MARK: - SHOW PACKING LIST QUIZ
         .sheet(isPresented: $isNewListQuizPresented) {
@@ -348,6 +356,7 @@ struct HomeListView: View {
     @Previewable @State var navigateToListView = false
     @Previewable @State var currentPackingList: PackingList?
     @Previewable @State var isSettingsPresented: Bool = false
+    @Previewable @State var isEditing: Bool = false
     
     let previewStack = CoreDataStack.preview
     
@@ -361,7 +370,8 @@ struct HomeListView: View {
             selection: $selection,
             navigateToListView: $navigateToListView,
             currentPackingList: $currentPackingList,
-            isSettingsPresented: $isSettingsPresented
+            isSettingsPresented: $isSettingsPresented,
+            isEditing: $isEditing
         )
         .environment(\.managedObjectContext, previewStack.context)
         .environment(StoreKitManager())
@@ -377,6 +387,7 @@ struct HomeListView: View {
     @Previewable @State var navigateToListView = false
     @Previewable @State var currentPackingList: PackingList?
     @Previewable @State var isSettingsPresented: Bool = false
+    @Previewable @State var isEditing: Bool = false
     
     let previewStack = CoreDataStack.preview
     
@@ -387,7 +398,8 @@ struct HomeListView: View {
             selection: $selection,
             navigateToListView: $navigateToListView,
             currentPackingList: $currentPackingList,
-            isSettingsPresented: $isSettingsPresented
+            isSettingsPresented: $isSettingsPresented,
+            isEditing: $isEditing
         )
         .environment(\.managedObjectContext, previewStack.context)
         .environment(StoreKitManager())

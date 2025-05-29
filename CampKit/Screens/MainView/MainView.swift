@@ -27,6 +27,7 @@ struct MainView: View {
     
     @State private var navigateToListView = false
     @State private var currentPackingList: PackingList?
+    @State private var isEditing = false
     
     var body: some View {
             ZStack {
@@ -40,7 +41,8 @@ struct MainView: View {
                             selection: $selection,
                             navigateToListView: $navigateToListView,
                             currentPackingList: $currentPackingList,
-                            isSettingsPresented: $isSettingsPresented
+                            isSettingsPresented: $isSettingsPresented,
+                            isEditing: $isEditing
                         )
                         .navigationDestination(isPresented: $navigateToListView) {
                             if let packingList = currentPackingList {
@@ -56,7 +58,8 @@ struct MainView: View {
                                     selection: $selection,
                                     navigateToListView: $navigateToListView,
                                     currentPackingList: $currentPackingList,
-                                    isSettingsPresented: $isSettingsPresented
+                                    isSettingsPresented: $isSettingsPresented,
+                                    isEditing: $isEditing
                                 )
                             }
                         }
@@ -118,6 +121,9 @@ struct MainView: View {
             .sheet(isPresented: $isSettingsPresented) {
                 SettingsView()
                     .presentationDragIndicator(.visible)
+            }
+            .onChange(of: selection) {
+                isEditing = false
             }
             // MARK: - CLOUD NOTIFICATIONS
             .onReceive(NotificationCenter.default.publisher(for: .didAcceptShare)) { _ in
