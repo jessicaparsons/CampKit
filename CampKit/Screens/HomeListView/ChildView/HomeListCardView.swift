@@ -25,24 +25,19 @@ struct HomeListCardView: View {
                 ZStack(alignment: .bottomTrailing) {
                     // MARK: - IMAGE
                     
-                    //USER IMAGE
-                    if let photoData = packingList.photo, let image = UIImage(data: photoData) {
-                        Image(uiImage: image)
-                            .resizable()
-                            .scaledToFill()
-                            .frame(width: geometry.size.width, height: geometry.size.width)
-                            .clipped()
-                        
-                    } else {
-                        //DEFAULT IMAGE
-                        ZStack {
-                            Color(Color.colorWhite)
-                            Image(systemName: "tent")
-                                .font(.system(size: 60))
-                                .foregroundColor(Color.colorSecondaryGrey)
-                        }//:ZSTACK
-                        .ignoresSafeArea()
-                    }
+                    let imageToShow: Image = {
+                        if let photoData = packingList.photo, let uiImage = UIImage(data: photoData) {
+                            return Image(uiImage: uiImage)
+                        } else {
+                            return Image(Constants.placeholderBannerPhoto)
+                        }
+                    }()
+
+                    imageToShow
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: geometry.size.width, height: geometry.size.width)
+                        .clipped()
                     
                     
                     //MARK: - OVERLAY
@@ -89,6 +84,7 @@ struct HomeListCardView: View {
                     .foregroundColor(.secondary)
                     .lineLimit(1)
                     .truncationMode(.tail)
+                    .font(.footnote)
                 }//:VSTACK
         } //:VSTACK
         

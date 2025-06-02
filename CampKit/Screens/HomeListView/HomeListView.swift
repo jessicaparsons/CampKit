@@ -326,16 +326,19 @@ struct HomeListView: View {
                     .frame(height: 50)
                 
                 HStack {
-                    Image(systemName: "magnifyingglass")
+                    Image(systemName: "tent.circle")
                         .foregroundColor(Color.colorNeon)
                         .frame(width: 35, height: 35)
                         .background(Color.colorSecondaryIcon)
                         .clipShape(Circle())
                         .padding(.leading, 10)
-                    Text("Where to next?")
+                        .font(.system(size: 24, weight: .light))
+                    Text("Start with a customized list")
                         .foregroundStyle(Color.secondary)
                     Spacer()
-                    
+                    Image(systemName: "chevron.right")
+                        .foregroundStyle(Color.secondary)
+                        .padding(.trailing)
                 }//:HSTACK
                 
             }//:ZSTACK

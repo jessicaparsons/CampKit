@@ -26,6 +26,7 @@ struct ChoiceOptions {
     static let toiletries = "🪥 Toiletries"
     static let emergency = "🦺 Safety"
     static let lounge = "😎 Lounge"
+    static let vehicle = "🚗 Vehicle"
     
     // MARK: - Participants
     static let adults = "👨‍🦰 Adults"

@@ -43,7 +43,7 @@ struct CategoriesListView: View {
                 }//:LOOP
             }
         }//:LAZY VSTACK
-        .offset(y: -30)
+        
     }
 }
 #if DEBUG

@@ -116,6 +116,7 @@ struct QuizView: View {
                                         navigateToListView = true
                                         isNewListQuizPresented = false
                                     }
+                                    resetQuiz()
                                 }
                             }) {
                                 Text(currentStep < 3 ? "Next" : "Create List")
@@ -142,6 +143,7 @@ struct QuizView: View {
                     Button {
                         isNewListQuizPresented = false
                         currentStep = 1
+                        resetQuiz()
                     } label: {
                         Image(systemName: "xmark")
                             .font(.footnote)

@@ -109,7 +109,7 @@ struct CategorySectionView: View {
                                 Button {
                                     isRearranging = true
                                 } label: {
-                                    Label("Rearrange", systemImage: "arrow.up.arrow.down")
+                                    Label("Rearrange Categories", systemImage: "arrow.up.arrow.down")
                                 }
                                 Button(role: .destructive) {
                                     deleteCategory()
@@ -144,21 +144,23 @@ struct CategorySectionView: View {
                 Divider()
                     .padding(.horizontal)
                     .padding(.bottom, Constants.verticalSpacing)
-                if !category.sortedItems.isEmpty {
-                    ForEach(category.sortedItems, id: \.id) { item in
-                        EditableItemView<Item>(
-                            item: item,
-                            togglePacked: { viewModel.togglePacked(for: item) },
-                            deleteItem: { viewModel.deleteItem(item) },
-                            isPickerFocused: $isPickerFocused
-                        )
+                LazyVStack(spacing: 2) {
+                    if !category.sortedItems.isEmpty {
+                        ForEach(category.sortedItems, id: \.id) { item in
+                                EditableItemView<Item>(
+                                    item: item,
+                                    togglePacked: { viewModel.togglePacked(for: item) },
+                                    deleteItem: { viewModel.deleteItem(item) },
+                                    isPickerFocused: $isPickerFocused
+                                )
+                        }
                     }
-                }
-                AddNewItemView(
-                    viewModel: viewModel,
-                    category: category,
-                    isPickerFocused: $isPickerFocused)
+                    AddNewItemView(
+                        viewModel: viewModel,
+                        category: category,
+                        isPickerFocused: $isPickerFocused)
                     .padding(.bottom, 10)
+                }//:LAZY VSTACK
                     
             }
         }

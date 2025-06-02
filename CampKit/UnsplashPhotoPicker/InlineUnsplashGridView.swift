@@ -15,6 +15,8 @@ struct InlineUnsplashGridView: View {
     @Binding var searchText: String
     
     let setImage: (UIImage) -> Void
+    
+    let size = (UIScreen.main.bounds.width - 40) / 3
 
     private let columns = [
         GridItem(.flexible(), spacing: Constants.gallerySpacing),
@@ -53,11 +55,13 @@ struct InlineUnsplashGridView: View {
                                 case .success(let image):
                                     image
                                         .resizable()
-                                        .aspectRatio(1, contentMode: .fit)
-                                        .overlay(
-                                            Rectangle()
-                                                .stroke(selectedID == photo.id ? Color.colorNeon : Color.clear, lineWidth: 3)
-                                        )
+                                            .scaledToFill()
+                                            .frame(width: size, height: size)
+                                            .clipped()
+                                            .overlay(
+                                                Rectangle()
+                                                    .stroke(selectedID == photo.id ? Color.colorNeon : Color.clear, lineWidth: 3)
+                                            )
                                         .onTapGesture {
                                             loadFullImage(from: photo.urls.regular)
                                             selectedID = photo.id
@@ -81,8 +85,8 @@ struct InlineUnsplashGridView: View {
                             .allowsHitTesting(false) // so taps still register on the image
                             
                             // Attribution text
-                            Text("\(photo.user.name)")
-                                .font(.caption2)
+                            Text("by \(photo.user.name)")
+                                .font(.system(size: 9))
                                 .foregroundColor(.white)
                                 .padding(5)
                                 .onTapGesture {

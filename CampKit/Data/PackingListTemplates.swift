@@ -23,6 +23,7 @@ import CoreData
         ChoiceOptions.toiletries,
         ChoiceOptions.emergency,
         ChoiceOptions.lounge,
+        ChoiceOptions.vehicle,
         ChoiceOptions.adults,
         ChoiceOptions.kids,
         ChoiceOptions.pets,
@@ -51,7 +52,7 @@ import CoreData
 
 
 let packingPreferenceCategories: [String: [String]] = [
-    ChoiceOptions.defaults: [ChoiceOptions.sleep, ChoiceOptions.kitchen, ChoiceOptions.foodStaples, ChoiceOptions.tools, ChoiceOptions.clothing, ChoiceOptions.toiletries, ChoiceOptions.emergency, ChoiceOptions.lounge],
+    ChoiceOptions.defaults: [ChoiceOptions.sleep, ChoiceOptions.kitchen, ChoiceOptions.foodStaples, ChoiceOptions.tools, ChoiceOptions.clothing, ChoiceOptions.toiletries, ChoiceOptions.emergency, ChoiceOptions.lounge, ChoiceOptions.vehicle],
     
     
     ChoiceOptions.participants: [ChoiceOptions.adults, ChoiceOptions.kids, ChoiceOptions.pets],
@@ -112,7 +113,8 @@ func generateCategoryTemplates(using viewContext: NSManagedObjectContext) -> [St
         ],
         ChoiceOptions.tools: [
             Item(context: viewContext, title: "Firewood"),
-            Item(context: viewContext, title: "Headlamps"),
+            Item(context: viewContext, title: "Fire permit (if required)"),
+            Item(context: viewContext, title: "Headlamps/flashlights"),
             Item(context: viewContext, title: "Camp lights and lanterns"),
             Item(context: viewContext, title: "Extra batteries"),
             Item(context: viewContext, title: "Power station/bank"),
@@ -170,6 +172,14 @@ func generateCategoryTemplates(using viewContext: NSManagedObjectContext) -> [St
             Item(context: viewContext, title: "Cards/games"),
             Item(context: viewContext, title: "Instruments"),
             Item(context: viewContext, title: "Camera")
+        ],
+        ChoiceOptions.vehicle: [
+            Item(context: viewContext, title: "Full tank of gas"),
+            Item(context: viewContext, title: "Offline maps or GPS"),
+            Item(context: viewContext, title: "Phone charger"),
+            Item(context: viewContext, title: "Emergency car kit"),
+            Item(context: viewContext, title: "Jumper cables"),
+            Item(context: viewContext, title: "Tire repair kit/spare tire")
         ],
         
         

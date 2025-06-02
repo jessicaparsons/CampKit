@@ -92,7 +92,7 @@ struct ListView: View {
                     VStack {
                         
                         //MARK: - BANNER IMAGE
-                        BannerImageView(viewModel: viewModel, bannerImage: $bannerImage)
+                        BannerImageView(viewModel: viewModel)
                             .frame(maxWidth: .infinity) // Ensure full width
                             .listRowInsets(EdgeInsets()) // Remove extra padding
                             .onTapGesture {
@@ -102,7 +102,7 @@ struct ListView: View {
                         //MARK: - LIST DETAILS HEADER
                         VStack {
                             ListDetailCardView(viewModel: viewModel)
-                                .offset(y: -40)
+                                .offset(y: -90)
                                 .onTapGesture {
                                     isPickerFocused = false
                                 }
@@ -114,6 +114,7 @@ struct ListView: View {
                                 isRearranging: $isRearranging,
                                 isPickerFocused: $isPickerFocused
                             )
+                            .offset(y: -80)
                             
                         }//:VSTACK
                         .padding(.horizontal)
@@ -193,7 +194,6 @@ struct ListView: View {
             .navigationTitle(viewModel.packingList.title ?? Constants.newPackingListTitle)
             .navigationBarTitleDisplayMode(.inline)
             .navigationBarBackButtonHidden(true)
-            .ignoresSafeArea(.keyboard, edges: .bottom)
             .animation(.easeOut(duration: 0.3), value: viewModel.isSuccessfulDuplicationPresented)
             .photosPicker(isPresented: $isGalleryPhotoPickerPresented, selection: $bannerImageItem, matching: .images)
             .toolbar {

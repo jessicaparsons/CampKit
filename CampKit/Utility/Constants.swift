@@ -34,6 +34,7 @@ struct Constants {
     
     //STRINGS
     static let newPackingListTitle: String = "New Packing List"
+    static let placeholderBannerPhoto: String = "PineShadow"
     
     //PRO
     static let proVersionListCount: Int = 3

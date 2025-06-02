@@ -453,11 +453,11 @@ final class ListViewModel: ObservableObject {
         var result = "Packing List: \(packingList.title ?? "Untitled")\n\n"
         for category in packingList.sortedCategories {
             let categoryName = category.name
-            result += "• \(categoryName)\n"
+            result += "\(categoryName)\n"
             
             for item in category.sortedItems {
                 let itemTitle = item.title ?? "Unnamed Item"
-                result += "  - \(itemTitle)\(item.isPacked ? " ✅" : "")\n"
+                result += "  〇 \(itemTitle)\n"
             }
             result += "\n"
         }
@@ -466,16 +466,49 @@ final class ListViewModel: ObservableObject {
 
  
     func generatePDF(from text: String) -> Data {
-        let pdfRenderer = UIGraphicsPDFRenderer(bounds: CGRect(x: 0, y: 0, width: 612, height: 792)) // Letter size
-        return pdfRenderer.pdfData { ctx in
-            ctx.beginPage()
-            let attributes: [NSAttributedString.Key: Any] = [
-                .font: UIFont.systemFont(ofSize: 12),
-                .paragraphStyle: NSMutableParagraphStyle()
-            ]
-            text.draw(in: CGRect(x: 20, y: 20, width: 572, height: 752), withAttributes: attributes)
+        let pageWidth: CGFloat = 612
+        let pageHeight: CGFloat = 792
+        let margin: CGFloat = 20
+        let textRect = CGRect(x: margin, y: margin, width: pageWidth - 2 * margin, height: pageHeight - 2 * margin)
+
+        let pdfRenderer = UIGraphicsPDFRenderer(bounds: CGRect(x: 0, y: 0, width: pageWidth, height: pageHeight))
+
+        let attributes: [NSAttributedString.Key: Any] = [
+            .font: UIFont.systemFont(ofSize: 12),
+            .paragraphStyle: {
+                let style = NSMutableParagraphStyle()
+                style.lineBreakMode = .byWordWrapping
+                return style
+            }()
+        ]
+
+        let attributedText = NSAttributedString(string: text, attributes: attributes)
+
+        return pdfRenderer.pdfData { context in
+            var currentRange = NSRange(location: 0, length: 0)
+            let framesetter = CTFramesetterCreateWithAttributedString(attributedText)
+
+            while currentRange.location < attributedText.length {
+                context.beginPage()
+
+                let path = CGPath(rect: textRect, transform: nil)
+                let frame = CTFramesetterCreateFrame(framesetter, CFRangeMake(currentRange.location, 0), path, nil)
+
+                let frameRange = CTFrameGetVisibleStringRange(frame)
+
+                guard let contextRef = UIGraphicsGetCurrentContext() else { return }
+
+                contextRef.textMatrix = .identity
+                contextRef.translateBy(x: 0, y: pageHeight)
+                contextRef.scaleBy(x: 1.0, y: -1.0)
+
+                CTFrameDraw(frame, contextRef)
+
+                currentRange = NSRange(location: currentRange.location + frameRange.length, length: 0)
+            }
         }
     }
+
 
     
 }

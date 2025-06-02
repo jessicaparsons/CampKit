@@ -19,7 +19,8 @@ extension PackingList {
         packingList.position = 0
         packingList.title = "Preview Camping Trip"
         packingList.dateCreated = Date()
-        packingList.photo = UIImage(named: "test")?.pngData()
+        //packingList.photo = UIImage(named: "TopographyDesign")?.pngData()
+        packingList.photo = nil
         packingList.startDate = Date()
         packingList.endDate = Date()
         packingList.locationName = "Angeles National Forest"
@@ -35,7 +36,7 @@ extension PackingList {
 extension Category {
     static func sampleCategories(context: NSManagedObjectContext) -> [Category] {
         let categoriesWithItems: [(name: String, position: Int, items: [String], isExpanded: Bool)] = [
-            ("Bed 4", 4, ["Pillows", "Sleeping bag", "Sleeping pad","Pillows", "Sleeping bag", "Sleeping pad","Pillows", "Sleeping bag", "Sleeping pad","Pillows", "Sleeping bag", "Sleeping pad","Pillows", "Sleeping bag", "Sleeping pad"], true),
+            ("Bed 4", 4, ["Pillows and a very long list item will be here", "Sleeping bag", "Sleeping pad","Pillows", "Sleeping bag", "Sleeping pad","Pillows", "Sleeping bag", "Sleeping pad","Pillows", "Sleeping bag", "Sleeping pad","Pillows", "Sleeping bag", "Sleeping pad"], true),
             ("Clothes 3", 3, ["Jackets", "Shoes", "Toiletries","Jackets", "Shoes", "Toiletries","Jackets", "Shoes", "Toiletries"], true),
             ("Food 2", 2, ["Propane", "Stove", "Cooler","Propane", "Stove", "Cooler","Propane", "Stove", "Cooler","Propane", "Stove", "Cooler"], true),
             ("Lounge 1", 1, ["Chair", "Books", "Cards/Games","Chair", "Books", "Cards/Games","Chair", "Books", "Cards/Games","Chair", "Books", "Cards/Games"], true),
