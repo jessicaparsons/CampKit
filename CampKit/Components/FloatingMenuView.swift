@@ -96,17 +96,21 @@ struct MenuItem: View {
         HStack {
             Text(label)
                 .foregroundColor(Color.colorWhiteForest)
-                .fontWeight(.bold)
+                .fontWeight(.semibold)
                 .padding(.horizontal)
                 .padding(.vertical, 12)
                 .background(Color.colorForest)
                 .clipShape(RoundedRectangle(cornerRadius: 50))
+                .shadow(radius: 5)
             
             Image(systemName: icon)
+                .offset(y: -1)
+                .font(.system(size: 18, weight: .semibold))
                 .foregroundColor(Color.colorNeonDark)
                 .frame(width: 44, height: 44)
                 .background(Color.colorForest)
                 .clipShape(Circle())
+                .shadow(radius: 5)
         }
     }
 }

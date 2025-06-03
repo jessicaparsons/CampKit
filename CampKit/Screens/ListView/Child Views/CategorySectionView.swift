@@ -12,6 +12,10 @@ enum FocusField: Hashable {
     case item(UUID)
 }
 
+enum DragDirection {
+    case vertical, horizontal, none
+}
+
 struct CategorySectionView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @FocusState var isFocused: Bool
@@ -21,7 +25,13 @@ struct CategorySectionView: View {
     let deleteCategory: () -> Void
     @State private var isEditing: Bool = false
     @Binding var isPickerFocused: Bool
-
+    @State private var isDeleteConfirmationPresented: Bool = false
+    @State private var isRearrangingListItems: Bool = false
+    
+    //For rearranging items
+    @State private var tempItems: [Item] = []
+    
+    
     private var isExpandedBinding: Binding<Bool> {
         Binding(
             get: { category.isExpanded },
@@ -48,10 +58,10 @@ struct CategorySectionView: View {
     private var packedRatio: Double {
         allItems.isEmpty ? 0 : Double(packedCount) / Double(allItems.count)
     }
-
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-
+            
             // MARK: - HEADER TOGGLE ROW
             Button {
                 isExpandedBinding.wrappedValue.toggle()
@@ -67,10 +77,10 @@ struct CategorySectionView: View {
                             .multilineTextAlignment(.leading)
                             .onSubmit {
                                 isEditing = false
-                                        save(viewContext)
+                                save(viewContext)
                             }
                             .padding(.leading, Constants.horizontalPadding)
-
+                        
                         Button("Done") {
                             isEditing = false
                             save(viewContext)
@@ -89,41 +99,53 @@ struct CategorySectionView: View {
                         Spacer()
                         
                         
-                            //MARK: - PROGRESS COUNTER
+                        //MARK: - PROGRESS COUNTER
                         let isSuccess = packedCount == allItems.count && allItems.count != 0
-
+                        
                         let countText: Text = isSuccess
-                            ? Text("\(packedCount)/\(allItems.count)").bold().foregroundColor(Color.colorSuccess)
-                            : Text("\(packedCount)/\(allItems.count)").foregroundColor(.secondary)
+                        ? Text("\(packedCount)/\(allItems.count)").bold().foregroundColor(Color.colorSuccess)
+                        : Text("\(packedCount)/\(allItems.count)").foregroundColor(.secondary)
                         countText
                             .font(.subheadline)
                             .fixedSize(horizontal: true, vertical: false)
-                            
-                            //MARK: - MENU
-                            Menu {
-                                Button {
-                                    isEditing = true
-                                } label: {
-                                    Label("Edit Name", systemImage: "pencil")
-                                }
-                                Button {
-                                    isRearranging = true
-                                } label: {
-                                    Label("Rearrange Categories", systemImage: "arrow.up.arrow.down")
-                                }
-                                Button(role: .destructive) {
-                                    deleteCategory()
-                                } label: {
-                                    Label("Delete", systemImage: "trash")
-                                }
+                        
+                        //MARK: - MENU
+                        Menu {
+                            Button {
+                                isEditing = true
                             } label: {
-                                Image(systemName: "ellipsis")
-                                    .padding(.horizontal, 8)
-                                    .padding(.vertical)
-                                    .foregroundStyle(Color.primary)
+                                Label("Edit Name", systemImage: "pencil")
+                            }
+                            Button {
+                                isRearranging = true
+                            } label: {
+                                Label("Reorder Categories", systemImage: "arrow.up.and.down.text.horizontal")
+                            }
+                            Button(role: .destructive) {
+                                isDeleteConfirmationPresented = true
+                            } label: {
+                                Label("Delete", systemImage: "trash")
+                            }
+                        } label: {
+                            Image(systemName: "ellipsis")
+                                .padding(.horizontal, 8)
+                                .padding(.vertical)
+                                .foregroundStyle(Color.primary)
+                            
+                        }//:MENU
+                        .labelStyle(.iconOnly)
+                        .confirmationDialog(
+                            "Are you sure you want to delete this category?",
+                            isPresented: $isDeleteConfirmationPresented,
+                            titleVisibility: .visible
+                        ) {
+                            Button("Delete", role: .destructive) {
+                                deleteCategory()
+                                HapticsManager.shared.triggerSuccess()
                                 
-                            }//:MENU
-                            .labelStyle(.iconOnly)
+                            }
+                            Button("Cancel", role: .cancel) { }
+                        }
                     }
                 }
                 .padding(.horizontal)
@@ -138,7 +160,7 @@ struct CategorySectionView: View {
             .onChange(of: isEditing) {
                 isFocused = isEditing
             }
-
+            
             // MARK: - EXPANDED CONTENT
             if category.isExpanded {
                 Divider()
@@ -147,12 +169,27 @@ struct CategorySectionView: View {
                 LazyVStack(spacing: 2) {
                     if !category.sortedItems.isEmpty {
                         ForEach(category.sortedItems, id: \.id) { item in
+                            ZStack {
                                 EditableItemView<Item>(
                                     item: item,
                                     togglePacked: { viewModel.togglePacked(for: item) },
                                     deleteItem: { viewModel.deleteItem(item) },
                                     isPickerFocused: $isPickerFocused
                                 )
+                            }
+                            .background(Color.colorWhite)
+                            .contextMenu {
+                                Button {
+                                    isRearrangingListItems = true
+                                } label: {
+                                    Label("Move item", systemImage: "arrow.up.and.down.text.horizontal")
+                                }
+                                Button(role: .destructive) {
+                                    viewModel.deleteItem(item)
+                                } label: {
+                                    Label("Delete", systemImage: "trash")
+                                }
+                            }
                         }
                     }
                     AddNewItemView(
@@ -161,10 +198,22 @@ struct CategorySectionView: View {
                         isPickerFocused: $isPickerFocused)
                     .padding(.bottom, 10)
                 }//:LAZY VSTACK
-                    
+                .sheet(isPresented: $isRearrangingListItems, onDismiss: {
+                    viewModel.moveItems(tempItems, in: category)
+                }) {
+                    RearrangeListView(
+                        items: tempItems,
+                        label: { $0.title ?? "Empty item" },
+                        moveAction: { source, destination in
+                            tempItems.move(fromOffsets: source, toOffset: destination)
+                        }
+                    )
+                    .onAppear { tempItems = category.sortedItems }
+                }
             }
-        }
-    }
+        }//:VSTACK
+        
+    }//:BODY
 }
 
 
@@ -181,16 +230,16 @@ struct CategorySectionView: View {
     let categories = Category.sampleCategories(context: context)
     
     // Return the preview
-   
-            NavigationStack {
-            CategorySectionView(
-                viewModel: ListViewModel(viewContext: context, packingList: list),
-                category: categories.first!,
-                isRearranging: $isRearranging,
-                deleteCategory: { print("Mock delete category") },
-                isPickerFocused: $isPickerFocused
-            )
-        }
+    
+    NavigationStack {
+        CategorySectionView(
+            viewModel: ListViewModel(viewContext: context, packingList: list),
+            category: categories.first!,
+            isRearranging: $isRearranging,
+            deleteCategory: { print("Mock delete category") },
+            isPickerFocused: $isPickerFocused
+        )
+    }
 }
 #endif
 

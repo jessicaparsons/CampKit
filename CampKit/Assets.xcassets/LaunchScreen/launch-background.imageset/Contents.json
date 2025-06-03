@@ -1,17 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "LaunchBackground.png",
+      "filename" : "CKloadingscreen1.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "LaunchBackground@2x.png",
+      "filename" : "CKloadingscreen2.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "LaunchBackground@3x.png",
+      "filename" : "CKloadingscreen 1.png",
       "idiom" : "universal",
       "scale" : "3x"
     }

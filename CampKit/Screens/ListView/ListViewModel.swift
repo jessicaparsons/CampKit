@@ -99,16 +99,26 @@ final class ListViewModel: ObservableObject {
         save(viewContext)
     }
     
+    func moveItems(_ items: [Item], in category: Category) {
+        for (index, item) in items.enumerated() {
+            item.position = Int64(index)
+        }
+        save(viewContext)
+        withAnimation {
+            objectWillChange.send()
+        }
+    }
+    
     func deleteItem(_ item: Item) {
         guard let category = item.category else {
             print("Error: Item does not belong to a category.")
             return
         }
         
-        withAnimation {
-            viewContext.delete(item)
-            reassignItemPositions(for: category)
-        }
+        
+        viewContext.delete(item)
+        reassignItemPositions(for: category)
+        
     }
     
     //MARK: - MODIFY CATEGORIES

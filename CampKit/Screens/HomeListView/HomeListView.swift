@@ -76,7 +76,7 @@ struct HomeListView: View {
                             .font(.headline)
                             .fontWeight(.bold)
                             .multilineTextAlignment(.leading)
-                            .padding(.bottom)
+                            .padding(.bottom, 12)
                         Spacer()
                     }//:HSTACK
                     .padding(.top, Constants.headerSpacing)
@@ -90,8 +90,8 @@ struct HomeListView: View {
                             .font(.headline)
                             .fontWeight(.bold)
                             .multilineTextAlignment(.leading)
-                            .padding(.top, Constants.largePadding)
-                            .padding(.bottom)
+                            .padding(.top, 25)
+                            .padding(.bottom, 12)
                         Spacer()
                     }//:HSTACK
                     
@@ -105,7 +105,7 @@ struct HomeListView: View {
                         
                     } else {
                         
-                        LazyVGrid(columns: gridItem, alignment: .center) {
+                        LazyVGrid(columns: gridItem, alignment: .center, spacing: Constants.cardSpacing) {
                             ForEach(viewModel.packingLists) { packingList in
                                 
                                     HomeListCardView(
@@ -194,11 +194,15 @@ struct HomeListView: View {
                 buttonOneImage: "clipboard",
                 buttonOneLabel: "Blank List",
                 buttonOneAction: {
-                    quizViewModel.createBlankPackingList()
-                    
-                    if let packingList = quizViewModel.currentPackingList {
-                        currentPackingList = packingList
-                        navigateToListView = true
+                    if storeKitManager.isUnlimitedListsUnlocked || packingListsCount < Constants.proVersionListCount {
+                        quizViewModel.createBlankPackingList()
+                        
+                        if let packingList = quizViewModel.currentPackingList {
+                            currentPackingList = packingList
+                            navigateToListView = true
+                        }
+                    } else {
+                        isUpgradeToProPresented.toggle()
                     }
                     isMenuOpen = false
                 },
@@ -303,6 +307,7 @@ struct HomeListView: View {
                         isEditing = false
                     } label: {
                         Text("Done")
+                            .fontWeight(.bold)
                     }
                 }
                 

@@ -322,7 +322,7 @@ struct ListView: View {
                 Button(action: {
                     isRearranging = true
                 }) {
-                    Label("Rearrange", systemImage: "arrow.up.arrow.down")
+                    Label("Reorder Categories", systemImage: "text.line.magnify")
                 }
                 
                 
@@ -414,9 +414,14 @@ struct ListView: View {
             
         }//:HSTACK
         .sheet(isPresented: $isRearranging) {
-            RearrangeCategoriesView(viewModel: viewModel)
-                .environmentObject(viewModel)
-                .presentationDetents([.medium, .large])
+            RearrangeListView(
+                items: viewModel.packingList.sortedCategories,
+                label: { $0.name },
+                moveAction: { source, destination in
+                    viewModel.moveCategory(from: source, to: destination)
+                }
+            )
+            .presentationDetents([.medium, .large])
         }
         .alert("Add New Category", isPresented: $isAddNewCategoryPresented) {
             TextField("New category", text: $newCategoryTitle)
@@ -482,7 +487,7 @@ struct ListView: View {
                 
             }
             Button("Cancel", role: .cancel) { }
-        } 
+        }
         .sheet(isPresented: $isUpgradeToProPresented) {
             UpgradeToProView()
         }
@@ -500,16 +505,24 @@ struct ListView: View {
 }
 
 extension ListView {
-    
     private func createShare(_ list: PackingList) async {
-      do {
-        let (_, share, _) =
-        try await stack.persistentContainer.share([list], to: nil)
-          share[CKShare.SystemFieldKey.title] = list.title
-        self.share = share
-      } catch {
-        print("Failed to create share")
-      }
+        do {
+            // 1. Create share
+            let (_, share, _) = try await stack.persistentContainer.share([list], to: nil)
+
+            // 2. Set metadata
+            share[CKShare.SystemFieldKey.title] = list.title
+
+            // 3. Persist it
+//            try await stack.persistentContainer.persistUpdatedShare(share, in: stack.sharedPersistentStore)
+
+            // 4. Save to state
+            self.share = share
+
+            print("Share successfully created and persisted.")
+        } catch {
+            print("Failed to create share: \(error)")
+        }
     }
 }
 

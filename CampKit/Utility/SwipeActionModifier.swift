@@ -44,7 +44,7 @@ struct SwipeActionModifier: ViewModifier {
                 swipeCellStyle: SwipeCellStyle(
                     alignment: .leading,
                     dismissWidth: 20,
-                    appearWidth: 20,
+                    appearWidth: 60,
                     destructiveWidth: 240,
                     vibrationForButton: .error,
                     vibrationForDestructive: .medium,

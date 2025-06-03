@@ -64,6 +64,7 @@ struct ReminderListItemView: View {
             VStack {
                 Text(reminder.title ?? "")
                     .frame(maxWidth: .infinity, alignment: .leading)
+                    .fontWeight(.light)
                 
                 if let notes = reminder.notes {
                     Text(notes)
@@ -80,7 +81,7 @@ struct ReminderListItemView: View {
                         Text(reminderTime, style: .time)
                     }
                 }//:HSTACK
-                .font(.caption)
+                .font(.footnote)
                 .foregroundStyle(.secondary)
                 .frame(maxWidth: .infinity, alignment: .leading)
             }

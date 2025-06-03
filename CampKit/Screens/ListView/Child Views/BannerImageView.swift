@@ -20,12 +20,13 @@ struct BannerImageView: View {
             bannerImageView
                 .resizable()
                 .aspectRatio(contentMode: .fill)
+                .frame(width: UIScreen.main.bounds.width, height: 250)
                 .clipped()
             
             Color.black.opacity(0.2)
                 .ignoresSafeArea()
         }//:ZSTACK
-        .frame(width: UIScreen.main.bounds.width, height: 250)
+        
         .ignoresSafeArea(edges: .horizontal)
         
     }

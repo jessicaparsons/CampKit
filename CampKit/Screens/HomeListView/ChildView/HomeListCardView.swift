@@ -67,7 +67,7 @@ struct HomeListCardView: View {
             .aspectRatio(1, contentMode: .fit)
 
             //MARK: - LIST INFO
-            VStack(alignment: .leading) {
+            VStack(alignment: .leading, spacing: 2) {
                     Text(packingList.title ?? Constants.newPackingListTitle)
                         .font(.headline)
                         .foregroundStyle(Color.colorSecondaryTitle)

@@ -74,6 +74,12 @@ struct UpgradeToProView: View {
                                 .fontWeight(.bold)
                         }
                         .buttonStyle(BigButton())
+                        .background(
+                            RoundedRectangle(cornerRadius: 50)
+                                .fill(Color.colorNeon)
+                                .shadow(color: .black.opacity(0.08), radius: 6, x: 0, y: 4)
+                        )
+                       
                         
                     }//:VSTACK
                     .padding(.vertical, 5)
@@ -96,7 +102,8 @@ struct UpgradeToProView: View {
                         Image(systemName: "x.circle.fill")
                             .font(.title3)
                             .fontWeight(.bold)
-                            .foregroundStyle(.regularMaterial)
+                            .foregroundStyle(Color.white)
+                            .opacity(0.7)
                             .padding(.top)
                     }
                 }

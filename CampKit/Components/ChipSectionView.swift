@@ -12,6 +12,7 @@ struct ChipSectionView: View {
     @Binding var selectedFilters: Set<String>
     let preferenceCategory: String
     
+    
     var body: some View {
         
         FlowLayout {
@@ -46,7 +47,8 @@ struct FlowLayout: Layout {
 
         var lineWidth: CGFloat = 0
         var lineHeight: CGFloat = 0
-
+        
+        
         for size in sizes {
             if lineWidth + size.width > proposal.width ?? 0 {
                 totalHeight += lineHeight

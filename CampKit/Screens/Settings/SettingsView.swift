@@ -353,7 +353,7 @@ struct SettingsView: View {
         "🗻", "🥾"
     ]
     
-    private let alternateAppIcons: [String] = (1...15).map { "AppIcon-\($0)" }
+    private let alternateAppIcons: [String] = (1...24).map { "AppIcon-\($0)" }
     
     private func fahrenheitToCelsius(_ fahrenheit: Double) -> Double {
         return (fahrenheit - 32) * 5 / 9
