@@ -9,8 +9,8 @@ import SwiftUI
 import PhotosUI
 internal import ConfettiSwiftUI
 import CoreData
-import CloudKit
 import os
+import CloudKit
 
 struct ListView: View {
     
@@ -54,10 +54,10 @@ struct ListView: View {
     
     //SHARING OPTIONS
     @State private var isSharingSheetPresented: Bool = false
-    
     @State private var isCloudShareSheetPresented = false
+    
+    //CLOUD SHARING
     @State private var share: CKShare?
-    //@State private var showEditSheet = false
     private let stack = CoreDataStack.shared
     @State private var isParticipantsPresented: Bool = false
     
@@ -119,7 +119,7 @@ struct ListView: View {
                         }//:VSTACK
                         .padding(.horizontal)
                     }//:VSTACK
-                    .disabled(!stack.canEdit(object: viewModel.packingList))
+//                    .disabled(!stack.canEdit(object: viewModel.packingList))
                     .background(
                         GeometryReader { geo in
                             Color.clear
@@ -196,6 +196,9 @@ struct ListView: View {
             .navigationBarBackButtonHidden(true)
             .animation(.easeOut(duration: 0.3), value: viewModel.isSuccessfulDuplicationPresented)
             .photosPicker(isPresented: $isGalleryPhotoPickerPresented, selection: $bannerImageItem, matching: .images)
+//            .onAppear {
+//                self.share = stack.getShare(viewModel.packingList)
+//            }
             .toolbar {
                 //CUSTOM BACK BUTTON
                 ToolbarItem(placement: .navigationBarLeading) {
@@ -233,11 +236,8 @@ struct ListView: View {
                     }
                 }
             }
-            .onAppear(perform: {
-                self.share = stack.getShare(viewModel.packingList)
-            })
-
-
+            
+            
         }//:CONDITION
     }//:BODY
     
@@ -247,23 +247,23 @@ struct ListView: View {
     private var optionsMenu: some View {
         HStack {
             //MARK: - LIST IS SHARED OPTIONS
-            if stack.isShared(object: viewModel.packingList) {
-                
-                Button {
-                    loadShare()
-                } label: {
-                    Label("Participants", systemImage: "person.crop.circle.badge.checkmark")
-                        .dynamicForegroundStyle(trigger: scrollOffset)
-                }
-                .sheet(isPresented: $isParticipantsPresented) {
-                    if let share = share {
-                        ParticipantView(share: share)
-                            .presentationDetents([.medium, .large])
-                    } else {
-                        ProgressView()
-                    }
-                }
-            }
+//            if stack.isShared(object: viewModel.packingList) {
+//                
+//                Button {
+//                    loadShare()
+//                } label: {
+//                    Label("Participants", systemImage: "person.crop.circle.badge.checkmark")
+//                        .dynamicForegroundStyle(trigger: scrollOffset)
+//                }
+//                .sheet(isPresented: $isParticipantsPresented) {
+//                    if let share = share {
+//                        ParticipantView(share: share)
+//                            .presentationDetents([.medium, .large])
+//                    } else {
+//                        ProgressView()
+//                    }
+//                }
+//            }
             
             //MARK: - CHANGE BANNER PHOTO
             Button(action: {
@@ -351,12 +351,16 @@ struct ListView: View {
                 // INVITE CAMPER
                 
                 Button {
+                    print("invite camper pressed")
+                    
                     if !stack.isShared(object: viewModel.packingList) {
-                      Task {
-                          await createShare(viewModel.packingList)
-                      }
+                        Task {
+                            await createShare(viewModel.packingList)
+                        }
                     }
                     isCloudShareSheetPresented = true
+                    
+                    
                 } label: {
                     
                     if stack.isShared(object: viewModel.packingList) {
@@ -366,6 +370,16 @@ struct ListView: View {
                         Label("Invite Camper to List", systemImage: "person.crop.circle.badge.plus")
                     }
                 }
+                //MARK: - CLOUD SHARE SHEET
+                .sheet(isPresented: $isCloudShareSheetPresented, content: {
+                    if let share = share {
+                        CloudSharingView(
+                            share: share,
+                            container: stack.ckContainer,
+                            list: viewModel.packingList
+                        )
+                    }
+                })
                 
                 // SHARE LIST
                 
@@ -377,7 +391,7 @@ struct ListView: View {
                 
                 // DUPLICATE LIST
                 Button {
-                    if storeKitManager.isUnlimitedListsUnlocked || packingListsCount < Constants.proVersionListCount {
+                    if storeKitManager.isProUnlocked || packingListsCount < Constants.proVersionListCount {
                         isDuplicationConfirmationPresented = true
                     } else {
                         isUpgradeToProPresented.toggle()
@@ -440,16 +454,7 @@ struct ListView: View {
             let pdf = viewModel.generatePDF(from: text)
             SharingOptionsSheet(items: [text, pdf])
         }
-        //MARK: - CLOUD SHARE SHEET
-        .sheet(isPresented: $isCloudShareSheetPresented, content: {
-          if let share = share {
-            CloudSharingView(
-              share: share,
-              container: stack.ckContainer,
-              list: viewModel.packingList
-            )
-          }
-        })
+        
         //MARK: - ADD NEW PRESET CATEGORY
         .sheet(isPresented: $isAddNewPresetCategoryPresented) {
             AddNewCategoriesView(viewModel: viewModel)
@@ -493,36 +498,27 @@ struct ListView: View {
         }
     }//:OPTIONS MENU
     
-    func loadShare() {
-        if let existingShare = stack.getShare(viewModel.packingList) {
-            self.share = existingShare
-            self.isParticipantsPresented = true
-        } else {
-            print("No share found.")
-        }
-    }
+//    func loadShare() {
+//        if let existingShare = stack.getShare(viewModel.packingList) {
+//            self.share = existingShare
+//            self.isParticipantsPresented = true
+//        } else {
+//            print("No share found.")
+//        }
+//    }
     
 }
 
 extension ListView {
     private func createShare(_ list: PackingList) async {
-        do {
-            // 1. Create share
-            let (_, share, _) = try await stack.persistentContainer.share([list], to: nil)
-
-            // 2. Set metadata
-            share[CKShare.SystemFieldKey.title] = list.title
-
-            // 3. Persist it
-//            try await stack.persistentContainer.persistUpdatedShare(share, in: stack.sharedPersistentStore)
-
-            // 4. Save to state
-            self.share = share
-
-            print("Share successfully created and persisted.")
-        } catch {
-            print("Failed to create share: \(error)")
-        }
+      do {
+        let (_, share, _) =
+        try await stack.persistentContainer.share([list], to: nil)
+          share[CKShare.SystemFieldKey.title] = list.title
+        self.share = share
+      } catch {
+        print("Failed to create share")
+      }
     }
 }
 

@@ -49,7 +49,7 @@ struct BannerImageView: View {
 #Preview {
     
     
-    let context = CoreDataStack.shared.context
+    let context = CoreDataStack.preview.context
     
     let list = PackingList.samplePackingList(context: context)
         

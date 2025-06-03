@@ -37,6 +37,6 @@ struct Constants {
     static let placeholderBannerPhoto: String = "PineShadow"
     
     //PRO
-    static let proVersionListCount: Int = 3
+    static let proVersionListCount: Int = 9
     @AppStorage("successEmoji") var successEmoji: String = "🔥"
 }

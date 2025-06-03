@@ -37,7 +37,7 @@ struct ElevationBarView: View {
     @Previewable @State var currentPackingList: PackingList?
     
     
-    let context = CoreDataStack.shared.context
+    let context = CoreDataStack.preview.context
         
     QuizView(
         viewModel: QuizViewModel(context: context),

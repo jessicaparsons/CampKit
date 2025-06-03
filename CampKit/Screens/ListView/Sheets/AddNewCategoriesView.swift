@@ -59,7 +59,6 @@ struct AddNewCategoriesView: View {
                         Text("Activities")
                             .font(.footnote)
                             .fontWeight(.bold)
-                        Spacer()
                     }
                     
                     ChipSectionView(
@@ -98,7 +97,6 @@ struct AddNewCategoriesView: View {
                 }//:VSTACK
                 .navigationTitle("Add Categories")
                 .navigationBarTitleDisplayMode(.inline)
-                .padding()
                 .toolbar {
                     ToolbarItem(placement: .cancellationAction) {
                         Button("Cancel") {
@@ -109,6 +107,9 @@ struct AddNewCategoriesView: View {
                 }//:TOOLBAR
                 
             }//:SCROLLVIEW
+            .padding()
+            .scrollIndicators(.hidden)
+            .ignoresSafeArea(edges: .bottom)
         }//:NAVIGATIONSTACK
         
     }

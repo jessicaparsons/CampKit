@@ -211,7 +211,7 @@ struct QuizView: View {
     @Previewable @State var navigateToListView: Bool = false
     @Previewable @State var currentPackingList: PackingList?
     
-    let context = CoreDataStack.shared.context
+    let context = CoreDataStack.preview.context
     
     NavigationStack {
         QuizView(

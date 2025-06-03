@@ -12,7 +12,7 @@ import StoreKit
 @MainActor
 class StoreKitManager {
     
-    var isUnlimitedListsUnlocked: Bool = false
+    var isProUnlocked: Bool = false
     private var updates: Task<Void, Never>? = nil
     
     init() {
@@ -44,7 +44,7 @@ class StoreKitManager {
                 if let transaction = try? verification.payloadValue, transaction.revocationDate == nil {
                     
                     await transaction.finish()
-                    isUnlimitedListsUnlocked = true
+                    isProUnlocked = true
                     UserDefaults.standard.set(true, forKey: "UnlimitedListsPurchased")
                     print("Purchase successful!")
                 }
@@ -64,7 +64,7 @@ class StoreKitManager {
         for await result in Transaction.currentEntitlements {
             if case .verified(let transaction) = result, transaction.productID == "com.campkit.unlimitedlists" {
                 
-                isUnlimitedListsUnlocked = true
+                isProUnlocked = true
                 UserDefaults.standard.set(true, forKey: "UnlimitedListsPurchased")
                 print("Already purchased")
             }
@@ -76,7 +76,7 @@ class StoreKitManager {
         for await result in Transaction.currentEntitlements {
             if case .verified(let transaction) = result, transaction.productID == "com.campkit.unlimitedlists" {
                 
-                isUnlimitedListsUnlocked = true
+                isProUnlocked = true
                 UserDefaults.standard.set(true, forKey: "UnlimitedListsPurchased")
                 print("Restored purchase")
             } else {
@@ -92,7 +92,7 @@ class StoreKitManager {
             for await result in Transaction.updates {
                 if case .verified(let transaction) = result, transaction.productID == "com.campkit.unlimitedlists" {
                     
-                    self.isUnlimitedListsUnlocked = true
+                    self.isProUnlocked = true
                     UserDefaults.standard.set(true, forKey: "UnlimitedListsPurchased")
                     print("Verified purchase")
                 }

@@ -197,7 +197,7 @@ struct ListDetailCardView: View {
 #Preview {
 
     @Previewable @State var isLocationSearchOpen: Bool = false
-    let context = CoreDataStack.shared.context
+    let context = CoreDataStack.preview.context
     
     let list = PackingList.samplePackingList(context: context)
         

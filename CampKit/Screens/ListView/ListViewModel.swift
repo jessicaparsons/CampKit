@@ -15,7 +15,7 @@ final class ListViewModel: ObservableObject {
     let viewContext: NSManagedObjectContext
     private let packingListID: NSManagedObjectID
     
-    @Published var packingList: PackingList 
+    @Published var packingList: PackingList
     
     @Published var item: String = ""
     @Published var globalIsExpanded: Bool = false

@@ -23,6 +23,7 @@ struct BackgroundPickerView: View {
     @State private var selectedTab: PickerType = .images
     @State private var selectedImage: UIImage?
     @State private var selectedGradient: GradientOption?
+    @State private var selectedImageName: String?
     @State private var selectedGalleryPhoto: PhotosPickerItem?
     @State private var isPhotoPickerPresented = false
     @State private var wasPhotoPickerOpened = false
@@ -59,26 +60,62 @@ struct BackgroundPickerView: View {
                         }
                     )
                 } else if selectedTab == .colors {
-                    LazyVGrid(columns: columns, spacing: Constants.gallerySpacing) {
-                        ForEach(presetGradients) { gradientOption in
-                            gradientOption.gradient
-                                .aspectRatio(1, contentMode: .fit)
-                                .overlay(
-                                    Rectangle()
-                                        .stroke(selectedGradient == gradientOption ? Color.colorNeon : Color.clear, lineWidth: 3)
-                                )
-                                .onTapGesture {
-                                    selectedGradient = gradientOption
-                                    if let image = imageFromGradient(gradientOption.gradient) {
-                                        selectedImage = image
-                                        onImageSelected(image)
-                                    }
-                                    HapticsManager.shared.triggerLightImpact()
+                    
+                    ScrollView {
+                        
+                        VStack(spacing: 0) {
+                            
+                            //IMAGES
+                            LazyVGrid(columns: columns, spacing: Constants.gallerySpacing) {
+                                ForEach(presetImages) { image in
+                                    Image(image.name)
+                                        .resizable()
+                                        .aspectRatio(1, contentMode: .fill)
+                                        .clipped()
+                                        .overlay(
+                                            Rectangle()
+                                                .stroke(selectedImageName == image.name ? Color.colorNeon : Color.clear, lineWidth: 3)
+                                        )
+                                        .onTapGesture {
+                                            selectedImageName = image.name
+                                            selectedImage = UIImage(named: image.name)
+                                            if let image = selectedImage {
+                                                onImageSelected(image)
+                                            }
+                                            HapticsManager.shared.triggerLightImpact()
+                                        }
                                 }
-                        }
-                    }
-                    .padding(.horizontal)
-                    .padding(.vertical, Constants.verticalSpacing)
+                                
+                            }
+                            .padding(.horizontal)
+                            .padding(.top, Constants.verticalSpacing)
+                            .padding(.bottom, 5)
+                            
+                            //GRADIENTS
+                            LazyVGrid(columns: columns, spacing: Constants.gallerySpacing) {
+                                ForEach(presetGradients) { gradientOption in
+                                    gradientOption.gradient
+                                        .aspectRatio(1, contentMode: .fit)
+                                        .overlay(
+                                            Rectangle()
+                                                .stroke(selectedGradient == gradientOption ? Color.colorNeon : Color.clear, lineWidth: 3)
+                                        )
+                                        .onTapGesture {
+                                            selectedGradient = gradientOption
+                                            if let image = imageFromGradient(gradientOption.gradient) {
+                                                selectedImage = image
+                                                onImageSelected(image)
+                                            }
+                                            HapticsManager.shared.triggerLightImpact()
+                                        }
+                                }
+                            }
+                            .padding(.horizontal)
+                            .padding(.bottom, Constants.verticalSpacing)
+                            .padding(.top, 0)
+                            
+                        }//:VSTACK
+                    }//:SCROLLVIEW
                 }
             }
             

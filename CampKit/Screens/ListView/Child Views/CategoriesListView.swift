@@ -52,7 +52,7 @@ struct CategoriesListView: View {
     @Previewable @State var isRearranging: Bool = false
     @Previewable @State var isPickerFocused: Bool = false
     
-    let context = CoreDataStack.shared.context
+    let context = CoreDataStack.preview.context
     
     let list = PackingList.samplePackingList(context: context)
         

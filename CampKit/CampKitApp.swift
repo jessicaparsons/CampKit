@@ -7,6 +7,8 @@
 
 import SwiftUI
 import UserNotifications
+import CloudKit
+import CoreData
 
 @main
 struct CampKitApp: App {
@@ -22,6 +24,8 @@ struct CampKitApp: App {
     init() {
         UITabBar.appearance().unselectedItemTintColor = UIColor(named:"ColorSecondaryMenu")
         
+        UserDefaults.standard.set(true, forKey: "com.apple.CoreData.CloudKitDebugLogging")
+
         Task {
             let center = UNUserNotificationCenter.current()
             do {
@@ -49,3 +53,5 @@ struct CampKitApp: App {
     }
     
 }
+
+

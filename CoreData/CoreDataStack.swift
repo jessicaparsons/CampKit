@@ -10,25 +10,13 @@ import CloudKit
 
 final class CoreDataStack: ObservableObject {
 
-    #if DEBUG
-    let shouldInitializeCloudKitSchema = true
-    #else
-    let shouldInitializeCloudKitSchema = false
-    #endif
-    
-    
+//    #if DEBUG
+//    let shouldInitializeCloudKitSchema = true
+//    #else
+//    let shouldInitializeCloudKitSchema = false
+//    #endif
     
     @MainActor static let shared = CoreDataStack()
-    
-    var ckContainer: CKContainer {
-        let storeDescription = persistentContainer.persistentStoreDescriptions.first
-        guard let identifier = storeDescription?
-            .cloudKitContainerOptions?.containerIdentifier else {
-            fatalError("Unable to get container identifier")
-        }
-        return CKContainer(identifier: identifier)
-    }
-    
     
     var context: NSManagedObjectContext {
         persistentContainer.viewContext
@@ -48,6 +36,7 @@ final class CoreDataStack: ObservableObject {
         return sharedStore
     }
     
+    
     lazy var persistentContainer: NSPersistentCloudKitContainer = {
         let container = NSPersistentCloudKitContainer(name: "CampKitModel")
         
@@ -57,7 +46,10 @@ final class CoreDataStack: ObservableObject {
         let storesURL = privateStoreDescription.url?.deletingLastPathComponent()
         privateStoreDescription.url = storesURL?.appendingPathComponent("private.sqlite")
         
-        // TODO: 1
+        
+        /// Configures the shared database to store records shared with you.
+        /// Makes a copy of your privateStoreDescription and update its URL to sharedStoreURL
+        
         let sharedStoreURL = storesURL?.appendingPathComponent("shared.sqlite")
         guard let sharedStoreDescription = privateStoreDescription
             .copy() as? NSPersistentStoreDescription else {
@@ -68,7 +60,7 @@ final class CoreDataStack: ObservableObject {
         sharedStoreDescription.url = sharedStoreURL
         
         
-        // TODO: 2
+        /// Creates NSPersistentContainerCloudKitContainerOptions, using the identifier from your private store description.
         
         guard let containerIdentifier = privateStoreDescription
             .cloudKitContainerOptions?.containerIdentifier else {
@@ -77,34 +69,47 @@ final class CoreDataStack: ObservableObject {
         let sharedStoreOptions = NSPersistentCloudKitContainerOptions(
             containerIdentifier: containerIdentifier
         )
+        
+        /// Set databaseScope to .shared
         sharedStoreOptions.databaseScope = .shared
+        
+        /// Set the cloudKitContainerOptions property for the sharedStoreDescription created.
         sharedStoreDescription.cloudKitContainerOptions = sharedStoreOptions
         
         
-        // TODO: 3
+        /// Adds shared NSPersistentStoreDescription to the container.
         
         container.persistentStoreDescriptions.append(sharedStoreDescription)
         
         
-        // TODO: 4
+        /// Stores a reference to each store when it’s loaded.
+        
         
         container.loadPersistentStores { loadedStoreDescription, error in
-            if let error = error as NSError? {
-                fatalError("Failed to load persistent stores: \(error)")
+          if let error = error as NSError? {
+            fatalError("Failed to load persistent stores: \(error)")
+          } else if let cloudKitContainerOptions = loadedStoreDescription
+            .cloudKitContainerOptions {
+            guard let loadedStoreDescritionURL = loadedStoreDescription.url else {
+              return
             }
-
-            // Assign the store references
-            if let cloudKitContainerOptions = loadedStoreDescription.cloudKitContainerOptions {
-                guard let loadedStoreDescriptionURL = loadedStoreDescription.url else { return }
-
-                if cloudKitContainerOptions.databaseScope == .private {
-                    self._privatePersistentStore = container.persistentStoreCoordinator
-                        .persistentStore(for: loadedStoreDescriptionURL)
-                } else if cloudKitContainerOptions.databaseScope == .shared {
-                    self._sharedPersistentStore = container.persistentStoreCoordinator
-                        .persistentStore(for: loadedStoreDescriptionURL)
-                }
+        
+          /// Checks databaseScope and determines whether it’s private or shared.
+          /// Sets the persistent store based on the scope.
+              
+            if cloudKitContainerOptions.databaseScope == .private {
+              let privateStore = container.persistentStoreCoordinator
+                .persistentStore(for: loadedStoreDescritionURL)
+              self._privatePersistentStore = privateStore
+                
+            } else if cloudKitContainerOptions.databaseScope == .shared {
+              let sharedStore = container.persistentStoreCoordinator
+                .persistentStore(for: loadedStoreDescritionURL)
+              self._sharedPersistentStore = sharedStore
             }
+          }
+        }
+
 
 //            // SCHEMA INIT (development only)
 //            #if DEBUG
@@ -117,34 +122,12 @@ final class CoreDataStack: ObservableObject {
 //                }
 //            }
 //            #endif
-        }
         
-//        container.loadPersistentStores { loadedStoreDescription, error in
-//            if let error = error as NSError? {
-//                fatalError("Failed to load persistent stores: \(error)")
-//            } else if let cloudKitContainerOptions = loadedStoreDescription
-//                .cloudKitContainerOptions {
-//                guard let loadedStoreDescritionURL = loadedStoreDescription.url else {
-//                    return
-//                }
-//                if cloudKitContainerOptions.databaseScope == .private {
-//                    let privateStore = container.persistentStoreCoordinator
-//                        .persistentStore(for: loadedStoreDescritionURL)
-//                    self._privatePersistentStore = privateStore
-//                } else if cloudKitContainerOptions.databaseScope == .shared {
-//                    let sharedStore = container.persistentStoreCoordinator
-//                        .persistentStore(for: loadedStoreDescritionURL)
-//                    self._sharedPersistentStore = sharedStore
-//                }
-//            }
-//        }
         
         for entity in container.managedObjectModel.entities {
             print("Entity loaded: \(entity.name ?? "Unnamed")")
         }
         
-        
-        //container.viewContext.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
         container.viewContext.mergePolicy = NSMergePolicy.mergeByPropertyObjectTrump
         container.viewContext.automaticallyMergesChangesFromParent = true
         return container
@@ -152,6 +135,17 @@ final class CoreDataStack: ObservableObject {
     
     private var _privatePersistentStore: NSPersistentStore?
     private var _sharedPersistentStore: NSPersistentStore?
+    
+    ///Create a CKContainer property using persistent container store description.
+    
+    var ckContainer: CKContainer {
+        let storeDescription = persistentContainer.persistentStoreDescriptions.first
+        guard let identifier = storeDescription?
+            .cloudKitContainerOptions?.containerIdentifier else {
+            fatalError("Unable to get container identifier")
+        }
+        return CKContainer(identifier: identifier)
+    }
     
     
     //private init() {}
@@ -200,71 +194,84 @@ extension CoreDataStack {
 
 
 extension CoreDataStack {
+    
+    ///Determine if the destination is already shared and then take the proper action.
+    
     func isShared(object: NSManagedObject) -> Bool {
-        isShared(objectID: object.objectID)
+      isShared(objectID: object.objectID)
     }
     
-    func canEdit(object: NSManagedObject) -> Bool {
-      return persistentContainer.canUpdateRecord(
-        forManagedObjectWith: object.objectID
-      )
-    }
-    func canDelete(object: NSManagedObject) -> Bool {
-      return persistentContainer.canDeleteRecord(
-        forManagedObjectWith: object.objectID
-      )
-    }
+    /// Checks the persistentStore of the NSManagedObjectID that was passed in to see if it’s the sharedPersistentStore.
+    /// If it is, then this object is already shared.
+    /// Otherwise, use fetchShares(matching:) to see if you have objects matching the objectID in question.
+    /// If a match returns, this object is already shared.
     
-    func isOwner(object: NSManagedObject) -> Bool {
-      guard isShared(object: object) else { return false }
-        
-      guard let share = try? persistentContainer.fetchShares(matching: [object.objectID])[object.objectID] else {
-        print("Get ckshare error")
-        return false
-      }
-        
-        guard let currentUser = share.currentUserParticipant else { return false }
-        
-        return currentUser.userIdentity.userRecordID == share.owner.userIdentity.userRecordID
-        
-    }
-
-
-    
-    //get information about the people participating in the share.
-    func getShare(_ list: PackingList) -> CKShare? {
-      guard isShared(object: list) else { return nil }
-      guard let shareDictionary = try? persistentContainer.fetchShares(matching: [list.objectID]),
-        let share = shareDictionary[list.objectID] else {
-        print("Unable to get CKShare")
-        return nil
-      }
-        share[CKShare.SystemFieldKey.title] = list.title
-      return share
-    }
-
-    //determine if an object isShared
-    
-    private func isShared(objectID: NSManagedObjectID) -> Bool {
-        var isShared = false
-        if let persistentStore = objectID.persistentStore {
-            if persistentStore == sharedPersistentStore {
-                isShared = true
-            } else {
-                let container = persistentContainer
-                do {
-                    let shares = try container.fetchShares(matching: [objectID])
-                    if shares.first != nil {
-                        isShared = true
-                    }
-                } catch {
-                    print("Failed to fetch share for \(objectID): \(error)")
-                }
-            }
+  private func isShared(objectID: NSManagedObjectID) -> Bool {
+    var isShared = false
+      
+    if let persistentStore = objectID.persistentStore {
+      if persistentStore == sharedPersistentStore {
+        isShared = true
+      } else {
+        let container = persistentContainer
+        do {
+          let shares = try container.fetchShares(matching: [objectID])
+          if shares.first != nil {
+            isShared = true
+          }
+        } catch {
+          print("Failed to fetch share for \(objectID): \(error)")
         }
-        return isShared
+      }
     }
+    return isShared
+  }
 }
+
+
+//extension CoreDataStack {
+//    
+//    
+//    func canEdit(object: NSManagedObject) -> Bool {
+//      return persistentContainer.canUpdateRecord(
+//        forManagedObjectWith: object.objectID
+//      )
+//    }
+//    func canDelete(object: NSManagedObject) -> Bool {
+//      return persistentContainer.canDeleteRecord(
+//        forManagedObjectWith: object.objectID
+//      )
+//    }
+//    
+//    func isOwner(object: NSManagedObject) -> Bool {
+//      guard isShared(object: object) else { return false }
+//        
+//      guard let share = try? persistentContainer.fetchShares(matching: [object.objectID])[object.objectID] else {
+//        print("Get ckshare error")
+//        return false
+//      }
+//        
+//        guard let currentUser = share.currentUserParticipant else { return false }
+//        
+//        print("I am the current user/owner: \(currentUser.userIdentity.userRecordID == share.owner.userIdentity.userRecordID)")
+//        
+//        return currentUser.userIdentity.userRecordID == share.owner.userIdentity.userRecordID
+//        
+//    }
+//    
+//    //get information about the people participating in the share.
+//    func getShare(_ list: PackingList) -> CKShare? {
+//      guard isShared(object: list) else { return nil }
+//      guard let shareDictionary = try? persistentContainer.fetchShares(matching: [list.objectID]),
+//        let share = shareDictionary[list.objectID] else {
+//        print("Unable to get CKShare")
+//        return nil
+//      }
+//        share[CKShare.SystemFieldKey.title] = list.title
+//      return share
+//    }
+//
+//}
 
 
 #if DEBUG

@@ -115,6 +115,7 @@ struct MenuItem: View {
     }
 }
 
+#if DEBUG
 
 #Preview {
     @Previewable @State var navigateToListView: Bool = false
@@ -124,7 +125,7 @@ struct MenuItem: View {
     @Previewable @State var tabSelection: Int = 1
     @Previewable @State var isMenuOpen: Bool = false
 
-    let context = CoreDataStack.shared.context
+    let context = CoreDataStack.preview.context
     let storeKitManager = StoreKitManager()
     
     
@@ -138,3 +139,5 @@ struct MenuItem: View {
         buttonTwoAction: {}
     )
 }
+
+#endif

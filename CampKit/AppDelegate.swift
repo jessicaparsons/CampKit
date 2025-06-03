@@ -6,9 +6,6 @@
 //
 
 import CloudKit
-import UIKit
-
-import CloudKit
 import SwiftUI
 
 final class AppDelegate: NSObject, UIApplicationDelegate {

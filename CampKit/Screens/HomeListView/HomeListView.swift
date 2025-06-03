@@ -194,7 +194,7 @@ struct HomeListView: View {
                 buttonOneImage: "clipboard",
                 buttonOneLabel: "Blank List",
                 buttonOneAction: {
-                    if storeKitManager.isUnlimitedListsUnlocked || packingListsCount < Constants.proVersionListCount {
+                    if storeKitManager.isProUnlocked || packingListsCount < Constants.proVersionListCount {
                         quizViewModel.createBlankPackingList()
                         
                         if let packingList = quizViewModel.currentPackingList {
@@ -209,7 +209,7 @@ struct HomeListView: View {
                 buttonTwoImage: "list.clipboard",
                 buttonTwoLabel: "Customized List",
                 buttonTwoAction: {
-                    if storeKitManager.isUnlimitedListsUnlocked || packingListsCount < Constants.proVersionListCount {
+                    if storeKitManager.isProUnlocked || packingListsCount < Constants.proVersionListCount {
                         isNewListQuizPresented = true
                     } else {
                         isUpgradeToProPresented.toggle()

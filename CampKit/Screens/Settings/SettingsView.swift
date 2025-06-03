@@ -17,6 +17,7 @@ enum TemperatureUnit: String, CaseIterable, Identifiable {
 
 struct SettingsView: View {
     
+    @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.dismiss) var dismiss
     @Environment(StoreKitManager.self) private var storeKitManager
     //Placeholder
@@ -33,6 +34,10 @@ struct SettingsView: View {
     @State private var isExpanded: Bool = false
     @State private var isSuccessfulIconRevert: Bool = false
     @State private var isSuccessfulCustomIconSelected: Bool = false
+    
+    //DEBUGGING
+    @State private var showAudit = false
+    @State private var auditViewModel: HomeListViewModel?
     
     
     private let options = TemperatureUnit.allCases
@@ -112,12 +117,13 @@ struct SettingsView: View {
                             
                             //MARK: - PURCHASE PRO
                             
-                            if !storeKitManager.isUnlimitedListsUnlocked {
+                            if !storeKitManager.isProUnlocked {
                                 Divider().padding(.vertical, 4)
                                 
                                 HStack {
                                     Text("Unlock Unlimited Lists")
                                     Image(systemName: "arrow.up.right.square").foregroundColor(.colorSage)
+                                    ProTag()
                                 }//:HSTACK
                                 .padding(.top, Constants.lineSpacing)
                                 .onTapGesture {
@@ -133,15 +139,17 @@ struct SettingsView: View {
                             
                             HStack {
                                 VStack(alignment: .leading) {
-                                    Text("Customize Celebration")
-                                        .foregroundStyle(!storeKitManager.isUnlimitedListsUnlocked ? .primary : .secondary)
+                                    HStack {
+                                        Text("Customize Celebration")
+                                        ProTag()
+                                    }//:HSTACK
                                     Text("Tap to change your celebration emoji")
                                         .font(.caption)
                                         .foregroundColor(.secondary)
                                 }//:VSTACK
                                 Spacer()
                                 Button {
-                                    if !storeKitManager.isUnlimitedListsUnlocked {
+                                    if storeKitManager.isProUnlocked {
                                         withAnimation {
                                             isPickerPresented.toggle()
                                         }
@@ -152,7 +160,7 @@ struct SettingsView: View {
                                     Text(successEmoji)
                                         .font(.title)
                                         .padding()
-                                        .opacity(!storeKitManager.isUnlimitedListsUnlocked ? 1 : 0.5)
+                                        .opacity(storeKitManager.isProUnlocked ? 1 : 0.5)
                                         .background(.colorWhiteSands)
                                         .clipShape(RoundedRectangle(cornerRadius: Constants.cornerRadius))
                                 }
@@ -184,8 +192,10 @@ struct SettingsView: View {
                             // MARK: - SECTION: ICONS
                             
                             VStack(alignment: .leading) {
-                                Text("Custom App Icon")
-                                    .foregroundStyle(!storeKitManager.isUnlimitedListsUnlocked ? .primary : .secondary)
+                                HStack {
+                                    Text("Custom App Icon")
+                                    ProTag()
+                                }//:HSTACK
                                 Text("Tap to choose your favorite app icon from the collection below")
                                     .font(.caption)
                                     .foregroundColor(.secondary)
@@ -197,7 +207,11 @@ struct SettingsView: View {
                                     HStack(spacing: 12) {
                                         ForEach(alternateAppIcons.indices, id: \.self) { item in
                                             Button {
-                                                changeAppIcon(to: alternateAppIcons[item])
+                                                if isProUnlocked {
+                                                    changeAppIcon(to: alternateAppIcons[item])
+                                                } else {
+                                                    isUpgradeToProPresented.toggle()
+                                                }
                                             } label: {
                                                 ZStack {
                                                     Image("\(alternateAppIcons[item])-preview")
@@ -205,6 +219,7 @@ struct SettingsView: View {
                                                         .scaledToFit()
                                                         .frame(width: 80, height: 80)
                                                         .cornerRadius(Constants.cornerRadius)
+                                                        .opacity(storeKitManager.isProUnlocked ? 1 : 0.5)
                                                 }
                                                 
                                             }
@@ -236,7 +251,7 @@ struct SettingsView: View {
                             Button {
                                 Task {
                                     await storeKitManager.restorePurchases()
-                                    restoreMessage = storeKitManager.isUnlimitedListsUnlocked
+                                    restoreMessage = storeKitManager.isProUnlocked
                                     ? "Your purchase has been restored."
                                     : "No purchases were found to restore."
                                     showRestoreAlert = true
@@ -329,6 +344,22 @@ struct SettingsView: View {
                 }//:GROUP
                 .backgroundStyle(Color.colorWhite)
                 
+                //MARK: - APP DEBUGGING
+                
+                
+                Button("Run Share Audit") {
+                    auditViewModel = HomeListViewModel(viewContext: viewContext)
+                    DispatchQueue.main.async {
+                        showAudit = true
+                    }
+                }
+                .sheet(isPresented: $showAudit) {
+                    if let viewModel = auditViewModel {
+                        CloudKitShareAuditView(viewModel: viewModel)
+                    }
+                }
+                
+                
             }//:VSTACK
             .padding(.horizontal)
             .sheet(isPresented: $isUpgradeToProPresented) {
@@ -381,32 +412,6 @@ struct SettingsView: View {
 }
 
 
-struct ColoredToggleStyle: ToggleStyle {
-    var label: String
-    var onColor: Color
-    var offColor: Color
-    var thumbColor: Color
-    
-    func makeBody(configuration: Self.Configuration) -> some View {
-        HStack {
-            Text(label)
-            Spacer()
-            Button(action: { configuration.isOn.toggle() } )
-            {
-                RoundedRectangle(cornerRadius: 16, style: .circular)
-                    .fill(configuration.isOn ? onColor : offColor)
-                    .frame(width: 50, height: 29)
-                    .overlay(
-                        Circle()
-                            .fill(thumbColor)
-                            .shadow(radius: 1, x: 0, y: 1)
-                            .padding(1.5)
-                            .offset(x: configuration.isOn ? 10 : -10))
-            }//:BUTTON
-            .animation(Animation.easeInOut(duration: 0.1), value: configuration.isOn)
-        }
-    }
-}
 
 
 
