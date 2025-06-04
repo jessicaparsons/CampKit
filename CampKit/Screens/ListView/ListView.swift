@@ -111,7 +111,7 @@ struct ListView: View {
                                 isRearranging: $isRearranging,
                                 isPickerFocused: $isPickerFocused
                             )
-                            
+                            .padding(.bottom, Constants.bodyPadding)
                             
                         }//:VSTACK
                         .padding(.horizontal)

@@ -93,7 +93,9 @@ struct AddNewCategoriesView: View {
                         dismiss()
                     }
                     .buttonStyle(BigButtonWide())
+                    .padding(.bottom, Constants.bodyPadding)
                     .accessibilityHint("Add the selected categories to your list")
+                    
                     
                 }//:VSTACK
                 .navigationTitle("Add Categories")

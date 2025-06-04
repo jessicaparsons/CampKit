@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		C802F56E2DF0F6EA0076829E /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C802F56D2DF0F6EA0076829E /* StoreKit.framework */; };
 		C82EBE932D3116E2000B39DF /* SwipeCell in Frameworks */ = {isa = PBXBuildFile; productRef = C82EBE922D3116E2000B39DF /* SwipeCell */; };
 		C8BED5542D9CA4710069171E /* ConfettiSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = C8BED5532D9CA4710069171E /* ConfettiSwiftUI */; };
 /* End PBXBuildFile section */
@@ -42,6 +43,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		C802F56D2DF0F6EA0076829E /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		C84DF0212DB74E54002ED0A9 /* CampKitPreviews.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = CampKitPreviews.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		C8B614F22D27078500E1DB8D /* CampKit.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CampKit.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C8C0F23B2D56B13200D3499A /* CampKitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CampKitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -121,6 +123,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C802F56E2DF0F6EA0076829E /* StoreKit.framework in Frameworks */,
 				C8BED5542D9CA4710069171E /* ConfettiSwiftUI in Frameworks */,
 				C82EBE932D3116E2000B39DF /* SwipeCell in Frameworks */,
 			);
@@ -139,6 +142,7 @@
 		C84DF0332DB74F91002ED0A9 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				C802F56D2DF0F6EA0076829E /* StoreKit.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -449,7 +453,7 @@
 				CODE_SIGN_ENTITLEMENTS = CampKit/CampKit.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 5;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"CampKit/Preview Content\"";
 				DEVELOPMENT_TEAM = 4Q55A6KPP6;
@@ -492,7 +496,7 @@
 				CODE_SIGN_ENTITLEMENTS = CampKit/CampKit.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 5;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"CampKit/Preview Content\"";
 				DEVELOPMENT_TEAM = 4Q55A6KPP6;

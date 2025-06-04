@@ -172,7 +172,7 @@ struct CategorySectionView: View {
                 Divider()
                     .padding(.horizontal)
                     .padding(.bottom, Constants.verticalSpacing)
-                LazyVStack(spacing: 2) {
+                VStack(spacing: 2) {
                     if !category.sortedItems.isEmpty {
                         ForEach(category.sortedItems, id: \.id) { item in
                             ZStack {

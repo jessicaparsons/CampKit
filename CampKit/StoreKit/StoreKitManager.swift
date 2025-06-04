@@ -25,7 +25,7 @@ class StoreKitManager {
     //Fetch product from the App Store
     func fetchProducts() async -> Product? {
         do {
-            let products = try await Product.products(for: ["com.campkit.unlimitedlists"])
+            let products = try await Product.products(for: [Constants.productIDPro])
             return products.first
         } catch {
             print("Failed to fetch products: \(error.localizedDescription)")
@@ -45,7 +45,7 @@ class StoreKitManager {
                     
                     await transaction.finish()
                     isProUnlocked = true
-                    UserDefaults.standard.set(true, forKey: "UnlimitedListsPurchased")
+                    UserDefaults.standard.set(true, forKey: Constants.userDefaultsProKey)
                     print("Purchase successful!")
                 }
             case .userCancelled:
@@ -62,10 +62,10 @@ class StoreKitManager {
     //Check if the user already purchased the product
     func checkPurchasedProducts() async {
         for await result in Transaction.currentEntitlements {
-            if case .verified(let transaction) = result, transaction.productID == "com.campkit.unlimitedlists" {
+            if case .verified(let transaction) = result, transaction.productID == Constants.productIDPro {
                 
                 isProUnlocked = true
-                UserDefaults.standard.set(true, forKey: "UnlimitedListsPurchased")
+                UserDefaults.standard.set(true, forKey: Constants.userDefaultsProKey)
                 print("Already purchased")
             }
         }
@@ -74,10 +74,10 @@ class StoreKitManager {
     //Restore purchases
     func restorePurchases() async {
         for await result in Transaction.currentEntitlements {
-            if case .verified(let transaction) = result, transaction.productID == "com.campkit.unlimitedlists" {
+            if case .verified(let transaction) = result, transaction.productID == Constants.productIDPro {
                 
                 isProUnlocked = true
-                UserDefaults.standard.set(true, forKey: "UnlimitedListsPurchased")
+                UserDefaults.standard.set(true, forKey: Constants.userDefaultsProKey)
                 print("Restored purchase")
             } else {
                 print("Failed to restore purchase")
@@ -90,10 +90,10 @@ class StoreKitManager {
     private func observeTransactionUpdates() -> Task<Void, Never>? {
         Task {
             for await result in Transaction.updates {
-                if case .verified(let transaction) = result, transaction.productID == "com.campkit.unlimitedlists" {
+                if case .verified(let transaction) = result, transaction.productID == Constants.productIDPro {
                     
                     self.isProUnlocked = true
-                    UserDefaults.standard.set(true, forKey: "UnlimitedListsPurchased")
+                    UserDefaults.standard.set(true, forKey: Constants.userDefaultsProKey)
                     print("Verified purchase")
                 }
             }

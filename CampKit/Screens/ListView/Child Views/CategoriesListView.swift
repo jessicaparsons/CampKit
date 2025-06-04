@@ -14,7 +14,7 @@ struct CategoriesListView: View {
     @Binding var isPickerFocused: Bool
     
     var body: some View {
-        LazyVStack(spacing: 10) {
+        VStack(spacing: 10) {
             if viewModel.packingList.isDeleted {
                 EmptyView()
                     .onAppear {

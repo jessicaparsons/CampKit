@@ -269,10 +269,11 @@ struct QuizPageOneView: View {
                 Text("Modify elevation (optional)")
                     .font(.footnote)
                     .fontWeight(.bold)
-                Text("Add additional elevation for a more accurate weather prediction")
+                Text("If more weather accuracy is needed, add additional elevation to your chosen location")
                     .font(.caption2)
                     .multilineTextAlignment(.leading)
                     .foregroundStyle(.secondary)
+                    .padding(.bottom, 10)
             }//:VSTACK
             
             

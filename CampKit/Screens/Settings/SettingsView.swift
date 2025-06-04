@@ -83,7 +83,7 @@ struct SettingsView: View {
                     GroupBox(
                         label: SettingsLabelView(labelText: "Temperature", labelImage: "thermometer.high")
                     ) {
-                        LazyVStack {
+                        VStack {
                             ForEach(options, id: \.self) { option in
                                 Divider().padding(.vertical, 4)
                                 HStack {
@@ -331,7 +331,6 @@ struct SettingsView: View {
                                 SettingsRowView(name: "Design", content: "Lauren Ussery")
                                 SettingsRowView(name: "Compatibility", content: "iOS 18.2+")
                                 SettingsRowView(name: "Website", linkLabel: "Juniper Creative Co.", linkDestination: "junipercreative.co")
-                                SettingsRowView(name: "Portfolio", linkLabel: "GitHub", linkDestination: "github.com/jessicaparsons")
                                 SettingsRowView(name: "Version", content: AppInfo.versionWithBuild)
 //                                Divider().padding(.vertical, 4)
 //                                HStack {
@@ -353,6 +352,7 @@ struct SettingsView: View {
                     )
                     .padding()
                     .background(Color.colorWhite)
+                    .tint(Color.colorForest)
                     .clipShape(RoundedRectangle(cornerRadius: 10))
                     .confirmationDialog(
                         "Are you sure you want to delete all iCloud Data? This cannot be undone.",

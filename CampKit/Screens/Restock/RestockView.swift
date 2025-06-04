@@ -42,7 +42,7 @@ struct RestockView: View {
                         .padding(.horizontal, Constants.wideMargin)
                     
                         //MARK: - RESTOCK LIST
-                        LazyVStack(spacing: 0) {
+                        VStack(spacing: 0) {
                             
                             if !viewModel.restockItems.isEmpty {
                                 

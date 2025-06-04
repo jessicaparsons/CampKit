@@ -24,6 +24,7 @@ struct RearrangeListView<T: Identifiable  & Equatable>: View {
                             .font(.headline)
                     }
                     .onMove(perform: moveAction)
+                    .listRowBackground(Color.colorWhiteBackground)
                 }//:LIST
                 .environment(\.editMode, .constant(.active)) // Enable edit mode for reordering
                 .scrollContentBackground(.hidden)

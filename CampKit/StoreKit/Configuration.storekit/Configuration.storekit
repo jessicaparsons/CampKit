@@ -20,13 +20,13 @@
       "internalID" : "6855A253",
       "localizations" : [
         {
-          "description" : "Upgrade to get unlimited packing lists",
-          "displayName" : "Unlimited Packing Lists",
+          "description" : "Upgrade to get unlimited packing lists and customization",
+          "displayName" : "CampingKit Pro",
           "locale" : "en_US"
         }
       ],
       "productID" : "com.campkit.unlimitedlists",
-      "referenceName" : "Unlimited Packing Lists",
+      "referenceName" : "CampingKit Pro",
       "type" : "NonConsumable"
     }
   ],

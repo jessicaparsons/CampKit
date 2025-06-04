@@ -137,7 +137,8 @@ final class QuizViewModel {
             ChoiceOptions.clothing,
             ChoiceOptions.toiletries,
             ChoiceOptions.emergency,
-            ChoiceOptions.lounge
+            ChoiceOptions.lounge,
+            ChoiceOptions.vehicle
         ]
         
         // Grab category templates with Core Data items

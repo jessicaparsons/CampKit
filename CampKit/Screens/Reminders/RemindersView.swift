@@ -98,7 +98,7 @@ struct RemindersView: View {
                         
                     } else {
                         //MARK: - RESTOCK LIST
-                        LazyVStack {
+                        VStack {
                             ForEach(reminderItems) { reminder in
                                 ReminderListItemView(
                                     reminder: reminder,

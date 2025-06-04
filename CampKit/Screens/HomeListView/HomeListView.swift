@@ -124,18 +124,24 @@ struct HomeListView: View {
                                                 listToDelete = packingList
                                                 isDeleteConfirmationPresented = true
                                             }) {
-                                                ZStack {
-                                                    Circle()
-                                                        .fill(Color.red)
-                                                        .frame(width: 24, height: 24)
-                                                    
-                                                    Image(systemName: "minus")
-                                                        .foregroundColor(.white)
-                                                        .font(.system(size: 12, weight: .bold))
-                                                        .accessibilityLabel("Delete")
+                                                ZStack(alignment: .topLeading) {
+                                                    Color.clear
+                                                        .frame(width: 60, height: 60)
+                                                    ZStack {
+                                                        Circle()
+                                                            .fill(Color.red)
+                                                            .frame(width: 26, height: 26)
+                                                        
+                                                        Image(systemName: "minus")
+                                                            .foregroundColor(.white)
+                                                            .font(.system(size: 14, weight: .bold))
+                                                            .accessibilityLabel("Delete")
+                                                    }//:ZSTACK
+                                                    .padding(6)
+                                                    .offset(x: -12, y: -12)
+                                                        
                                                 }
-                                                .padding(6)
-                                                .offset(x: -12, y: -12)
+                                                
                                             }
                                             .accessibilityHint("Delete packing list")
                                         }
