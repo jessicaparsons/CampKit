@@ -46,7 +46,7 @@ class HomeListViewModel: ObservableObject {
         do {
             self.packingLists = try viewContext.fetch(request)
         } catch {
-            print("Fetch error: \(error)")
+           
         }
     }
     
@@ -58,7 +58,9 @@ class HomeListViewModel: ObservableObject {
             queue: .main
         ) { notification in
             if let event = notification.userInfo?[NSPersistentCloudKitContainer.eventNotificationUserInfoKey] as? NSPersistentCloudKitContainer.Event {
+                #if DEBUG
                 print("CloudKit sync finished: \(event)")
+                #endif
                 Task { @MainActor in
                     self.fetchPackingLists() 
                 }
@@ -103,9 +105,16 @@ class HomeListViewModel: ObservableObject {
 
         do {
             let (_, deleted) = try await database.modifyRecords(saving: [], deleting: [share.recordID])
-            print("✅ CKShare deleted: \(deleted)")
+            
+            #if DEBUG
+            print("CKShare deleted: \(deleted)")
+            #endif
+            
         } catch {
-            print("❌ Failed to delete CKShare: \(error)")
+            
+            #if DEBUG
+            print("Failed to delete CKShare: \(error)")
+            #endif
         }
     }
 

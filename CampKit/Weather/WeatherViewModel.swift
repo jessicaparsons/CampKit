@@ -43,7 +43,7 @@ final class WeatherViewModel {
     
     
     
-    //Fetch weather by city and coordinates that are stored in the Packing List
+    ///Fetch weather by city and coordinates that are stored in the Packing List
     
     @MainActor
     func fetchLocation(for cityName: String) async {
@@ -71,26 +71,24 @@ final class WeatherViewModel {
             
             
         } catch let error as NetworkError {
-            print("Could not fetch location due to network error: \(error)")
+            
         } catch {
-            print("Could not fetch location: \(error.localizedDescription)")
             isNoLocationFoundMessagePresented = true
         }
     }
     
-    // Creates the user's weather choices for page 2 of the Packing List Quiz
-    // If the high temp is at or above 80, mark it as "hot" mild hot cold snow rainy
-    // If the temp is lower than 50, mark it as cold
-    // If the conditionName == "cloud.bolt.rain", "cloud.drizzle", "cloud.heavyrain", mark it as rain
-    // If the conditionName == "cloud.snow", mark it as snow
-    
-    //add in elevation from page one.
+    /// Creates the user's weather choices for page 2 of the Packing List Quiz
+    /// If the high temp is at or above 80, mark it as "hot" mild hot cold snow rainy
+    /// If the temp is lower than 50, mark it as cold
+    /// If the conditionName == "cloud.bolt.rain", "cloud.drizzle", "cloud.heavyrain", mark it as rain
+    /// If the conditionName == "cloud.snow", mark it as snow
+    /// add in elevation from page one.
     
     func categorizeWeather(for forecast: [WeatherModel], elevation: Double) -> Set<String> {
         
         var weatherCategories: Set<String> = ["mild"]
         
-        //The temperature decreases by approximately 0.33°F for every 100 feet of elevation gain.
+        ///The temperature decreases by approximately 0.33°F for every 100 feet of elevation gain.
         let elevationCompensation = elevation / 100 * 0.33
         var avgHigh: Double = 0
         var avgLow: Double = 0
@@ -124,7 +122,7 @@ final class WeatherViewModel {
             }
         }
                 
-        //If the average low is greater than 70, or if the average high is lower than 50, the user does not have to pack for Mild weather
+        ///If the average low is greater than 70, or if the average high is lower than 50, the user does not have to pack for Mild weather
         if avgLow / Double(forecast.count) > 70 || avgHigh / Double(forecast.count) < 50 {
             weatherCategories.remove("mild")
         }
@@ -132,7 +130,7 @@ final class WeatherViewModel {
         return weatherCategories
     }
     
-    //Formats the weather categories for display in the UI
+    ///Formats the weather categories for display in the UI
     
     func formatWeatherCategories(_ categories: Set<String>) -> Text {
         let sortedCategories = categories.sorted()  // Sorting for consistent order
@@ -160,7 +158,7 @@ final class WeatherViewModel {
         }
     }
     
-    //Computed average high and low temps for Packing List view
+    ///Computed average high and low temps for Packing List view
     
     var highTemp: Double? {
         var dailyHigh: [Double] = []
@@ -217,8 +215,8 @@ class WeatherAPIClient: WeatherFetching {
             
             let weatherData = try decoder.decode(WeatherData.self, from: data)
             
-            //Get the highs and lows from every day in the [List]
-            //Get the mode weather id for the icon
+            ///Get the highs and lows from every day in the [List]
+            ///Get the mode weather id for the icon
             
             let dailyWeather = await getDailyWeather(from: weatherData.list)
             
@@ -241,7 +239,7 @@ class WeatherAPIClient: WeatherFetching {
     }
     
     func getDailyWeather(from forecastList: [WeatherEntry]) async -> [DailyWeather] {
-        //Create a dictionary to store daily high and low temps to use in the WeatherModel
+        ///Create a dictionary to store daily high and low temps to use in the WeatherModel
         
         var dailyTemps: [String: [Double]] = [:]
         var dailyWeatherIDs: [String: [Int]] = [:]
@@ -282,8 +280,8 @@ class WeatherAPIClient: WeatherFetching {
         return dailyWeather.sorted { $0.date < $1.date }
     }
     
-    //Finds the most common weather ID by identifying the mode.
-    //This is to display the most accurate weather icon next to each day
+    ///Finds the most common weather ID by identifying the mode.
+    ///This is to display the most accurate weather icon next to each day
     
     private func findMode(_ numbers: [Int]) -> Int {
         let frequency = numbers.reduce(into: [:]) { counts, number in

@@ -98,7 +98,7 @@ struct EditableItemView<T: EditablePackableItem>: View {
         do {
             try item.managedObjectContext?.save()
         } catch {
-            print("Error saving item: \(error.localizedDescription)")
+            
         }
     }
     

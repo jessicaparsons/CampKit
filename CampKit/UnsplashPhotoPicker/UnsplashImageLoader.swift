@@ -53,7 +53,7 @@ class UnsplashImageLoader: ObservableObject {
         URLSession.shared.dataTask(with: url) { data, _, error in
             guard let data = data,
                   let result = try? JSONDecoder().decode(UnsplashPhotoResult.self, from: data) else {
-                print("Failed: \(error?.localizedDescription ?? "Unknown error")")
+                
                 return
             }
 

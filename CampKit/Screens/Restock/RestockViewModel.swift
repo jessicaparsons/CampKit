@@ -77,7 +77,6 @@ final class RestockViewModel {
         do {
             restockItems = try fetchRestockItems(using: viewContext)
         } catch {
-            print("Failed to fetch restock items: \(error)")
             
         }
     }

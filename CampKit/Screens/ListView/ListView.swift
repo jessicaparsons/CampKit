@@ -223,7 +223,7 @@ struct ListView: View {
                         save(viewContext)
                         
                     } else {
-                        print("Failed to load image")
+                        
                     }
                 }
             }

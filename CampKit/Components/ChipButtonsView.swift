@@ -38,6 +38,6 @@ struct ChipButtonsView: View {
     
     @Previewable @State var isSelected: Bool = true
     
-    ChipButtonsView(label: "label", isSelected: isSelected, onTap: { print("Button tapped") })
+    ChipButtonsView(label: "label", isSelected: isSelected, onTap: {  })
 }
 #endif

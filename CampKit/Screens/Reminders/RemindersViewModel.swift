@@ -36,7 +36,6 @@ final class RemindersViewModel {
             }
             try viewContext.save()
         } catch {
-            print("Failed to delete completed remiders: \(error.localizedDescription)")
         }
         
     }
@@ -65,7 +64,6 @@ final class RemindersViewModel {
         do {
             try viewContext.save()
         } catch {
-            print("Could not save or update reminder: \(error.localizedDescription)")
             if isNew {
                 viewContext.delete(currentReminder)
             }

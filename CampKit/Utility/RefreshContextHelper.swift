@@ -12,8 +12,6 @@ import CoreData
 func refresh(context: NSManagedObjectContext) async {
     do {
         try context.setQueryGenerationFrom(.current)
-        print("Manually refreshed query generation")
     } catch {
-        print("Refresh failed: \(error)")
     }
 }

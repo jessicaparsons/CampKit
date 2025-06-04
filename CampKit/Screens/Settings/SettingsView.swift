@@ -417,7 +417,9 @@ struct SettingsView: View {
     private func changeAppIcon(to iconName: String) {
         UIApplication.shared.setAlternateIconName(iconName) { error in
             if error != nil {
+                #if DEBUG
                 print("Failed request to update the app's icon: \(String(describing: error?.localizedDescription))")
+                #endif
             } else {
                 isSuccessfulCustomIconSelected = true
             }
@@ -428,7 +430,9 @@ struct SettingsView: View {
     private func revertAppIcon() {
         UIApplication.shared.setAlternateIconName(nil) { error in
             if let error = error {
+                #if DEBUG
                 print("Error reverting to default icon: \(error.localizedDescription)")
+                #endif
             }
         }
         HapticsManager.shared.triggerSuccess()

@@ -41,7 +41,6 @@ struct RemindersView: View {
         do {
             return try viewContext.fetch(request)
         } catch {
-            print("Fetch failed:", error)
             return []
         }
     }

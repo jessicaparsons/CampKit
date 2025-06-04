@@ -243,7 +243,7 @@ struct CategorySectionView: View {
             viewModel: ListViewModel(viewContext: context, packingList: list),
             category: categories.first!,
             isRearranging: $isRearranging,
-            deleteCategory: { print("Mock delete category") },
+            deleteCategory: { },
             isPickerFocused: $isPickerFocused
         )
     }

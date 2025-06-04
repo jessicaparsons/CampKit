@@ -111,7 +111,7 @@ final class ListViewModel: ObservableObject {
     
     func deleteItem(_ item: Item) {
         guard let category = item.category else {
-            print("Error: Item does not belong to a category.")
+            
             return
         }
         
@@ -299,9 +299,7 @@ final class ListViewModel: ObservableObject {
         
         //Save
         save(viewContext)
-        
-        print("duplicated packing lists position is: \(duplicatedPackingList.position)")
-        
+                
         isSuccessfulDuplicationPresented = true
     }
     

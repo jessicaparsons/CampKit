@@ -14,6 +14,8 @@ class StoreKitManager {
     
     var isProUnlocked: Bool = false
     private var updates: Task<Void, Never>? = nil
+    var showPurchaseAlert: Bool = false
+    var purchaseAlertMessage: String = ""
     
     init() {
         updates = observeTransactionUpdates()
@@ -22,19 +24,27 @@ class StoreKitManager {
         }
     }
     
-    //Fetch product from the App Store
+    ///Trigger alert for purchases
+    func triggerAlert(message: String) {
+        purchaseAlertMessage = message
+        showPurchaseAlert = true
+    }
+    
+    ///Fetch product from the App Store
     func fetchProducts() async -> Product? {
         do {
             let products = try await Product.products(for: [Constants.productIDPro])
             return products.first
         } catch {
+            #if DEBUG
             print("Failed to fetch products: \(error.localizedDescription)")
+            #endif
             return nil
         }
     }
     
-    //Purchase Unlimited Lists
-    func purchaseUnlimitedLists() async {
+    ///Purchase Pro
+    func purchasePro() async {
         do {
             guard let product = await fetchProducts() else { return }
             let result = try await product.purchase()
@@ -46,47 +56,48 @@ class StoreKitManager {
                     await transaction.finish()
                     isProUnlocked = true
                     UserDefaults.standard.set(true, forKey: Constants.userDefaultsProKey)
-                    print("Purchase successful!")
+                    triggerAlert(message: "Purchase successful!")
                 }
             case .userCancelled:
-                print("Purchase cancelled by user")
-                
+                #if DEBUG
+                print("User cancelled")
+                #endif
             default:
-                print("Purchase failed")
+                triggerAlert(message: "Something went wrong with your purchase. Please try again.")
             }
         } catch {
-            print("Error purchasing product: \(error.localizedDescription)")
+            
         }
     }
     
-    //Check if the user already purchased the product
+    ///Check if the user already purchased the product
     func checkPurchasedProducts() async {
         for await result in Transaction.currentEntitlements {
             if case .verified(let transaction) = result, transaction.productID == Constants.productIDPro {
                 
                 isProUnlocked = true
                 UserDefaults.standard.set(true, forKey: Constants.userDefaultsProKey)
-                print("Already purchased")
+                
             }
         }
     }
     
-    //Restore purchases
+    ///Restore purchases
     func restorePurchases() async {
         for await result in Transaction.currentEntitlements {
             if case .verified(let transaction) = result, transaction.productID == Constants.productIDPro {
                 
                 isProUnlocked = true
                 UserDefaults.standard.set(true, forKey: Constants.userDefaultsProKey)
-                print("Restored purchase")
+                triggerAlert(message: "purchase successfully restored")
             } else {
-                print("Failed to restore purchase")
+                triggerAlert(message: "Failed to restore purchase")
             }
         }
     }
     
     
-    //Observe real-time transaction updates
+    ///Observe real-time transaction updates
     private func observeTransactionUpdates() -> Task<Void, Never>? {
         Task {
             for await result in Transaction.updates {
@@ -94,7 +105,7 @@ class StoreKitManager {
                     
                     self.isProUnlocked = true
                     UserDefaults.standard.set(true, forKey: Constants.userDefaultsProKey)
-                    print("Verified purchase")
+                    
                 }
             }
         }

@@ -29,13 +29,11 @@ struct CampKitApp: App {
             let center = UNUserNotificationCenter.current()
             do {
                 if try await center.requestAuthorization(options: [.alert, .sound, .badge]) == true {
-                    print("success")
-                } else {
-                    print("fail")
+                    
                 }
                 
             } catch {
-                print("Error")
+                
             }
         }
     }
