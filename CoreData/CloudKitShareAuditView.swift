@@ -123,9 +123,10 @@ struct CloudKitShareAuditView: View {
     }
 }
 
-
+#if DEBUG
 #Preview {
+    let previewStack = CoreDataStack.preview
     
-    
-    CloudKitShareAuditView(viewModel: HomeListViewModel(viewContext: CoreDataStack.preview.context))
+    CloudKitShareAuditView(viewModel: HomeListViewModel(viewContext: previewStack.context))
 }
+#endif

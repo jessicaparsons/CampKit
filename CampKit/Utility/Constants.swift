@@ -39,7 +39,7 @@ struct Constants {
     static let gradientBannerHeight: CGFloat = 120
     static let bannerHeight: CGFloat = 250
     
-    static let homePageOffset: CGFloat = -95
+    static let homePageOffset: CGFloat = 0
     
     
     //STRINGS

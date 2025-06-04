@@ -19,10 +19,11 @@ struct ProFeaturesListItemView: View {
                 .font(.title)
             VStack(alignment: .leading) {
                 Text(title)
-                    .font(.title3)
+                    .font(.headline)
                     .fontWeight(.bold)
                 Text(description)
                     .multilineTextAlignment(.leading)
+                    .fontWeight(.light)
             }
             .padding(.leading, 8)
         }//:HSTACK

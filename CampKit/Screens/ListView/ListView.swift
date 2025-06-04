@@ -48,7 +48,7 @@ struct ListView: View {
     
     //NAVIGATION
     @State private var scrollOffset: CGFloat = 0
-    private let scrollThreshold: CGFloat = Constants.homePageOffset
+    private let scrollThreshold: CGFloat = 1
     @State private var isMenuOpen = false
     
     //SHARING OPTIONS
@@ -97,11 +97,9 @@ struct ListView: View {
                     
                         //MARK: - LIST DETAILS HEADER
                         VStack {
-                            Color.clear
-                                .frame(height: 60)
                             
                             ListDetailCardView(viewModel: viewModel)
-                                
+                                .padding(.top, 68)
                                 .onTapGesture {
                                     isPickerFocused = false
                                 }
@@ -117,15 +115,15 @@ struct ListView: View {
                             
                         }//:VSTACK
                         .padding(.horizontal)
-                    .background(
-                        GeometryReader { geo in
-                            Color.clear
-                                .frame(height: 0)
-                                .onChange(of: geo.frame(in: .global).minY) {
-                                    scrollOffset = geo.frame(in: .global).minY
-                                }
-                        }
-                    )//NAV BAR UI CHANGES ON SCROLL
+                        .background(
+                            GeometryReader { geo in
+                                Color.clear
+                                    .frame(height: 0)
+                                    .onChange(of: geo.frame(in: .global).minY) {
+                                        scrollOffset = geo.frame(in: .global).minY - 88
+                                    }
+                            }
+                        )//NAV BAR UI CHANGES ON SCROLL
                 }//:SCROLLVIEW
                 .refreshable {
                     await refresh(context: viewContext)
@@ -209,10 +207,10 @@ struct ListView: View {
                     optionsMenu
                 }
                 
-                /// This makes the title invisible until scrolled
+                // This makes the title invisible until scrolled
                 ToolbarItem(placement: .principal) {
                     Text(viewModel.packingList.title ?? Constants.newPackingListTitle)
-                        .opacity(scrollOffset < -scrollThreshold ? 1 : 0)
+                        .opacity(scrollOffset < -scrollThreshold + 1 ? 1 : 0)
                 }
             }
             .onChange(of: bannerImageItem) {
