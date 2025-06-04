@@ -33,6 +33,7 @@ struct InlineUnsplashGridView: View {
                 Image(systemName: "magnifyingglass")
                     .foregroundColor(Color.colorForest)
                     .padding(.leading, 8)
+                    .accessibilityLabel("Search images")
 
                 TextField("Search Unsplash", text: $searchText)
                     .submitLabel(.search)

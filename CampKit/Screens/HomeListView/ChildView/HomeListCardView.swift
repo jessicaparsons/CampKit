@@ -47,6 +47,7 @@ struct HomeListCardView: View {
                             .foregroundStyle(Color.colorNeon)
                             .font(.system(size: 26))
                             .padding()
+                            .accessibilityLabel("Check mark indicates all items have been packed")
                     }
                     
                 }//:ZSTACK

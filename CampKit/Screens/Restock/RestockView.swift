@@ -138,6 +138,7 @@ struct RestockView: View {
                 } label: {
                     Image(systemName: "gearshape.fill")
                         .foregroundStyle(Color.colorForestSecondary)
+                        .accessibilityLabel("Settings")
                 }
             }//:TOOL BAR ITEM
         }//:TOOLBAR

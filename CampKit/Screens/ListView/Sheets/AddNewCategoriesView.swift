@@ -93,6 +93,7 @@ struct AddNewCategoriesView: View {
                         dismiss()
                     }
                     .buttonStyle(BigButtonWide())
+                    .accessibilityHint("Add the selected categories to your list")
                     
                 }//:VSTACK
                 .navigationTitle("Add Categories")
@@ -103,6 +104,7 @@ struct AddNewCategoriesView: View {
                             viewModel.selectedFilters = []
                             dismiss()
                         }
+                        .accessibilityHint("Cancel adding categories")
                     }
                 }//:TOOLBAR
                 

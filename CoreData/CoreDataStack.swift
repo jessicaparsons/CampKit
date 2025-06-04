@@ -10,6 +10,7 @@ import CloudKit
 
 final class CoreDataStack: ObservableObject {
 
+
 //    #if DEBUG
 //    let shouldInitializeCloudKitSchema = true
 //    #else
@@ -17,6 +18,17 @@ final class CoreDataStack: ObservableObject {
 //    #endif
     
     @MainActor static let shared = CoreDataStack()
+    
+    ///Create a CKContainer property using persistent container store description.
+    
+    var ckContainer: CKContainer {
+        let storeDescription = persistentContainer.persistentStoreDescriptions.first
+        guard let identifier = storeDescription?
+            .cloudKitContainerOptions?.containerIdentifier else {
+            fatalError("Unable to get container identifier")
+        }
+        return CKContainer(identifier: identifier)
+    }
     
     var context: NSManagedObjectContext {
         persistentContainer.viewContext
@@ -45,8 +57,7 @@ final class CoreDataStack: ObservableObject {
         }
         let storesURL = privateStoreDescription.url?.deletingLastPathComponent()
         privateStoreDescription.url = storesURL?.appendingPathComponent("private.sqlite")
-        
-        
+                
         /// Configures the shared database to store records shared with you.
         /// Makes a copy of your privateStoreDescription and update its URL to sharedStoreURL
         
@@ -136,16 +147,7 @@ final class CoreDataStack: ObservableObject {
     private var _privatePersistentStore: NSPersistentStore?
     private var _sharedPersistentStore: NSPersistentStore?
     
-    ///Create a CKContainer property using persistent container store description.
     
-    var ckContainer: CKContainer {
-        let storeDescription = persistentContainer.persistentStoreDescriptions.first
-        guard let identifier = storeDescription?
-            .cloudKitContainerOptions?.containerIdentifier else {
-            fatalError("Unable to get container identifier")
-        }
-        return CKContainer(identifier: identifier)
-    }
     
     
     //private init() {}
@@ -229,49 +231,49 @@ extension CoreDataStack {
 }
 
 
-//extension CoreDataStack {
-//    
-//    
-//    func canEdit(object: NSManagedObject) -> Bool {
-//      return persistentContainer.canUpdateRecord(
-//        forManagedObjectWith: object.objectID
-//      )
-//    }
-//    func canDelete(object: NSManagedObject) -> Bool {
-//      return persistentContainer.canDeleteRecord(
-//        forManagedObjectWith: object.objectID
-//      )
-//    }
-//    
-//    func isOwner(object: NSManagedObject) -> Bool {
-//      guard isShared(object: object) else { return false }
-//        
-//      guard let share = try? persistentContainer.fetchShares(matching: [object.objectID])[object.objectID] else {
-//        print("Get ckshare error")
-//        return false
-//      }
-//        
-//        guard let currentUser = share.currentUserParticipant else { return false }
-//        
-//        print("I am the current user/owner: \(currentUser.userIdentity.userRecordID == share.owner.userIdentity.userRecordID)")
-//        
-//        return currentUser.userIdentity.userRecordID == share.owner.userIdentity.userRecordID
-//        
-//    }
-//    
-//    //get information about the people participating in the share.
-//    func getShare(_ list: PackingList) -> CKShare? {
-//      guard isShared(object: list) else { return nil }
-//      guard let shareDictionary = try? persistentContainer.fetchShares(matching: [list.objectID]),
-//        let share = shareDictionary[list.objectID] else {
-//        print("Unable to get CKShare")
-//        return nil
-//      }
-//        share[CKShare.SystemFieldKey.title] = list.title
-//      return share
-//    }
-//
-//}
+extension CoreDataStack {
+    
+    
+    func canEdit(object: NSManagedObject) -> Bool {
+      return persistentContainer.canUpdateRecord(
+        forManagedObjectWith: object.objectID
+      )
+    }
+    func canDelete(object: NSManagedObject) -> Bool {
+      return persistentContainer.canDeleteRecord(
+        forManagedObjectWith: object.objectID
+      )
+    }
+    
+    func isOwner(object: NSManagedObject) -> Bool {
+      guard isShared(object: object) else { return false }
+        
+      guard let share = try? persistentContainer.fetchShares(matching: [object.objectID])[object.objectID] else {
+        print("Get ckshare error")
+        return false
+      }
+        
+        guard let currentUser = share.currentUserParticipant else { return false }
+        
+        print("I am the current user/owner: \(currentUser.userIdentity.userRecordID == share.owner.userIdentity.userRecordID)")
+        
+        return currentUser.userIdentity.userRecordID == share.owner.userIdentity.userRecordID
+        
+    }
+    
+    //get information about the people participating in the share.
+    func getShare(_ list: PackingList) -> CKShare? {
+      guard isShared(object: list) else { return nil }
+      guard let shareDictionary = try? persistentContainer.fetchShares(matching: [list.objectID]),
+        let share = shareDictionary[list.objectID] else {
+        print("Unable to get CKShare")
+        return nil
+      }
+        share[CKShare.SystemFieldKey.title] = list.title
+      return share
+    }
+
+}
 
 
 #if DEBUG

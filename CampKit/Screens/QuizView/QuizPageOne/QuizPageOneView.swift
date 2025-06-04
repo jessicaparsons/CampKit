@@ -129,6 +129,7 @@ struct QuizPageOneView: View {
                 HStack(spacing: 8) {
                     Image(systemName: "calendar")
                         .font(.subheadline)
+                        .accessibilityLabel("Pick dates")
                         
                     Text(formattedDate)
                         .font(.footnote)
@@ -146,6 +147,7 @@ struct QuizPageOneView: View {
                         )
                 )
             }
+            .accessibilityHint("Pick dates")
             .sheet(isPresented: $isCalendarPresented) {
                 DatePickerView(
                     startDate: $tempStartDate,
@@ -228,6 +230,7 @@ struct QuizPageOneView: View {
                     }
                     Spacer()
                     Image(systemName: "magnifyingglass")
+                        .accessibilityLabel("Search")
                 }
                 .padding(.vertical, 10)
                 .padding(.horizontal, 15)

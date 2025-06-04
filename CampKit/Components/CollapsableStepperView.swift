@@ -29,6 +29,7 @@ struct CollapsableStepperView: View {
                         }) {
                             Image(systemName: "minus")
                         }
+                        .accessibilityHint("Lowers the value")
 
                         Text("\(value)")
                             
@@ -41,6 +42,7 @@ struct CollapsableStepperView: View {
                         }) {
                             Image(systemName: "plus")
                         }
+                        .accessibilityHint("Raises the value")
                     }
                     .font(.footnote)
                     .foregroundColor(.primary)
@@ -93,6 +95,7 @@ struct CollapsableStepperView: View {
                             )
                     }
                     .transition(.asymmetric(insertion: .move(edge: .leading).combined(with: .opacity), removal: .opacity))
+                    .accessibilityHint("Change the quantity")
                 }
             }
             .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isExpanded)

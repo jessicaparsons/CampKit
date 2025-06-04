@@ -47,6 +47,7 @@ struct DatePickerView: View {
                     Button("Cancel") {
                         dismiss()
                     }
+                    .accessibilityHint("Cancel date selection")
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Done") {
@@ -54,6 +55,7 @@ struct DatePickerView: View {
                         onTap()
                         dismiss()
                     }
+                    .accessibilityHint("Confirm selected dates")
                 }
             }
         }//:NAVSTACK

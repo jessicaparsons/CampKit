@@ -7,7 +7,6 @@
 
 import SwiftUI
 import UserNotifications
-import CloudKit
 import CoreData
 
 @main

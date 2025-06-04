@@ -72,7 +72,7 @@ struct HomeListView: View {
                     //MARK: - WHERE TO NEXT?
                     
                     HStack {
-                        Text("Let's get packing")
+                        Text("Adventure awaits")
                             .font(.headline)
                             .fontWeight(.bold)
                             .multilineTextAlignment(.leading)
@@ -132,10 +132,12 @@ struct HomeListView: View {
                                                     Image(systemName: "minus")
                                                         .foregroundColor(.white)
                                                         .font(.system(size: 12, weight: .bold))
+                                                        .accessibilityLabel("Delete")
                                                 }
                                                 .padding(6)
                                                 .offset(x: -12, y: -12)
                                             }
+                                            .accessibilityHint("Delete packing list")
                                         }
                                     }
                                     
@@ -172,7 +174,10 @@ struct HomeListView: View {
                         }
                       
                     }
+                    .accessibilityHint("Delete list")
+                    
                     Button("Cancel", role: .cancel) { }
+                        .accessibilityHint("Cancel deletion")
                 }
             }//:SCROLLVIEW
             .scrollIndicators(.hidden)
@@ -287,11 +292,13 @@ struct HomeListView: View {
                             } label: {
                                 Label("Delete a list", systemImage: "trash")
                             }
+                            .accessibilityHint("Delete a list")
                             
                         } label: {
                             Image(systemName: "ellipsis.circle")
                                 .font(.body)
                                 .foregroundStyle(Color.colorForestSecondary)
+                                .accessibilityLabel("Menu")
                         }//:MENU
                         
                         //SETTINGS
@@ -300,6 +307,7 @@ struct HomeListView: View {
                         } label: {
                             Image(systemName: "gearshape.fill")
                                 .foregroundStyle(Color.colorForestSecondary)
+                                .accessibilityLabel("Settings")
                         }
                     }//:HSTACK
                 } else {
@@ -322,13 +330,14 @@ struct HomeListView: View {
             HapticsManager.shared.triggerLightImpact()
         } label: {
             ZStack {
-                RoundedRectangle(cornerRadius: 50)
+                RoundedRectangle(cornerRadius: Constants.cornerRadiusButton)
                     .fill(Color.colorWhite)
                     .overlay(
-                        RoundedRectangle(cornerRadius: 50)
+                        RoundedRectangle(cornerRadius: Constants.cornerRadiusButton)
                             .stroke(Color(UIColor.systemGray4), lineWidth: 1)
                     )
                     .frame(height: 50)
+                    .shadow(color: Color.black.opacity(0.1), radius: 8)
                 
                 HStack {
                     Image(systemName: "tent.circle")
@@ -338,7 +347,7 @@ struct HomeListView: View {
                         .clipShape(Circle())
                         .padding(.leading, 10)
                         .font(.system(size: 24, weight: .light))
-                    Text("Start with a customized list")
+                    Text("Let's get packing")
                         .foregroundStyle(Color.secondary)
                     Spacer()
                     Image(systemName: "chevron.right")

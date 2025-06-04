@@ -228,6 +228,7 @@ struct RemindersView: View {
                     } label: {
                         Image(systemName: "ellipsis.circle")
                             .font(.body)
+                            .accessibilityLabel("Menu")
                     }
                     
                         
@@ -236,6 +237,7 @@ struct RemindersView: View {
                     } label: {
                         Image(systemName: "gearshape.fill")
                                 .foregroundStyle(Color.colorForestSecondary)
+                                .accessibilityLabel("Settings")
                     }
 
             }//:HSTACK

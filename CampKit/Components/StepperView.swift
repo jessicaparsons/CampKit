@@ -24,6 +24,7 @@ struct StepperView: View {
                 }) {
                     Image(systemName: "minus")
                 }
+                .accessibilityHint("Lowers the value")
                 
                 Text("\(value)")
                 
@@ -36,6 +37,7 @@ struct StepperView: View {
                     Image(systemName: "plus")
                         
                 }
+                .accessibilityHint("Raises the value")
             }//:GROUP
             .foregroundColor(.primary)
             .font(.caption)

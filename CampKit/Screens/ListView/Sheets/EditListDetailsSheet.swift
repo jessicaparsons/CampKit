@@ -76,6 +76,7 @@ struct EditListDetailsSheet: View {
                     }
                     .padding(.top)
                     .buttonStyle(BigButtonWide())
+                    .accessibilityHint("Save the changes to your list")
                     
                     Spacer()
                 }//:VSTACK
@@ -108,6 +109,7 @@ struct EditListDetailsSheet: View {
                         Button("Cancel") {
                             dismiss()
                         }
+                        .accessibilityHint("Cancel and discard any changes")
                     }
                 }//:TOOLBAR
             }//:ZSTACK

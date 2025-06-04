@@ -61,6 +61,7 @@ struct WeatherModuleView: View {
                                 Text("Weather data isn’t available for this area. Try choosing a different location nearby.")
                                     .multilineTextAlignment(.center)
                                 Image(systemName: "icloud.slash")
+                                    .accessibilityLabel("Weather unavailable")
                             }
                             .padding()
                         }
@@ -72,6 +73,7 @@ struct WeatherModuleView: View {
                                 Text("Choose a location on the previous screen to see a 5 day weather forecast")
                                     .multilineTextAlignment(.center)
                                 Image(systemName: "cloud.sun")
+                                    .accessibilityLabel("Weather icon")
                             }
                             .padding()
                         }

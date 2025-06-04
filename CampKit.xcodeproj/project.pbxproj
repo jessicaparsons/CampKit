@@ -55,7 +55,6 @@
 				"Category+CoreDataClass.swift",
 				"Category+CoreDataProperties.swift",
 				"Category+Extensions.swift",
-				CloudKitShareAuditView.swift,
 				CloudSharingController.swift,
 				CoreDataStack.swift,
 				"Item+CoreDataClass.swift",

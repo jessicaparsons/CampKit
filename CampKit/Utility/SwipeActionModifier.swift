@@ -31,6 +31,7 @@ struct SwipeActionModifier: ViewModifier {
                                                         .aspectRatio(contentMode: .fit)
                                                         .frame(width: 20, height: 20)
                                                         .foregroundColor(.white)
+                                                        .accessibilityLabel("Delete")
                                                 )},
                                             backgroundColor: .red,
                                             action: {

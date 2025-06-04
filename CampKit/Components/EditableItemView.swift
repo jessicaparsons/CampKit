@@ -36,8 +36,10 @@ struct EditableItemView<T: EditablePackableItem>: View {
                     Image(systemName: item.isPacked ? "checkmark.circle.fill" : "circle")
                         .foregroundStyle(item.isPacked ? Color.colorSage : .secondary)
                         .font(.system(size: 22))
+                        .accessibilityLabel("Check or uncheck circle to mark item as packed")
                 }
                 .buttonStyle(BorderlessButtonStyle()) // Prevent button from triggering NavigationLink
+                .accessibilityHint("Check or uncheck to mark item as packed")
                 
                 TextField("Item Name", text: Binding(
                     get: { item.title ?? "" },

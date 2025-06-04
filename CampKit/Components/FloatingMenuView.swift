@@ -77,6 +77,7 @@ struct FloatingMenuView: View {
                             .background(Color.colorForest)
                             .clipShape(Circle())
                             .shadow(radius: 5)
+                            .accessibilityLabel("Open menu")
                     }
                     
 

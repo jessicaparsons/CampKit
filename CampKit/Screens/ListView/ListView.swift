@@ -10,7 +10,6 @@ import PhotosUI
 internal import ConfettiSwiftUI
 import CoreData
 import os
-import CloudKit
 
 struct ListView: View {
     
@@ -49,17 +48,11 @@ struct ListView: View {
     
     //NAVIGATION
     @State private var scrollOffset: CGFloat = 0
-    private let scrollThreshold: CGFloat = 1
+    private let scrollThreshold: CGFloat = Constants.homePageOffset
     @State private var isMenuOpen = false
     
     //SHARING OPTIONS
     @State private var isSharingSheetPresented: Bool = false
-    @State private var isCloudShareSheetPresented = false
-    
-    //CLOUD SHARING
-    @State private var share: CKShare?
-    private let stack = CoreDataStack.shared
-    @State private var isParticipantsPresented: Bool = false
     
     //PRO
     @State private var isUpgradeToProPresented: Bool = false
@@ -87,22 +80,28 @@ struct ListView: View {
         }
         else {
             ZStack(alignment: .center) {
+                //MARK: - BANNER IMAGE
+                VStack {
+                    BannerImageView(viewModel: viewModel)
+                        .frame(maxWidth: .infinity) // Ensure full width
+                        .listRowInsets(EdgeInsets()) // Remove extra padding
+                        .onTapGesture {
+                            isPickerFocused = false
+                        }
+                    Spacer()
+                    
+                }//:VSTACK
+                .ignoresSafeArea(edges: .top)
                 
                 ScrollView {
-                    VStack {
-                        
-                        //MARK: - BANNER IMAGE
-                        BannerImageView(viewModel: viewModel)
-                            .frame(maxWidth: .infinity) // Ensure full width
-                            .listRowInsets(EdgeInsets()) // Remove extra padding
-                            .onTapGesture {
-                                isPickerFocused = false
-                            }
-                        
+                    
                         //MARK: - LIST DETAILS HEADER
                         VStack {
+                            Color.clear
+                                .frame(height: 60)
+                            
                             ListDetailCardView(viewModel: viewModel)
-                                .offset(y: -90)
+                                
                                 .onTapGesture {
                                     isPickerFocused = false
                                 }
@@ -114,12 +113,10 @@ struct ListView: View {
                                 isRearranging: $isRearranging,
                                 isPickerFocused: $isPickerFocused
                             )
-                            .offset(y: -80)
+                            
                             
                         }//:VSTACK
                         .padding(.horizontal)
-                    }//:VSTACK
-//                    .disabled(!stack.canEdit(object: viewModel.packingList))
                     .background(
                         GeometryReader { geo in
                             Color.clear
@@ -130,8 +127,6 @@ struct ListView: View {
                         }
                     )//NAV BAR UI CHANGES ON SCROLL
                 }//:SCROLLVIEW
-                .background(Color.colorWhiteSands)
-                .ignoresSafeArea(edges: .top)
                 .refreshable {
                     await refresh(context: viewContext)
                 }
@@ -196,9 +191,6 @@ struct ListView: View {
             .navigationBarBackButtonHidden(true)
             .animation(.easeOut(duration: 0.3), value: viewModel.isSuccessfulDuplicationPresented)
             .photosPicker(isPresented: $isGalleryPhotoPickerPresented, selection: $bannerImageItem, matching: .images)
-//            .onAppear {
-//                self.share = stack.getShare(viewModel.packingList)
-//            }
             .toolbar {
                 //CUSTOM BACK BUTTON
                 ToolbarItem(placement: .navigationBarLeading) {
@@ -207,6 +199,7 @@ struct ListView: View {
                     } label: {
                         HStack(spacing: 4) {
                             Image(systemName: "chevron.left")
+                                .accessibilityLabel("Back")
                             Text("Back")
                         }
                         .dynamicForegroundStyle(trigger: scrollOffset)
@@ -216,7 +209,7 @@ struct ListView: View {
                     optionsMenu
                 }
                 
-                // This makes the title invisible until scrolled
+                /// This makes the title invisible until scrolled
                 ToolbarItem(placement: .principal) {
                     Text(viewModel.packingList.title ?? Constants.newPackingListTitle)
                         .opacity(scrollOffset < -scrollThreshold ? 1 : 0)
@@ -246,24 +239,6 @@ struct ListView: View {
     
     private var optionsMenu: some View {
         HStack {
-            //MARK: - LIST IS SHARED OPTIONS
-//            if stack.isShared(object: viewModel.packingList) {
-//                
-//                Button {
-//                    loadShare()
-//                } label: {
-//                    Label("Participants", systemImage: "person.crop.circle.badge.checkmark")
-//                        .dynamicForegroundStyle(trigger: scrollOffset)
-//                }
-//                .sheet(isPresented: $isParticipantsPresented) {
-//                    if let share = share {
-//                        ParticipantView(share: share)
-//                            .presentationDetents([.medium, .large])
-//                    } else {
-//                        ProgressView()
-//                    }
-//                }
-//            }
             
             //MARK: - CHANGE BANNER PHOTO
             Button(action: {
@@ -272,6 +247,7 @@ struct ListView: View {
                 Label("Edit Photo", systemImage: "photo")
             }
             .dynamicForegroundStyle(trigger: scrollOffset)
+            .accessibilityHint("Edit the photo used as the background")
             .sheet(isPresented: $isPhotoPickerPresented) {
                 NavigationStack {
                     BackgroundPickerView { image in
@@ -288,6 +264,7 @@ struct ListView: View {
                                     .font(.footnote)
                                     .fontWeight(.bold)
                                     .tint(Color.primary)
+                                    .accessibilityLabel("Exit")
                             }
                         }
                         ToolbarItemGroup(placement: .topBarTrailing) {
@@ -296,6 +273,7 @@ struct ListView: View {
                             } label: {
                                 Image(systemName: "plus")
                                     .foregroundStyle(Color.primary)
+                                    .accessibilityLabel("Open phone gallery")
                             }
                         }
                     }
@@ -316,6 +294,7 @@ struct ListView: View {
                         systemImage: viewModel.allItemsAreChecked ? "circle" : "checkmark.circle"
                     )
                 }
+                .accessibilityHint("Check or uncheck all items")
                 
                 Divider()
                 // REARRANGE
@@ -324,6 +303,7 @@ struct ListView: View {
                 }) {
                     Label("Reorder Categories", systemImage: "text.line.magnify")
                 }
+                .accessibilityHint("Reorder the categories in the list")
                 
                 
                 // EXPAND ALL
@@ -334,6 +314,7 @@ struct ListView: View {
                 }) {
                     Label("Expand All", systemImage: "rectangle.expand.vertical")
                 }
+                .accessibilityHint("Expand all categories")
                 
                 // COLLAPSE ALL
                 Button(action: {
@@ -344,50 +325,18 @@ struct ListView: View {
                 }) {
                     Label("Collapse All", systemImage: "rectangle.compress.vertical")
                 }
+                .accessibilityHint("Collapse all categories")
                 
                 Divider()
-                
-                
-                // INVITE CAMPER
-                
-                Button {
-                    print("invite camper pressed")
-                    
-                    if !stack.isShared(object: viewModel.packingList) {
-                        Task {
-                            await createShare(viewModel.packingList)
-                        }
-                    }
-                    isCloudShareSheetPresented = true
-                    
-                    
-                } label: {
-                    
-                    if stack.isShared(object: viewModel.packingList) {
-                        
-                        Label("Edit List Sharing", systemImage: "person.crop.circle.badge.plus")
-                    } else {
-                        Label("Invite Camper to List", systemImage: "person.crop.circle.badge.plus")
-                    }
-                }
-                //MARK: - CLOUD SHARE SHEET
-                .sheet(isPresented: $isCloudShareSheetPresented, content: {
-                    if let share = share {
-                        CloudSharingView(
-                            share: share,
-                            container: stack.ckContainer,
-                            list: viewModel.packingList
-                        )
-                    }
-                })
                 
                 // SHARE LIST
                 
                 Button {
                     isSharingSheetPresented.toggle()
                 } label: {
-                    Label("Export", systemImage: "square.and.arrow.up")
+                    Label("Share/Export", systemImage: "square.and.arrow.up")
                 }
+                .accessibilityHint("Share or export your list")
                 
                 // DUPLICATE LIST
                 Button {
@@ -399,6 +348,7 @@ struct ListView: View {
                 } label: {
                     Label("Duplicate", systemImage: "doc.on.doc")
                 }
+                .accessibilityHint("Duplicate your list")
                 
                 Divider()
                 // DELETE LIST
@@ -407,11 +357,13 @@ struct ListView: View {
                 } label: {
                     Label("Delete List", systemImage: "trash")
                 }
+                .accessibilityHint("Delete your list")
                 
                 
             } label: {
                 Image(systemName: "ellipsis.circle")
                     .dynamicForegroundStyle(trigger: scrollOffset)
+                    .accessibilityLabel("Menu")
             }
             .confirmationDialog(
                 viewModel.allItemsAreChecked ? "Are you sure you want to uncheck all items?" : "Are you sure you want to check all items?",
@@ -422,8 +374,10 @@ struct ListView: View {
                     viewModel.toggleAllItems()
                     isToggleAllItemsConfirmationPresented = false
                 }
+                .accessibilityHint("Check or uncheck all items")
                 
                 Button("Cancel", role: .cancel) { }
+                    .accessibilityHint("Cancel")
             }
             
         }//:HSTACK
@@ -445,8 +399,12 @@ struct ListView: View {
                     newCategoryTitle = ""
                 }
                 isAddNewCategoryPresented = false
-            }).disabled(!isFormValid)
+            })
+            .disabled(!isFormValid)
+            .accessibilityHint("Done adding new category")
+            
             Button("Cancel", role: .cancel) { }
+                .accessibilityHint("Cancel")
         }
         //MARK: - SHARE SHEET
         .sheet(isPresented: $isSharingSheetPresented) {
@@ -469,14 +427,17 @@ struct ListView: View {
                 HapticsManager.shared.triggerSuccess()
                 isDuplicationConfirmationPresented = false
             }
+            .accessibilityHint("Duplicate the list")
             
             Button("Cancel", role: .cancel) { }
+                .accessibilityHint("Cancel")
         }
         .alert("Duplicate List", isPresented: Binding(
             get: { viewModel.isSuccessfulDuplicationPresented },
             set: { viewModel.isSuccessfulDuplicationPresented = $0 }
         )) {
             Button("OK", role: .cancel) { }
+                .accessibilityHint("Close")
         } message: {
             Text("Your list has been successfully duplicated.")
         }
@@ -491,36 +452,18 @@ struct ListView: View {
                 HapticsManager.shared.triggerSuccess()
                 
             }
+            .accessibilityHint("Delete the list")
             Button("Cancel", role: .cancel) { }
+                .accessibilityHint("Cancel")
         }
         .sheet(isPresented: $isUpgradeToProPresented) {
             UpgradeToProView()
         }
     }//:OPTIONS MENU
     
-//    func loadShare() {
-//        if let existingShare = stack.getShare(viewModel.packingList) {
-//            self.share = existingShare
-//            self.isParticipantsPresented = true
-//        } else {
-//            print("No share found.")
-//        }
-//    }
     
 }
 
-extension ListView {
-    private func createShare(_ list: PackingList) async {
-      do {
-        let (_, share, _) =
-        try await stack.persistentContainer.share([list], to: nil)
-          share[CKShare.SystemFieldKey.title] = list.title
-        self.share = share
-      } catch {
-        print("Failed to create share")
-      }
-    }
-}
 
 //MARK: - PREVIEWS
 #if DEBUG

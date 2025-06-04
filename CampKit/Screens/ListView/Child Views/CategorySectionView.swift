@@ -70,6 +70,7 @@ struct CategorySectionView: View {
                     Image(systemName: category.isExpanded ? "chevron.down" : "chevron.right")
                         .foregroundColor(Color.colorNeonLight)
                         .font(.caption.lowercaseSmallCaps())
+                        .accessibilityLabel("Expand/Collapse \(category.name)")
                     if isEditing {
                         TextField("Category Name", text: $category.name)
                             .focused($isFocused)
@@ -86,6 +87,7 @@ struct CategorySectionView: View {
                             save(viewContext)
                         }
                         .padding(.vertical, 8)
+                        .accessibilityHint("Done editing category name")
                         
                         //MARK: - CATEGORY NAME
                     } else {
@@ -126,11 +128,13 @@ struct CategorySectionView: View {
                             } label: {
                                 Label("Delete", systemImage: "trash")
                             }
+                            .accessibilityHint("Delete this category")
                         } label: {
                             Image(systemName: "ellipsis")
                                 .padding(.horizontal, 8)
                                 .padding(.vertical)
                                 .foregroundStyle(Color.primary)
+                                .accessibilityLabel("Menu")
                             
                         }//:MENU
                         .labelStyle(.iconOnly)
@@ -144,7 +148,9 @@ struct CategorySectionView: View {
                                 HapticsManager.shared.triggerSuccess()
                                 
                             }
+                            .accessibilityHint("Delete this category")
                             Button("Cancel", role: .cancel) { }
+                                .accessibilityHint("Cancel deletion")
                         }
                     }
                 }
@@ -189,6 +195,7 @@ struct CategorySectionView: View {
                                 } label: {
                                     Label("Delete", systemImage: "trash")
                                 }
+                                .accessibilityHint("Delete this item")
                             }
                         }
                     }

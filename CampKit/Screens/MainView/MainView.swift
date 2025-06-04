@@ -68,6 +68,7 @@ struct MainView: View {
                         VStack {
                             Image(systemName: selection == 0 ? "tent.fill" : "tent")
                                 .environment(\.symbolVariants, .none)
+                                .accessibilityLabel("Home")
                             Text("Home")
                         }
                     }
@@ -83,6 +84,7 @@ struct MainView: View {
                         VStack {
                             Image(systemName: selection != 1  && colorScheme == .dark ? "alarm" : "alarm.fill")
                                 .environment(\.symbolVariants, .none)
+                                .accessibilityLabel("Reminders")
                             Text("Reminders")
                         }
                     }
@@ -99,6 +101,7 @@ struct MainView: View {
                         VStack {
                             Image(systemName: selection != 2 && colorScheme == .dark ?  "arrow.clockwise.circle" : "arrow.clockwise.circle.fill")
                                 .environment(\.symbolVariants, .none)
+                                .accessibilityLabel("Restock List")
                
                             Text("Restock")
                         }

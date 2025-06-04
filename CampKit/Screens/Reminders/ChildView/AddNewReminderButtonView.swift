@@ -15,6 +15,7 @@ struct AddNewReminderButtonView: View {
             Image(systemName: "plus.circle")
                 .foregroundColor(.secondary)
                 .font(.system(size: 22))
+                .accessibilityLabel("Add new reminder")
             Text("Add new reminder")
                 .foregroundColor(Color.secondary)
             Spacer()

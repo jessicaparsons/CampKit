@@ -15,18 +15,18 @@ struct BannerImageView: View {
     
     var body: some View {
         
-        ZStack(alignment: .center) {
-            
-            bannerImageView
-                .resizable()
-                .aspectRatio(contentMode: .fill)
-                .frame(width: UIScreen.main.bounds.width, height: 250)
-                .clipped()
-            
-            Color.black.opacity(0.2)
-                .ignoresSafeArea()
+        ZStack {
+            Group {
+                bannerImageView
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    
+                Color.black.opacity(0.2)
+                    .ignoresSafeArea()
+            }//:GROUP
+            .frame(width: UIScreen.main.bounds.width, height: Constants.bannerHeight)
+            .clipped()
         }//:ZSTACK
-        
         .ignoresSafeArea(edges: .horizontal)
         
     }

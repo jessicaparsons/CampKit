@@ -52,10 +52,16 @@ struct UpgradeToProView: View {
                 //MARK: - WHAT'S INCLUDED
                 GroupBox {
                     VStack(alignment: .leading, spacing: Constants.cardSpacing) {
-                        ProFeaturesListItemView(title: "Unlimited Packing Lists", description: "Create and manage as many lists as you need for every trip.")
-                        ProFeaturesListItemView(title: "Cloud Sharing", description: "Easily collaborate on your packing lists with family and friends across devices.")
-                        ProFeaturesListItemView(title: "Personalize Your App", description: "Choose from cool custom designed app icons and your own emoji for completed lists 🔥")
-                    }//:VSTACK
+                        ProFeaturesListItemView(title: "Unlimited Packing Lists", description: "Create and manage as many lists as you need for every trip")
+                        ProFeaturesListItemView(
+                            title: "Customize Your Trail Icon",
+                            description: "Set your style with app icons designed around wild trails and alpine peaks"
+                        )
+                        ProFeaturesListItemView(
+                            title: "Bonfire Customization",
+                            description: "Choose your own emoji when you check everything off your list 🔥"
+                        )
+                                            }//:VSTACK
                     .padding(.vertical, Constants.verticalSpacing)
                     .padding(.horizontal, Constants.verticalSpacing)
                     
@@ -79,6 +85,7 @@ struct UpgradeToProView: View {
                                 .fill(Color.colorNeon)
                                 .shadow(color: .black.opacity(0.08), radius: 6, x: 0, y: 4)
                         )
+                        .accessibilityHint("Upgrade to Pro for unlimited packing lists and customization")
                        
                         
                     }//:VSTACK
@@ -105,6 +112,7 @@ struct UpgradeToProView: View {
                             .foregroundStyle(Color.white)
                             .opacity(0.7)
                             .padding(.top)
+                            .accessibilityLabel("Exit")
                     }
                 }
             }

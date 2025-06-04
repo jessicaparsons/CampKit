@@ -44,7 +44,9 @@ struct LocationSearchView: View {
                         dismiss()
                     }, label: {
                         Image(systemName: "arrow.backward")
+                            .accessibilityLabel("Back arrow")
                     })
+                    .accessibilityHint("Cancel search")
                 }
             }
         }

@@ -20,6 +20,7 @@ struct AddNewItemView: View {
             Image(systemName: "plus.circle")
                 .foregroundColor(.gray)
                 .font(.system(size: 22))
+                .accessibilityLabel("Add")
                 .onTapGesture {
                     isFocused = true
                 }

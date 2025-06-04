@@ -34,11 +34,8 @@ struct SettingsView: View {
     @State private var isExpanded: Bool = false
     @State private var isSuccessfulIconRevert: Bool = false
     @State private var isSuccessfulCustomIconSelected: Bool = false
-    
-    //DEBUGGING
-    @State private var showAudit = false
-    @State private var auditViewModel: HomeListViewModel?
-    
+    @State private var isDeleteICloudDataPresented: Bool = false
+    @State private var isICloudDataDeleted: Bool = false
     
     private let options = TemperatureUnit.allCases
     
@@ -95,6 +92,7 @@ struct SettingsView: View {
                                     if option.rawValue == temperatureUnit {
                                         Image(systemName: "checkmark")
                                             .foregroundColor(Color.colorSage)
+                                            .accessibilityLabel("Temperature unit is \(option.rawValue)")
                                     }
                                 }
                                 .contentShape(Rectangle())
@@ -123,6 +121,7 @@ struct SettingsView: View {
                                 HStack {
                                     Text("Unlock Unlimited Lists")
                                     Image(systemName: "arrow.up.right.square").foregroundColor(.colorSage)
+                                        .accessibilityLabel("Link to purchase Pro")
                                     ProTag()
                                 }//:HSTACK
                                 .padding(.top, Constants.lineSpacing)
@@ -236,6 +235,7 @@ struct SettingsView: View {
                                         Text("Reset to original icon")
                                         Image(systemName: "tent")
                                             .font(.caption)
+                                            .accessibilityLabel("Link to reset icon")
                                             
                                     }//:HSTACK
                                     .foregroundColor(.colorSage)
@@ -261,12 +261,14 @@ struct SettingsView: View {
                                     Text("Restore in-app purchases")
                                     Image(systemName: "arrow.clockwise")
                                         .font(.caption)
+                                        .accessibilityLabel("Link to restore purchases")
                                 }//:HSTACK
                                 .foregroundColor(.colorSage)
                             }
                             .padding(.top, Constants.lineSpacing)
                             .alert("Restore Purchases", isPresented: $showRestoreAlert) {
                                 Button("OK", role: .cancel) { }
+                                    .accessibilityHint("OK to dismiss")
                             } message: {
                                 Text(restoreMessage)
                             }
@@ -291,6 +293,7 @@ struct SettingsView: View {
                                         .font(.body)
                                         .foregroundStyle(Color.colorSage)
                                     Image(systemName: "arrow.up.right.square").foregroundColor(Color.colorSage)
+                                        .accessibilityLabel("Link to rate CampKit")
                                 }//:HSTACK
                                 
                             }//:HSTACK
@@ -307,6 +310,7 @@ struct SettingsView: View {
                                         Link("Email the Developer", destination: URL(string: "mailto:jess@junipercreative.co?subject=CampKit Feedback")!)
                                             .foregroundStyle(Color.colorSage)
                                         Image(systemName: "arrow.up.right.square").foregroundColor(Color.colorSage)
+                                            .accessibilityLabel("Link to email the developer")
                                     }//:HSTACK
                                     
                                     Text("Have a feature idea or ran into an issue? I’d love to hear from you.")
@@ -329,6 +333,15 @@ struct SettingsView: View {
                                 SettingsRowView(name: "Website", linkLabel: "Juniper Creative Co.", linkDestination: "junipercreative.co")
                                 SettingsRowView(name: "Portfolio", linkLabel: "GitHub", linkDestination: "github.com/jessicaparsons")
                                 SettingsRowView(name: "Version", content: AppInfo.versionWithBuild)
+//                                Divider().padding(.vertical, 4)
+//                                HStack {
+//                                    Text("Delete iCloud Data")
+//                                    Image(systemName: "arrow.up.right.square")
+//                                }
+//                                .foregroundColor(Color.colorSage)
+//                                .onTapGesture {
+//                                    isDeleteICloudDataPresented = true
+//                                }
                             }
                             .padding(.top, 8)
                         },
@@ -341,23 +354,34 @@ struct SettingsView: View {
                     .padding()
                     .background(Color.colorWhite)
                     .clipShape(RoundedRectangle(cornerRadius: 10))
+                    .confirmationDialog(
+                        "Are you sure you want to delete all iCloud Data? This cannot be undone.",
+                        isPresented: $isDeleteICloudDataPresented,
+                        titleVisibility: .visible
+                    ) {
+                        Button("Delete", role: .destructive) {
+                            
+                            HapticsManager.shared.triggerSuccess()
+                            isDeleteICloudDataPresented = false
+                            isICloudDataDeleted = true
+                        }
+                        .accessibilityHint("Delete all iCloud Data")
+                        
+                        Button("Cancel", role: .cancel) { }
+                            .accessibilityHint("Cancel")
+                    }
+                    .alert("Delete Success", isPresented: $isICloudDataDeleted) {
+                        Button("OK", role: .cancel) { }
+                            .accessibilityHint("OK")
+                    } message: {
+                        Text("Your list has been successfully duplicated.")
+                    }
+
                 }//:GROUP
                 .backgroundStyle(Color.colorWhite)
+                                
                 
-                //MARK: - APP DEBUGGING
                 
-                
-                Button("Run Share Audit") {
-                    auditViewModel = HomeListViewModel(viewContext: viewContext)
-                    DispatchQueue.main.async {
-                        showAudit = true
-                    }
-                }
-                .sheet(isPresented: $showAudit) {
-                    if let viewModel = auditViewModel {
-                        CloudKitShareAuditView(viewModel: viewModel)
-                    }
-                }
                 
                 
             }//:VSTACK

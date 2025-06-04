@@ -83,31 +83,31 @@ class HomeListViewModel: ObservableObject {
             viewContext.delete(packingList)
             save(viewContext)
             
-//            // Delete associated CKShare if exists
-//                Task {
-//                    await deleteCKShareIfNeeded(for: packingList)
-//                }
+            // Delete associated CKShare if exists
+                Task {
+                    await deleteCKShareIfNeeded(for: packingList)
+                }
             
             fetchPackingLists()
         }
     }
     
-//    func deleteCKShareIfNeeded(for list: PackingList) async {
-//        guard CoreDataStack.shared.isOwner(object: list),
-//              let share = CoreDataStack.shared.getShare(list) else {
-//            return
-//        }
-//
-//        let container = CKContainer.default()
-//        let database = container.privateCloudDatabase
-//
-//        do {
-//            let (_, deleted) = try await database.modifyRecords(saving: [], deleting: [share.recordID])
-//            print("✅ CKShare deleted: \(deleted)")
-//        } catch {
-//            print("❌ Failed to delete CKShare: \(error)")
-//        }
-//    }
+    func deleteCKShareIfNeeded(for list: PackingList) async {
+        guard CoreDataStack.shared.isOwner(object: list),
+              let share = CoreDataStack.shared.getShare(list) else {
+            return
+        }
+
+        let container = CKContainer.default()
+        let database = container.privateCloudDatabase
+
+        do {
+            let (_, deleted) = try await database.modifyRecords(saving: [], deleting: [share.recordID])
+            print("✅ CKShare deleted: \(deleted)")
+        } catch {
+            print("❌ Failed to delete CKShare: \(error)")
+        }
+    }
 
     
     //LOOK UP BY ID

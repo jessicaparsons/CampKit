@@ -30,6 +30,7 @@ struct ColoredToggleStyle: ToggleStyle {
                             .offset(x: configuration.isOn ? 10 : -10))
             }//:BUTTON
             .animation(Animation.easeInOut(duration: 0.1), value: configuration.isOn)
+            .accessibilityHint("On/Off")
         }
     }
 }

@@ -53,6 +53,7 @@ struct UpdateReminderView: View {
                         Image(systemName: "calendar")
                             .foregroundStyle(.primary)
                             .font(.title2)
+                            .accessibilityLabel("Select date")
                         Text("Select Date")
                             .foregroundStyle(.primary)
                         
@@ -71,6 +72,7 @@ struct UpdateReminderView: View {
                         Image(systemName: "clock")
                             .foregroundStyle(.primary)
                             .font(.title2)
+                            .accessibilityLabel("Select time")
                         Text("Select Time")
                             .foregroundStyle(.primary)
                         
@@ -125,13 +127,16 @@ struct UpdateReminderView: View {
                             reminderTime: reminderTime)
                         
                         dismiss()
-                    }.disabled(!isFormValid)
+                    }
+                    .disabled(!isFormValid)
+                    .accessibilityHint("Done editing reminder")
                 }
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") {
                         dismiss()
                         dataRefreshTrigger.toggle()
                     }
+                    .accessibilityHint("Cancel editing reminder")
                 }
             }
             

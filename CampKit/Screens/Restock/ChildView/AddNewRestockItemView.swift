@@ -20,6 +20,7 @@ struct AddNewRestockItemView: View {
             Image(systemName: "plus.circle")
                 .foregroundColor(.gray)
                 .font(.system(size: 22))
+                .accessibilityLabel("Add new item")
                 .onTapGesture {
                     isFocused = true
                 }

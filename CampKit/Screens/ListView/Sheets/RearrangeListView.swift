@@ -35,6 +35,7 @@ struct RearrangeListView<T: Identifiable  & Equatable>: View {
                         Button("Done") {
                            dismiss()
                         }
+                        .accessibilityHint("Done reordering")
                     }
                 }
         }//:NAVIGATION STACK

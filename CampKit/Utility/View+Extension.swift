@@ -12,20 +12,12 @@ extension View {
         UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
     }
     
-    func dynamicForegroundStyle(trigger: CGFloat, threshold: CGFloat = 1) -> some View {
+    func dynamicForegroundStyle(trigger: CGFloat, threshold: CGFloat = Constants.homePageOffset) -> some View {
         self.foregroundStyle(trigger < -threshold ? Color.primary : Color.white)
     }
     
-    func dynamicMaterialOpacity(trigger: CGFloat, threshold: CGFloat = 1) -> some View {
+    func dynamicMaterialOpacity(trigger: CGFloat, threshold: CGFloat = Constants.homePageOffset) -> some View {
         self.opacity(trigger < -threshold ? 0 : 1)
     }
 }
 
-    
-//if light mode
-
-//white then black
-
-//if dark mode
-
-//white

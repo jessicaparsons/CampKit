@@ -101,6 +101,7 @@ struct QuizView: View {
                             .buttonStyle(BigButtonWide())
                             .opacity(currentStep == 1 ? 0 : 1)
                             .animation(.interactiveSpring, value: currentStep)
+                            .accessibilityHint("Back")
                             
                             //MARK: - NEXT / CREATE LIST BUTTON
                             Button(action: {
@@ -123,6 +124,7 @@ struct QuizView: View {
                                     .frame(maxWidth: .infinity)
                             }
                             .buttonStyle(BigButtonWide())
+                            .accessibilityHint("Next / Create List")
                         }//:HSTACK
                         .padding(.bottom)
                     }
@@ -149,6 +151,7 @@ struct QuizView: View {
                             .font(.footnote)
                             .fontWeight(.bold)
                             .tint(Color.primary)
+                            .accessibilityLabel("Exit")
                     }
                 }
                 ToolbarItemGroup(placement: .topBarTrailing) {
@@ -160,6 +163,7 @@ struct QuizView: View {
                         } label: {
                             Image(systemName: "plus")
                                 .foregroundStyle(Color.primary)
+                                .accessibilityLabel("Open phone gallery")
                                 
                         }
                         

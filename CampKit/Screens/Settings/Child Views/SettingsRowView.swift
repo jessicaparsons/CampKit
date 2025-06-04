@@ -18,7 +18,8 @@ struct SettingsRowView: View {
         VStack {
             Divider().padding(.vertical, 4)
             HStack {
-                Text(name).foregroundColor(Color.gray)
+                Text(name)
+                    .foregroundColor(Color.secondary)
                 Spacer()
                 if (content != nil) {
                     Text(content!)
@@ -26,6 +27,7 @@ struct SettingsRowView: View {
                     Link(linkLabel!, destination: URL(string: "https://\(linkDestination!)")!)
                         .foregroundColor(Color.colorSage)
                     Image(systemName: "arrow.up.right.square").foregroundColor(Color.colorSage)
+                        .accessibilityLabel("Link to \(linkLabel!)")
                 } else {
                     EmptyView()
                 }

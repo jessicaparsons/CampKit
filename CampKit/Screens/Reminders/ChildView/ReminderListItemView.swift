@@ -38,6 +38,7 @@ struct ReminderListItemView: View {
                 .foregroundStyle(isChecked || reminder.isCompleted ? Color.colorSage : .secondary)
                 .font(.system(size: 22))
                 .padding(.trailing, Constants.lineSpacing)
+                .accessibilityLabel("Reminder is complete or not")
                 .onTapGesture {
                     Task {
                         // Immediate UI feedback
@@ -91,6 +92,7 @@ struct ReminderListItemView: View {
             Image(systemName: "pencil.circle.fill")
                 .foregroundStyle(.colorForest)
                 .opacity(isSelected ? 1 : 0)
+                .accessibilityLabel("Edit reminder")
                 .onTapGesture {
                     onEvent(.onInfoSelected(reminder))
                 }

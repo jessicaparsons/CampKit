@@ -85,6 +85,7 @@ struct ListDetailCardView: View {
             Image(systemName: "calendar")
                 .foregroundColor(.colorSage)
                 .font(.footnote)
+                .accessibilityLabel("Calendar")
             
             Group {
                 if viewModel.packingList.startDate != nil && viewModel.packingList.endDate != nil {
@@ -121,7 +122,7 @@ struct ListDetailCardView: View {
             Image(systemName: "arrow.up.right.square")
                     .foregroundColor(.colorSage)
                     .offset(y: 1)
-         
+                    .accessibilityLabel("Open Location Details")
             
             if let locationName = viewModel.packingList.locationName {
                Text(locationName)
@@ -144,6 +145,7 @@ struct ListDetailCardView: View {
             Button("Edit Location") {
                 isLocationPresented = true
             }
+            .accessibilityHint("Edit the location of this list")
             
             //MAP OPTIONS IF LOCATION IS SET
             if let locationName = viewModel.packingList.locationName,
@@ -154,16 +156,20 @@ struct ListDetailCardView: View {
                 Button("Clear Location") {
                     viewModel.packingList.locationName = nil
                 }
+                .accessibilityHint("Clear the location of this list")
                 
                 Button("Open in Apple Maps") {
                     openInAppleMaps(query: locationName + ", " + locationAddress)
                 }
+                .accessibilityHint("Open the location in Apple Maps")
                 
                 Button("Open in Google Maps") {
                     openInGoogleMaps(query: locationName + ", " + locationAddress)
                 }
+                .accessibilityHint("Open the location in Google Maps")
                 
                 Button("Cancel", role: .cancel) {}
+                    .accessibilityHint("Close")
             }//:IF
         }//:CONFIRMATION DIALOGUE
     }
