@@ -219,8 +219,7 @@ struct ListView: View {
                        let loadedImage = UIImage(data: data)
                     {
                         bannerImage = loadedImage
-                        viewModel.packingList.photo = data
-                        save(viewContext)
+                        viewModel.updatePhoto(with: loadedImage)
                         
                     } else {
                         

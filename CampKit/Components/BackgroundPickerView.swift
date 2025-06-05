@@ -66,7 +66,7 @@ struct BackgroundPickerView: View {
                         
                         VStack(spacing: 0) {
                             
-                            //IMAGES
+                            //MARK: - PRESETS
                             LazyVGrid(columns: columns, spacing: Constants.gallerySpacing) {
                                 ForEach(presetImages) { image in
                                     Image(image.name)
@@ -92,7 +92,7 @@ struct BackgroundPickerView: View {
                             .padding(.top, Constants.verticalSpacing)
                             .padding(.bottom, 5)
                             
-                            //GRADIENTS
+                            //MARK: - GRADIENTS
                             LazyVGrid(columns: columns, spacing: Constants.gallerySpacing) {
                                 ForEach(presetGradients) { gradientOption in
                                     gradientOption.gradient
