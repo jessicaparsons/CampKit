@@ -37,11 +37,24 @@ class HomeListViewModel: ObservableObject {
     
     func fetchPackingLists() {
         let request: NSFetchRequest<PackingList> = PackingList.fetchRequest()
-        
-        request.sortDescriptors = selectedSort == "Date"
-        ? [NSSortDescriptor(keyPath: \PackingList.startDate, ascending: true)]
-        : [NSSortDescriptor(keyPath: \PackingList.title, ascending: true)]
 
+        if selectedSort == "Date" {
+            /// Step 1: Sort by whether date is nil (false first = not nil)
+            /// Step 2: Then sort by actual date ascending
+            request.sortDescriptors = [
+                NSSortDescriptor(
+                    key: "startDate",
+                    ascending: false,
+                    selector: #selector(NSNumber.compare(_:)) // This works because nil = false
+                ),
+                NSSortDescriptor(keyPath: \PackingList.startDate, ascending: true)
+            ]
+        } else {
+            request.sortDescriptors = [
+                NSSortDescriptor(keyPath: \PackingList.title, ascending: true)
+            ]
+        }
+        
         do {
             self.packingLists = try viewContext.fetch(request)
         } catch {
