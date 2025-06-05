@@ -116,9 +116,10 @@ struct BackgroundPickerView: View {
                             .padding(.top, 0)
                             
                         }//:VSTACK
+                        .padding(.bottom, Constants.quizPadding)
                     }//:SCROLLVIEW
                 }
-            }
+            }//:GROUP
             
             Spacer()
         }//:VSTACK

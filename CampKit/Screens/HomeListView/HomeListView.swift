@@ -165,6 +165,7 @@ struct HomeListView: View {
                         }
                     }//:ELSE
                 }//:VSTACK
+                .padding(.bottom, Constants.bodyPadding)
                 .padding(.horizontal, Constants.wideMargin)
                 .background(
                     GeometryReader { geo in
@@ -393,6 +394,10 @@ struct HomeListView: View {
     
     let list = PackingList.samplePackingList(context: previewStack.context)
     let list2 = PackingList.samplePackingList(context: previewStack.context)
+    let list3 = PackingList.samplePackingList(context: previewStack.context)
+    let list4 = PackingList.samplePackingList(context: previewStack.context)
+    let list5 = PackingList.samplePackingList(context: previewStack.context)
+    let list6 = PackingList.samplePackingList(context: previewStack.context)
     
     NavigationStack {
         HomeListView(

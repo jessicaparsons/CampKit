@@ -11,7 +11,7 @@ import CoreData
 
 extension RestockItem {
     static func generateSampleItems(context: NSManagedObjectContext) {
-        let titles = ["Toothpaste and a long item goes here to see wrap", "Fuel Canister", "Trail Mix"]
+        let titles = ["Toothpaste and a long item goes here to see wrap", "Fuel Canister", "Trail Mix", "Boots", "Water Bottle", "Snacks", "Sunscreen", "Map", "Whistle", "First Aid Kit", "Matches", "Knife", "Whistle", "Emergency Blanket", "Flashlight", "Whistle", "Emergency Blanket", "Flashlight"]
         for (index, title) in titles.enumerated() {
             let item = RestockItem(context: context)
             item.id = UUID()

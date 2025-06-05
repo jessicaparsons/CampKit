@@ -56,14 +56,17 @@ class StoreKitManager {
                     await transaction.finish()
                     isProUnlocked = true
                     UserDefaults.standard.set(true, forKey: Constants.userDefaultsProKey)
-                    triggerAlert(message: "Purchase successful!")
+                    //triggerAlert(message: "Purchase successful!")
                 }
             case .userCancelled:
                 #if DEBUG
                 print("User cancelled")
                 #endif
             default:
-                triggerAlert(message: "Something went wrong with your purchase. Please try again.")
+                #if DEBUG
+                print("Something went wrong with your purchase. Please try again.")
+                #endif
+                //triggerAlert(message: "Something went wrong with your purchase. Please try again.")
             }
         } catch {
             

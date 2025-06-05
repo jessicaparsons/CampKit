@@ -35,32 +35,30 @@ class HomeListViewModel: ObservableObject {
         fetchPackingLists()
     }
     
+    ///Sort by title or date, but set nil dates to distant future so they are sorted at the bottom of the list
     func fetchPackingLists() {
         let request: NSFetchRequest<PackingList> = PackingList.fetchRequest()
+        request.sortDescriptors = [] //Sort manually
 
-        if selectedSort == "Date" {
-            /// Step 1: Sort by whether date is nil (false first = not nil)
-            /// Step 2: Then sort by actual date ascending
-            request.sortDescriptors = [
-                NSSortDescriptor(
-                    key: "startDate",
-                    ascending: false,
-                    selector: #selector(NSNumber.compare(_:)) // This works because nil = false
-                ),
-                NSSortDescriptor(keyPath: \PackingList.startDate, ascending: true)
-            ]
-        } else {
-            request.sortDescriptors = [
-                NSSortDescriptor(keyPath: \PackingList.title, ascending: true)
-            ]
-        }
-        
         do {
-            self.packingLists = try viewContext.fetch(request)
+            var lists = try viewContext.fetch(request)
+
+            if selectedSort == "Date" {
+                lists.sort {
+                    ($0.startDate ?? .distantFuture) < ($1.startDate ?? .distantFuture)
+                }
+            } else {
+                lists.sort {
+                    ($0.title ?? "") < ($1.title ?? "")
+                }
+            }
+
+            self.packingLists = lists
         } catch {
-           
+            self.packingLists = []
         }
     }
+
     
     
     private func setupCloudKitObserver() {

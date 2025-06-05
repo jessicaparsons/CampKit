@@ -42,13 +42,11 @@ struct RestockView: View {
                         .padding(.horizontal, Constants.wideMargin)
                     
                         //MARK: - RESTOCK LIST
-                        VStack(spacing: 0) {
+                        LazyVStack(spacing: 0) {
                             
                             if !viewModel.restockItems.isEmpty {
                                 
                                 ForEach(Array(viewModel.sortedItems.enumerated()), id: \.element.id) { index, item in
-                                    
-                                    let isFirst = index == 0
                                     
                                     HStack(spacing: 0) {
                                         Spacer()
@@ -64,10 +62,9 @@ struct RestockView: View {
                                             deleteItem: {
                                                 viewModel.deleteItem(item)
                                             },
-                                            isPickerFocused: $isPickerFocused
+                                            isPickerFocused: $isPickerFocused,
+                                            isRestockItem: true
                                         )
-                                        .padding(.top, isFirst ? -8 : 4)
-                                        .padding(.bottom, 4)
                                     }//:HSTACK
                                     .overlay(
                                         Rectangle()
@@ -102,6 +99,7 @@ struct RestockView: View {
                         .animation(.easeInOut, value: viewModel.restockItems.count)
                     
                 }//:VSTACK
+                .padding(.bottom, Constants.bodyPadding)
                 .background(
                     GeometryReader { geo in
                         Color.clear

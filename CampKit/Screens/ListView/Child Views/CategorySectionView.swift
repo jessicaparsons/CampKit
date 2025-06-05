@@ -38,12 +38,10 @@ struct CategorySectionView: View {
         Binding(
             get: { category.isExpanded },
             set: { newValue in
-                withAnimation {
-                    category.isExpanded = newValue
-                    save(viewContext)
-                    withAnimation(nil) {
-                        viewModel.objectWillChange.send()
-                    }
+                category.isExpanded = newValue
+                save(viewContext)
+                withAnimation(nil) {
+                    viewModel.objectWillChange.send()
                 }
             }
         )
@@ -72,6 +70,7 @@ struct CategorySectionView: View {
                     Image(systemName: category.isExpanded ? "chevron.down" : "chevron.right")
                         .foregroundColor(Color.colorNeonLight)
                         .font(.caption.lowercaseSmallCaps())
+                        .animation(nil, value: category.isExpanded)
                         .accessibilityLabel("Expand/Collapse \(category.name)")
                     if isEditing {
                         TextField("Category Name", text: $category.name)
@@ -98,6 +97,7 @@ struct CategorySectionView: View {
                             .foregroundStyle(Color.primary)
                             .multilineTextAlignment(.leading)
                             .padding(.leading, 8)
+                            .offset(x: category.isExpanded ? -4 : 0)
                             .layoutPriority(1)
                         
                         Spacer()
@@ -174,18 +174,17 @@ struct CategorySectionView: View {
                 Divider()
                     .padding(.horizontal)
                     .padding(.bottom, Constants.verticalSpacing)
-                VStack(spacing: 2) {
+                LazyVStack(spacing: 2) {
                     if !category.sortedItems.isEmpty {
                         ForEach(category.sortedItems, id: \.id) { item in
-                            ZStack {
-                                EditableItemView<Item>(
-                                    item: item,
-                                    togglePacked: { viewModel.togglePacked(for: item) },
-                                    deleteItem: { viewModel.deleteItem(item) },
-                                    isPickerFocused: $isPickerFocused
-                                )
-                            }
-                            .background(Color.colorWhite)
+                            
+                            EditableItemView<Item>(
+                                item: item,
+                                togglePacked: { viewModel.togglePacked(for: item) },
+                                deleteItem: { viewModel.deleteItem(item) },
+                                isPickerFocused: $isPickerFocused,
+                                isRestockItem: false
+                            )
                             .contextMenu {
                                 Button {
                                     isRearrangingListItems = true

@@ -97,7 +97,7 @@ struct RemindersView: View {
                         
                     } else {
                         //MARK: - RESTOCK LIST
-                        VStack {
+                        LazyVStack {
                             ForEach(reminderItems) { reminder in
                                 ReminderListItemView(
                                     reminder: reminder,
@@ -136,6 +136,7 @@ struct RemindersView: View {
                     }//:ELSE
                     
                 }//:VSTACK
+                .padding(.bottom, Constants.bodyPadding)
                 .background(
                     GeometryReader { geo in
                         Color.clear

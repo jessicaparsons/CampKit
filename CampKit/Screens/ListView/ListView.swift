@@ -45,6 +45,7 @@ struct ListView: View {
     @State private var trigger: Int = 0
     @State private var isConfettiVisible: Bool = false
     @State private var fireScale: CGFloat = 0.1
+    @State private var confettiOpacity: Double = 1.0
     
     //NAVIGATION
     @State private var scrollOffset: CGFloat = 0
@@ -152,6 +153,7 @@ struct ListView: View {
                         isPickerFocused = false
                     }
                 )
+                .ignoresSafeArea(.keyboard)
                 
                 //MARK: - CONFETTI ANIMATION
                 
@@ -161,13 +163,19 @@ struct ListView: View {
                             .font(.system(size: 100))
                             .scaleEffect(fireScale)
                             .shadow(color: .black.opacity(0.3), radius: 10, x: 0, y: 2)
-                        
                             .onAppear {
                                 fireScale = 0.1
+                                confettiOpacity = 1.0
                                 withAnimation(.interpolatingSpring(stiffness: 200, damping: 8)) {
                                     fireScale = 1.0
                                 }
                                 trigger += 1
+                                
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                                    withAnimation {
+                                        confettiOpacity = 0
+                                    }
+                                }
                             }
                             .confettiCannon(
                                 trigger: $trigger,
@@ -180,6 +188,7 @@ struct ListView: View {
                                 repetitionInterval: 0.1,
                                 hapticFeedback: true)
                     }//:ZSTACK
+                    .opacity(confettiOpacity)
                 }//:CONDITION
                 
             }//:ZSTACK
@@ -305,9 +314,7 @@ struct ListView: View {
                 
                 // EXPAND ALL
                 Button(action: {
-                    withAnimation {
-                        viewModel.expandAll()
-                    }
+                    viewModel.expandAll()
                 }) {
                     Label("Expand All", systemImage: "rectangle.expand.vertical")
                 }
@@ -315,10 +322,7 @@ struct ListView: View {
                 
                 // COLLAPSE ALL
                 Button(action: {
-                    withAnimation {
-                        viewModel.collapseAll()
-                        
-                    }
+                    viewModel.collapseAll()
                 }) {
                     Label("Collapse All", systemImage: "rectangle.compress.vertical")
                 }

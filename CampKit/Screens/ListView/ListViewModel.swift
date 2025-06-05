@@ -23,6 +23,8 @@ final class ListViewModel: ObservableObject {
     @Published var isConfettiVisible: Bool = false
     @Published var isSuccessfulDuplicationPresented: Bool = false
     @Published var selectedFilters: Set<String> = []
+    
+    private var confettiResetTask: Task<Void, Never>?
         
     init(viewContext: NSManagedObjectContext, packingList: PackingList) {
         self.viewContext = viewContext
@@ -364,18 +366,33 @@ final class ListViewModel: ObservableObject {
     }
     
     @MainActor
+    func releaseConfetti() {
+        //Avoids repeat animation glitches
+        if !isConfettiVisible {
+            isConfettiVisible = true
+        }
+        
+        //cancel any previous reset
+        confettiResetTask?.cancel()
+        
+        //create a new one
+        confettiResetTask = Task {
+            try? await Task.sleep(nanoseconds: 3_000_000_000)
+            guard !Task.isCancelled else { return }
+            
+            isConfettiVisible = false
+        }
+        
+    }
+    
+    
+    @MainActor
     func toggleAllItems() {
         if allItemsAreChecked {
             uncheckAllItems()
         } else {
             checkAllItems()
-            isConfettiVisible = true
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                withAnimation {
-                    self.isConfettiVisible = false
-                }
-            }
-           
+            releaseConfetti()
         }
         save(viewContext)
     }
@@ -421,12 +438,7 @@ final class ListViewModel: ObservableObject {
         
         if allItemsAreChecked {
             
-            isConfettiVisible = true
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                withAnimation {
-                    self.isConfettiVisible = false
-                }
-            }
+            releaseConfetti()
         }
             
     }

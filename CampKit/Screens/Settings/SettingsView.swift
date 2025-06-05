@@ -159,7 +159,7 @@ struct SettingsView: View {
                                         .font(.title)
                                         .padding()
                                         .opacity(storeKitManager.isProUnlocked ? 1 : 0.5)
-                                        .background(.colorWhiteSands)
+                                        .background(.colorWhiteSandsSheet)
                                         .clipShape(RoundedRectangle(cornerRadius: Constants.cornerRadius))
                                 }
                                 
@@ -378,17 +378,11 @@ struct SettingsView: View {
 
                 }//:GROUP
                 .backgroundStyle(Color.colorWhite)
-                                
-                
-                
-                
-                
             }//:VSTACK
             .padding(.horizontal)
             .sheet(isPresented: $isUpgradeToProPresented) {
                 UpgradeToProView()
             }
-            
         }//:SCROLLVIEW
         .background(Color.colorWhiteSandsSheet)
         .preferredColorScheme(isDarkMode ? .dark : .light)

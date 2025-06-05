@@ -22,6 +22,7 @@ struct EditableItemView<T: EditablePackableItem>: View {
     let togglePacked: () -> Void
     let deleteItem: () -> Void
     @Binding var isPickerFocused: Bool
+    let isRestockItem: Bool
 
     
     var body: some View {
@@ -86,7 +87,8 @@ struct EditableItemView<T: EditablePackableItem>: View {
             }//:HSTACK
         }//:ZSTACK
         .padding(.horizontal)
-        .padding(.vertical, 8)
+        .padding(.vertical, isRestockItem ? 12 : 8)
+        .background(Color.colorWhite)
         //MARK: - SWIPE TO DELETE
         .modifier(SwipeActionModifier(
             isFocused: disableSwipe,
@@ -118,12 +120,14 @@ struct EditableItemView<T: EditablePackableItem>: View {
             togglePacked: { },
             deleteItem: { },
             isPickerFocused: $isPickerFocused,
+            isRestockItem: true
         )
         EditableItemView(
             item: item2,
             togglePacked: { },
             deleteItem: { },
             isPickerFocused: $isPickerFocused,
+            isRestockItem: true
         )
     }
     .frame(height: 100)

@@ -70,6 +70,7 @@ struct UpgradeToProView: View {
                             .padding(.bottom)
                         Text("One time purchase")
                         Button {
+                            HapticsManager.shared.triggerSuccess()
                             Task {
                                 await storeKitManager.purchasePro()
                             }

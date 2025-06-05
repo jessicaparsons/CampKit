@@ -17,6 +17,6 @@ struct AppInfo {
     }
 
     static var versionWithBuild: String {
-        "v\(version) (\(build))"
+        "\(version)"
     }
 }
