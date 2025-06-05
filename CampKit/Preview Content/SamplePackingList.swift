@@ -5,6 +5,8 @@
 //  Created by Jessica Parsons on 1/11/25.
 //
 
+#if DEBUG
+
 import Foundation
 import UIKit
 import CoreData
@@ -72,5 +74,5 @@ extension Category {
     }
 }
 
-
+#endif 
 

@@ -23,8 +23,10 @@ struct CategorySectionView: View {
     @ObservedObject var category: Category
     @Binding var isRearranging: Bool
     let deleteCategory: () -> Void
-    @State private var isEditing: Bool = false
     @Binding var isPickerFocused: Bool
+    
+    //ALERTS AND SHEETS
+    @State private var isEditing: Bool = false
     @State private var isDeleteConfirmationPresented: Bool = false
     @State private var isRearrangingListItems: Bool = false
     

@@ -4,6 +4,7 @@
 //
 //  Created by Jessica Parsons on 4/15/25.
 //
+#if DEBUG
 
 import Foundation
 import CoreData
@@ -19,3 +20,5 @@ extension Reminder {
         ]
     }
 }
+
+#endif

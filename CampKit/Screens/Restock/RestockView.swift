@@ -11,12 +11,12 @@ import CoreData
 struct RestockView: View {
     
     @State var viewModel: RestockViewModel
+     
+    @Binding var isSettingsPresented: Bool
+    @State private var isPickerFocused: Bool = false
     @State private var isAddNewItemPresented: Bool = false
     
     @State private var scrollOffset: CGFloat = 0
-    
-    @Binding var isSettingsPresented: Bool
-    @State private var isPickerFocused: Bool = false
     
     init(context: NSManagedObjectContext, isSettingsPresented: Binding<Bool>) {
         _viewModel = State(wrappedValue: RestockViewModel(context: context))

@@ -68,11 +68,11 @@ final class CloudSharingCoordinator: NSObject, UICloudSharingControllerDelegate 
                     await MainActor.run {
                         let viewContext = stack.context
                         
-                        // Create a new object in the private store
+                        /// Create a new object in the private store
                         let privateStore = stack.privatePersistentStore
                         
-                        // Create a new PackingList in the private store
-                        // Copy relevant properties from shared list
+                        /// Create a new PackingList in the private store
+                        /// Copy relevant properties from shared list
                         
                         let privatePackingList = PackingList(
                             context: viewContext,
@@ -89,7 +89,7 @@ final class CloudSharingCoordinator: NSObject, UICloudSharingControllerDelegate 
                         
                         privatePackingList.photo = list.photo
                         
-                        // Duplicate categories and items
+                        /// Duplicate categories and items
                         for category in list.sortedCategories {
                             let newCategory = Category(
                                 context: viewContext,
@@ -113,7 +113,7 @@ final class CloudSharingCoordinator: NSObject, UICloudSharingControllerDelegate 
                         
                         viewContext.assign(privatePackingList, to: privateStore)
                         
-                        // Delete the shared version
+                        /// Delete the shared version
                         viewContext.delete(list)
                         
                         do {
@@ -124,7 +124,7 @@ final class CloudSharingCoordinator: NSObject, UICloudSharingControllerDelegate 
                         }
                     }
                     
-                    //Delete the CKShare from the private CloudKit database
+                    ///Delete the CKShare from the private CloudKit database
                     
                     let database = CKContainer.default().privateCloudDatabase
                     

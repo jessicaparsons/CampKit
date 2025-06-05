@@ -289,7 +289,7 @@ struct SettingsView: View {
                                 Image(systemName: "star.square.fill")
                                     .foregroundStyle(Color.colorSage)
                                 HStack {
-                                    Link("Rate CampKit", destination: URL(string: "https://apps.apple.com/app/idYOUR_APP_ID")!)
+                                    Link("Rate CampKit", destination: URL(string: "https://apps.apple.com/app/6744910267")!)
                                         .font(.body)
                                         .foregroundStyle(Color.colorSage)
                                     Image(systemName: "arrow.up.right.square").foregroundColor(Color.colorSage)

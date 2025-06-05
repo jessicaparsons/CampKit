@@ -13,21 +13,19 @@ let log = Logger(subsystem: "co.junipercreative.CampKit", category: "Sharing")
 
 struct MainView: View {
     
-    
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(StoreKitManager.self) private var storeKitManager
     @Environment(\.colorScheme) var colorScheme
     
     @State private var selection = 0
+    @State private var packingListsCount: Int = 0
     
     @State private var isSettingsPresented: Bool = false
     @State private var isUpgradeToProPresented: Bool = false
-    
-    @State private var packingListsCount: Int = 0
-    
     @State private var navigateToListView = false
-    @State private var currentPackingList: PackingList?
     @State private var isEditing = false
+
+    @State private var currentPackingList: PackingList?
     
     
     private var alertBinding: Binding<Bool> {

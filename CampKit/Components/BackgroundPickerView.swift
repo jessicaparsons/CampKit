@@ -25,6 +25,7 @@ struct BackgroundPickerView: View {
     @State private var selectedGradient: GradientOption?
     @State private var selectedImageName: String?
     @State private var selectedGalleryPhoto: PhotosPickerItem?
+    
     @State private var isPhotoPickerPresented = false
     @State private var wasPhotoPickerOpened = false
     

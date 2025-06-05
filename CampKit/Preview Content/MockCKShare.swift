@@ -5,6 +5,8 @@
 //  Created by Jessica Parsons on 4/23/25.
 //
 
+#if DEBUG
+
 import SwiftUI
 import CloudKit
 
@@ -39,3 +41,5 @@ struct ParticipantPreviewView: View {
         }
     }
 }
+
+#endif

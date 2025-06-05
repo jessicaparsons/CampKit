@@ -10,7 +10,6 @@ import CoreData
 
 struct HomeListView: View {
     
-    
     let weatherViewModel = WeatherViewModel(weatherFetcher: WeatherAPIClient(), geoCoder: Geocoder())
     
     @Environment(\.managedObjectContext) private var viewContext
@@ -18,21 +17,30 @@ struct HomeListView: View {
     @State private var quizViewModel: QuizViewModel
     @Environment(StoreKitManager.self) private var storeKitManager
     
-    @State private var isMenuOpen = false
     @State private var location: String = ""
+    
+    //ALERTS AND SHEETS
+    @State private var isMenuOpen = false
     @State private var isNewListQuizPresented: Bool = false
     @State private var isUpgradeToProPresented: Bool = false
+    @State private var isDeleteConfirmationPresented: Bool = false
+    
+    //QUIZ
     @State private var currentStep: Int = 1
+    
+    //UI
+    @State private var scrollOffset: CGFloat = 0
+    
+    //BINDINGS
     @Binding var navigateToListView: Bool
     @Binding var currentPackingList: PackingList?
     @Binding var packingListsCount: Int
     @Binding var selection: Int
     @Binding var isSettingsPresented: Bool
-    @State private var isDeleteConfirmationPresented: Bool = false
     @Binding var isEditing: Bool
+    
     @State private var listToDelete: PackingList?
     
-    @State private var scrollOffset: CGFloat = 0
     
     private let stack = CoreDataStack.shared
     

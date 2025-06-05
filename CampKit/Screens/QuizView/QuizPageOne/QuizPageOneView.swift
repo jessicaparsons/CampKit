@@ -12,13 +12,16 @@ struct QuizPageOneView: View {
     @Environment(WeatherViewModel.self) private var weatherViewModel
     @Environment(\.dismiss) private var dismiss
     @Bindable var viewModel: QuizViewModel
-    @State private var isElevationPopoverPresented: Bool = true
+    
     @FocusState var isFocused: Bool
     @Binding var isElevationAdded: Bool
+    
+    //ALERTS AND SHEETS
+    @State private var isElevationPopoverPresented: Bool = true
     @State private var isLocationSearchPresented: Bool = false
-    @State private var showStepper: Bool = false
     @State private var isCalendarPresented: Bool = false
     
+    //DATES
     @State private var tempStartDate: Date? = nil
     @State private var tempEndDate: Date? = nil
     @State private var formattedDate: String = "Select Dates"

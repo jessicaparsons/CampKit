@@ -4,7 +4,7 @@
 //
 //  Created by Jessica Parsons on 3/25/25.
 //
-
+#if DEBUG
 import Foundation
 
 extension WeatherModel {
@@ -16,3 +16,4 @@ extension WeatherModel {
     }
     
 }
+#endif

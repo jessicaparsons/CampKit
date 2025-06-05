@@ -9,7 +9,6 @@ import SwiftUI
 
 struct CollapsableStepperView: View {
     
-    
     @Binding var value: Int
     let range: ClosedRange<Int>
 

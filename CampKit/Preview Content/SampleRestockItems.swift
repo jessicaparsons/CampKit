@@ -4,7 +4,7 @@
 //
 //  Created by Jessica Parsons on 4/4/25.
 //
-
+#if DEBUG
 import SwiftUI
 import CoreData
 
@@ -21,3 +21,4 @@ extension RestockItem {
         }
     }
 }
+#endif

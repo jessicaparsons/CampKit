@@ -9,13 +9,16 @@ import SwiftUI
 
 struct ListDetailCardView: View {
     @ObservedObject var viewModel: ListViewModel
+    
+    //PRESENTING
     @State private var isLocationPresented: Bool = false
     @State private var isCalendarPresented: Bool = false
     
+    //TEMP DATES
     @State private var tempStartDate: Date? = nil
     @State private var tempEndDate: Date? = nil
     
-    //Map Options
+    //MAP OPTIONS
     @State private var showMapOptions = false
     let locationQuery = "1 Infinite Loop, Cupertino, CA"
         

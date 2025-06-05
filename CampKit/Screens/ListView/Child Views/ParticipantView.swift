@@ -172,8 +172,10 @@ extension ParticipantView {
 }
 
 
+//#if DEBUG
+//
 //#Preview("Styled ParticipantView with Mock Data") {
-//   
+//
 //    NavigationStack {
 //        ParticipantView(
 //            share: nil,
@@ -184,3 +186,4 @@ extension ParticipantView {
 //        )
 //    }
 //}
+// #endif

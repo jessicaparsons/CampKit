@@ -9,7 +9,6 @@ import SwiftUI
 
 struct StepperView: View {
     
-    
     @Binding var value: Int
     let range: ClosedRange<Int>
     

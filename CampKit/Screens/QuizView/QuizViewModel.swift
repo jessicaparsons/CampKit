@@ -45,9 +45,9 @@ final class QuizViewModel {
     func createPackingList() {
         withAnimation {
             
-            // filters the choices to include only the selected items
-            // where 'isSelected' is true, then maps the filtered result to an array of their names
-            // inserts the choices into the context
+            /// filters the choices to include only the selected items
+            /// where 'isSelected' is true, then maps the filtered result to an array of their names
+            /// inserts the choices into the context
             
             let lists = fetchPackingLists()
             
@@ -71,12 +71,12 @@ final class QuizViewModel {
                 
             )
             
-            //Generate recommended categories and items
+            ///Generate recommended categories and items
             let categories = generateCategories(for: newPackingList, using: viewContext)
             categories.forEach { newPackingList.addToCategories($0)
             }
             
-            //Expand the first category in the UI
+            ///Expand the first category in the UI
             newPackingList.sortedCategories.first?.isExpanded = true
             
             save(viewContext)
@@ -122,7 +122,7 @@ final class QuizViewModel {
     }
     
     
-    //Generate Packing Categories
+    ///Generate Packing Categories
     
     @MainActor
     private func generateCategories(for packingList: PackingList, using context: NSManagedObjectContext) -> [Category] {
@@ -141,7 +141,7 @@ final class QuizViewModel {
             ChoiceOptions.vehicle
         ]
         
-        // Grab category templates with Core Data items
+        /// Grab category templates with Core Data items
         let templates = generateCategoryTemplates(using: context)
         
         let filters = defaultCategories + Array(selectedFilters)

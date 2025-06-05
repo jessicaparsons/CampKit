@@ -15,7 +15,6 @@ class HomeListViewModel: ObservableObject {
     private let viewContext: NSManagedObjectContext
     private let sortKey = "selectedHomeSort"
 
-    
     @Published var packingLists: [PackingList] = []
     @Published var draggedItem: PackingList?
     

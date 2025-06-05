@@ -9,8 +9,7 @@ import SwiftUI
 
 struct AddNewReminderButtonView: View {
     var body: some View {
-        
-        
+         
         HStack {
             Image(systemName: "plus.circle")
                 .foregroundColor(.secondary)

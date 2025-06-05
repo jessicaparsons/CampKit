@@ -10,7 +10,7 @@ import CoreData
 
 
 
-//Dictionary with all category templates
+///Dictionary with all category templates
 
  func setCategoryOrder() -> [String: Int64] {
      
@@ -79,15 +79,19 @@ func generateCategoryTemplates(using viewContext: NSManagedObjectContext) -> [St
             Item(context: viewContext, title: "Sleeping bag (temp rated)"),
             Item(context: viewContext, title: "Sleeping pad"),
             Item(context: viewContext, title: "Pillows"),
-            Item(context: viewContext, title: "Extra blankets")
+            Item(context: viewContext, title: "Extra blankets"),
+            Item(context: viewContext, title: "Extra stakes"),
+            Item(context: viewContext, title: "Mallet")
         ],
         ChoiceOptions.kitchen: [
+            Item(context: viewContext, title: "Stove"),
             Item(context: viewContext, title: "Propane/fuel"),
             Item(context: viewContext, title: "Pots and pans"),
             Item(context: viewContext, title: "Plates and bowls"),
-            Item(context: viewContext, title: "Coffee mugs"),
-            Item(context: viewContext, title: "Cooking knives"),
             Item(context: viewContext, title: "Utensils"),
+            Item(context: viewContext, title: "Cups/coffee mugs"),
+            Item(context: viewContext, title: "Cooking knives"),
+            Item(context: viewContext, title: "Cutting board"),
             Item(context: viewContext, title: "Roasting sticks"),
             Item(context: viewContext, title: "Paper towels"),
             Item(context: viewContext, title: "Coffee brewer"),
@@ -96,10 +100,10 @@ func generateCategoryTemplates(using viewContext: NSManagedObjectContext) -> [St
             Item(context: viewContext, title: "Water (2 gal/pp/day)"),
             Item(context: viewContext, title: "Water bottles"),
             Item(context: viewContext, title: "Thermos"),
-            Item(context: viewContext, title: "Dish soap & sponge/brush"),
+            Item(context: viewContext, title: "Dish sponge/brush"),
+            Item(context: viewContext, title: "Campsuds/biodegradable soap"),
             Item(context: viewContext, title: "Trash bags"),
             Item(context: viewContext, title: "Food storage containers"),
-            Item(context: viewContext, title: "Cutting board"),
             Item(context: viewContext, title: "Can/bottle opener"),
             Item(context: viewContext, title: "Scissors")
         ],
@@ -114,40 +118,41 @@ func generateCategoryTemplates(using viewContext: NSManagedObjectContext) -> [St
         ],
         ChoiceOptions.tools: [
             Item(context: viewContext, title: "Firewood"),
+            Item(context: viewContext, title: "Hatchet"),
             Item(context: viewContext, title: "Fire permit (if required)"),
             Item(context: viewContext, title: "Headlamps/flashlights"),
             Item(context: viewContext, title: "Camp lights and lanterns"),
             Item(context: viewContext, title: "Extra batteries"),
             Item(context: viewContext, title: "Power station/bank"),
-            Item(context: viewContext, title: "Extra stakes"),
             Item(context: viewContext, title: "Paracord/rope"),
             Item(context: viewContext, title: "Utility knife/multi-tool"),
             Item(context: viewContext, title: "Fire starter"),
             Item(context: viewContext, title: "Matches/lighter/flint"),
             Item(context: viewContext, title: "Bug spray"),
             Item(context: viewContext, title: "Hand sanitizer"),
-            Item(context: viewContext, title: "Toilet paper/wet wipes"),
             Item(context: viewContext, title: "Duct tape"),
-            Item(context: viewContext, title: "Mallet"),
             Item(context: viewContext, title: "Camp shower"),
-            Item(context: viewContext, title: "Trowel")
+            Item(context: viewContext, title: "Trowel"),
+            Item(context: viewContext, title: "Walkie Talkies"),
         ],
         ChoiceOptions.clothing: [
             Item(context: viewContext, title: "Moisture-wicking shirts"),
             Item(context: viewContext, title: "Quick-dry pants/shorts"),
-            Item(context: viewContext, title: "Jackets"),
-            Item(context: viewContext, title: "Hats"),
+            Item(context: viewContext, title: "Jackets: warm/light"),
+            Item(context: viewContext, title: "Sweater/fleece"),
             Item(context: viewContext, title: "Socks: hiking/warm"),
             Item(context: viewContext, title: "Undergarments"),
-            Item(context: viewContext, title: "Walking/hiking shoes"),
+            Item(context: viewContext, title: "Shoes: walking/hiking"),
             Item(context: viewContext, title: "Boots"),
             Item(context: viewContext, title: "Camping slippers"),
-            Item(context: viewContext, title: "Towels"),
             Item(context: viewContext, title: "Pajamas/sweats"),
+            Item(context: viewContext, title: "Hats"),
             Item(context: viewContext, title: "Sunglasses"),
             Item(context: viewContext, title: "Watch/jewelry")
         ],
         ChoiceOptions.toiletries: [
+            Item(context: viewContext, title: "Toilet paper/wet wipes"),
+            Item(context: viewContext, title: "Towels"),
             Item(context: viewContext, title: "Medications/supplements"),
             Item(context: viewContext, title: "Toothpaste/toothbrush"),
             Item(context: viewContext, title: "Brush/comb"),
@@ -157,19 +162,24 @@ func generateCategoryTemplates(using viewContext: NSManagedObjectContext) -> [St
             Item(context: viewContext, title: "Chapstick"),
             Item(context: viewContext, title: "Feminine products"),
             Item(context: viewContext, title: "Makeup/skincare"),
-            Item(context: viewContext, title: "Small mirror")
+            Item(context: viewContext, title: "Contact solution/lenses"),
+            Item(context: viewContext, title: "Small mirror"),
+            Item(context: viewContext, title: "Camp shower"),
+            Item(context: viewContext, title: "Biodegradable shampoo/soap")
         ],
         ChoiceOptions.emergency: [
             Item(context: viewContext, title: "First aid kit"),
             Item(context: viewContext, title: "Whistle"),
             Item(context: viewContext, title: "Navigation tools"),
             Item(context: viewContext, title: "Bear spray (if in bear country)"),
-            Item(context: viewContext, title: "Cash")
+            Item(context: viewContext, title: "Cash"),
+            Item(context: viewContext, title: "Water filtration system")
         ],
         ChoiceOptions.lounge: [
             Item(context: viewContext, title: "Camp chairs"),
+            Item(context: viewContext, title: "Hammock"),
             Item(context: viewContext, title: "Shade pop-up/canopy"),
-            Item(context: viewContext, title: "Electronics/BT speakers"),
+            Item(context: viewContext, title: "Bluetooth speaker"),
             Item(context: viewContext, title: "Books"),
             Item(context: viewContext, title: "Cards/games"),
             Item(context: viewContext, title: "Instruments"),

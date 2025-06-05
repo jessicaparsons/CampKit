@@ -14,6 +14,7 @@ struct QuizView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(WeatherViewModel.self) private var weatherViewModel
     @Bindable var viewModel: QuizViewModel
+    
     @Binding var isNewListQuizPresented: Bool
     @Binding var currentStep: Int
     @Binding var navigateToListView: Bool

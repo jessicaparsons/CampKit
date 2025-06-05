@@ -8,14 +8,27 @@
 import SwiftUI
 
 struct ProTag: View {
+    
+    @Environment(StoreKitManager.self) private var storeKitManager
+    
     var body: some View {
         Text("PRO")
             .font(.caption2)
             .fontWeight(.bold)
             .padding(.horizontal, 6)
             .padding(.vertical, 2)
-            .background(Color.colorBloodOrange)
-            .foregroundColor(.white)
+            .background(storeKitManager.isProUnlocked
+                        ?
+                        Color.colorSage
+                        :
+                        Color.colorBloodOrange
+                    )
+            .foregroundColor(storeKitManager.isProUnlocked
+                             ?
+                             Color.colorWhiteBackground
+                             :
+                             Color.white
+                         )
             .clipShape(Capsule())
             .accessibilityLabel("Pro feature")
     }
@@ -23,4 +36,5 @@ struct ProTag: View {
 
 #Preview {
     ProTag()
+        .environment(StoreKitManager())
 }

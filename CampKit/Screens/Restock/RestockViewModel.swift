@@ -37,7 +37,7 @@ final class RestockViewModel {
         
         withAnimation {
             let newPosition = (restockItems.map(\.positionInt).max() ?? -1) + 1
-            let newItem = RestockItem(context: viewContext, title: title, position: newPosition, isPacked: false)
+            _ = RestockItem(context: viewContext, title: title, position: newPosition, isPacked: false)
             save(viewContext)
             restockItems = try! fetchRestockItems(using: viewContext)
         }

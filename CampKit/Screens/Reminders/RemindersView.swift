@@ -14,18 +14,18 @@ struct RemindersView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.dismiss) private var dismiss
     
-    @State var viewModel: RemindersViewModel
-    @State private var isAddNewReminderAlertPresented: Bool = false
-    @State private var selectedReminder: Reminder?
-    @State private var showReminderEditScreen: Bool = false
     @AppStorage("isShowingCompletedReminders") private var isShowingCompleted: Bool = false
     @AppStorage("selectedRemindersSort") private var selectedSort: String = "Date"
+    
+    @State var viewModel: RemindersViewModel
+    @State private var selectedReminder: Reminder?
+    
+    @State private var isAddNewReminderAlertPresented: Bool = false
+    @State private var showReminderEditScreen: Bool = false
     @State private var dataRefreshTrigger = false
-    
-    @State private var scrollOffset: CGFloat = 0
-    
     @Binding var isSettingsPresented: Bool
-    
+
+    @State private var scrollOffset: CGFloat = 0
     
     var reminderItems: [Reminder] {
         _ = dataRefreshTrigger

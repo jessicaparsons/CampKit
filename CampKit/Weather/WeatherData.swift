@@ -33,7 +33,7 @@ struct Weather: Codable {
 }
 
 
-//Stores the daily highs and lows and most common weatherID
+///Stores the daily highs and lows and most common weatherID
 struct DailyWeather {
     let date: String
     let high: Double

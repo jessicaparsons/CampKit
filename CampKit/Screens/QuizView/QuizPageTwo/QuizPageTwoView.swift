@@ -11,7 +11,9 @@ struct QuizPageTwoView: View {
     
     @Environment(WeatherViewModel.self) private var weatherViewModel
     @Bindable var viewModel: QuizViewModel
+    
     @Binding var isElevationAdded: Bool
+    
     @State private var weatherCategories: Set<String> = []
     @State private var isWeatherLoading: Bool = false
     

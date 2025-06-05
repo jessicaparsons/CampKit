@@ -13,8 +13,6 @@ struct HomeListCardView: View {
     @ObservedObject var viewModel: HomeListViewModel
     @ObservedObject var packingList: PackingList
     
-    
-    
     @Binding var isEditing: Bool
     
     

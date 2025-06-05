@@ -89,9 +89,9 @@ class StoreKitManager {
                 
                 isProUnlocked = true
                 UserDefaults.standard.set(true, forKey: Constants.userDefaultsProKey)
-                triggerAlert(message: "purchase successfully restored")
+                
             } else {
-                triggerAlert(message: "Failed to restore purchase")
+                
             }
         }
     }
