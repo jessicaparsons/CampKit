@@ -71,7 +71,7 @@ struct UpgradeToProView: View {
                         Text("One time purchase")
                         Button {
                             Task {
-                                await                         storeKitManager.purchasePro()
+                                await storeKitManager.purchasePro()
                             }
                         } label: {
                             Text("Upgrade to Pro")
