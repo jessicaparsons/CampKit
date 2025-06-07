@@ -138,10 +138,10 @@ struct SettingsView: View {
                             HStack {
                                 VStack(alignment: .leading) {
                                     HStack {
-                                        Text("Customize Celebration")
+                                        Text("Customize Bonfire")
                                         ProTag()
                                     }//:HSTACK
-                                    Text("Tap to change your celebration emoji")
+                                    Text("Tap to customize your celebration emoji for when every item is packed")
                                         .font(.caption)
                                         .foregroundColor(.secondary)
                                 }//:VSTACK

@@ -96,7 +96,6 @@ struct RestockView: View {
                                 .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
                         )
                         .padding(.horizontal)
-                        .animation(.easeInOut, value: viewModel.restockItems.count)
                     
                 }//:VSTACK
                 .padding(.bottom, Constants.bodyPadding)

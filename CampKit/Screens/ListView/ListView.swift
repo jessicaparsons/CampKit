@@ -277,10 +277,11 @@ struct ListView: View {
                             Button {
                                 isGalleryPhotoPickerPresented = true
                             } label: {
-                                Image(systemName: "plus")
-                                    .foregroundStyle(Color.primary)
-                                    .accessibilityLabel("Open phone gallery")
+                                Image(systemName: "camera")
+                                .foregroundStyle(Color.primary)
+                                .accessibilityLabel("Open phone gallery")
                             }
+                            
                         }
                     }
                 }

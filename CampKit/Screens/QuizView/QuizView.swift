@@ -162,7 +162,7 @@ struct QuizView: View {
                         Button {
                             isPhotoPickerPresented.toggle()
                         } label: {
-                            Image(systemName: "plus")
+                            Image(systemName: "camera")
                                 .foregroundStyle(Color.primary)
                                 .accessibilityLabel("Open phone gallery")
                                 

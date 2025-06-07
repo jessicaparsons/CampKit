@@ -8,11 +8,13 @@
 import SwiftUI
 
 struct ListDetailCardView: View {
+    @Environment(\.managedObjectContext) private var viewContext
     @ObservedObject var viewModel: ListViewModel
     
     //PRESENTING
     @State private var isLocationPresented: Bool = false
     @State private var isCalendarPresented: Bool = false
+    @State private var isCalendarOptionsPresented: Bool = false
     
     //TEMP DATES
     @State private var tempStartDate: Date? = nil
@@ -28,7 +30,10 @@ struct ListDetailCardView: View {
             HStack {
                 TextField("List Title", text: Binding(
                     get: { viewModel.packingList.title ?? Constants.newPackingListTitle },
-                    set: { viewModel.packingList.title = $0 }
+                    set: {
+                        viewModel.packingList.title = $0
+                        save(viewContext)
+                    }
                 ))
                 .multilineTextAlignment(.center)
                 .font(.title2.weight(.bold))
@@ -104,7 +109,26 @@ struct ListDetailCardView: View {
         .onTapGesture {
             tempStartDate = viewModel.packingList.startDate ?? nil
             tempEndDate = viewModel.packingList.endDate ?? nil
-            isCalendarPresented = true
+            isCalendarOptionsPresented = true
+        }
+        .confirmationDialog("Date Details", isPresented: $isCalendarOptionsPresented, titleVisibility: .visible) {
+            
+            //EDIT DATES
+            Button("Edit Dates") {
+                isCalendarPresented = true
+            }
+            .accessibilityHint("Edit the dates of this list")
+            
+            //CLEAR LOCATION IF LOCATION IS SET
+            if viewModel.packingList.startDate != nil, viewModel.packingList.endDate != nil {
+                
+                //CLEAR LOCATION
+                Button("Clear Dates") {
+                    viewModel.packingList.startDate = nil
+                    viewModel.packingList.endDate = nil
+                }
+                .accessibilityHint("Clear the location of this list")
+            }
         }
         .sheet(isPresented: $isCalendarPresented) {
             DatePickerView(

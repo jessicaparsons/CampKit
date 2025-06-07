@@ -36,6 +36,7 @@ class HomeListViewModel: ObservableObject {
     }
     
     ///Sort by title or date, but set nil dates to distant future so they are sorted at the bottom of the list
+    ///If both dates are nil, additionally sort by title
     func fetchPackingLists() {
         let request: NSFetchRequest<PackingList> = PackingList.fetchRequest()
         request.sortDescriptors = [] //Sort manually
@@ -45,7 +46,12 @@ class HomeListViewModel: ObservableObject {
 
             if selectedSort == "Date" {
                 lists.sort {
-                    ($0.startDate ?? .distantFuture) < ($1.startDate ?? .distantFuture)
+                    let lhsDate = $0.startDate ?? .distantFuture
+                    let rhsDate = $1.startDate ?? .distantFuture
+                    if lhsDate == rhsDate {
+                        return ($0.title ?? "") < ($1.title ?? "")
+                    }
+                    return lhsDate < rhsDate
                 }
             } else {
                 lists.sort {

@@ -44,7 +44,10 @@ struct EditableItemView<T: EditablePackableItem>: View {
                 
                 TextField("Item Name", text: Binding(
                     get: { item.title ?? "" },
-                    set: { item.title = $0 }),
+                    set: {
+                        item.title = $0
+                        saveContext(for: item as! NSManagedObject)
+                    }),
                           axis: .vertical
                 )
                 .focused($isFocused)

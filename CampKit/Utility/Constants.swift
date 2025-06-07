@@ -47,7 +47,7 @@ struct Constants {
     static let placeholderBannerPhoto: String = "PineShadow"
     
     //PRO
-    static let proVersionListCount: Int = 9
+    static let proVersionListCount: Int = 3
     @AppStorage("successEmoji") var successEmoji: String = "🔥"
     static let productIDPro: String = "com.campingkitapp.pro"
     static let userDefaultsProKey: String = "ProPurchased"

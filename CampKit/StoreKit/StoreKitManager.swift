@@ -56,7 +56,7 @@ class StoreKitManager {
                     await transaction.finish()
                     isProUnlocked = true
                     UserDefaults.standard.set(true, forKey: Constants.userDefaultsProKey)
-                    //triggerAlert(message: "Purchase successful!")
+                    triggerAlert(message: "Thank you for purchasing Pro!")
                 }
             case .userCancelled:
                 #if DEBUG

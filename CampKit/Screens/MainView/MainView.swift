@@ -131,7 +131,7 @@ struct MainView: View {
             SettingsView()
                 .presentationDragIndicator(.visible)
         }
-        .alert("Pro Upgrade", isPresented: alertBinding, actions: {
+        .alert("CampingKit Pro", isPresented: alertBinding, actions: {
             Button("OK", role: .cancel) { }
         }, message: {
             Text(storeKitManager.purchaseAlertMessage)
