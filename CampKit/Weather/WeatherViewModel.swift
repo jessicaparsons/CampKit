@@ -110,13 +110,13 @@ final class WeatherViewModel {
                 weatherCategories.insert("cold")
             }
             
-            if conditionName == "cloud.bolt.rain" ||
-                conditionName == "cloud.drizzle" ||
-                conditionName == "cloud.heavyrain" {
+            if conditionName == "⛈️" ||
+                conditionName == "🌧️" ||
+                conditionName == "🌧️" {
                 weatherCategories.insert("rainy")
             }
             
-            if conditionName == "cloud.snow" {
+            if conditionName == "❄️" {
                 weatherCategories.insert("snowy")
                 weatherCategories.remove("mild")
             }
