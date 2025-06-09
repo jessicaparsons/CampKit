@@ -82,6 +82,7 @@ struct CategorySectionView: View {
                                 save(viewContext)
                             }
                             .padding(.leading, Constants.horizontalPadding)
+                            .offset(x: category.isExpanded ? -16 : -12)
                         
                         Button("Done") {
                             isEditing = false
