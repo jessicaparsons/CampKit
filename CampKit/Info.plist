@@ -2,6 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>We use your photo library to let you choose a custom banner image for your list.</string>
 	<key>UNSPLASH_SECRET_KEY</key>
@@ -19,9 +21,9 @@
 		<key>UIColorName</key>
 		<string>launch-color</string>
 		<key>UIImageName</key>
-		<string>launch-background</string>
+		<string>launch-icon</string>
 		<key>UIImageRespectsSafeAreaInsets</key>
-		<false/>
+		<true/>
 	</dict>
 	<key>UTExportedTypeDeclarations</key>
 	<array>

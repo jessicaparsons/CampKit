@@ -13,6 +13,8 @@ struct HomeListView: View {
     let weatherViewModel = WeatherViewModel(weatherFetcher: WeatherAPIClient(), geoCoder: Geocoder())
     
     @Environment(\.managedObjectContext) private var viewContext
+    @Environment(\.horizontalSizeClass) var sizeClass
+    
     @StateObject private var viewModel: HomeListViewModel
     @State private var quizViewModel: QuizViewModel
     @Environment(StoreKitManager.self) private var storeKitManager
@@ -22,6 +24,7 @@ struct HomeListView: View {
     //ALERTS AND SHEETS
     @State private var isMenuOpen = false
     @State private var isNewListQuizPresented: Bool = false
+    @State private var isNewListQuizPresentediPad: Bool = false
     @State private var isUpgradeToProPresented: Bool = false
     @State private var isDeleteConfirmationPresented: Bool = false
     
@@ -44,8 +47,13 @@ struct HomeListView: View {
     
     private let stack = CoreDataStack.shared
     
-    private let gridItem: [GridItem] = Array(repeating: .init(.flexible(), spacing: Constants.horizontalPadding), count: 2)
-    
+    private var gridItem: [GridItem] {
+        if sizeClass == .regular {
+            return Array(repeating: GridItem(.flexible(), spacing: Constants.horizontalPadding), count: 3) // iPad layout
+        } else {
+            return Array(repeating: GridItem(.flexible(), spacing: Constants.horizontalPadding), count: 2) // iPhone layout
+        }
+    }
     
     init(
         context: NSManagedObjectContext,
@@ -230,7 +238,13 @@ struct HomeListView: View {
                 buttonTwoLabel: "Customized List",
                 buttonTwoAction: {
                     if storeKitManager.isProUnlocked || packingListsCount < Constants.proVersionListCount {
-                        isNewListQuizPresented = true
+                        
+                        if sizeClass == .regular {
+                            isNewListQuizPresentediPad = true
+                        } else {
+                            isNewListQuizPresented = true
+                        }
+                        
                     } else {
                         isUpgradeToProPresented.toggle()
                     }
@@ -252,6 +266,19 @@ struct HomeListView: View {
             }
         }
         //MARK: - SHOW PACKING LIST QUIZ
+        .fullScreenCover(isPresented: $isNewListQuizPresentediPad) {
+            NavigationStack {
+                QuizView(
+                    viewModel: quizViewModel,
+                    isNewListQuizPresented: $isNewListQuizPresentediPad,
+                    currentStep: $currentStep,
+                    navigateToListView: $navigateToListView,
+                    currentPackingList: $currentPackingList,
+                    packingListCount: viewModel.packingLists.count
+                )
+                .environment(weatherViewModel)
+            }
+        }
         .sheet(isPresented: $isNewListQuizPresented) {
             NavigationStack {
                 QuizView(
@@ -344,33 +371,36 @@ struct HomeListView: View {
             isNewListQuizPresented = true
             HapticsManager.shared.triggerLightImpact()
         } label: {
-            ZStack {
-                RoundedRectangle(cornerRadius: Constants.cornerRadiusButton)
-                    .fill(Color.colorWhite)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: Constants.cornerRadiusButton)
-                            .stroke(Color(UIColor.systemGray4), lineWidth: 1)
-                    )
-                    .frame(height: 50)
-                    .shadow(color: Color.black.opacity(0.1), radius: 8)
-                
-                HStack {
-                    Image(systemName: "tent.circle")
-                        .foregroundColor(Color.colorNeon)
-                        .frame(width: 35, height: 35)
-                        .background(Color.colorSecondaryIcon)
-                        .clipShape(Circle())
-                        .padding(.leading, 10)
-                        .font(.system(size: 24, weight: .light))
-                    Text("Let's get packing")
-                        .foregroundStyle(Color.secondary)
-                    Spacer()
-                    Image(systemName: "chevron.right")
-                        .foregroundStyle(Color.secondary)
-                        .padding(.trailing)
-                }//:HSTACK
-                
-            }//:ZSTACK
+            HStack {
+                ZStack {
+                    RoundedRectangle(cornerRadius: Constants.cornerRadiusButton)
+                        .fill(Color.colorWhite)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: Constants.cornerRadiusButton)
+                                .stroke(Color(UIColor.systemGray4), lineWidth: 1)
+                        )
+                        .frame(height: 50)
+                        .shadow(color: Color.black.opacity(0.1), radius: 8)
+                    
+                    HStack {
+                        Image(systemName: "tent.circle")
+                            .foregroundColor(Color.colorNeon)
+                            .frame(width: 35, height: 35)
+                            .background(Color.colorSecondaryIcon)
+                            .clipShape(Circle())
+                            .padding(.leading, 10)
+                            .font(.system(size: 24, weight: .light))
+                        Text("Let's get packing")
+                            .foregroundStyle(Color.secondary)
+                        Spacer()
+                        Image(systemName: "chevron.right")
+                            .foregroundStyle(Color.secondary)
+                            .padding(.trailing)
+                    }//:HSTACK
+                }//:ZSTACK
+                .frame(maxWidth: sizeClass == .regular ? 300 : .infinity, alignment: .leading)
+                Spacer()
+            }//:HSTACK
         }//:BUTTON
     }
     

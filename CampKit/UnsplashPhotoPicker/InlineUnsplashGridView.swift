@@ -44,37 +44,39 @@ struct InlineUnsplashGridView: View {
             .padding(10)
             .background(Color.colorTertiaryGrey)
             .cornerRadius(Constants.cornerRadius)
-            .padding(.horizontal)
+            .padding(.horizontal, Constants.horizontalPadding)
             .padding(.vertical, Constants.verticalSpacing)
             
             ScrollView {
                 LazyVGrid(columns: columns, spacing: Constants.gallerySpacing) {
                     ForEach(loader.photos) { photo in
                         ZStack(alignment: .bottomLeading) {
-                            AsyncImage(url: photo.urls.small) { phase in
-                                switch phase {
-                                case .success(let image):
-                                    image
-                                        .resizable()
-                                            .scaledToFill()
-                                            .frame(width: size, height: size)
-                                            .clipped()
-                                            .overlay(
-                                                Rectangle()
-                                                    .stroke(selectedID == photo.id ? Color.colorNeon : Color.clear, lineWidth: 3)
-                                            )
-                                        .onTapGesture {
-                                            loadFullImage(from: photo.urls.regular)
-                                            selectedID = photo.id
-                                            HapticsManager.shared.triggerLightImpact()
+                            Color.clear //force square container
+                                .aspectRatio(1, contentMode: .fit)
+                                .overlay(
+                                    AsyncImage(url: photo.urls.small) { phase in
+                                        switch phase {
+                                        case .success(let image):
+                                            image
+                                                .resizable()
+                                                .scaledToFill()
+                                                .clipped()
+                                        default:
+                                            Color.gray.opacity(0.1)
+                                                .overlay(ProgressView())
                                         }
-                                    
-                                default:
-                                    Color.gray.opacity(0.1)
-                                        .aspectRatio(1, contentMode: .fit)
-                                        .overlay(ProgressView())
+                                    }
+                                )
+                                .clipShape(Rectangle())
+                                .overlay(
+                                        Rectangle()
+                                            .stroke(selectedID == photo.id ? Color.colorNeon : Color.clear, lineWidth: 3)
+                                    )
+                                .onTapGesture {
+                                    loadFullImage(from: photo.urls.regular)
+                                    selectedID = photo.id
+                                    HapticsManager.shared.triggerLightImpact()
                                 }
-                            }//:IMAGE
                             
                             // Gradient overlay
                             LinearGradient(
@@ -98,7 +100,7 @@ struct InlineUnsplashGridView: View {
                         }//:ZSTACK
                     }
                 }
-                .padding(.horizontal)
+                .padding(.horizontal, Constants.horizontalPadding)
                 .padding(.bottom, Constants.quizPadding)
             }//:SCROLLVIEW
         }//:VSTACK

@@ -17,6 +17,8 @@ struct ListView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.dismiss) private var dismiss
     @Environment(StoreKitManager.self) private var storeKitManager
+    @Environment(\.horizontalSizeClass) var sizeClass
+    
     @StateObject var viewModel: ListViewModel
     @ObservedObject var homeViewModel: HomeListViewModel
     
@@ -57,6 +59,11 @@ struct ListView: View {
     
     //PRO
     @State private var isUpgradeToProPresented: Bool = false
+    
+    //LAYOUT
+    private var baseOffset: CGFloat {
+        sizeClass == .regular ? 128.5 : 97.67
+    }
     
     let packingListsCount: Int
     
@@ -115,13 +122,13 @@ struct ListView: View {
                             .padding(.bottom, Constants.bodyPadding)
                             
                         }//:VSTACK
-                        .padding(.horizontal)
+                        .padding(.horizontal, sizeClass == .regular ? Constants.ipadPadding : Constants.defaultPadding)
                         .background(
                             GeometryReader { geo in
                                 Color.clear
                                     .frame(height: 0)
                                     .onChange(of: geo.frame(in: .global).minY) {
-                                        scrollOffset = geo.frame(in: .global).minY - 88
+                                        scrollOffset = geo.frame(in: .global).minY - baseOffset
                                     }
                             }
                         )//NAV BAR UI CHANGES ON SCROLL
@@ -219,7 +226,7 @@ struct ListView: View {
                 // This makes the title invisible until scrolled
                 ToolbarItem(placement: .principal) {
                     Text(viewModel.packingList.title ?? Constants.newPackingListTitle)
-                        .opacity(scrollOffset < -scrollThreshold + 1 ? 1 : 0)
+                        .opacity(scrollOffset < -scrollThreshold ? 1 : 0)
                 }
             }
             .onChange(of: bannerImageItem) {
@@ -391,7 +398,6 @@ struct ListView: View {
                     viewModel.moveCategory(from: source, to: destination)
                 }
             )
-            .presentationDetents([.medium, .large])
         }
         .alert("Add New Category", isPresented: $isAddNewCategoryPresented) {
             TextField("New category", text: $newCategoryTitle)

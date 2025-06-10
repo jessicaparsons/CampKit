@@ -11,6 +11,8 @@ struct QuizPageOneView: View {
     
     @Environment(WeatherViewModel.self) private var weatherViewModel
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.horizontalSizeClass) var sizeClass
+
     @Bindable var viewModel: QuizViewModel
     
     @FocusState var isFocused: Bool
@@ -106,7 +108,7 @@ struct QuizPageOneView: View {
                 }//:VSTACK
                 
             }//:VSTACK
-            .padding(.horizontal, Constants.horizontalPadding)
+            .padding(.horizontal, sizeClass == .regular ? Constants.ipadPadding : Constants.horizontalPadding)
             .onTapGesture {
                 hideKeyboard()
             }
@@ -321,7 +323,7 @@ struct QuizPageOneView: View {
     
     let previewStack = CoreDataStack.preview
     
-    NavigationView {
+    
         ScrollView {
             QuizPageOneView(
                 viewModel: QuizViewModel(context: previewStack.context),
@@ -330,6 +332,6 @@ struct QuizPageOneView: View {
                 .environment(\.managedObjectContext, previewStack.context)
                 .environment(WeatherViewModel(weatherFetcher: WeatherAPIClient(), geoCoder: Geocoder()))
         }
-    }
+    
 }
 #endif

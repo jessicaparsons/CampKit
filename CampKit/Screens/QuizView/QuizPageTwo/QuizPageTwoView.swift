@@ -10,6 +10,8 @@ import SwiftUI
 struct QuizPageTwoView: View {
     
     @Environment(WeatherViewModel.self) private var weatherViewModel
+    @Environment(\.horizontalSizeClass) var sizeClass
+
     @Bindable var viewModel: QuizViewModel
     
     @Binding var isElevationAdded: Bool
@@ -59,7 +61,7 @@ struct QuizPageTwoView: View {
             }//:VSTACK
             
         }//:VSTACK
-        .padding(.horizontal, Constants.horizontalPadding)
+        .padding(.horizontal, sizeClass == .regular ? Constants.ipadPadding : Constants.horizontalPadding)
         .background(Color.colorWhiteBackground)
         .task {
             if let locationName = viewModel.locationName {

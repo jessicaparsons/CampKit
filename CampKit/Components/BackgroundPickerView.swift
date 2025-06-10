@@ -47,7 +47,7 @@ struct BackgroundPickerView: View {
                 }
             }
             .pickerStyle(.segmented)
-            .padding(.horizontal)
+            .padding(.horizontal, Constants.horizontalPadding)
             
             Group {
                 if selectedTab == .images {
@@ -88,7 +88,7 @@ struct BackgroundPickerView: View {
                                 }
                                 
                             }
-                            .padding(.horizontal)
+                            .padding(.horizontal, Constants.horizontalPadding)
                             .padding(.top, Constants.verticalSpacing)
                             .padding(.bottom, 5)
                             

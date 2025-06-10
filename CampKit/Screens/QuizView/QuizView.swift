@@ -50,7 +50,6 @@ struct QuizView: View {
                             
                         } else {
                             QuizPageThreeView(viewModel: viewModel)
-                                
                         }
                     }
                     .scrollIndicators(.hidden)

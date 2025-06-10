@@ -10,6 +10,7 @@ import PhotosUI
 
 struct BannerImageView: View {
     
+    @Environment(\.horizontalSizeClass) var sizeClass
     @ObservedObject var viewModel: ListViewModel
     private let placeholderImage: String = Constants.placeholderBannerPhoto
     
@@ -24,7 +25,7 @@ struct BannerImageView: View {
                 Color.black.opacity(0.2)
                     .ignoresSafeArea()
             }//:GROUP
-            .frame(width: UIScreen.main.bounds.width, height: Constants.bannerHeight)
+            .frame(width: UIScreen.main.bounds.width, height: sizeClass == .regular ? Constants.ipadBannerHeight : Constants.bannerHeight)
             .clipped()
         }//:ZSTACK
         .ignoresSafeArea(edges: .horizontal)

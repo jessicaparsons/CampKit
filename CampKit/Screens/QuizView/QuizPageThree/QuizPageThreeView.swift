@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct QuizPageThreeView: View {
-    
+    @Environment(\.horizontalSizeClass) var sizeClass
     @Bindable var viewModel: QuizViewModel
     
     var body: some View {
@@ -16,6 +16,7 @@ struct QuizPageThreeView: View {
             viewModel.setTempPhoto(image)
         }
         .padding(.top, Constants.largePadding)
+        .padding(.horizontal, sizeClass == .regular ? Constants.ipadPadding : 0)
     }
 }
 

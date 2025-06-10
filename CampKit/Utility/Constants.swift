@@ -35,11 +35,14 @@ struct Constants {
     static let horizontalPadding: CGFloat = 20
     static let bodyPadding: CGFloat = 70
     static let quizPadding: CGFloat = 150
+    static let ipadPadding: CGFloat = 200
+    static let defaultPadding: CGFloat = 16
     
     static let gradientBannerHeight: CGFloat = 120
     static let bannerHeight: CGFloat = 250
+    static let ipadBannerHeight: CGFloat = 450
     
-    static let homePageOffset: CGFloat = 0
+    static let homePageOffset: CGFloat = 1
     
     
     //STRINGS

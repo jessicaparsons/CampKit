@@ -117,9 +117,7 @@ struct MainView: View {
             }//:TABVIEW
             .toolbarBackground(Color(UIColor.tertiarySystemBackground), for: .tabBar)
             .tint(colorScheme == .light ? Color.colorForest : Color.colorSage)
-            
-            
-            
+
         }//:ZSTACK
         .ignoresSafeArea(.keyboard) // So the button doesn't move on keyboard appearance
         

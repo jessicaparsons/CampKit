@@ -13,6 +13,7 @@ struct RemindersView: View {
     
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.horizontalSizeClass) var sizeClass
     
     @AppStorage("isShowingCompletedReminders") private var isShowingCompleted: Bool = false
     @AppStorage("selectedRemindersSort") private var selectedSort: String = "Date"
