@@ -329,17 +329,8 @@ struct SettingsView: View {
                                 SettingsRowView(name: "Development", content: "Jessica Parsons")
                                 SettingsRowView(name: "Design", content: "Lauren Ussery")
                                 SettingsRowView(name: "Compatibility", content: "iOS 18.2+")
-                                SettingsRowView(name: "Website", linkLabel: "Juniper Creative Co.", linkDestination: "junipercreative.co")
+                                SettingsRowView(name: "Website", linkLabel: "campingkitapp.com", linkDestination: "campingkitapp.com")
                                 SettingsRowView(name: "Version", content: AppInfo.versionWithBuild)
-//                                Divider().padding(.vertical, 4)
-//                                HStack {
-//                                    Text("Delete iCloud Data")
-//                                    Image(systemName: "arrow.up.right.square")
-//                                }
-//                                .foregroundColor(Color.colorSage)
-//                                .onTapGesture {
-//                                    isDeleteICloudDataPresented = true
-//                                }
                             }
                             .padding(.top, 8)
                         },

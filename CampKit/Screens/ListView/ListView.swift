@@ -61,9 +61,7 @@ struct ListView: View {
     @State private var isUpgradeToProPresented: Bool = false
     
     //LAYOUT
-    private var baseOffset: CGFloat {
-        sizeClass == .regular ? 128.5 : 97.67
-    }
+    @State private var scrollPosition: CGFloat = 0
     
     let packingListsCount: Int
     
@@ -106,6 +104,17 @@ struct ListView: View {
                         //MARK: - LIST DETAILS HEADER
                         VStack {
                             
+                            GeometryReader { geo in
+                                Color.clear
+                                    .onAppear {
+                                        scrollOffset = geo.frame(in: .named("scroll")).minY
+                                    }
+                                    .onChange(of: geo.frame(in: .named("scroll")).minY) {
+                                        scrollOffset = geo.frame(in: .named("scroll")).minY
+                                    }
+                                    .frame(height: 0) // Keeps layout unaffected
+                            }
+                            
                             ListDetailCardView(viewModel: viewModel)
                                 .padding(.top, 68)
                                 .onTapGesture {
@@ -123,19 +132,8 @@ struct ListView: View {
                             
                         }//:VSTACK
                         .padding(.horizontal, sizeClass == .regular ? Constants.ipadPadding : Constants.defaultPadding)
-                        .background(
-                            GeometryReader { geo in
-                                Color.clear
-                                    .frame(height: 0)
-                                    .onChange(of: geo.frame(in: .global).minY) {
-                                        scrollOffset = geo.frame(in: .global).minY - baseOffset
-                                    }
-                            }
-                        )//NAV BAR UI CHANGES ON SCROLL
                 }//:SCROLLVIEW
-                .refreshable {
-                    await refresh(context: viewContext)
-                }
+                .coordinateSpace(name: "scroll")
                 
                 
                 //MARK: - FLOATING MENU
