@@ -10,7 +10,7 @@ Pack smarter, stress less, and never forget the essentials again.
 
 ## Screenshots
 ![AppStore Screenshots](assets/ck-appstore-1.jpg)
-![AppStore Screenshots](assets/ck-appstore-1.jpg)
+![AppStore Screenshots](assets/ck-appstore-2.jpg)
 
 ---
 
