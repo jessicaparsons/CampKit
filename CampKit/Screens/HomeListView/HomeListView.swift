@@ -368,8 +368,20 @@ struct HomeListView: View {
     
     var whereToNextButton: some View {
         Button {
-            isNewListQuizPresented = true
-            HapticsManager.shared.triggerLightImpact()
+            if storeKitManager.isProUnlocked || packingListsCount < Constants.proVersionListCount {
+                
+                if sizeClass == .regular {
+                    isNewListQuizPresentediPad = true
+                } else {
+                    isNewListQuizPresented = true
+                }
+                HapticsManager.shared.triggerLightImpact()
+                
+            } else {
+                isUpgradeToProPresented.toggle()
+            }
+            
+            
         } label: {
             HStack {
                 ZStack {
