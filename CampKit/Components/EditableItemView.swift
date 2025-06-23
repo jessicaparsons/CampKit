@@ -88,6 +88,11 @@ struct EditableItemView<T: EditablePackableItem>: View {
                     }
                 
             }//:HSTACK
+            .onChange(of: isPickerFocused) {
+                if !isPickerFocused {
+                    disableSwipe = false
+                }
+            }
         }//:ZSTACK
         .padding(.horizontal)
         .padding(.vertical, isRestockItem ? 12 : 8)
