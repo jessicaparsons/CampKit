@@ -10,7 +10,6 @@ import SwiftUI
 struct UpgradeToProView: View {
     
     @Environment(StoreKitManager.self) private var storeKitManager
-    @Environment(\.colorScheme) private var colorScheme
     @Environment(\.dismiss) private var dismiss
     
     var body: some View {

@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct HomeListCardView: View {
-    @Environment(\.colorScheme) var colorScheme
     @Environment(\.managedObjectContext) private var viewContext
     @ObservedObject var viewModel: HomeListViewModel
     @ObservedObject var packingList: PackingList

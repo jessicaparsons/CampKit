@@ -9,7 +9,6 @@ import SwiftUI
 
 struct HeaderView: View {
     
-    @Environment(\.colorScheme) var colorScheme
     let title: String
     
     @Binding var scrollOffset: CGFloat

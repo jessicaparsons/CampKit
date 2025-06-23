@@ -40,11 +40,13 @@ struct CampKitApp: App {
     
     var body: some Scene {
         WindowGroup {
-            MainView()
-                .environment(\.managedObjectContext, CoreDataStack.shared.context)
-                .environment(weatherViewModel)
-                .environment(storeKitManager)
-                .preferredColorScheme(isDarkMode ? .dark : .light)
+            StatusBarView {
+                MainView()
+                    .environment(\.managedObjectContext, CoreDataStack.shared.context)
+                    .environment(weatherViewModel)
+                    .environment(storeKitManager)
+                    .preferredColorScheme(isDarkMode ? .dark : .light)
+            }
         }
         
     }

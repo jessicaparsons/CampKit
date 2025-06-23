@@ -11,6 +11,7 @@ internal import ConfettiSwiftUI
 import CoreData
 import os
 
+
 struct ListView: View {
     
     @AppStorage("successEmoji") private var successEmoji: String = "🔥"
@@ -62,6 +63,7 @@ struct ListView: View {
     
     //LAYOUT
     @State private var scrollPosition: CGFloat = 0
+    @State private var statusBarStyle: UIStatusBarStyle = .lightContent
     
     let packingListsCount: Int
     
