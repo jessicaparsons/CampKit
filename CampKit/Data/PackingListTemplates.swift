@@ -32,6 +32,7 @@ import CoreData
         ChoiceOptions.bouldering,
         ChoiceOptions.biking,
         ChoiceOptions.backpacking,
+        ChoiceOptions.festival,
         ChoiceOptions.fishing,
         ChoiceOptions.hunting,
         ChoiceOptions.hot,
@@ -59,7 +60,7 @@ let packingPreferenceCategories: [String: [String]] = [
     ChoiceOptions.addParticipants: [ChoiceOptions.kids, ChoiceOptions.pets],
 
     
-    ChoiceOptions.activities: [ChoiceOptions.hiking, ChoiceOptions.waterSports, ChoiceOptions.bouldering, ChoiceOptions.biking, ChoiceOptions.backpacking, ChoiceOptions.fishing, ChoiceOptions.hunting],
+    ChoiceOptions.activities: [ChoiceOptions.hiking, ChoiceOptions.waterSports, ChoiceOptions.bouldering, ChoiceOptions.biking, ChoiceOptions.backpacking, ChoiceOptions.festival, ChoiceOptions.fishing, ChoiceOptions.hunting],
     
     
     ChoiceOptions.weatherConditions: [ChoiceOptions.mild, ChoiceOptions.hot, ChoiceOptions.cold, ChoiceOptions.snowy, ChoiceOptions.rainy],
@@ -117,13 +118,13 @@ func generateCategoryTemplates(using viewContext: NSManagedObjectContext) -> [St
             Item(context: viewContext, title: "Snacks and energy bars")
         ],
         ChoiceOptions.tools: [
+            Item(context: viewContext, title: "Passes and permits"),
             Item(context: viewContext, title: "Firewood"),
             Item(context: viewContext, title: "Hatchet"),
-            Item(context: viewContext, title: "Fire permit (if required)"),
             Item(context: viewContext, title: "Headlamps/flashlights"),
             Item(context: viewContext, title: "Camp lights and lanterns"),
             Item(context: viewContext, title: "Extra batteries"),
-            Item(context: viewContext, title: "Power station/bank"),
+            Item(context: viewContext, title: "Power/solar station"),
             Item(context: viewContext, title: "Paracord/rope"),
             Item(context: viewContext, title: "Utility knife/multi-tool"),
             Item(context: viewContext, title: "Fire starter"),
@@ -159,7 +160,7 @@ func generateCategoryTemplates(using viewContext: NSManagedObjectContext) -> [St
             Item(context: viewContext, title: "Deodorant"),
             Item(context: viewContext, title: "Face cleanser/moisturizer"),
             Item(context: viewContext, title: "Sunscreen"),
-            Item(context: viewContext, title: "Chapstick"),
+            Item(context: viewContext, title: "Chapstick with SPF"),
             Item(context: viewContext, title: "Feminine products"),
             Item(context: viewContext, title: "Makeup/skincare"),
             Item(context: viewContext, title: "Contact solution/lenses"),
@@ -329,6 +330,26 @@ func generateCategoryTemplates(using viewContext: NSManagedObjectContext) -> [St
             Item(context: viewContext, title: "Bone saw"),
             Item(context: viewContext, title: "Latex/nitrile gloves"),
             Item(context: viewContext, title: "Seat pad")
+        ],
+        
+        ChoiceOptions.festival: [
+            Item(context: viewContext, title: "Tickets/wristband"),
+            Item(context: viewContext, title: "Car pass"),
+            Item(context: viewContext, title: "Cash and ID"),
+            Item(context: viewContext, title: "Earplugs"),
+            Item(context: viewContext, title: "Dust mask/goggles"),
+            Item(context: viewContext, title: "Electrolyte packets"),
+            Item(context: viewContext, title: "Eye drops"),
+            Item(context: viewContext, title: "Portable phone charger"),
+            Item(context: viewContext, title: "Carpet/floor mats"),
+            Item(context: viewContext, title: "Small broom"),
+            Item(context: viewContext, title: "Daypack or fanny pack"),
+            Item(context: viewContext, title: "Spray bottle for misting"),
+            Item(context: viewContext, title: "Water shoes for showering"),
+            Item(context: viewContext, title: "Extra towels"),
+            Item(context: viewContext, title: "Costumes/fun outfits"),
+            Item(context: viewContext, title: "Art supplies"),
+            Item(context: viewContext, title: "Vitamins")
         ],
         
         //WEATHER

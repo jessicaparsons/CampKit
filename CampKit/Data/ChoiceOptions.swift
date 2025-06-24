@@ -41,6 +41,7 @@ struct ChoiceOptions {
     static let biking = "🚲 Biking"
     static let backpacking = "🎒 Backpacking"
     static let hunting = "🦌 Hunting"
+    static let festival = "🎪 Festival"
     
     // MARK: - Weather
     static let mild = "⛅ Mild"

@@ -22,8 +22,18 @@ struct BannerImageView: View {
                     .resizable()
                     .aspectRatio(contentMode: .fill)
                     
-                Color.black.opacity(0.2)
-                    .ignoresSafeArea()
+                LinearGradient(
+                    gradient: Gradient(stops: [
+                        .init(color: Color.black.opacity(0.7), location: 0.0),
+                        .init(color: Color.black.opacity(0.3), location: 0.5),
+                        .init(color: Color.black.opacity(0.1), location: 1.0)
+                    ]),
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+                .ignoresSafeArea(edges: .top)
+                
+                
             }//:GROUP
             .frame(width: UIScreen.main.bounds.width, height: sizeClass == .regular ? Constants.ipadBannerHeight : Constants.bannerHeight)
             .clipped()

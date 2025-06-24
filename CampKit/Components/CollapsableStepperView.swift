@@ -56,7 +56,7 @@ struct CollapsableStepperView: View {
                             )
                     )
                     .onTapGesture {
-                        isPickerFocused = true
+                        isPickerFocused.toggle()
                     }
                     .onChange(of: isPickerFocused) {
                         if !isPickerFocused {
