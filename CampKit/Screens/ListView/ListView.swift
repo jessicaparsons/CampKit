@@ -136,7 +136,7 @@ struct ListView: View {
                         .padding(.horizontal, sizeClass == .regular ? Constants.ipadPadding : Constants.defaultPadding)
                 }//:SCROLLVIEW
                 .coordinateSpace(name: "scroll")
-                
+                .scrollIndicators(.hidden)
                 
                 //MARK: - FLOATING MENU
                 
